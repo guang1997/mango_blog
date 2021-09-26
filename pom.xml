@@ -7,10 +7,6 @@
         <module>mango_base</module>
         <module>mango_service</module>
     </modules>
-    <!--    <modules>-->
-<!--        <module>mango_base</module>-->
-<!--        <module>mango_service</module>-->
-<!--    </modules>-->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
