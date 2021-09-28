@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- * 博客表 前端控制器
+ * 角色表 前端控制器
  * </p>
  *
  * @author 李斯特
  * @since 2021-09-28
  */
 @RestController
-@RequestMapping("/blog")
-public class BlogController {
+@RequestMapping("/role")
+public class RoleController {
 
 }
 

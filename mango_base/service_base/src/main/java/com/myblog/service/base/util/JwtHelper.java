@@ -40,8 +40,9 @@ public class JwtHelper {
                 .setSubject("GULI-USER")//主题
                 .setExpiration(new Date(System.currentTimeMillis() + tokenExpiration))
                 .claim("id", jwtInfo.getId())//用户id
-                .claim("nickname", jwtInfo.getNickname())//用户昵称
+                .claim("userName", jwtInfo.getUserName())//用户昵称
                 .claim("avatar", jwtInfo.getAvatar())//用户头像
+                .claim("roleNames", jwtInfo.getRoleNames())//用户角色组
                 .signWith(SignatureAlgorithm.HS256, getKeyInstance())
                 .compact();
 
@@ -102,6 +103,6 @@ public class JwtHelper {
      */
     public static JwtInfo getJwtInfo(HttpServletRequest request) throws Exception {
         Claims claims = checkToken(request);
-        return new JwtInfo(claims.get("id").toString(), claims.get("nickname").toString(), claims.get("avatar").toString());
+        return new JwtInfo(claims.get("id").toString(), claims.get("userName").toString(), claims.get("avatar").toString(), claims.get("roleNames").toString());
     }
 }

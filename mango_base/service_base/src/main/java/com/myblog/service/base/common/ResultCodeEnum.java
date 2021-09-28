@@ -14,7 +14,6 @@ public enum ResultCodeEnum {
     QUERY_FAILED(false, 20003, "查询失败"),
     UPDATE_SUCCESS(true, 20004, "更新成功"),
     UPDATE_FAILED(false, 20005, "更新失败"),
-    UPDATE_FAILED_By_Pwd_ERROR(false, 200014, "更新失败，密码错误"),
     SAVE_SUCCESS(true, 20006, "保存成功"),
     SAVE_FAILED(false, 20007, "保存失败"),
     DELETE_SUCCESS(true, 20008, "删除成功"),
@@ -45,7 +44,9 @@ public enum ResultCodeEnum {
     ILLEGAL_CALLBACK_REQUEST_ERROR(false, 23002, "非法回调请求"),
     FETCH_ACCESSTOKEN_FAILD(false, 23003, "获取accessToken失败"),
     FETCH_USERINFO_ERROR(false, 23004, "获取用户信息失败"),
-    LOGIN_ERROR(false, 23005, "登录失败"),
+    LOGIN_ERROR_LOCKED(false, 23005, "用户名或密码错误，错误%d次后，账户将被锁定30分钟"),
+    LOGIN_ERROR(false, 23006, "登录失败，用户名或者密码不能为空"),
+    LOGIN_ERROR_ROLE(false, 23007, "没有分配角色权限"),
 
     COMMENT_EMPTY(false, 24006, "评论内容必须填写"),
 

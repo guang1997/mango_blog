@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author 李斯特
- * @since 2021-09-26
+ * @since 2021-09-28
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -49,9 +49,6 @@ public class Admin extends BaseEntity {
 
     @ApiModelProperty(value = "手机")
     private String mobile;
-
-    @ApiModelProperty(value = "邮箱验证码")
-    private String validCode;
 
     @ApiModelProperty(value = "自我简介最多150字")
     private String summary;
@@ -87,7 +84,7 @@ public class Admin extends BaseEntity {
     private String gitee;
 
     @ApiModelProperty(value = "拥有的角色id")
-    private Integer roleId;
+    private String roleId;
 
     @ApiModelProperty(value = "履历")
     private String personResume;

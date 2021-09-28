@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author 李斯特
- * @since 2021-09-26
+ * @since 2021-09-28
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -38,7 +38,7 @@ public class Blog extends BaseEntity {
     private String content;
 
     @ApiModelProperty(value = "标签id")
-    private Integer tagId;
+    private String tagId;
 
     @ApiModelProperty(value = "博客点击数")
     private Integer clickCount;
@@ -53,7 +53,7 @@ public class Blog extends BaseEntity {
     private Integer status;
 
     @ApiModelProperty(value = "管理员id")
-    private Integer adminId;
+    private String adminId;
 
     @ApiModelProperty(value = "是否原创（0:不是 1：是）")
     private String isOriginal;
@@ -65,7 +65,7 @@ public class Blog extends BaseEntity {
     private String articlesPart;
 
     @ApiModelProperty(value = "博客分类ID")
-    private Integer blogSortId;
+    private String blogSortId;
 
     @ApiModelProperty(value = "推荐等级(0:正常)")
     private Boolean level;
