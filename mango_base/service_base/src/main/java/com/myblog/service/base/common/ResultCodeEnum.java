@@ -45,8 +45,12 @@ public enum ResultCodeEnum {
     FETCH_ACCESSTOKEN_FAILD(false, 23003, "获取accessToken失败"),
     FETCH_USERINFO_ERROR(false, 23004, "获取用户信息失败"),
     LOGIN_ERROR_LOCKED(false, 23005, "用户名或密码错误，错误%d次后，账户将被锁定30分钟"),
-    LOGIN_ERROR(false, 23006, "登录失败，用户名或者密码不能为空"),
+    LOGIN_ERROR(false, 23006, "登录失败"),
     LOGIN_ERROR_ROLE(false, 23007, "没有分配角色权限"),
+    LOGIN_ERROR_BY_TOKEN_EXPIRED(false, 23008, "令牌已过期，请重新登录"),
+    LOGIN_ERROR_BY_VALIDATA_TOKEN(false, 23008, "无效的令牌"),
+    LOGIN_LOCKED(false, 23009, "密码输错次数过多,已被锁定30分钟"),
+    GET_USERINFO_ERROR(false, 23010, "获取用户信息失败"),
 
     COMMENT_EMPTY(false, 24006, "评论内容必须填写"),
 
@@ -61,8 +65,8 @@ public enum ResultCodeEnum {
     CODE_ERROR(false, 28000, "验证码错误"),
 
     LOGIN_SUCCESS(true, 28008, "登录成功"),
-    LOGOut_SUCCESS(true, 28011, "退出登录成功"),
-    LOGOut_ERROR(false, 28012, "退出登录失败"),
+    LOGOUT_SUCCESS(true, 28011, "退出登录成功"),
+    LOGOUT_ERROR(false, 28012, "退出登录失败"),
     LOGIN_USERNAME_OR_PASSWORD_ERROR(false, 28010, "账号或密码不正确"),
     LOGIN_PHONE_ERROR(false, 28009, "手机号码不正确"),
     LOGIN_MOBILE_ERROR(false, 28001, "账号不正确"),

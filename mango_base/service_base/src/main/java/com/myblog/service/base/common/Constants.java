@@ -11,7 +11,15 @@ public interface Constants {
         String COMMA = ",";
     }
 
-    interface ResponseField {
+    interface ReplyField {
+        String ID = "id";
         String TOKEN = "token";
+        String ROLES = "roles";
+        String AVATAR = "avatar";
+        String USER_NAME = "username";
+        String CREATE_TIME = "createTime";
+        String EXPIRES_SECOND = "expiresSecond";
+        String SECRET_KEY = "secretKey";
+        String HEADER = "Authorization";
     }
 }
