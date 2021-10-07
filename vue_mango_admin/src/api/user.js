@@ -8,7 +8,7 @@ export function login(data) {
   })
 }
 
-export function getInfo(token) {
+export function getInfo() {
   return request({
     url: '/admin/auth/info',
     method: 'get',
@@ -22,5 +22,12 @@ export function logout() {
   return request({
     url: '/admin/auth/logout',
     method: 'post'
+  })
+}
+
+export function getMenu() {
+  return request({
+    url: '/admin/auth/getMenu',
+    method: 'get'
   })
 }

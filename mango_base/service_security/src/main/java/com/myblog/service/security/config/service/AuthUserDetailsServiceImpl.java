@@ -6,6 +6,7 @@ import com.myblog.service.base.exception.LoginException;
 import com.myblog.service.security.config.entity.Audience;
 import com.myblog.service.security.config.entity.AuthUser;
 import com.myblog.service.security.entity.Admin;
+import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.service.AdminService;
 import com.myblog.service.security.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +49,10 @@ public class AuthUserDetailsServiceImpl implements UserDetailsService {
             return null;
         }else {
             //查找角色
-            List<String> roles =  roleService.getRolesByUserName(username);
+            List<Role> roles =  roleService.getRolesByUserName(username);
             List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-            for (String role : roles) {
-                authorities.add(new SimpleGrantedAuthority(role));
+            for (Role role : roles) {
+                authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
             }
             return new AuthUser(admin.getId(),
                     admin.getUserName(),

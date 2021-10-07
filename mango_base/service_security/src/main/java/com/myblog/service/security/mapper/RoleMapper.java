@@ -17,5 +17,5 @@ import java.util.List;
  */
 public interface RoleMapper extends BaseMapper<Role> {
 
-    List<String> getRolesByUserName(@Param("userName") String username);
+    List<Role> getRolesByUserName(@Param("userName") String username);
 }

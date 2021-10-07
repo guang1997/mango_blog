@@ -30,9 +30,6 @@ public class Role extends BaseEntity {
     @ApiModelProperty(value = "角色名")
     private String roleName;
 
-    @ApiModelProperty(value = "状态")
-    private Integer status;
-
     @ApiModelProperty(value = "角色介绍")
     private String summary;
 

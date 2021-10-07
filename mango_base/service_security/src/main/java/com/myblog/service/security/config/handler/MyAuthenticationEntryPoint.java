@@ -1,8 +1,6 @@
 package com.myblog.service.security.config.handler;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.myblog.service.security.config.util.JSONAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +32,7 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
         String msg = StringUtils.format("请求访问：{}，认证失败，无法访问系统资源", request.getRequestURI());
         Map<String, Object> result = new HashMap<>();
         result.put("code", HttpStatus.UNAUTHORIZED.value());
-        result.put("msg", msg);
+        result.put("message", msg);
         result.put("data", "token无效或过期,请重新登录");
         //输出
         jsonAuthentication.WriteJSON(request, response, result);

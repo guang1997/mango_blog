@@ -21,5 +21,6 @@ public interface Constants {
         String EXPIRES_SECOND = "expiresSecond";
         String SECRET_KEY = "secretKey";
         String HEADER = "Authorization";
+        String MENU = "menu";
     }
 }
