@@ -7,4 +7,6 @@ public interface RedisConstants {
     String TOKEN_KEY = "TOKEN_KEY";
 
     String DIVISION = ":";
+
+    String REDIS_DICT_TYPE = "REDIS_DICT_TYPE";
 }

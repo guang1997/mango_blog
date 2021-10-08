@@ -22,5 +22,7 @@ public interface Constants {
         String SECRET_KEY = "secretKey";
         String HEADER = "Authorization";
         String MENU = "menu";
+        String DEFAULT_VALUE = "defaultValue";
+        String LIST = "list";
     }
 }

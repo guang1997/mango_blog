@@ -10,7 +10,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>service_base</module>
-        <module>mango_security</module>
         <module>service_security</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
