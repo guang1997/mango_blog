@@ -4,6 +4,7 @@ public interface DbConstants {
 
     interface Base {
         String isDeleted = "is_deleted";
+        String sort = "sort";
     }
     interface Admin{
         String userName = "user_name";
@@ -11,5 +12,8 @@ public interface DbConstants {
         String email = "email";
         String mobile = "mobile";
         String status = "status";
+    }
+    interface Menu{
+        String name = "name";
     }
 }

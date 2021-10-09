@@ -1,12 +1,11 @@
 package com.myblog.service.admin.controller;
 
-import com.myblog.service.admin.entity.vo.MenuVo;
-import com.myblog.service.admin.entity.vo.Meta;
-import com.myblog.service.admin.util.TreeUtil;
+import com.myblog.service.security.entity.vo.MenuVo;
+import com.myblog.service.security.entity.vo.Meta;
+import com.myblog.service.security.util.TreeUtil;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
-import com.myblog.service.base.util.RedisUtil;
 import com.myblog.service.security.config.entity.Audience;
 import com.myblog.service.security.config.entity.AuthUser;
 import com.myblog.service.security.config.util.JwtTokenUtil;
@@ -18,7 +17,6 @@ import com.myblog.service.security.service.MenuService;
 import com.myblog.service.security.service.RoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

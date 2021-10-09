@@ -1,5 +1,6 @@
 package com.myblog.service.security.service;
 
+import com.myblog.service.base.common.Response;
 import com.myblog.service.security.entity.Menu;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.security.entity.Role;
@@ -17,4 +18,6 @@ import java.util.List;
 public interface MenuService extends IService<Menu> {
 
     List<Menu> getMenuByRoles(List<Role> roles);
+
+    Response getAllMenu();
 }

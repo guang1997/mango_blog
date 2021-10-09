@@ -24,5 +24,6 @@ public interface Constants {
         String MENU = "menu";
         String DEFAULT_VALUE = "defaultValue";
         String LIST = "list";
+        String DATA = "data";
     }
 }

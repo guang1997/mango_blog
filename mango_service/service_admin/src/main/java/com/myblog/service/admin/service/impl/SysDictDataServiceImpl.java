@@ -64,4 +64,44 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         redisUtil.setEx(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictType, JsonUtils.objectToJson(result), 1, TimeUnit.DAYS);
         return Response.ok().data(result);
     }
+
+    /**
+     * 根据多个dictType获取字典值
+     * @param dictTypes
+     * @return
+     */
+    @Override
+    public Response getListByDictTypeList(List<String> dictTypes) {
+        // 先从redis中获取数据，如果取到所有的数据再返回
+        Map<String, Object> resultMap = new HashMap<>();
+        for (String dictType : dictTypes) {
+            String redisStr = redisUtil.get(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictType);
+            if (!StringUtils.isEmpty(redisStr)) {
+                Map<String, Object> result = JsonUtils.jsonToMap(redisStr);
+                resultMap.put(dictType, result);
+                dictTypes.remove(dictType);
+            }
+        }
+        if (dictTypes.size() <= 0) {
+            return Response.ok().data(resultMap);
+        }
+        for (String dictType : dictTypes) {
+            List<SysDictData> dictDataList = sysDictDataMapper.getListByDictType(dictType);
+            String defaultValue = null;
+            for (SysDictData sysDictData : dictDataList) {
+                // 获取默认值
+                if (sysDictData.getIsDefault()) {
+                    defaultValue = sysDictData.getDictValue();
+                    break;
+                }
+            }
+            Map<String, Object> result = new HashMap<>();
+            result.put(Constants.ReplyField.DEFAULT_VALUE, defaultValue);
+            result.put(Constants.ReplyField.LIST, dictDataList);
+            resultMap.put(dictType, result);
+            redisUtil.setEx(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictType, JsonUtils.objectToJson(result), 1, TimeUnit.DAYS);
+        }
+
+        return Response.ok().data(resultMap);
+    }
 }

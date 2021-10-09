@@ -1,4 +1,4 @@
-package com.myblog.service.admin.entity.vo;
+package com.myblog.service.security.entity.vo;
 
 import lombok.Data;
 

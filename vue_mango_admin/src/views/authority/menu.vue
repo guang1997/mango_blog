@@ -26,7 +26,7 @@
 
               <el-table-column label width="100" align="center">
                 <template slot-scope="scope_child">
-                  <el-tag v-for="item in menuLevelDictList" :key="item.uid" v-if="scope_child.row.menuLevel == item.dictValue" :type="item.listClass">{{item.dictLabel}}</el-tag>
+                  <el-tag v-for="item in computedMenuLevelDictList(scope_child.row.menuLevel)" :key="item.id" :type="item.listClass">{{item.dictLabel}}</el-tag>
                 </template>
               </el-table-column>
 
@@ -50,13 +50,7 @@
 
               <el-table-column width="100" align="center">
                 <template slot-scope="scope">
-                  <el-tag v-for="item in yesNoDictList" :key="item.uid" v-if="scope.row.isShow == item.dictValue" :type="item.listClass">{{item.dictLabel}}</el-tag>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="120" align="center">
-                <template slot-scope="scope">
-                  <el-tag v-for="item in jumpExternalDictList" :key="item.uid" v-if="scope.row.isJumpExternalUrl == item.dictValue" :type="item.listClass">{{item.dictLabel}}</el-tag>
+                  <el-tag v-for="item in computedYesNoDictList(scope.row.isShow)" :key="item.id" :type="item.listClass">{{item.dictLabel}}</el-tag>
                 </template>
               </el-table-column>
 
@@ -91,7 +85,7 @@
 
       <el-table-column label="菜单级别" width="100" align="center">
         <template slot-scope="scope">
-          <el-tag v-for="item in menuLevelDictList" :key="item.uid" v-if="scope.row.menuLevel == item.dictValue" :type="item.listClass">{{item.dictLabel}}</el-tag>
+          <el-tag v-for="item in computedMenuLevelDictList(scope.row.menuLevel)" :key="item.uid" :type="item.listClass">{{item.dictLabel}}</el-tag>
         </template>
       </el-table-column>
 
@@ -115,13 +109,7 @@
 
       <el-table-column label="是否显示" width="100" align="center">
         <template slot-scope="scope">
-          <el-tag v-for="item in yesNoDictList" :key="item.uid" v-if="scope.row.isShow == item.dictValue" :type="item.listClass">{{item.dictLabel}}</el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="是否跳转外链" width="120" align="center">
-        <template slot-scope="scope">
-          <el-tag v-for="item in jumpExternalDictList" :key="item.uid" v-if="scope.row.isJumpExternalUrl == item.dictValue" :type="item.listClass">{{item.dictLabel}}</el-tag>
+          <el-tag v-for="item in computedYesNoDictList(scope.row.isShow)" :key="item.uid" :type="item.listClass">{{item.dictLabel}}</el-tag>
         </template>
       </el-table-column>
 
@@ -166,7 +154,7 @@
           prop="parentUid"
         >
           <el-select
-            v-model="form.parentUid"
+            v-model="form.pid"
             filterable
             clearable
             remote
@@ -177,9 +165,9 @@
           >
             <el-option
               v-for="item in menuOptions"
-              :key="item.uid"
+              :key="item.id"
               :label="item.name"
-              :value="item.uid"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -239,6 +227,7 @@ import {
 import {getListByDictTypeList} from "@/api/sysDictData"
 import { formatData } from "@/utils/webUtils";
 import IconsDialog from "../../components/IconsDialog";
+import func from 'vue-editor-bridge';
 export default {
   components: {
     IconsDialog
@@ -264,7 +253,7 @@ export default {
       yesNoDefault: null,
       jumpExternalDefault: null,
       form: {
-        uid: null,
+        id: null,
         name: "",
         summary: "",
         icon: "",
@@ -302,6 +291,22 @@ export default {
         ],
       }
     };
+  },
+  computed: {
+    computedYesNoDictList() {
+      return function(isShow) {
+        return this.yesNoDictList.filter(item => {
+            return item.dictValue == isShow
+        });
+      }
+    },
+    computedMenuLevelDictList() {
+      return function(menuLevel) {
+        return this.menuLevelDictList.filter(item => {
+            return item.dictValue == menuLevel
+        });
+      }
+    }
   },
   created() {
     this.getDictList();
