@@ -11,5 +11,6 @@
         <foreach collection="roles" item="role" separator="," open="(" close=")">
             #{role.id}
         </foreach>
+        ORDER BY t1.sort
     </select>
 </mapper>

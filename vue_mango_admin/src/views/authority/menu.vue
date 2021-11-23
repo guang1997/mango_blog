@@ -225,9 +225,7 @@ import {
   stickMenu
 } from "@/api/menu";
 import {getListByDictTypeList} from "@/api/sysDictData"
-import { formatData } from "@/utils/webUtils";
 import IconsDialog from "../../components/IconsDialog";
-import func from 'vue-editor-bridge';
 export default {
   components: {
     IconsDialog
