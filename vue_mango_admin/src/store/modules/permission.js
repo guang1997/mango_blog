@@ -1,5 +1,7 @@
 import {
-  constantRoutes
+  asyncRoutes,
+  constantRoutes,
+  componentMap
 } from '@/router'
 import {
   getMenu
@@ -50,39 +52,42 @@ const state = {
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
-    
+
     state.routes = constantRoutes.concat(routes)
     console.log('state.routes', state.routes)
   }
 }
 
 const actions = {
-  generateRoutes: async function({ commit }, roles) {
+  generateRoutes: async function ({
+    commit
+  }, roles) {
     // return new Promise(resolve => {
-      // 从后台请求所有的路由信息
-      let res = await getMenu()
-      
-      
-      let dbAsyncRoutes = res.data.menu
-      // 替换组件名称，删除children
-      let myAsyncRoutes = dbAsyncRoutes.filter(curr => {
-        if (curr.children == null || curr.children.length == 0) {
-          delete curr.children
-        }
-        return replaceComponent(curr)
-      })
-      let accessedRoutes
-      if (roles.includes('admin')) {
-        //路由是否有admin,有直接全部显示
-        accessedRoutes = myAsyncRoutes || []
-      } else {
-        //accessedRoutes这个就是当前角色可见的动态路由
-        accessedRoutes = filterAsyncRoutes(myAsyncRoutes, roles)
+    // 从后台请求所有的路由信息
+    debugger
+    let res = await getMenu()
+    let dbAsyncRoutes = res.data.menu
+    // 替换组件名称，删除children
+    let myAsyncRoutes = dbAsyncRoutes.filter(curr => {
+      if (curr.children == null || curr.children.length == 0) {
+        delete curr.children
       }
-      console.log("accessedRoutes", accessedRoutes)
-      commit('SET_ROUTES', accessedRoutes)
-      // resolve(accessedRoutes)
-      return accessedRoutes
+      return replaceComponent(curr)
+    })
+    console.log("myAsyncRoutes",myAsyncRoutes)
+    // 可以访问的路由表
+    let accessedRoutes
+    if (roles.includes('admin')) {
+      //路由是否有admin,有直接全部显示
+      accessedRoutes = myAsyncRoutes || []
+    } else {
+      //accessedRoutes这个就是当前角色可见的动态路由
+      accessedRoutes = filterAsyncRoutes(myAsyncRoutes, roles)
+    }
+    console.log("accessedRoutes", accessedRoutes)
+    commit('SET_ROUTES', accessedRoutes)
+    // resolve(accessedRoutes)
+    return accessedRoutes
     // })
   }
 
@@ -90,24 +95,24 @@ const actions = {
 
 // 替换route对象中的component
 function replaceComponent(comp) {
-  // if (comp.component && typeof (comp.component) == 'string') {
-  //   comp.component = componentMap(comp.component);
-  // }
-  // if (comp.children && comp.children.length > 0) {
-  //   for (let i = 0; i < comp.children.length; i++) {
-  //     comp.children[i] = replaceComponent(comp.children[i])
-  //   }
-  // }
-  if (comp.component && comp.component == 'Layout') {
-      comp.component = Layout;
-    } else {
-      comp.component = _import(comp.component)
+  if (comp.component && typeof (comp.component) == 'string') {
+    comp.component = componentMap[comp.component];
+  }
+  if (comp.children && comp.children.length > 0) {
+    for (let i = 0; i < comp.children.length; i++) {
+      comp.children[i] = replaceComponent(comp.children[i])
     }
-    if (comp.children && comp.children.length) {
-        for (let i = 0; i < comp.children.length; i++) {
-          comp.children[i] = replaceComponent(comp.children[i])
-        }
-      }
+  }
+  // if (comp.component && comp.component == 'Layout') {
+  //     comp.component = Layout;
+  //   } else {
+  //     comp.component = _import(comp.component)
+  //   }
+  //   if (comp.children && comp.children.length) {
+  //       for (let i = 0; i < comp.children.length; i++) {
+  //         comp.children[i] = replaceComponent(comp.children[i])
+  //       }
+  //     }
   return comp
 }
 export default {

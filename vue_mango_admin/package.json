@@ -25,7 +25,8 @@
     "vue": "2.6.10",
     "vue-particles": "^1.0.9",
     "vue-router": "3.0.6",
-    "vuex": "3.1.0"
+    "vuex": "3.1.0",
+    "showdown-katex": "^0.8.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "4.4.4",

@@ -1,6 +1,7 @@
 package com.myblog.service.security.service;
 
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.entity.vo.BaseVO;
 import com.myblog.service.security.entity.Menu;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.security.entity.Role;

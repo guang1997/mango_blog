@@ -30,11 +30,13 @@ import Layout from '@/layout'
  * 用于将后端传过来的组件名称转换为相应的组件对象
  */
   export const componentMap = {
-    'layout': require('@/layout'),
-    'login_index': () => import('@/views/login/index'),
-    'error_page_404': () => import('@/views/error-page/404'),
-    'error_page_401': () => import('@/views/error-page/401'),
-    'dashboard_index': () => import('@/views/dashboard/index')
+    'layout': require('@/layout').default,
+    'login_index': () => import('@/views/login/index').then(m => m.default),
+    'admin_index': () => import('@/views/authority/admin').then(m => m.default),
+    'menu_index': () => import('@/views/authority/menu').then(m => m.default),
+    'error_page_404': () => import('@/views/error-page/404').then(m => m.default),
+    'error_page_401': () => import('@/views/error-page/401').then(m => m.default),
+    'dashboard_index': () => import('@/views/dashboard/index').then(m => m.default)
 
   }
 

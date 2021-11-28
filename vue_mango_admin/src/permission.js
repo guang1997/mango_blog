@@ -19,31 +19,34 @@ router.beforeEach(async(to, from, next) => {
 
   // determine whether the user has logged in
   const hasToken = getToken()
-
+  console.log("22222111", hasToken)
   if (hasToken) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
       NProgress.done()
     } else {
+      
       const hasGetUserInfo = store.getters.name
       if (hasGetUserInfo) {
         next()
       } else {
         try {
-          // get user info
+          // get user info 获取当前用户角色信息
           await store.dispatch('user/getInfo')
-
+          // 根据用户角色信息，调用permission/generateRoutes，生成动态路由表
+          debugger
           const accessRoutes = await store.dispatch('permission/generateRoutes', store.getters.roles)
-          // //刷新路由
-          router.options.routes = store.getters.permission_routes
-          // // dynamically add accessible routes
+          console.log("accessRoutes", accessRoutes)
+          // 刷新路由
+          // router.options.routes = store.getters.permission_routes
+          // dynamically add accessible routes 挂载动态路由
           router.addRoutes(accessRoutes)
           next()
         } catch (error) {
           console.log("permission error", error)
           // remove token and go to login page to re-login
-          await store.dispatch('user/resetToken')
+          // await store.dispatch('user/resetToken')
           Message.error(error.message || 'Has Error')
           next(`/login?redirect=${to.path}`)
           NProgress.done()
@@ -52,7 +55,7 @@ router.beforeEach(async(to, from, next) => {
     }
   } else {
     /* has no token*/
-
+      console.log("22222333")
     if (whiteList.indexOf(to.path) !== -1) {
       // in the free login whitelist, go directly
       next()

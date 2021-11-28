@@ -1,6 +1,7 @@
 package com.myblog.service.admin.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.myblog.service.admin.controller.MenuController;
 import com.myblog.service.admin.entity.SysDictData;
 import com.myblog.service.admin.mapper.SysDictDataMapper;
 import com.myblog.service.admin.service.SysDictDataService;
@@ -10,6 +11,8 @@ import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -31,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData> implements SysDictDataService {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(SysDictDataServiceImpl.class);
+
     @Autowired
     private RedisUtil redisUtil;
 
@@ -50,6 +55,10 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
             return Response.ok().data(result);
         }
         List<SysDictData> dictDataList = sysDictDataMapper.getListByDictType(dictType);
+        if (CollectionUtils.isEmpty(dictDataList)) {
+            LOGGER.warn("getListByDictType cannot find dictDate from db, dictType:{}", dictType);
+            return Response.ok();
+        }
         String defaultValue = null;
         for (SysDictData sysDictData : dictDataList) {
             // 获取默认值
@@ -87,6 +96,10 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         }
         for (String dictType : dictTypes) {
             List<SysDictData> dictDataList = sysDictDataMapper.getListByDictType(dictType);
+            if (CollectionUtils.isEmpty(dictDataList)) {
+                LOGGER.warn("getListByDictTypeList cannot find dictDate from db, dictType:{}", dictType);
+                continue;
+            }
             String defaultValue = null;
             for (SysDictData sysDictData : dictDataList) {
                 // 获取默认值

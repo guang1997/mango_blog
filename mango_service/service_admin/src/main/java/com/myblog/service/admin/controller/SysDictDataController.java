@@ -1,7 +1,9 @@
 package com.myblog.service.admin.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.myblog.service.admin.entity.SysDictData;
+import com.myblog.service.admin.entity.vo.DictTypeVO;
 import com.myblog.service.admin.service.SysDictDataService;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
@@ -34,13 +36,13 @@ public class SysDictDataController {
 
     @ApiOperation(value = "根据字典类型获取字典数据", notes = "根据字典类型获取字典数据", response = Response.class)
     @PostMapping("/getListByDictType")
-    public Response getListByDictType(@RequestParam("dictType") String dictType) {
+    public Response getListByDictType(@RequestBody DictTypeVO dictTypeVO) {
         Response response = Response.ok();
-        if (StringUtils.isEmpty(dictType)) {
+        if (dictTypeVO == null || StringUtils.isEmpty(dictTypeVO.getDictType())) {
             return response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
         }
         try {
-            response = sysDictDataService.getListByDictType(dictType);
+            response = sysDictDataService.getListByDictType(dictTypeVO.getDictType());
         } catch (Exception e) {
             LOGGER.error("getListByDictType Exception:", e);
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
@@ -50,13 +52,13 @@ public class SysDictDataController {
 
     @ApiOperation(value = "根据字典类型集合获取字典数据", notes = "根据字典类型集合获取字典数据", response = Response.class)
     @PostMapping("/getListByDictTypeList")
-    public Response getListByDictTypeList(@RequestBody List<String> dictTypes) {
+    public Response getListByDictTypeList(@RequestBody DictTypeVO dictTypeVO) {
         Response response = Response.ok();
-        if (CollectionUtils.isEmpty(dictTypes)) {
+        if (dictTypeVO == null || CollectionUtils.isEmpty(dictTypeVO.getDictTypes())) {
             return response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
         }
         try {
-            response = sysDictDataService.getListByDictTypeList(dictTypes);
+            response = sysDictDataService.getListByDictTypeList(dictTypeVO.getDictTypes());
         } catch (Exception e) {
             LOGGER.error("getListByDictTypeList Exception:", e);
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
