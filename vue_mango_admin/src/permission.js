@@ -39,7 +39,7 @@ router.beforeEach(async(to, from, next) => {
           const accessRoutes = await store.dispatch('permission/generateRoutes', store.getters.roles)
           console.log("accessRoutes", accessRoutes)
           // 刷新路由
-          // router.options.routes = store.getters.permission_routes
+          router.options.routes = store.getters.permission_routes
           // dynamically add accessible routes 挂载动态路由
           router.addRoutes(accessRoutes)
           next()
