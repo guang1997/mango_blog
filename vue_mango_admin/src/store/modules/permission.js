@@ -1,13 +1,9 @@
 import {
   asyncRoutes,
-  constantRoutes,
-  componentMap
+  constantRoutes
 } from '@/router'
-import {
-  getMenu
-} from '@/api/user'
-import _import from '@/router/_import_dev'
-import Layout from '@/layout'
+
+
 /**
  * Use meta.role to determine if the current user has permission
  * @param roles
@@ -28,7 +24,6 @@ function hasPermission(roles, route) {
  */
 export function filterAsyncRoutes(routes, roles) {
   const res = []
-
   routes.forEach(route => {
     const tmp = {
       ...route
@@ -59,37 +54,65 @@ const mutations = {
 }
 
 const actions = {
-  generateRoutes: async function ({
-    commit
-  }, roles) {
-    // return new Promise(resolve => {
-    // 从后台请求所有的路由信息
-    debugger
-    let res = await getMenu()
-    let dbAsyncRoutes = res.data.menu
-    // 替换组件名称，删除children
-    let myAsyncRoutes = dbAsyncRoutes.filter(curr => {
-      if (curr.children == null || curr.children.length == 0) {
-        delete curr.children
+  generateRoutes({ commit }, data) {
+    return new Promise(resolve => {
+      const { roles } = data;
+      let accessedRoutes
+      if (roles.includes('admin')) {
+        accessedRoutes = asyncRoutes || []
+      } else {
+        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }
-      return replaceComponent(curr)
+      // const accessedRoutes = asyncRoutes.filter(v => {
+      //   if (roles.includes('admin')) return true;
+      //   if (hasPermission(roles, v)) {
+      //     if (v.children && v.children.length > 0) {
+      //       v.children = v.children.filter(child => {
+      //         if (hasPermission(roles, child)) {
+      //           return child
+      //         }
+      //         return false;
+      //       });
+      //       return v
+      //     } else {
+      //       return v
+      //     }
+      //   }
+      //   return false;
+      // });
+      commit('SET_ROUTES', accessedRoutes);
+      resolve(accessedRoutes);
     })
-    console.log("myAsyncRoutes",myAsyncRoutes)
-    // 可以访问的路由表
-    let accessedRoutes
-    if (roles.includes('admin')) {
-      //路由是否有admin,有直接全部显示
-      accessedRoutes = myAsyncRoutes || []
-    } else {
-      //accessedRoutes这个就是当前角色可见的动态路由
-      accessedRoutes = filterAsyncRoutes(myAsyncRoutes, roles)
-    }
-    console.log("accessedRoutes", accessedRoutes)
-    commit('SET_ROUTES', accessedRoutes)
-    // resolve(accessedRoutes)
-    return accessedRoutes
-    // })
   }
+  // generateRoutes: async function ({
+  //   commit
+  // }, roles) {
+  //   // return new Promise(resolve => {
+  //   // 从后台请求所有的路由信息
+  //   let res = await getMenu()
+  //   let dbAsyncRoutes = res.data.menu
+  //   // 替换组件名称，删除children
+  //   let myAsyncRoutes = dbAsyncRoutes.filter(curr => {
+  //     if (curr.children == null || curr.children.length == 0) {
+  //       delete curr.children
+  //     }
+  //     return replaceComponent(curr)
+  //   })
+  //   // 可以访问的路由表
+  //   let accessedRoutes
+  //   if (roles.includes('admin')) {
+  //     //路由是否有admin,有直接全部显示
+  //     accessedRoutes = myAsyncRoutes || []
+  //   } else {
+  //     //accessedRoutes这个就是当前角色可见的动态路由
+  //     accessedRoutes = filterAsyncRoutes(myAsyncRoutes, roles)
+  //   }
+  //   console.log("accessedRoutes", accessedRoutes)
+  //   commit('SET_ROUTES', accessedRoutes)
+  //   // resolve(accessedRoutes)
+  //   return accessedRoutes
+  //   // })
+  // }
 
 }
 

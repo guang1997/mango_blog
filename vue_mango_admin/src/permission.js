@@ -18,44 +18,48 @@ router.beforeEach(async(to, from, next) => {
   document.title = getPageTitle(to.meta.title)
 
   // determine whether the user has logged in
-  const hasToken = getToken()
-  console.log("22222111", hasToken)
-  if (hasToken) {
+  if (getToken()) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
       NProgress.done()
     } else {
-      
-      const hasGetUserInfo = store.getters.name
-      if (hasGetUserInfo) {
-        next()
+      if (store.getters.roles.length === 0) {
+        store.dispatch('user/getInfo').then(res => { // 拉取info
+          const roles = res.data.roles;
+          store.dispatch('permission/generateRoutes', { roles }).then(() => { // 生成可访问的路由表
+            console.log("store.getters.addRoutes", store.getters.addRoutes)
+            router.addRoutes(store.getters.addRoutes) // 动态添加可访问路由表
+            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+          })
+        }).catch(err => {
+          console.log(err);
+        });
       } else {
-        try {
-          // get user info 获取当前用户角色信息
-          await store.dispatch('user/getInfo')
-          // 根据用户角色信息，调用permission/generateRoutes，生成动态路由表
-          debugger
-          const accessRoutes = await store.dispatch('permission/generateRoutes', store.getters.roles)
-          console.log("accessRoutes", accessRoutes)
-          // 刷新路由
-          router.options.routes = store.getters.permission_routes
-          // dynamically add accessible routes 挂载动态路由
-          router.addRoutes(accessRoutes)
-          next()
-        } catch (error) {
-          console.log("permission error", error)
-          // remove token and go to login page to re-login
-          // await store.dispatch('user/resetToken')
-          Message.error(error.message || 'Has Error')
-          next(`/login?redirect=${to.path}`)
-          NProgress.done()
-        }
+        next() //当有用户权限的时候，说明所有可访问路由已生成 如访问没权限的全面会自动进入404页面
+        // try {
+        //   // get user info 获取当前用户角色信息
+        //   await store.dispatch('user/getInfo')
+        //   // 根据用户角色信息，调用permission/generateRoutes，生成动态路由表
+        //   const accessRoutes = await store.dispatch('permission/generateRoutes', store.getters.roles)
+        //   console.log("accessRoutes", accessRoutes)
+        //   // 刷新路由
+        //   router.options.routes = store.getters.permission_routes
+        //   // dynamically add accessible routes 挂载动态路由
+        //   router.addRoutes(accessRoutes)
+        //   next()
+        // } catch (error) {
+        //   console.log("permission error", error)
+        //   // remove token and go to login page to re-login
+        //   // await store.dispatch('user/resetToken')
+        //   Message.error(error.message || 'Has Error')
+        //   next(`/login?redirect=${to.path}`)
+        //   NProgress.done()
+        // }
       }
     }
   } else {
     /* has no token*/
-      console.log("22222333")
     if (whiteList.indexOf(to.path) !== -1) {
       // in the free login whitelist, go directly
       next()

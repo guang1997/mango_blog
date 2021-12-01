@@ -26,27 +26,13 @@ import Layout from '@/layout'
     activeMenu: '/example/list'  if set path, the sidebar will highlight the path you set
   }
  */
-/**
- * 用于将后端传过来的组件名称转换为相应的组件对象
- */
-  export const componentMap = {
-    'layout': require('@/layout').default,
-    'login_index': () => import('@/views/login/index').then(m => m.default),
-    'admin_index': () => import('@/views/authority/admin').then(m => m.default),
-    'menu_index': () => import('@/views/authority/menu').then(m => m.default),
-    'error_page_404': () => import('@/views/error-page/404').then(m => m.default),
-    'error_page_401': () => import('@/views/error-page/401').then(m => m.default),
-    'dashboard_index': () => import('@/views/dashboard/index').then(m => m.default)
-
-  }
 
 /**
  * constantRoutes
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
-export const constantRoutes = [
-  {
+export const constantRoutes = [{
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
@@ -55,22 +41,63 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
+    name: '首页',
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: {
+        title: '仪表盘',
+        icon: 'dashboard'
+      }
     }]
   },
 
   // 404 page must be placed at the end !!!
-  // { path: '*', redirect: '/404', hidden: true }
+  {
+    path: '/401',
+    component: () => import('@/views/error-page/401'),
+    hidden: true
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/error-page/404'),
+    hidden: true
+  }
+
 ]
 export const asyncRoutes = [
-]
+  
+  {
+    path: '/authority',
+    component: Layout,
+    redirect: '/authority/admin',
+    name: '权限管理',
+    meta: { title: '权限管理', icon: 'authority', role: ['admin'] }, //页面需要的权限
+    children: [
+      {
+        path: 'admin',
+        name: '管理员管理',
+        component: () => import('@/views/authority/admin'),
+        meta: { title: '管理员管理', icon: 'user', role: ['admin'] }
+      },
+      {
+        path: 'menu',
+        name: '菜单管理',
+        component: () => import('@/views/authority/menu'),
+        meta: { title: '菜单管理', icon: 'authority', role: ['admin'] }
+      },
+    ]
+  },{
+  path: '*',
+  redirect: '/404',
+  hidden: true
+}]
 const createRouter = () => new Router({
   // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({
+    y: 0
+  }),
   routes: constantRoutes
 })
 
