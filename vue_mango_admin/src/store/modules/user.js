@@ -12,69 +12,64 @@ import {
   resetRouter
 } from '@/router'
 
-const getDefaultState = () => {
-  return {
+const user = {
+  state: {
     token: getToken(),
     name: '',
     avatar: '',
-    roles: ''
-  }
-}
-
-const state = getDefaultState()
-
-const mutations = {
-  RESET_STATE: (state) => {
-    Object.assign(state, getDefaultState())
+    roles: [],
+    // 第一次加载菜单时用到
+    loadMenus: false
   },
-  SET_TOKEN: (state, token) => {
-    state.token = token
+  mutations: {
+    SET_TOKEN: (state, token) => {
+      state.token = token
+    },
+    SET_NAME: (state, name) => {
+      state.name = name
+    },
+    SET_AVATAR: (state, avatar) => {
+      state.avatar = avatar
+    },
+    SET_ROLES: (state, roles) => {
+      state.roles = roles
+    },
+    SET_LOAD_MENUS: (state, loadMenus) => {
+      state.loadMenus = loadMenus
+    }
   },
-  SET_NAME: (state, name) => {
-    state.name = name
-  },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar
-  },
-  SET_ROLES: (state, roles) => {
-    state.roles = roles
-  }
-}
-
-const actions = {
-  // 登录
-  login({
-    commit
-  }, userInfo) {
-    const {
-      username,
-      password
-    } = userInfo
-    return new Promise((resolve, reject) => {
-      login({
-        username: username.trim(),
-        password: password.trim()
-      }).then(response => {
-        const data = response.data
-        // 向store中设置token
-        commit('SET_TOKEN', data.token)
-        // 向cookie中设置token
-        setToken(data.token)
-        resolve()
-      }).catch(error => {
-        reject(error)
+  actions: {
+    // 登录
+    Login({ commit }, userInfo) {
+      const {
+        username,
+        password
+      } = userInfo
+      return new Promise((resolve, reject) => {
+        login({
+          username: username.trim(),
+          password: password.trim()
+        }).then(response => {
+          const data = response.data
+          // 向store中设置token
+          commit('SET_TOKEN', data.token)
+          // 向cookie中设置token
+          setToken(data.token)
+          // setUserInfo(res.user, commit)
+          // 第一次加载菜单时用到， 具体见 src 目录下的 permission.js
+          commit('SET_LOAD_MENUS', true)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
       })
-    })
-  },
+    },
 
-  // 获取用户信息
-  getInfo({
-    commit,
-    state
-  }) {
-    return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const data = response.data
+    // 获取用户信息
+    GetInfo({ commit }) {
+      return new Promise((resolve, reject) => {
+        getInfo().then(response => {
+          const data = response.data
 
         if (data && data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
           commit('SET_ROLES', data.roles)
@@ -85,44 +80,46 @@ const actions = {
         commit('SET_NAME', data.username)
         commit('SET_AVATAR', data.avatar)
         resolve(response)
-      }).catch(error => {
-        reject(error)
+        }).catch(error => {
+          reject(error)
+        })
       })
-    })
-  },
-
-  // user logout
-  logout({
-    commit,
-    state
-  }) {
-    return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        removeToken() // must remove  token  first
-        resetRouter()
-        commit('RESET_STATE')
-        resolve()
-      }).catch(error => {
-        reject(error)
+    },
+    // 登出
+    Logout({ commit }) {
+      return new Promise((resolve, reject) => {
+        logout().then(() => {
+          removeToken() // must remove  token  first
+          resetRouter()
+          commit('SET_ROLES', [])
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
       })
-    })
-  },
+    },
 
-  // remove token
-  resetToken({
-    commit
-  }) {
-    return new Promise(resolve => {
-      removeToken() // must remove  token  first
-      commit('RESET_STATE')
-      resolve()
-    })
+    updateLoadMenus({ commit }) {
+      return new Promise((resolve, reject) => {
+        commit('SET_LOAD_MENUS', false)
+      })
+    }
   }
-}
 
-export default {
-  namespaced: true,
-  state,
-  mutations,
-  actions
 }
+export const logOut = (commit) => {
+  commit('SET_TOKEN', '')
+  commit('SET_ROLES', [])
+  removeToken()
+}
+// export const setUserInfo = (res, commit) => {
+//   // 如果没有任何权限，则赋予一个默认的权限，避免请求死循环
+//   if (res.roles.length === 0) {
+//     commit('SET_ROLES', ['ROLE_SYSTEM_DEFAULT'])
+//   } else {
+//     commit('SET_ROLES', res.roles)
+//   }
+//   commit('SET_NAME', data.username)
+//   commit('SET_AVATAR', data.avatar)
+// }
+export default user

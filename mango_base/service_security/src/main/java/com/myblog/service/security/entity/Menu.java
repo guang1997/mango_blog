@@ -40,14 +40,8 @@ public class Menu extends BaseEntity {
     @ApiModelProperty(value = "菜单级别")
     private Boolean menuLevel;
 
-    @ApiModelProperty(value = "简介")
-    private String summary;
-
     @ApiModelProperty(value = "父id")
     private String pid;
-
-    @ApiModelProperty(value = "url地址")
-    private String redirect;
 
     @ApiModelProperty(value = "图标")
     private String icon;
@@ -61,20 +55,6 @@ public class Menu extends BaseEntity {
 
     @ApiModelProperty(value = "是否显示 1:是 0:否")
     private Boolean hidden;
-
-    @ApiModelProperty(value = "是否一直显示 1:是 0:否")
-    @TableField("alwaysShow")
-    private Boolean alwaysShow;
-
-    @ApiModelProperty(value = "是否在面包屑中显示 1:是 0:否")
-    private Boolean breadcrumb;
-
-    @ApiModelProperty(value = "是否缓存 1:是 0:否")
-    @TableField("noCache")
-    private Boolean noCache;
-
-    @ApiModelProperty(value = "是否固定在顶部 1:是 0:否")
-    private Boolean affix;
 
     @ApiModelProperty(value = "组件名称")
     private String component;

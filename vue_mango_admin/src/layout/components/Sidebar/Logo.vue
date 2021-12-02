@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      title: 'Mango',
+      title: 'Mango-后台管理',
       logo: 'favicon.ico'
     }
   }

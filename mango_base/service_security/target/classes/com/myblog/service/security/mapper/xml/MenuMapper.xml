@@ -3,8 +3,8 @@
 <mapper namespace="com.myblog.service.security.mapper.MenuMapper">
 
     <select id="getMenuByRoles" resultType="com.myblog.service.security.entity.Menu">
-        SELECT t1.id, t1.name, t1.title, t1.menu_level, t1.summary, t1.pid, t1.redirect, t1.icon, t1.sort, t1.is_deleted, t1.create_time, t1.update_time, t1.hidden,
-        t1.alwaysShow, t1.breadcrumb, t1.noCache, t1.affix, t1.component, t1.path
+        SELECT t1.id, t1.name, t1.title, t1.menu_level, t1.pid, t1.icon, t1.sort, t1.is_deleted, t1.create_time, t1.update_time, t1.hidden,
+         t1.component, t1.path
         FROM t_menu t1
         LEFT JOIN t_role_menu t2
         ON t1.id=t2.menu_id WHERE t1.is_deleted=0 AND t2.role_id IN

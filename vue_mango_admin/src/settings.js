@@ -1,16 +1,24 @@
 module.exports = {
 
+   /**
+   * @description 网站标题
+   */
   title: 'Mango',
 
   /**
-   * @type {boolean} true | false
-   * @description Whether fix the header
+   * @description 是否显示 tagsView
    */
-  fixedHeader: false,
-
-  /**
-   * @type {boolean} true | false
-   * @description Whether show the logo in sidebar
+   tagsView: true,
+   /**
+    * @description 固定头部
+    */
+   fixedHeader: true,
+   /**
+    * @description 是否显示logo
+    */
+   sidebarLogo: true,
+   /**
+   * @description 是否只保持一个子菜单的展开
    */
-  sidebarLogo: true
+  uniqueOpened: false,
 }
