@@ -192,6 +192,7 @@ public class LoginController {
         menuVo.setChildren(new ArrayList<>());
         menuVo.setComponent(menu.getComponent());
         menuVo.setPath(menu.getPath());
+        menuVo.setRedirect(menu.getRedirect());
         Meta meta = new Meta();
         meta.setTitle(menu.getTitle());
         meta.setIcon(menu.getIcon());

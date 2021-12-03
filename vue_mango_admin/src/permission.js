@@ -1,9 +1,10 @@
 import router from './router'
 import store from '@/store'
+import Config from '@/settings'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
-import { buildMenus } from '@/api/menu'
+import { getMenu } from '@/api/user'
 import { filterAsyncRouter } from '@/store/modules/permission'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
@@ -13,7 +14,7 @@ const whiteList = ['/login'] // no redirect whitelist
 router.beforeEach(async(to, from, next) => {
   // 设置页面标题
   if (to.meta.title) {
-    document.title = to.meta.title + ' - ' + Config.title
+    document.title = Config.title + ' - ' + to.meta.title
   }
   // start progress bar
   NProgress.start()
@@ -60,9 +61,10 @@ router.beforeEach(async(to, from, next) => {
 })
 
 export const loadMenus = (next, to) => {
-  buildMenus().then(res => {
-    const sdata = JSON.parse(JSON.stringify(res))
-    const rdata = JSON.parse(JSON.stringify(res))
+  getMenu().then(res => {
+    const sdata = JSON.parse(JSON.stringify(res.data.menu))
+    const rdata = JSON.parse(JSON.stringify(res.data.menu))
+    console.log("sdata", sdata)
     const sidebarRoutes = filterAsyncRouter(sdata)
     const rewriteRoutes = filterAsyncRouter(rdata, false, true)
     rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
@@ -71,6 +73,7 @@ export const loadMenus = (next, to) => {
       router.addRoutes(rewriteRoutes) // 动态添加可访问路由表
       next({ ...to, replace: true })
     })
+    console.log("sidebarRoutes",sidebarRoutes)
     store.dispatch('SetSidebarRouters', sidebarRoutes)
   })
 }
