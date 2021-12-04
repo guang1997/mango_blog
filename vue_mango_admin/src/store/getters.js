@@ -8,5 +8,6 @@ const getters = {
   permission_routers: state =>state.permission.routes,
   loadMenus: state => state.user.loadMenus,
   addRouters: state => state.permission.addRouters,
+  sidebarRouters: state => state.permission.sidebarRouters
 }
 export default getters

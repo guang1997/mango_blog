@@ -44,7 +44,7 @@ const permission = {
       addRouters: [],
       sidebarRouters: []
   },
-  moutations: {
+  mutations: {
     SET_ROUTERS: (state, routers) => {
       state.addRouters = routers
       state.routers = constantRoutes.concat(routers)
@@ -71,13 +71,14 @@ export const filterAsyncRouter = (routers, lastRouter = false, type = false) => 
     if (router.component) {
       if (router.component === 'Layout') { // Layout组件特殊处理
         router.component = Layout
-      } else if (router.component === 'ParentView') {
+      } else if (router.component === 'ParentView') {// 多级菜单
         router.component = ParentView
       } else {
         const component = router.component
         router.component = loadView(component)
       }
     }
+    
     if (router.children != null && router.children && router.children.length) {
       router.children = filterAsyncRouter(router.children, router, type)
     } else {
@@ -116,89 +117,4 @@ export const loadView = (view) => {
   return (resolve) => require([`@/views/${view}`], resolve)
 }
 
-// const actions = {
-//   generateRoutes({ commit }, data) {
-//     return new Promise(resolve => {
-//       const { roles } = data;
-//       let accessedRoutes
-//       if (roles.includes('admin')) {
-//         accessedRoutes = asyncRoutes || []
-//       } else {
-//         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-//       }
-//       // const accessedRoutes = asyncRoutes.filter(v => {
-//       //   if (roles.includes('admin')) return true;
-//       //   if (hasPermission(roles, v)) {
-//       //     if (v.children && v.children.length > 0) {
-//       //       v.children = v.children.filter(child => {
-//       //         if (hasPermission(roles, child)) {
-//       //           return child
-//       //         }
-//       //         return false;
-//       //       });
-//       //       return v
-//       //     } else {
-//       //       return v
-//       //     }
-//       //   }
-//       //   return false;
-//       // });
-//       commit('SET_ROUTES', accessedRoutes);
-//       resolve(accessedRoutes);
-//     })
-//   }
-//   // generateRoutes: async function ({
-//   //   commit
-//   // }, roles) {
-//   //   // return new Promise(resolve => {
-//   //   // 从后台请求所有的路由信息
-//   //   let res = await getMenu()
-//   //   let dbAsyncRoutes = res.data.menu
-//   //   // 替换组件名称，删除children
-//   //   let myAsyncRoutes = dbAsyncRoutes.filter(curr => {
-//   //     if (curr.children == null || curr.children.length == 0) {
-//   //       delete curr.children
-//   //     }
-//   //     return replaceComponent(curr)
-//   //   })
-//   //   // 可以访问的路由表
-//   //   let accessedRoutes
-//   //   if (roles.includes('admin')) {
-//   //     //路由是否有admin,有直接全部显示
-//   //     accessedRoutes = myAsyncRoutes || []
-//   //   } else {
-//   //     //accessedRoutes这个就是当前角色可见的动态路由
-//   //     accessedRoutes = filterAsyncRoutes(myAsyncRoutes, roles)
-//   //   }
-//   //   console.log("accessedRoutes", accessedRoutes)
-//   //   commit('SET_ROUTES', accessedRoutes)
-//   //   // resolve(accessedRoutes)
-//   //   return accessedRoutes
-//   //   // })
-//   // }
-
-// }
-
-// 替换route对象中的component
-// function replaceComponent(comp) {
-//   if (comp.component && typeof (comp.component) == 'string') {
-//     comp.component = componentMap[comp.component];
-//   }
-//   if (comp.children && comp.children.length > 0) {
-//     for (let i = 0; i < comp.children.length; i++) {
-//       comp.children[i] = replaceComponent(comp.children[i])
-//     }
-//   }
-//   // if (comp.component && comp.component == 'Layout') {
-//   //     comp.component = Layout;
-//   //   } else {
-//   //     comp.component = _import(comp.component)
-//   //   }
-//   //   if (comp.children && comp.children.length) {
-//   //       for (let i = 0; i < comp.children.length; i++) {
-//   //         comp.children[i] = replaceComponent(comp.children[i])
-//   //       }
-//   //     }
-//   return comp
-// }
 export default permission

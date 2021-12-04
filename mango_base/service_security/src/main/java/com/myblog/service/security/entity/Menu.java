@@ -62,6 +62,9 @@ public class Menu extends BaseEntity {
     @ApiModelProperty(value = "路径")
     private String path;
 
+    @ApiModelProperty(value = "重定向地址")
+    private String redirect;
+
     @TableField(exist = false)
     private List<Menu> children;
 }
