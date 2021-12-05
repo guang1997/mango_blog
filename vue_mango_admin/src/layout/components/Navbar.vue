@@ -25,7 +25,7 @@
               <span style="display:block;" @click="aboutMe">关于我</span>
             </el-dropdown-item> -->
           <el-dropdown-item divided @click.native="logout">
-            <span style="display:block;">退出</span>
+            <span style="display:block;">退出登录</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -59,10 +59,23 @@ export default {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
-    async logout() {
-      await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+     logout() {
+      this.$confirm('确定注销并退出系统吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$store.dispatch('Logout').then(() => {
+          location.reload()
+        })
+      })
     }
+    // logout() {
+    //   this.$store.dispatch('Logout').then(() => {
+    //     location.reload()
+    //   })
+    //   // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    // }
   }
 }
 </script>

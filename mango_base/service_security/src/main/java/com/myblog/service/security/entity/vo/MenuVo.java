@@ -1,11 +1,14 @@
 package com.myblog.service.security.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.myblog.service.base.entity.vo.BaseVO;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
-public class MenuVo {
+public class MenuVo extends BaseVO {
 
     private String id;
 
@@ -22,6 +25,9 @@ public class MenuVo {
     private String component;
 
     private String path;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "GMT+8")
+    private Date createTime;
 
     private Meta meta;
 

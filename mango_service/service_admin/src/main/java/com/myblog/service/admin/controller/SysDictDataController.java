@@ -25,6 +25,7 @@ import java.util.List;
  * @author 李斯特
  * @since 2021-10-08
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/admin/sysDictData")
 public class SysDictDataController {

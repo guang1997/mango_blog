@@ -48,13 +48,18 @@
           />
         </span>
       </el-form-item>
-
+      <el-checkbox v-model="loginForm.rememberMe" style="margin:0 0 25px 0;">
+        七天免登陆
+      </el-checkbox>
       <el-button
         :loading="loading"
         type="primary"
         style="width: 100%; margin-bottom: 30px"
         @click.native.prevent="handleLogin"
-        >登录</el-button
+        >
+        <span v-if="!loading">登 录</span>
+          <span v-else>登 录 中...</span>
+        </el-button
       >
     </el-form>
     <!--引入粒子特效-->
@@ -105,6 +110,7 @@ export default {
       loginForm: {
         username: "admin",
         password: "admin2021",
+        rememberMe: false,
       },
       loginRules: {
         username: [

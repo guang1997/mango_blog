@@ -3,6 +3,9 @@ package com.myblog.service.security.config.util;
 
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.security.config.entity.AuthUser;
+import com.myblog.service.security.config.entity.vo.AdminVO;
+import com.myblog.service.security.entity.Admin;
+import com.myblog.service.security.entity.Role;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,15 +37,15 @@ public class JwtTokenUtil {
      *
      * @return
      */
-    public String createToken(AuthUser authUser, String secretKey) {
+    public String createToken(Admin admin, List<Role> roles, long expiresSecond, String secretKey) {
+        String userName = admin.getUsername();
+        String avatar = admin.getAvatar();
+        String id = admin.getId();
         StringBuilder roleNames = new StringBuilder();
-        for (GrantedAuthority authority : authUser.getAuthorities()) {
-            roleNames.append(authority.getAuthority());
+        for (Role role : roles) {
+            roleNames.append(role.getRoleName()).append(Constants.Symbol.COMMA);
         }
-        String userName = authUser.getUsername();
-        String avatar = authUser.getAvatar();
-        String id = authUser.getId();
-        int expiresSecond = authUser.getExpiresSecond();
+        roleNames.substring(0, roleNames.length() - 2);
 
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         long nowMillis = System.currentTimeMillis();
@@ -103,9 +106,8 @@ public class JwtTokenUtil {
      * @return 是否有效
      */
     public Boolean validateToken(String token, UserDetails userDetails, String secretKey) throws Exception {
-        AuthUser user = (AuthUser) userDetails;
         String username = getUsername(token, secretKey);
-        return (username.equals(user.getUsername()) && !isExpiration(token, secretKey));
+        return (username.equals(userDetails.getUsername()) && !isExpiration(token, secretKey));
     }
 
     /**
@@ -196,27 +198,8 @@ public class JwtTokenUtil {
         return new AuthUser(claims.get(Constants.ReplyField.ID).toString(),
                 claims.get(Claims.SUBJECT).toString(),
                 null,
-                null,
                 claims.get(Constants.ReplyField.AVATAR).toString(),
-                (Integer) (claims.get(Claims.EXPIRATION)),
+                (Integer) claims.get(Claims.EXPIRATION),
                 authorities);
-    }
-
-    /**
-     * 刷新令牌
-     *
-     * @param token 原令牌
-     * @return 新令牌
-     */
-    public String refreshToken(String token, String secretKey) {
-        String refreshedToken;
-        try {
-            AuthUser authUser = getAuthUser(token, secretKey);
-            refreshedToken = createToken(authUser, secretKey);
-        } catch (Exception e) {
-            LOGGER.error("refresh token Exception:", e);
-            refreshedToken = null;
-        }
-        return refreshedToken;
     }
 }

@@ -1,10 +1,14 @@
 package com.myblog.service.security.entity.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Meta {
 
     private List<String> roles;
@@ -12,10 +16,4 @@ public class Meta {
     private String title;
 
     private String icon;
-
-    private boolean noCache;
-
-    private boolean breadcrumb;
-
-    private boolean affix;
 }

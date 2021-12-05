@@ -5,10 +5,12 @@ public interface DbConstants {
     interface Base {
         String isDeleted = "is_deleted";
         String sort = "sort";
+        String id = "id";
+        String pid = "pid";
     }
     interface Admin{
-        String userName = "user_name";
-        String password = "pass_word";
+        String username = "username";
+        String password = "password";
         String email = "email";
         String mobile = "mobile";
         String status = "status";

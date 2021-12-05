@@ -70,36 +70,9 @@ export const constantRoutes = [
   }
 
 ]
-// export const asyncRoutes = [
-  
-//   {
-//     path: '/authority',
-//     component: Layout,
-//     redirect: '/authority/admin',
-//     name: '权限管理',
-//     meta: { title: '权限管理', icon: 'authority', role: ['admin'] }, //页面需要的权限
-//     children: [
-//       {
-//         path: 'admin',
-//         name: '管理员管理',
-//         component: () => import('@/views/authority/admin'),
-//         meta: { title: '管理员管理', icon: 'user', role: ['admin'] }
-//       },
-//       {
-//         path: 'menu',
-//         name: '菜单管理',
-//         component: () => import('@/views/authority/menu'),
-//         meta: { title: '菜单管理', icon: 'authority', role: ['admin'] }
-//       },
-//     ]
-//   },{
-//   path: '*',
-//   redirect: '/404',
-//   hidden: true
-// }]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
+  mode: 'history', // require service support
   scrollBehavior: () => ({
     y: 0
   }),
