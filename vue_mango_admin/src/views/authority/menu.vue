@@ -200,8 +200,8 @@ export default {
     getMenus(tree, treeNode, resolve) {
       const params = { pid: tree.id };
       setTimeout(() => {
-        crudMenu.getMenus(params).then((res) => {
-          console.log("enus", res.data)
+        crudMenu.getAllMenu(params).then((res) => {
+          console.log("menus", res.data)
           resolve(res.data);
         });
       }, 100);
@@ -219,7 +219,7 @@ export default {
     },
     loadMenus({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
-        crudMenu.getAllMenu().then((res) => {
+        crudMenu.getMenusByPid().then((res) => {
           parentNode.children = res.data.map(function (obj) {
             if (!obj.children || obj.children.length <= 0) {
               obj.children = null;

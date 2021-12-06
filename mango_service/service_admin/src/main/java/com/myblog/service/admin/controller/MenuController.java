@@ -36,7 +36,7 @@ public class MenuController {
         try {
             response = menuService.getAllMenu();
         } catch (Exception e) {
-            LOGGER.error("getListByDictType Exception:", e);
+            LOGGER.error("getAllMenu Exception:", e);
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
         }
         return response;
@@ -49,7 +49,7 @@ public class MenuController {
         try {
             response = menuService.getMenuById(id);
         } catch (Exception e) {
-            LOGGER.error("getListByDictType Exception:", e);
+            LOGGER.error("getMenuById Exception:", e);
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
         }
         return response;
@@ -62,7 +62,7 @@ public class MenuController {
         try {
             response = menuService.getMenusByPid(pid);
         } catch (Exception e) {
-            LOGGER.error("getListByDictType Exception:", e);
+            LOGGER.error("getMenusByPid Exception:", e);
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
         }
         return response;

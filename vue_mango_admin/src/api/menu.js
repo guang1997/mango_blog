@@ -16,7 +16,7 @@ export function getMenuById(data) {
   })
 }
 
-export function getMenus(data) {
+export function getMenusByPid(data) {
   return request({
     url: '/admin/menu/getMenusByPid',
     method: 'get',
