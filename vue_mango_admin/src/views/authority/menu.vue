@@ -10,10 +10,11 @@
         <el-form-item label="菜单类型" prop="menuType">
           <el-radio-group v-model="form.menuType" size="mini" style="width: 178px">
             <el-radio-button label="0">目录</el-radio-button>
-            <el-radio-button label="1">按钮</el-radio-button>
+            <el-radio-button label="1">菜单</el-radio-button>
+            <el-radio-button label="2">按钮</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-show="form.menuType.toString() !== '1'" label="菜单图标" prop="icon">
+        <el-form-item v-show="form.menuType.toString() !== '2'" label="菜单图标" prop="icon">
           <el-popover
             placement="bottom-start"
             width="450"
@@ -27,22 +28,22 @@
             </el-input>
           </el-popover>
         </el-form-item>
-        <el-form-item v-show="form.menuType.toString() !== '1'" label="菜单可见" prop="hidden">
+        <el-form-item v-show="form.menuType.toString() !== '2'" label="菜单可见" prop="hidden">
           <el-radio-group v-model="form.hidden" size="mini">
             <el-radio-button label="false">是</el-radio-button>
             <el-radio-button label="true">否</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="form.menuType.toString() !== '1'" label="菜单标题" prop="title">
+        <el-form-item v-if="form.menuType.toString() !== '2'" label="菜单标题" prop="title">
           <el-input v-model="form.title" :style=" form.menuType.toString() === '0' ? 'width: 450px' : 'width: 178px'" placeholder="菜单标题" />
         </el-form-item>
-        <el-form-item v-if="form.menuType.toString() === '1'" label="按钮名称" prop="title">
+        <el-form-item v-if="form.menuType.toString() === '2'" label="按钮名称" prop="title">
           <el-input v-model="form.title" placeholder="按钮名称" style="width: 178px;" />
         </el-form-item>
         <el-form-item v-show="form.menuType.toString() !== '0'" label="权限标识" prop="permission">
-          <el-input v-model="form.permission" :disabled="form.menuType.toString() === '1' || form.menuType.toString() === '2'" placeholder="权限标识" style="width: 178px;" />
+          <el-input v-model="form.permission" placeholder="权限标识" style="width: 178px;" />
         </el-form-item>
-        <el-form-item v-if="form.menuType.toString() !== '1'" label="路由地址" prop="path">
+        <el-form-item v-if="form.menuType.toString() !== '2'" label="路由地址" prop="path">
           <el-input v-model="form.path" placeholder="路由地址" style="width: 178px;" />
         </el-form-item>
         <el-form-item label="菜单排序" prop="menuSort">
@@ -157,12 +158,12 @@ export default {
   cruds() {
     return CRUD({
       title: "菜单",
-      url: "/admin/menu/getMenusByPid",
+      url: "/admin/menu/getAllMenu",
       crudMethod: { ...crudMenu },
       optShow: {
         add: true,
         edit: false,
-        del: false,
+        del: true,
         download: false,
         reset: false,
       },
@@ -201,14 +202,14 @@ export default {
       const params = { pid: tree.id };
       setTimeout(() => {
         crudMenu.getAllMenu(params).then((res) => {
-          console.log("menus", res.data)
-          resolve(res.data);
+          console.log("menus", res.data.data)
+          resolve(res.data.data);
         });
       }, 100);
     },
     getMenuById(id) {
       crudMenu.getMenuById(id).then((res) => {
-        const children = res.data.map(function (obj) {
+        const children = res.data.data.map(function (obj) {
           if (!obj.children || obj.children.length <= 0) {
             obj.children = null;
           }
@@ -219,8 +220,9 @@ export default {
     },
     loadMenus({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
-        crudMenu.getMenusByPid().then((res) => {
-          parentNode.children = res.data.map(function (obj) {
+        crudMenu.getMenusByPid(parentNode.id).then((res) => {
+          console.log("res.data", res.data.data);
+          parentNode.children = res.data.data.map(function (obj) {
             if (!obj.children || obj.children.length <= 0) {
               obj.children = null;
             }

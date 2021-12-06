@@ -23,3 +23,4 @@ export function getMenusByPid(data) {
     data
   })
 }
+export default { getAllMenu, getMenuById, getMenusByPid}

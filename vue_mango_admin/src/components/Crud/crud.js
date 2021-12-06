@@ -140,9 +140,7 @@ function CRUD(options) {
           if(res.data.total) {
             crud.page.total = res.data.total
           }
-          if(res.data.size) {
-            crud.data = res.data.size
-          }
+          crud.data = res.data.data
           crud.resetDataStatus()
           // time 毫秒后显示表格
           setTimeout(() => {
@@ -600,6 +598,7 @@ function CRUD(options) {
 
 // hook VM
 function callVmHook(crud, hook) {
+
   if (crud.debug) {
     console.log('callVmHook: ' + hook)
   }
