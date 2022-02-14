@@ -4,40 +4,7 @@ import {
 import Layout from '@/layout/index'
 import ParentView from '@/components/ParentView'
 
-/**
- * Use meta.role to determine if the current user has permission
- * @param roles
- * @param route
- */
-function hasPermission(roles, route) {
-  if (route.meta && route.meta.roles) {
-    return roles.some(role => route.meta.roles.includes(role))
-  } else {
-    return true
-  }
-}
 
-/**
- * Filter asynchronous routing tables by recursion
- * @param routes asyncRoutes
- * @param roles
- */
-export function filterAsyncRoutes(routes, roles) {
-  const res = []
-  routes.forEach(route => {
-    const tmp = {
-      ...route
-    }
-    if (hasPermission(roles, tmp)) {
-      if (tmp.children) {
-        tmp.children = filterAsyncRoutes(tmp.children, roles)
-      }
-      res.push(tmp)
-    }
-  })
-
-  return res
-}
 const permission = {
   state : {
       routers: constantRoutes,
@@ -113,8 +80,10 @@ function filterChildren(childrenMap, lastRouter = false) {
   return children
 }
 
+// 路由懒加载
 export const loadView = (view) => {
-  return (resolve) => require([`@/views/${view}`], resolve)
+  return (resolve) => require([`@/views/${view}`], resolve);
+  // return () => Promise.resolve(require(`@/views/${view}`).default);
 }
 
 export default permission

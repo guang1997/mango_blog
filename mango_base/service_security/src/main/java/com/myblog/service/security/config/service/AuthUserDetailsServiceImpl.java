@@ -3,8 +3,8 @@ package com.myblog.service.security.config.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.exception.LoginException;
-import com.myblog.service.security.config.entity.Audience;
 import com.myblog.service.security.config.entity.AuthUser;
+import com.myblog.service.security.config.entity.MySecurityProperties;
 import com.myblog.service.security.entity.Admin;
 import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.service.AdminService;
@@ -32,7 +32,7 @@ public class AuthUserDetailsServiceImpl implements UserDetailsService {
     private RoleService roleService;
 
     @Autowired
-    private Audience audience;
+    private MySecurityProperties properties;
 
     /**
      * 通过账号查找用户、角色的信息
@@ -43,7 +43,7 @@ public class AuthUserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws LoginException {
         QueryWrapper<Admin> adminQueryWrapper = new QueryWrapper<>();
-        adminQueryWrapper.eq(DbConstants.Admin.userName, username);
+        adminQueryWrapper.eq(DbConstants.Admin.username, username);
         Admin admin = adminService.getOne(adminQueryWrapper);
         if (admin == null) {
             return null;
@@ -55,11 +55,10 @@ public class AuthUserDetailsServiceImpl implements UserDetailsService {
                 authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
             }
             return new AuthUser(admin.getId(),
-                    admin.getUserName(),
-                    admin.getPassWord(),
-                    null,
+                    admin.getUsername(),
+                    admin.getPassword(),
                     admin.getAvatar(),
-                    audience.getExpiresSecond(),
+                    properties.getExpiresSecond(),
                     authorities);
         }
     }

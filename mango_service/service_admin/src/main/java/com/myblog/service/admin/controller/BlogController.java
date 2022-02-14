@@ -1,6 +1,7 @@
 package com.myblog.service.admin.controller;
 
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 李斯特
  * @since 2021-09-28
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/blog")
 public class BlogController {

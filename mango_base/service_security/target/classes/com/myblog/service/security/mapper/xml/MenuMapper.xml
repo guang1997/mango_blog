@@ -7,7 +7,7 @@
          t1.component, t1.path, t1.redirect
         FROM t_menu t1
         LEFT JOIN t_role_menu t2
-        ON t1.id=t2.menu_id WHERE t1.is_deleted=0 AND t2.role_id IN
+        ON t1.id=t2.menu_id WHERE t1.is_deleted=0 AND t1.menu_type != 2 AND t2.role_id IN
         <foreach collection="roles" item="role" separator="," open="(" close=")">
             #{role.id}
         </foreach>

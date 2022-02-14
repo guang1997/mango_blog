@@ -21,4 +21,12 @@ module.exports = {
    * @description 是否只保持一个子菜单的展开
    */
   uniqueOpened: false,
+  /**
+   * @description token
+   */
+  TokenKey: "Authorization",
+  /**
+   * @description 记住密码状态下的token在Cookie中存储的天数，默认7天
+   */
+   tokenCookieExpires: 7,
 }

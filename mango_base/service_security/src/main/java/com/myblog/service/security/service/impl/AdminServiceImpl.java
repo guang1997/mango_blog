@@ -1,13 +1,9 @@
 package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
-import com.myblog.service.base.common.Response;
-import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.CheckUtils;
-import com.myblog.service.security.config.handler.MyAuthenticationFailureHandler;
-import com.myblog.service.security.config.util.BCryptPasswordEncoderUtil;
+import com.myblog.service.security.config.entity.vo.AdminVO;
 import com.myblog.service.security.entity.Admin;
 import com.myblog.service.security.mapper.AdminMapper;
 import com.myblog.service.security.service.AdminService;
@@ -33,14 +29,13 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
     private static Logger LOGGER = LoggerFactory.getLogger(AdminServiceImpl.class);
 
-    @Autowired
-    private BCryptPasswordEncoderUtil bCryptPasswordEncoderUtil;
-
     @Override
-    public boolean checkLogin(String username, String password) {
+    public Admin checkLogin(AdminVO adminVO) {
+        String username = adminVO.getUsername();
+        String password = adminVO.getPassword();
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             LOGGER.error("admin login failed, userName:{}", username);
-            return false;
+            return null;
         }
         boolean isEmail = CheckUtils.checkEmails(username);
         boolean isMobile = CheckUtils.checkMobile(username);
@@ -51,20 +46,22 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         } else if (isMobile) {
             adminWrapper.eq(DbConstants.Admin.mobile, username);
         } else {
-            adminWrapper.eq(DbConstants.Admin.userName, username);
+            adminWrapper.eq(DbConstants.Admin.username, username);
         }
         adminWrapper.eq(DbConstants.Base.isDeleted, "0");
         Admin admin = baseMapper.selectOne(adminWrapper);
         if (admin == null) {
             LOGGER.error("admin login failed, cannot find admin by userName:{}", username);
-            return false;
+            return null;
         }
         // 对密码进行动态加盐处理
-        boolean matchPassword = bCryptPasswordEncoderUtil.matches(password, admin.getPassWord());
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        boolean matchPassword = encoder.matches(password, admin.getPassword());
         if (!matchPassword) {
             LOGGER.error("admin login failed, password is error");
-            return false;
+            return null;
         }
-        return true;
+
+        return admin;
     }
 }

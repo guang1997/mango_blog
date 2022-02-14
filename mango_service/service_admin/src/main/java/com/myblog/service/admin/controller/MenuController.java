@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * @author 李斯特
  * @since 2021-10-02
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/admin/menu")
 public class MenuController {
@@ -35,7 +36,33 @@ public class MenuController {
         try {
             response = menuService.getAllMenu();
         } catch (Exception e) {
-            LOGGER.error("getListByDictType Exception:", e);
+            LOGGER.error("getAllMenu Exception:", e);
+            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+        }
+        return response;
+    }
+
+    @ApiOperation(value = "根据id获取菜单及上级菜单信息", notes = "根据id获取菜单及上级菜单信息", response = Response.class)
+    @GetMapping("/getMenuById")
+    public Response getMenuById(@RequestParam("id") String id) {
+        Response response = Response.ok();
+        try {
+            response = menuService.getMenuById(id);
+        } catch (Exception e) {
+            LOGGER.error("getMenuById Exception:", e);
+            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+        }
+        return response;
+    }
+
+    @ApiOperation(value = "根据pid获取当前菜单及下级菜单信息", notes = "根据pid获取当前菜单及下级菜单信息", response = Response.class)
+    @GetMapping("/getMenusByPid")
+    public Response getMenusByPid(@RequestParam(value = "pid", required = false) String pid) {
+        Response response = Response.ok();
+        try {
+            response = menuService.getMenusByPid(pid);
+        } catch (Exception e) {
+            LOGGER.error("getMenusByPid Exception:", e);
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
         }
         return response;

@@ -21,4 +21,8 @@ public interface MenuService extends IService<Menu> {
     List<Menu> getMenuByRoles(List<Role> roles);
 
     Response getAllMenu();
+
+    Response getMenuById(String id);
+
+    Response getMenusByPid(String pid);
 }

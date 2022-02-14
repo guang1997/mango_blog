@@ -32,7 +32,7 @@ router.beforeEach(async(to, from, next) => {
           // 动态路由，拉取菜单
           loadMenus(next, to)
         }).catch(err => {
-          store.dispatch('Logout').then(() => {
+          store.dispatch('FedLogOut').then(() => {
             location.reload() // 为了重新实例化vue-router对象 避免bug
           })
           console.log(err);
@@ -64,7 +64,6 @@ export const loadMenus = (next, to) => {
   getMenu().then(res => {
     const sdata = JSON.parse(JSON.stringify(res.data.menu))
     const rdata = JSON.parse(JSON.stringify(res.data.menu))
-    console.log("sdata", sdata)
     const sidebarRoutes = filterAsyncRouter(sdata)
     const rewriteRoutes = filterAsyncRouter(rdata, false, true)
     rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
@@ -73,7 +72,7 @@ export const loadMenus = (next, to) => {
       router.addRoutes(rewriteRoutes) // 动态添加可访问路由表
       next({ ...to, replace: true })
     })
-    console.log("sidebarRoutes",sidebarRoutes)
+    
     store.dispatch('SetSidebarRouters', sidebarRoutes)
   })
 }

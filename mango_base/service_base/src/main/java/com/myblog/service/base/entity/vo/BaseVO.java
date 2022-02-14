@@ -8,4 +8,6 @@ public class BaseVO {
     private Integer page;
 
     private Integer size;
+
+    private Integer total;
 }

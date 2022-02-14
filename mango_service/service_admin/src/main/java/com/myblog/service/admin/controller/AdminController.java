@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * @author 李斯特
  * @since 2021-09-26
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/admin")
 @Api(value = "管理员相关接口", tags = {"管理员相关接口"})

@@ -43,19 +43,20 @@ const user = {
     Login({ commit }, userInfo) {
       const {
         username,
-        password
+        password,
+        rememberMe
       } = userInfo
       return new Promise((resolve, reject) => {
         login({
           username: username.trim(),
-          password: password.trim()
+          password: password.trim(),
+          rememberMe: rememberMe
         }).then(response => {
           const data = response.data
           // 向store中设置token
           commit('SET_TOKEN', data.token)
           // 向cookie中设置token
-          setToken(data.token)
-          // setUserInfo(res.user, commit)
+          setToken(data.token, rememberMe)
           // 第一次加载菜单时用到， 具体见 src 目录下的 permission.js
           commit('SET_LOAD_MENUS', true)
           resolve()
@@ -98,7 +99,14 @@ const user = {
         })
       })
     },
-
+    // 前端 登出
+    FedLogOut({ commit }) {
+      return new Promise(resolve => {
+        commit('SET_TOKEN', '')
+        removeToken()
+        resolve()
+      })
+    },
     updateLoadMenus({ commit }) {
       return new Promise((resolve, reject) => {
         commit('SET_LOAD_MENUS', false)
@@ -107,19 +115,5 @@ const user = {
   }
 
 }
-export const logOut = (commit) => {
-  commit('SET_TOKEN', '')
-  commit('SET_ROLES', [])
-  removeToken()
-}
-// export const setUserInfo = (res, commit) => {
-//   // 如果没有任何权限，则赋予一个默认的权限，避免请求死循环
-//   if (res.roles.length === 0) {
-//     commit('SET_ROLES', ['ROLE_SYSTEM_DEFAULT'])
-//   } else {
-//     commit('SET_ROLES', res.roles)
-//   }
-//   commit('SET_NAME', data.username)
-//   commit('SET_AVATAR', data.avatar)
-// }
+
 export default user

@@ -30,10 +30,10 @@ public class Admin extends BaseEntity {
     private static final long serialVersionUID=1L;
 
     @ApiModelProperty(value = "用户名")
-    private String userName;
+    private String username;
 
     @ApiModelProperty(value = "密码")
-    private String passWord;
+    private String password;
 
     @ApiModelProperty(value = "性别(1:男2:女)")
     private String gender;
