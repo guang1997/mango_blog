@@ -1,6 +1,6 @@
 package com.myblog.service.base.common;
 
-import com.baomidou.mybatisplus.extension.api.R;
+import com.myblog.service.base.util.JsonUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -74,5 +74,10 @@ public class Response {
     public Response data(Map<String, Object> map){
         this.setData(map);
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return JsonUtils.objectToJson(this);
     }
 }

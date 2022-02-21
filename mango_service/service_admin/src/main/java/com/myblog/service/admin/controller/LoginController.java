@@ -1,5 +1,6 @@
 package com.myblog.service.admin.controller;
 
+import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.annotation.rest.AnonymousPostMapping;
 import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.util.IpUtils;
@@ -31,6 +32,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -76,13 +78,14 @@ public class LoginController {
      *
      * @return
      */
+    @LogByMethod("/admin/auth/login")
     @ApiOperation(value = "登录", notes = "登录", response = Response.class)
     @AnonymousPostMapping(value = "/login")
-    public Response login(@RequestBody AdminVO adminVO, HttpServletRequest request) {
+    public Response login(@RequestBody AdminVO adminVO, HttpServletRequest request) throws UnknownHostException {
         Response response = Response.ok();
         if (adminVO == null || StringUtils.isEmpty(adminVO.getUsername()) || StringUtils.isEmpty(adminVO.getPassword())) {
             LOGGER.error("admin:{} login error", adminVO);
-            return Response.setResult(ResultCodeEnum.LOGIN_ERROR);
+            return response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message(ResultCodeEnum.LOGIN_ERROR.getMessage());
         }
         try {
             // 校验用户是否失败次数过多
@@ -91,14 +94,13 @@ public class LoginController {
             if (StringUtils.isNotEmpty(limitCount)) {
                 int tempLimitCount = Integer.parseInt(limitCount);
                 if (tempLimitCount >= loginLimitCount) {
-                    return Response.setResult(ResultCodeEnum.LOGIN_LOCKED);
+                    return response.code(ResultCodeEnum.LOGIN_LOCKED.getCode()).message(ResultCodeEnum.LOGIN_LOCKED.getMessage());
                 }
             }
 
             Admin admin = adminService.checkLogin(adminVO);
             if (admin == null) {
-                response.code(ResultCodeEnum.LOGIN_ERROR_LOCKED.getCode()).message(String.format(ResultCodeEnum.LOGIN_ERROR_LOCKED.getMessage(), setLoginCommit(ipAddress)));
-                return response;
+                return response.code(ResultCodeEnum.LOGIN_ERROR_LOCKED.getCode()).message(String.format(ResultCodeEnum.LOGIN_ERROR_LOCKED.getMessage(), setLoginCommit(ipAddress)));
             }
             //查找角色
             List<Role> roles =  roleService.getRolesByUserName(admin.getUsername());
@@ -117,8 +119,8 @@ public class LoginController {
             //将token返回到页面
             response.data(Constants.ReplyField.TOKEN, token);
         } catch (Exception e) {
-            LOGGER.error("attemptAuthentication failed, Exception:", e);
-            return Response.setResult(ResultCodeEnum.LOGIN_ERROR);
+            response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message(ResultCodeEnum.LOGIN_ERROR.getMessage());
+            throw e;
         }
         return response;
     }
@@ -128,9 +130,10 @@ public class LoginController {
      * @param request
      * @return
      */
+    @LogByMethod("/admin/auth/info")
     @ApiOperation(value = "用户信息", notes = "用户信息", response = Response.class)
     @GetMapping("/info")
-    public Response info(HttpServletRequest request) {
+    public Response info(HttpServletRequest request) throws Exception {
 
         Response response = Response.ok();
         try {
@@ -152,7 +155,7 @@ public class LoginController {
                     .data(Constants.ReplyField.AVATAR, authUser.getAvatar());
         } catch (Exception e) {
             response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
-            LOGGER.error("getUserInfo Exception:", e);
+            throw e;
         }
         return response;
     }
@@ -162,9 +165,10 @@ public class LoginController {
      *
      * @return
      */
+    @LogByMethod("/admin/auth/logout")
     @ApiOperation(value = "退出登录", notes = "退出登录", response = Response.class)
     @AnonymousPostMapping(value = "/logout")
-    public Response logout(HttpServletRequest request) {
+    public Response logout(HttpServletRequest request) throws Exception {
         Response response = Response.ok();
         try {
             String token = request.getHeader(Constants.ReplyField.HEADER);
@@ -177,7 +181,7 @@ public class LoginController {
             redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + authUser.getUsername());
         } catch (Exception e) {
             response.code(ResultCodeEnum.LOGOUT_ERROR.getCode()).message(ResultCodeEnum.LOGOUT_ERROR.getMessage());
-            LOGGER.error("logout Exception:", e);
+            throw e;
         }
         return response;
     }
@@ -204,9 +208,10 @@ public class LoginController {
      *
      * @return
      */
+    @LogByMethod("/admin/auth/getMenu")
     @ApiOperation(value = "获取当前用户菜单", notes = "获取当前用户菜单", response = Response.class)
     @GetMapping(value = "/getMenu")
-    public Response getMenu(HttpServletRequest request) {
+    public Response getMenu(HttpServletRequest request) throws Exception {
         Response response = Response.ok();
         try {
             String token = request.getHeader(Constants.ReplyField.HEADER);
@@ -237,8 +242,8 @@ public class LoginController {
             List<MenuVo> resultList = TreeUtil.toTree(menuVos, "0");
             response.data(Constants.ReplyField.MENU, resultList);
         } catch (Exception e) {
-            response.code(ResultCodeEnum.LOGOUT_ERROR.getCode()).message(ResultCodeEnum.LOGOUT_ERROR.getMessage());
-            LOGGER.error("logout Exception:", e);
+            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+            throw e;
         }
         return response;
     }
