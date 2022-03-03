@@ -25,7 +25,7 @@ public class MenuController {
     private MenuService menuService;
 
     @ApiOperation(value = "获取所有菜单列表", notes = "获取所有菜单列表", response = Response.class)
-    @PostMapping("/getAllMenu")
+    @GetMapping("/getAllMenu")
     public Response getAllMenu() {
         Response response = Response.ok();
         try {

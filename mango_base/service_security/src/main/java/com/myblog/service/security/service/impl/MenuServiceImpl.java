@@ -97,32 +97,33 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     /**
-     * 根据pid获取当前菜单及下级菜单信息
+     * 根据pid获取当前菜单信息
      * @param pid
      * @return
      */
     @Override
     public Response getMenusByPid(String pid) {
-        List<Menu> menus = new ArrayList<>();
+//        List<Menu> menus = new ArrayList<>();
         if (StringUtils.isEmpty(pid)) {
             pid = "0";
         }
-        String treePid = pid;
-        if (!"0".equals(pid)) {
-            Menu menu = baseMapper.selectById(pid);
-            if (menu == null) {
-                LOGGER.error("getMenusByPid:[{}] failed from db", pid);
-                return Response.setResult(ResultCodeEnum.QUERY_FAILED);
-            }
-            treePid = menu.getPid();
-            menus.add(menu);
-        }
+//        String treePid = pid;
+//        if (!"0".equals(pid)) {
+//            Menu menu = baseMapper.selectById(pid);
+//            if (menu == null) {
+//                LOGGER.error("getMenusByPid:[{}] failed from db", pid);
+//                return Response.setResult(ResultCodeEnum.QUERY_FAILED);
+//            }
+//            treePid = menu.getPid();
+//            menus.add(menu);
+//        }
         QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
         QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
         wrapper.eq(DbConstants.Base.pid, pid);
-        menus.addAll(baseMapper.selectList(wrapper));
-        List<Menu> resultMenus = TreeUtil.toMenuTree(menus, treePid);
-        return Response.ok().data(Constants.ReplyField.DATA, resultMenus);
+        List<Menu> menus = baseMapper.selectList(wrapper);
+//                menus.addAll(baseMapper.selectList(wrapper));
+//        List<Menu> resultMenus = TreeUtil.toMenuTree(menus, treePid);
+        return Response.ok().data(Constants.ReplyField.DATA, menus);
     }
 
 }
