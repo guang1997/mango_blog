@@ -1,17 +1,14 @@
 package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
-import com.myblog.service.base.entity.vo.BaseVO;
 import com.myblog.service.base.util.QueryWrapperDecorator;
 import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.Role;
-import com.myblog.service.security.entity.vo.MenuVo;
+import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.mapper.MenuMapper;
 import com.myblog.service.security.service.MenuService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -19,7 +16,6 @@ import com.myblog.service.security.util.TreeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -76,7 +72,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      */
     @Override
     public Response getMenuById(String id) {
-        Menu menu = baseMapper.selectById(id);
+        Menu menu = menuMapper.selectById(id);
         if (menu == null) {
             LOGGER.error("getMenuById:[{}] failed from db", id);
             return Response.setResult(ResultCodeEnum.QUERY_FAILED);
@@ -103,27 +99,20 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      */
     @Override
     public Response getMenusByPid(String pid) {
-//        List<Menu> menus = new ArrayList<>();
         if (StringUtils.isEmpty(pid)) {
             pid = "0";
         }
-//        String treePid = pid;
-//        if (!"0".equals(pid)) {
-//            Menu menu = baseMapper.selectById(pid);
-//            if (menu == null) {
-//                LOGGER.error("getMenusByPid:[{}] failed from db", pid);
-//                return Response.setResult(ResultCodeEnum.QUERY_FAILED);
-//            }
-//            treePid = menu.getPid();
-//            menus.add(menu);
-//        }
         QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
         QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
         wrapper.eq(DbConstants.Base.pid, pid);
-        List<Menu> menus = baseMapper.selectList(wrapper);
-//                menus.addAll(baseMapper.selectList(wrapper));
-//        List<Menu> resultMenus = TreeUtil.toMenuTree(menus, treePid);
-        return Response.ok().data(Constants.ReplyField.DATA, menus);
+        List<MenuDto> menuDtos = toDto(menuMapper.selectList(wrapper));
+
+        return Response.ok().data(Constants.ReplyField.DATA, menuDtos);
     }
 
+    private List<MenuDto> toDto(List<Menu> menus) {
+        List<MenuDto> menuDtos = new ArrayList<>();
+
+        return menuDtos;
+    }
 }

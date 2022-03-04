@@ -25,7 +25,7 @@ import lombok.experimental.Accessors;
 @ApiModel(value="Role对象", description="角色表")
 public class Role extends BaseEntity {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID=8659709211352400087L;
 
     @ApiModelProperty(value = "角色名")
     private String roleName;

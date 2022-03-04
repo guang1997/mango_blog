@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
 @ApiModel(value="SysDictType对象", description="字典类型表")
 public class SysDictType extends BaseEntity {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID=8359709211352400087L;
 
     @ApiModelProperty(value = "字典名称")
     private String dictName;

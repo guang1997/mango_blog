@@ -29,7 +29,7 @@ import java.util.List;
 @ApiModel(value="Menu对象", description="菜单表")
 public class Menu extends BaseEntity {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID=8559709211352400087L;
 
     @ApiModelProperty(value = "菜单名称")
     private String name;

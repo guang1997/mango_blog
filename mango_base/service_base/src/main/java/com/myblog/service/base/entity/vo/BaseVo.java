@@ -3,7 +3,7 @@ package com.myblog.service.base.entity.vo;
 import lombok.Data;
 
 @Data
-public class BaseVO {
+public class BaseVo {
 
     private Integer page;
 

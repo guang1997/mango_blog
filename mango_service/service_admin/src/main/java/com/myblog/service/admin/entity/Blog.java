@@ -26,7 +26,7 @@ import lombok.experimental.Accessors;
 @ApiModel(value="Blog对象", description="博客表")
 public class Blog extends BaseEntity {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID=8759709211352400087L;
 
     @ApiModelProperty(value = "博客标题")
     private String title;

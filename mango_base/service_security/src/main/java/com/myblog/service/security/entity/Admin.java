@@ -27,7 +27,7 @@ import lombok.experimental.Accessors;
 @ApiModel(value="Admin对象", description="管理员表")
 public class Admin extends BaseEntity {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID=8459709211352400087L;
 
     @ApiModelProperty(value = "用户名")
     private String username;

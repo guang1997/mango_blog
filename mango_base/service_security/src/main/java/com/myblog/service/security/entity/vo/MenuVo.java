@@ -1,14 +1,14 @@
 package com.myblog.service.security.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.myblog.service.base.entity.vo.BaseVO;
+import com.myblog.service.base.entity.vo.BaseVo;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
-public class MenuVo extends BaseVO {
+public class MenuVo extends BaseVo {
 
     private String id;
 

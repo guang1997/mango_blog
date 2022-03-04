@@ -45,6 +45,7 @@
         <springboot.version>2.2.1.RELEASE</springboot.version>
         <quartz.version>2.3.0</quartz.version>
         <druid.version>1.1.21</druid.version>
+        <reflectasm.version>1.11.9</reflectasm.version>
     </properties>
 
     <dependencyManagement>
@@ -224,6 +225,12 @@
                 <groupId>org.apache.xmlbeans</groupId>
                 <artifactId>xmlbeans</artifactId>
                 <version>${apache.xmlbeans.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>reflectasm</artifactId>
+                <version>${reflectasm.version}</version>
             </dependency>
 
         </dependencies>
