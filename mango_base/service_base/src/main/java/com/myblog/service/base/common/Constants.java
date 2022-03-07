@@ -8,7 +8,8 @@ public interface Constants {
     }
 
     interface Symbol {
-        String COMMA = ",";
+        String COMMA1 = ",";
+        String COMMA2 = "-";
     }
 
     interface ReplyField {

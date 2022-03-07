@@ -3,6 +3,7 @@ package com.myblog.service.admin.controller;
 import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.annotation.rest.AnonymousPostMapping;
 import com.myblog.service.base.common.RedisConstants;
+import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.RedisUtil;
 import com.myblog.service.security.config.entity.MySecurityProperties;
@@ -250,14 +251,9 @@ public class LoginController {
 
     private MenuVo convertToMenuVo(Menu menu, List<String> roleNames) {
         MenuVo menuVo = new MenuVo();
-        menuVo.setId(menu.getId());
-        menuVo.setPid(menu.getPid());
-        menuVo.setHidden(menu.getHidden());
-        menuVo.setName(menu.getName());
+        BeanUtil.copyProperties(menu, menuVo);
         menuVo.setChildren(new ArrayList<>());
-        menuVo.setComponent(menu.getComponent());
-        menuVo.setPath(menu.getPath());
-        menuVo.setRedirect(menu.getRedirect());
+        menuVo.setId(menu.getId());
         menuVo.setCreateTime(menu.getCreateTime());
         Meta meta = new Meta(roleNames, menu.getTitle(), menu.getIcon());
         menuVo.setMeta(meta);

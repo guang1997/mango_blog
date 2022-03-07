@@ -37,9 +37,6 @@ public class Menu extends BaseEntity {
     @ApiModelProperty(value = "菜单标题")
     private String title;
 
-    @ApiModelProperty(value = "菜单级别")
-    private Boolean menuLevel;
-
     @ApiModelProperty(value = "父id")
     private String pid;
 
@@ -70,6 +67,9 @@ public class Menu extends BaseEntity {
 
     @ApiModelProperty(value = "权限标识")
     private String permission;
+
+    @ApiModelProperty(value = "子菜单数量")
+    private Integer subCount;
 
     @TableField(exist = false)
     private List<Menu> children;

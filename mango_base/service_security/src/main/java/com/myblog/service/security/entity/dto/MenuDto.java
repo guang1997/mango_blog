@@ -12,11 +12,11 @@ public class MenuDto extends BaseDto {
 
     private String pid;
 
-    private boolean hidden;
+    private Boolean hidden;
 
     private String redirect;
 
-    private boolean alwaysShow;
+    private String permission;
 
     private String name;
 
@@ -26,8 +26,6 @@ public class MenuDto extends BaseDto {
 
     private String title;
 
-    private Boolean menuLevel;
-
     private String icon;
 
     private Integer sort;
@@ -36,7 +34,9 @@ public class MenuDto extends BaseDto {
 
     private List<MenuDto> children;
 
+    private Integer subCount;
+
     public Boolean getHasChildren() {
-        return children != null && children.size() > 0;
+        return subCount > 0;
     }
 }

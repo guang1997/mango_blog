@@ -14,11 +14,11 @@ public class MenuVo extends BaseVo {
 
     private String pid;
 
-    private boolean hidden;
+    private Boolean hidden;
 
     private String redirect;
 
-    private boolean alwaysShow;
+//    private Boolean alwaysShow;
 
     private String name;
 

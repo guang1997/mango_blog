@@ -43,7 +43,7 @@ public class JwtTokenUtil {
         String id = admin.getId();
         StringBuilder roleNames = new StringBuilder();
         for (Role role : roles) {
-            roleNames.append(role.getRoleName()).append(Constants.Symbol.COMMA);
+            roleNames.append(role.getRoleName()).append(Constants.Symbol.COMMA1);
         }
         roleNames.substring(0, roleNames.length() - 2);
 
@@ -192,7 +192,7 @@ public class JwtTokenUtil {
         Claims claims = parseToken(token, secretKey);
         String roles = String.valueOf(claims.get(Constants.ReplyField.ROLES));
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        for (String role : roles.split(Constants.Symbol.COMMA)) {
+        for (String role : roles.split(Constants.Symbol.COMMA1)) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
         return new AuthUser(claims.get(Constants.ReplyField.ID).toString(),

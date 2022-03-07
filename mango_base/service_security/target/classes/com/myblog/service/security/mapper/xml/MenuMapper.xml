@@ -3,7 +3,7 @@
 <mapper namespace="com.myblog.service.security.mapper.MenuMapper">
 
     <select id="getMenuByRoles" resultType="com.myblog.service.security.entity.Menu">
-        SELECT t1.id, t1.name, t1.title, t1.menu_level, t1.pid, t1.icon, t1.sort, t1.is_deleted, t1.create_time, t1.update_time, t1.hidden,
+        SELECT t1.id, t1.name, t1.title, t1.pid, t1.icon, t1.sort, t1.is_deleted, t1.create_time, t1.update_time, t1.hidden,
          t1.component, t1.path, t1.redirect
         FROM t_menu t1
         LEFT JOIN t_role_menu t2
@@ -11,6 +11,6 @@
         <foreach collection="roles" item="role" separator="," open="(" close=")">
             #{role.id}
         </foreach>
-        ORDER BY t1.sort
+        ORDER BY t1.sort DESC
     </select>
 </mapper>

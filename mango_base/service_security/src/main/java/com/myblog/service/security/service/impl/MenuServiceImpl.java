@@ -5,6 +5,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.QueryWrapperDecorator;
 import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.Role;
@@ -22,6 +23,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -112,7 +114,17 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     private List<MenuDto> toDto(List<Menu> menus) {
         List<MenuDto> menuDtos = new ArrayList<>();
-
+        for (Menu menu : menus) {
+            MenuDto menuDto = new MenuDto();
+            BeanUtil.copyProperties(menu, menuDto);
+            menuDto.setId(menu.getId());
+            menuDto.setCreateTime(menu.getCreateTime());
+            menuDto.setUpdateTime(menu.getUpdateTime());
+            if (Objects.equals("Layout", menuDto.getComponent())) {
+                menuDto.setComponent("");
+            }
+            menuDtos.add(menuDto);
+        }
         return menuDtos;
     }
 }
