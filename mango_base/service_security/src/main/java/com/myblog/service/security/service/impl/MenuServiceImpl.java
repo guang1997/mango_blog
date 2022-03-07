@@ -14,12 +14,11 @@ import com.myblog.service.security.mapper.MenuMapper;
 import com.myblog.service.security.service.MenuService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myblog.service.security.util.TreeUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,64 +51,64 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     /**
-     * 获取所有的菜单，用于展示菜单列表
-     * @return
-     */
-    @Override
-    public Response getAllMenu() {
-        QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
-        QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
-        List<Menu> menus = menuMapper.selectList(wrapper);
-        if (CollectionUtils.isEmpty(menus)) {
-            return Response.setResult(ResultCodeEnum.QUERY_FAILED);
-        }
-        List<Menu> resultMenu = TreeUtil.toMenuTree(menus, "0");
-        return Response.ok().data(Constants.ReplyField.DATA, resultMenu);
-    }
-
-    /**
-     * 根据菜单id获取菜单信息和上级菜单信息
+     * 根据菜单id获取菜单信息
      * @param id
      * @return
      */
     @Override
-    public Response getMenuById(String id) {
+    public MenuDto getMenuById(String id) {
         Menu menu = menuMapper.selectById(id);
         if (menu == null) {
             LOGGER.error("getMenuById:[{}] failed from db", id);
-            return Response.setResult(ResultCodeEnum.QUERY_FAILED);
+            return new MenuDto();
         }
-        List<Menu> menus = new ArrayList<>();
-        menus.add(menu);
-        String pid = menu.getPid();
-        if (!"0".equals(pid)) {
-            QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
-            QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
-            wrapper.eq(DbConstants.Base.id, menu.getPid());
-            Menu parentMenu = baseMapper.selectOne(wrapper);
-            pid = parentMenu.getPid();
-            menus.add(parentMenu);
+        MenuDto menuDto = new MenuDto();
+        BeanUtil.copyProperties(menu, menuDto);
+        menuDto.setId(menu.getId());
+        menuDto.setCreateTime(menu.getCreateTime());
+        menuDto.setUpdateTime(menu.getUpdateTime());
+        if (Objects.equals("Layout", menuDto.getComponent())) {
+            menuDto.setComponent("");
         }
-        List<Menu> resultMenus = TreeUtil.toMenuTree(menus, pid);
-        return Response.ok().data(Constants.ReplyField.DATA, resultMenus);
+        return menuDto;
     }
 
     /**
-     * 根据pid获取当前菜单信息
+     * 根据pid获取与当前菜单同级别的菜单信息
      * @param pid
      * @return
      */
     @Override
-    public Response getMenusByPid(String pid) {
-        if (StringUtils.isEmpty(pid)) {
+    public List<MenuDto> getMenusByPid(String pid) {
+        if (StringUtils.isBlank(pid)) {
             pid = "0";
         }
         QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
         QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
         wrapper.eq(DbConstants.Base.pid, pid);
-        List<MenuDto> menuDtos = toDto(menuMapper.selectList(wrapper));
+        return toDto(menuMapper.selectList(wrapper));
+    }
 
-        return Response.ok().data(Constants.ReplyField.DATA, menuDtos);
+    /**
+     * 获取当前菜单和上级菜单信息
+     * @param menuDto
+     * @param menuDtos
+     * @return
+     */
+    @Override
+    public List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos) {
+        // 如果是0，说明是最高级别的菜单了
+        if (Objects.equals("0", menuDto.getPid())) {
+            QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
+            QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
+            wrapper.eq(DbConstants.Base.pid,  "0");
+            menuDtos.addAll(toDto(menuMapper.selectList(wrapper)));
+            return menuDtos;
+        }
+        // 获取与当前菜单同级别的菜单信息
+        menuDtos.addAll(getMenusByPid(menuDto.getPid()));
+        // 获取当前菜单上一级别的菜单，并再次进入getSuperior方法来获取上级菜单同级别的所有菜单的信息，直至获取到所有菜单的信息
+        return getSuperior(getMenuById(menuDto.getPid()), menuDtos);
     }
 
     private List<MenuDto> toDto(List<Menu> menus) {

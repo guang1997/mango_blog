@@ -3,6 +3,7 @@ package com.myblog.service.security.util;
 
 
 import com.myblog.service.security.entity.Menu;
+import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.entity.vo.MenuVo;
 
 import java.util.ArrayList;
@@ -50,6 +51,28 @@ public class TreeUtil {
 
     private static Menu findChildren(Menu parent, List<Menu> treeList) {
         for (Menu child : treeList) {
+            if (parent.getId().equals(child.getPid())) {
+                if (parent.getChildren() == null) {
+                    parent.setChildren(new ArrayList<>());
+                }
+                parent.getChildren().add(findChildren(child, treeList));
+            }
+        }
+        return parent;
+    }
+
+    public static List<MenuDto> toMenuDtoTree(List<MenuDto> treeList, String pid) {
+        List<MenuDto> retList = new ArrayList<>();
+        for (MenuDto parent : treeList) {
+            if (pid.equals(parent.getPid())) {
+                retList.add(findChildren(parent, treeList));
+            }
+        }
+        return retList;
+    }
+
+    private static MenuDto findChildren(MenuDto parent, List<MenuDto> treeList) {
+        for (MenuDto child : treeList) {
             if (parent.getId().equals(child.getPid())) {
                 if (parent.getChildren() == null) {
                     parent.setChildren(new ArrayList<>());
