@@ -18,4 +18,6 @@ import java.util.List;
 public interface MenuMapper extends BaseMapper<Menu> {
 
     List<Menu> getMenuByRoles(@Param("roles") List<Role> roles);
+
+    int updateSubCount(@Param("id") String id, @Param("subCount") Integer subCount);
 }

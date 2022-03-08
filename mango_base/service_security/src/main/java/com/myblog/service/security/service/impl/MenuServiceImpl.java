@@ -1,6 +1,7 @@
 package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,12 +121,36 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Override
     public Response addMenu(Menu menu) {
         // 校验菜单是否已经存在
-
+        QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
+        QueryWrapper<Menu> queryWrapper = decorator.createBaseQueryWrapper();
+        queryWrapper.eq(DbConstants.Menu.name, menu.getName());
+        if (!Objects.equals("Layout", menu.getComponent())) {
+            queryWrapper.or().eq(DbConstants.Menu.component, menu.getComponent());
+        }
+        List<Menu> menus = menuMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(menus)) {
+            LOGGER.error("addMenu failed, menu already exist in db, menu:{}", menu);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
         if (StringUtils.isBlank(menu.getName())) {
             menu.setName(menu.getTitle());
         }
         // 保存菜单
+        if (menuMapper.insert(menu) < 1) {
+            LOGGER.error("addMenu failed, menu:{}", menu);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
         // 更新父菜单subCount
+        if (Objects.equals("0", menu.getPid())) {
+            return Response.ok();
+        }
+        QueryWrapper<Menu> countWrapper = decorator.createBaseQueryWrapper();
+        countWrapper.eq(DbConstants.Base.pid, menu.getPid());
+        Integer subCount = menuMapper.selectCount(countWrapper);
+        if (menuMapper.updateSubCount(menu.getPid(), ++subCount) < 1) {
+            LOGGER.error("addMenu failed by updateSubCount, menu:{}", menu);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
         return Response.ok();
     }
 

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.myblog.service.security.mapper.MenuMapper">
+    <update id="updateSubCount">
+        UPDATE t_menu SET sub_count = #{subCount} WHERE id = #{id}
+    </update>
 
     <select id="getMenuByRoles" resultType="com.myblog.service.security.entity.Menu">
         SELECT t1.id, t1.name, t1.title, t1.pid, t1.icon, t1.sort, t1.is_deleted, t1.create_time, t1.update_time, t1.hidden,

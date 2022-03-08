@@ -28,7 +28,7 @@ public class MenuDto extends BaseDto {
 
     private Integer sort;
 
-    private String menuType;
+    private Integer menuType;
 
     private List<MenuDto> children;
 

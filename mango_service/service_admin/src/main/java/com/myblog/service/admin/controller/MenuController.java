@@ -2,6 +2,7 @@ package com.myblog.service.admin.controller;
 
 
 import com.myblog.service.base.common.Constants;
+import com.myblog.service.base.common.MenuTypeEnum;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.security.entity.Menu;
@@ -9,13 +10,13 @@ import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.service.MenuService;
 import com.myblog.service.security.util.TreeUtil;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -29,6 +30,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/admin/menu")
 public class MenuController {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     private MenuService menuService;
@@ -68,9 +71,23 @@ public class MenuController {
     public Response addMenu(@RequestBody Menu menu) {
         Response response = Response.ok();
         try {
+            MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menu.getMenuType());
+            if (menuType == null) {
+                LOGGER.error("addMenu failed, cannot find menuType, menu:{}", menu);
+                response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
+                return response;
+            }
+            if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
+                menu.setComponent("Layout");
+            }
+            if (StringUtils.isBlank(menu.getTitle()) || StringUtils.isBlank(menu.getComponent())) {
+                LOGGER.error("addMenu failed, title or component is empty, menu:{}", menu);
+                response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
+                return response;
+            }
             response = menuService.addMenu(menu);
         } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+            response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
             throw e;
         }
         return response;
