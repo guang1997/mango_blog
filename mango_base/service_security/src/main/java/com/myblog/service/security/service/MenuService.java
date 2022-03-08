@@ -25,4 +25,6 @@ public interface MenuService extends IService<Menu> {
     List<MenuDto> getMenusByPid(String pid);
 
     List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos);
+
+    Response addMenu(Menu menu);
 }

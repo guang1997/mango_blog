@@ -111,6 +111,23 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         return getSuperior(getMenuById(menuDto.getPid()), menuDtos);
     }
 
+    /**
+     * 添加菜单
+     * @param menu
+     * @return
+     */
+    @Override
+    public Response addMenu(Menu menu) {
+        // 校验菜单是否已经存在
+
+        if (StringUtils.isBlank(menu.getName())) {
+            menu.setName(menu.getTitle());
+        }
+        // 保存菜单
+        // 更新父菜单subCount
+        return Response.ok();
+    }
+
     private List<MenuDto> toDto(List<Menu> menus) {
         List<MenuDto> menuDtos = new ArrayList<>();
         for (Menu menu : menus) {

@@ -159,9 +159,13 @@ export default {
     }
   },
   created() {
-    this.crud.updateProp('searchToggle', true)
+    this.crud.updateProp('searchToggle', true),
+    this.consoleName()
   },
   methods: {
+    consoleName() {
+      console.log("permission", this.permission);
+    },
     updateTableColumns() {
       const table = this.crud.getTable()
       if (!table) {

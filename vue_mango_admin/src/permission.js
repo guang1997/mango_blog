@@ -72,7 +72,6 @@ export const loadMenus = (next, to) => {
       router.addRoutes(rewriteRoutes) // 动态添加可访问路由表
       next({ ...to, replace: true })
     })
-    
     store.dispatch('SetSidebarRouters', sidebarRoutes)
   })
 }

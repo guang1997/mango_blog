@@ -16,7 +16,7 @@ public class MenuVo extends BaseVo {
 
     private Boolean hidden;
 
-    private String redirect;
+//    private String redirect;
 
 //    private Boolean alwaysShow;
 

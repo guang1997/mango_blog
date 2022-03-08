@@ -41,10 +41,10 @@
           <el-input v-model="form.title" placeholder="按钮名称" style="width: 178px;" />
         </el-form-item>
         <el-form-item v-show="form.menuType.toString() !== '0'" label="权限标识" prop="permission">
-          <el-input v-model="form.permission" placeholder="权限标识" style="width: 178px;" />
+          <el-input v-model="form.permission" placeholder="权限标识, 如menu:list" style="width: 178px;" />
         </el-form-item>
         <el-form-item v-if="form.menuType.toString() !== '2'" label="路由地址" prop="path">
-          <el-input v-model="form.path" placeholder="路由地址" style="width: 178px;" />
+          <el-input v-model="form.path" placeholder="路由地址，即path" style="width: 178px;" />
         </el-form-item>
         <el-form-item label="菜单排序" prop="menuSort">
           <el-input-number v-model.number="form.sort" :min="0" :max="999" controls-position="right" style="width: 178px;" />
@@ -53,7 +53,7 @@
           <el-input v-model="form.name" style="width: 178px;" placeholder="匹配组件内Name字段" />
         </el-form-item>
         <el-form-item v-show="form.menuType.toString() === '1'" label="组件路径" prop="component">
-          <el-input v-model="form.component" style="width: 178px;" placeholder="组件路径" />
+          <el-input v-model="form.component" style="width: 178px;" placeholder="组件路径, 即component" />
         </el-form-item>
         <el-form-item label="上级类目" prop="pid">
           <treeselect
@@ -84,7 +84,7 @@
       @selection-change="crud.selectionChangeHandler"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column :show-overflow-tooltip="true" label="菜单标题" width="125px" prop="title" />
+      <el-table-column :show-overflow-tooltip="true" label="菜单标题" width="200px" prop="title" />
       <el-table-column prop="icon" label="图标" align="center" width="60px">
         <template slot-scope="scope">
           <svg-icon :icon-class="scope.row.icon ? scope.row.icon : ''" />
@@ -104,16 +104,16 @@
           <span v-else>是</span>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建日期" width="135px" />
-      <!-- <el-table-column v-if="checkPer(['admin','menu:edit','menu:del'])" label="操作" width="130px" align="center" fixed="right"> -->
-        <!-- <template slot-scope="scope">
+      <el-table-column prop="createTime" label="创建日期" width="200px" />
+      <el-table-column v-if="checkPer(['admin','menu:edit','menu:del'])" label="操作" width="130px" align="center" fixed="right"> -->
+        <template slot-scope="scope">
           <udOperation
             :data="scope.row"
             :permission="permission"
             msg="确定删除吗,如果存在下级节点则一并删除，此操作不能撤销！"
           />
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -158,11 +158,11 @@ export default {
   cruds() {
     return CRUD({
       title: "菜单",
-      url: "/admin/menu/getAllMenu",
+      url: "/admin/menu/getMenusByPid",
       crudMethod: { ...crudMenu },
       optShow: {
         add: true,
-        edit: false,
+        edit: true,
         del: true,
         download: false,
         reset: false,
@@ -175,9 +175,9 @@ export default {
     return {
       menus: [],
       permission: {
-        add: ["admin", "menu:add"],
-        edit: ["admin", "menu:edit"],
-        del: ["admin", "menu:del"],
+        add: ['admin', 'menu:add'],
+        edit: ['admin', 'menu:edit'],
+        del: ['admin', 'menu:del']
       },
       rules: {
         title: [{ required: true, message: "请输入标题", trigger: "blur" }],
@@ -201,15 +201,14 @@ export default {
     getMenus(tree, treeNode, resolve) {
       const params = { pid: tree.id };
       setTimeout(() => {
-        crudMenu.getAllMenu(params).then((res) => {
-          console.log("menus", res.data.data)
+        crudMenu.getMenusByPid(tree.id).then((res) => {
           resolve(res.data.data);
         });
       }, 100);
     },
     getMenuById(id) {
       crudMenu.getMenuById(id).then((res) => {
-        const children = res.data.data.map(function (obj) {
+        const children = res.data.map(function (obj) {
           if (!obj.children || obj.children.length <= 0) {
             obj.children = null;
           }
@@ -221,10 +220,9 @@ export default {
     loadMenus({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
         crudMenu.getMenusByPid(parentNode.id).then((res) => {
-          console.log("res.data", res.data.data);
           parentNode.children = res.data.data.map(function (obj) {
-            if (!obj.children || obj.children.length <= 0) {
-              obj.children = null;
+            if (obj.leaf) {
+              delete obj.children
             }
             return obj;
           });

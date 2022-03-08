@@ -4,6 +4,7 @@ package com.myblog.service.admin.controller;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.service.MenuService;
 import com.myblog.service.security.util.TreeUtil;
@@ -55,6 +56,19 @@ public class MenuController {
         try {
             List<MenuDto> menuDtos = menuService.getMenusByPid(pid);
             response.data(Constants.ReplyField.DATA, menuDtos);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @ApiOperation(value = "新增菜单", notes = "新增菜单", response = Response.class)
+    @PostMapping("/addMenu")
+    public Response addMenu(@RequestBody Menu menu) {
+        Response response = Response.ok();
+        try {
+            response = menuService.addMenu(menu);
         } catch (Exception e) {
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
             throw e;

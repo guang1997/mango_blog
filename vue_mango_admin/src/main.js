@@ -17,6 +17,9 @@ import '@/permission' // permission control
 // 添加粒子特效
 import VueParticles from 'vue-particles'
 
+// 权限指令
+import checkPer from '@/utils/permission'
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -29,6 +32,7 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
+Vue.use(checkPer)
 Vue.use(VueParticles)
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })

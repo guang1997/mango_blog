@@ -14,8 +14,6 @@ public class MenuDto extends BaseDto {
 
     private Boolean hidden;
 
-    private String redirect;
-
     private String permission;
 
     private String name;
@@ -35,6 +33,14 @@ public class MenuDto extends BaseDto {
     private List<MenuDto> children;
 
     private Integer subCount;
+
+    public Boolean getLeaf() {
+        return subCount <= 0;
+    }
+
+    public String getLabel() {
+        return title;
+    }
 
     public Boolean getHasChildren() {
         return subCount > 0;

@@ -10,18 +10,11 @@ public enum ResultCodeEnum {
 
     SUCCESS(true, 20000,"成功"),
     UNKNOWN_REASON(false, 20001, "错误"),
-    QUERY_SUCCESS(true, 20002, "查询成功"),
     QUERY_FAILED(false, 20003, "查询失败"),
-    UPDATE_SUCCESS(true, 20004, "更新成功"),
     UPDATE_FAILED(false, 20005, "更新失败"),
-    SAVE_SUCCESS(true, 20006, "保存成功"),
     SAVE_FAILED(false, 20007, "保存失败"),
-    DELETE_SUCCESS(true, 20008, "删除成功"),
     DELETE_FAILED(false, 20009, "删除失败"),
-
-    LOGIN_SUCCESS(true, 23001, "登录成功"),
     LOGIN_ERROR(false, 23002, "登录失败"),
-    LOGOUT_SUCCESS(true, 23003, "退出登录成功"),
     LOGOUT_ERROR(false, 23004, "退出登录失败"),
     LOGIN_ERROR_LOCKED(false, 23005, "用户名或密码错误，错误%d次后，账户将被锁定30分钟"),
     LOGIN_ERROR_ROLE(false, 23006, "没有分配角色权限"),

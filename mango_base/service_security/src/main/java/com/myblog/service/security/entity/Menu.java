@@ -59,9 +59,6 @@ public class Menu extends BaseEntity {
     @ApiModelProperty(value = "路径")
     private String path;
 
-    @ApiModelProperty(value = "重定向地址")
-    private String redirect;
-
     @ApiModelProperty(value = "菜单类型 0:目录 1:菜单 2:按钮")
     private String menuType;
 

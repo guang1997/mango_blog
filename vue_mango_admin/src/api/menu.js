@@ -16,11 +16,19 @@ export function getMenuById(data) {
   })
 }
 
-export function getMenusByPid(data) {
+export function getMenusByPid(pid) {
   return request({
-    url: '/admin/menu/getMenusByPid',
-    method: 'get',
+    url: '/admin/menu/getMenusByPid?pid=' + pid,
+    method: 'get'
+  })
+}
+
+export function add(data) {
+  return request({
+    url: '/admin/menu/addMenu',
+    method: 'post',
     data
   })
 }
-export default { getAllMenu, getMenuById, getMenusByPid}
+
+export default { getAllMenu, getMenuById, getMenusByPid, add }

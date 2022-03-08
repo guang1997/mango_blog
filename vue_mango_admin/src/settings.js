@@ -16,7 +16,7 @@ module.exports = {
    /**
     * @description 是否显示logo
     */
-   sidebarLogo: true,
+   sidebarLogo: false,
    /**
    * @description 是否只保持一个子菜单的展开
    */
