@@ -193,7 +193,7 @@ export default {
         if (form.pid === null) {
           form.pid = 0;
         }
-        this.getMenuById(form.id);
+        this.getSuperior(form.id);
       } else {
         this.menus.push({ id: 0, label: "顶级类目", children: null });
       }
@@ -207,8 +207,8 @@ export default {
         });
       }, 100);
     },
-    getMenuById(id) {
-      crudMenu.getMenuById(id).then((res) => {
+    getSuperior(id) {
+      crudMenu.getSuperior(id).then((res) => {
         const children = res.data.data.map(function (obj) {
            if (obj.leaf) {
               delete obj.children

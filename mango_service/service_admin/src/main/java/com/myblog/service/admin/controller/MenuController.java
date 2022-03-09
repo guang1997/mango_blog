@@ -39,16 +39,38 @@ public class MenuController {
     @Autowired
     private MenuService menuService;
 
-    @LogByMethod("/admin/menu/getMenuById")
+    @LogByMethod("/admin/menu/getSuperior")
     @ApiOperation(value = "根据id获取菜单及上级菜单信息", notes = "根据id获取菜单及上级菜单信息", response = Response.class)
-    @GetMapping("/getMenuById")
-    public Response getMenuById(@RequestParam("id") String id) {
+    @GetMapping("/getSuperior")
+    public Response getSuperior(@RequestParam("id") String id) {
         Response response = Response.ok();
         Set<MenuDto> menuDtos = new LinkedHashSet<>();
         try {
             MenuDto menuDto = menuService.getMenuById(id);
             menuDtos.addAll(menuService.getSuperior(menuDto, new ArrayList<>()));
             response.data(Constants.ReplyField.DATA, TreeUtil.toMenuDtoTree(new ArrayList<>(menuDtos), "0"));
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @LogByMethod("/admin/menu/getChildren")
+    @ApiOperation(value = "根据id获取当前菜单id及所有下级菜单的id", notes = "根据id获取当前菜单id及所有下级菜单的id", response = Response.class)
+    @GetMapping("/getChildren")
+    public Response getChildren(@RequestParam("id") String id) {
+        Response response = Response.ok();
+        Set<MenuDto> menuDtos = new LinkedHashSet<>();
+        try {
+            MenuDto menuDto = menuService.getMenuById(id);
+            List<MenuDto> childrenList = menuService.getMenusByPid(id);
+            menuDtos.addAll(menuService.getChildren(childrenList, menuDtos));
+            List<String> resultIds = menuDtos.stream()
+                    .filter(BaseUtil.distinctByKey(MenuDto::getId))
+                    .map(MenuDto::getId)
+                    .collect(Collectors.toList());
+            response.data(Constants.ReplyField.DATA, resultIds);
         } catch (Exception e) {
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
             throw e;

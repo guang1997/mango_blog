@@ -8,9 +8,16 @@ export function getAllMenu(data) {
   })
 }
 
-export function getMenuById(id) {
+export function getSuperior(id) {
   return request({
-    url: '/admin/menu/getMenuById?id=' + id,
+    url: '/admin/menu/getSuperior?id=' + id,
+    method: 'get'
+  })
+}
+
+export function getChildren() {
+  return request({
+    url: '/admin/menu/getChildren?id=' + id,
     method: 'get'
   })
 }

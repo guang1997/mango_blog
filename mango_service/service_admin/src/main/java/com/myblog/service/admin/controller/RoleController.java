@@ -1,14 +1,22 @@
 package com.myblog.service.admin.controller;
 
 
+import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.base.common.MenuTypeEnum;
+import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.security.entity.Menu;
+import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.service.MenuService;
 import com.myblog.service.security.service.RoleService;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -28,5 +36,48 @@ public class RoleController {
 
     @Autowired
     private RoleService roleService;
+
+
+    @LogByMethod("/admin/role/addRole")
+    @ApiOperation(value = "新增角色", notes = "新增角色", response = Response.class)
+    @PostMapping("/addRole")
+    public Response addRole(@RequestBody Role role) {
+        Response response = Response.ok();
+        try {
+
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @LogByMethod("/admin/role/editRole")
+    @ApiOperation(value = "修改角色", notes = "修改角色", response = Response.class)
+    @PutMapping("/editRole")
+    public Response editRole(@RequestBody Role role) {
+        Response response = Response.ok();
+        try {
+
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @LogByMethod("/admin/role/delRole")
+    @ApiOperation(value = "删除角色", notes = "删除角色", response = Response.class)
+    @DeleteMapping("/delRole")
+    public Response delRole(@RequestBody Role role) {
+        Response response = Response.ok();
+        try {
+
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
 }
 
