@@ -22,9 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>
@@ -62,7 +60,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         Menu menu = menuMapper.selectById(id);
         if (menu == null) {
             LOGGER.error("getMenuById:[{}] failed from db", id);
-            return new MenuDto();
+            throw new RuntimeException("cannot find menu from db");
         }
         MenuDto menuDto = new MenuDto();
         BeanUtil.copyProperties(menu, menuDto);
@@ -114,6 +112,25 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     /**
+     * 获取当前菜单和下级菜单信息
+     * @param childrenList
+     * @param menuDtos
+     * @return
+     */
+    @Override
+    public Set<MenuDto> getChildren(List<MenuDto> childrenList, Set<MenuDto> menuDtos) {
+        for (MenuDto menuDto : childrenList) {
+            menuDtos.add(menuDto);
+            List<MenuDto> menusByPid = this.getMenusByPid(menuDto.getId());
+            if (!CollectionUtils.isEmpty(menusByPid)) {
+                getChildren(menusByPid, menuDtos);
+            }
+
+        }
+        return menuDtos;
+    }
+
+    /**
      * 添加菜单
      * @param menu
      * @return
@@ -123,7 +140,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         // 校验菜单是否已经存在
         QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
         QueryWrapper<Menu> queryWrapper = decorator.createBaseQueryWrapper();
-        queryWrapper.eq(DbConstants.Menu.name, menu.getName());
+        queryWrapper.eq(DbConstants.Menu.title, menu.getTitle());
         if (!Objects.equals("Layout", menu.getComponent())) {
             queryWrapper.or().eq(DbConstants.Menu.component, menu.getComponent());
         }
@@ -135,11 +152,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (StringUtils.isBlank(menu.getName())) {
             menu.setName(menu.getTitle());
         }
-        // 保存菜单
-        if (menuMapper.insert(menu) < 1) {
-            LOGGER.error("addMenu failed, menu:{}", menu);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        if (menuMapper.updateByTitle(menu) < 1) {
+            if (menuMapper.insert(menu) < 1) {
+                LOGGER.error("addMenu failed, menu:{}", menu);
+                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            }
         }
+
         // 更新父菜单subCount
         if (Objects.equals("0", menu.getPid())) {
             return Response.ok();
@@ -150,6 +169,43 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (menuMapper.updateSubCount(menu.getPid(), ++subCount) < 1) {
             LOGGER.error("addMenu failed by updateSubCount, menu:{}", menu);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
+        return Response.ok();
+    }
+
+    /**
+     * 更新菜单
+     * @param menu
+     * @return
+     */
+    @Override
+    public Response editMenu(Menu menu) {
+        // 获取旧的菜单信息，用于更新父菜单的subCount
+        MenuDto oldMenu = this.getMenuById(menu.getId());
+        if (menuMapper.updateById(menu) < 1) {
+            LOGGER.error("editMenu failed, menu:{}", menu);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+
+        if (!Objects.equals(oldMenu.getPid(), menu.getPid())) {
+            Menu oldParentMenu = menuMapper.selectById(oldMenu.getPid());
+            Menu newParentMenu = menuMapper.selectById(menu.getPid());
+            menuMapper.updateSubCount(oldParentMenu.getId(), oldParentMenu.getSubCount() - 1);
+            menuMapper.updateSubCount(newParentMenu.getId(), newParentMenu.getSubCount() + 1);
+        }
+        return Response.ok();
+    }
+
+    /**
+     * 删除菜单
+     * @param ids
+     * @return
+     */
+    @Override
+    public Response delMenu(List<String> ids) {
+        if (menuMapper.deleteBatchIds(ids) < 1) {
+            LOGGER.error("delMenu failed, ids:{}", ids);
+            return Response.setResult(ResultCodeEnum.DELETE_FAILED);
         }
         return Response.ok();
     }

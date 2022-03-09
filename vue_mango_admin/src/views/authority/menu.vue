@@ -200,6 +200,7 @@ export default {
     },
     getMenus(tree, treeNode, resolve) {
       const params = { pid: tree.id };
+      console.log("getMenus", params)
       setTimeout(() => {
         crudMenu.getMenusByPid(tree.id).then((res) => {
           resolve(res.data.data);
@@ -208,10 +209,10 @@ export default {
     },
     getMenuById(id) {
       crudMenu.getMenuById(id).then((res) => {
-        const children = res.data.map(function (obj) {
-          if (!obj.children || obj.children.length <= 0) {
-            obj.children = null;
-          }
+        const children = res.data.data.map(function (obj) {
+           if (obj.leaf) {
+              delete obj.children
+            }
           return obj;
         });
         this.menus = [{ id: 0, label: "顶级类目", children: children }];

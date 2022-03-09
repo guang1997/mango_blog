@@ -25,7 +25,7 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <!--日志级别，与下面的日志级别相比，哪个级别高就用哪个-->
-            <level>INFO</level>
+            <level>DEBUG</level>
         </filter>
         <encoder>
             <!--日志格式-->

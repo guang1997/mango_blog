@@ -1,10 +1,12 @@
 package com.myblog.service.admin.controller;
 
 
+import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.MenuTypeEnum;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.util.BaseUtil;
 import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.service.MenuService;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -36,6 +39,7 @@ public class MenuController {
     @Autowired
     private MenuService menuService;
 
+    @LogByMethod("/admin/menu/getMenuById")
     @ApiOperation(value = "根据id获取菜单及上级菜单信息", notes = "根据id获取菜单及上级菜单信息", response = Response.class)
     @GetMapping("/getMenuById")
     public Response getMenuById(@RequestParam("id") String id) {
@@ -52,6 +56,7 @@ public class MenuController {
         return response;
     }
 
+    @LogByMethod("/admin/menu/getMenusByPid")
     @ApiOperation(value = "根据pid获取与当前菜单同级别的菜单信息", notes = "根据pid获取与当前菜单同级别的菜单信息", response = Response.class)
     @GetMapping("/getMenusByPid")
     public Response getMenusByPid(@RequestParam(value = "pid", required = false) String pid) {
@@ -66,6 +71,7 @@ public class MenuController {
         return response;
     }
 
+    @LogByMethod("/admin/menu/addMenu")
     @ApiOperation(value = "新增菜单", notes = "新增菜单", response = Response.class)
     @PostMapping("/addMenu")
     public Response addMenu(@RequestBody Menu menu) {
@@ -80,7 +86,9 @@ public class MenuController {
             if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
                 menu.setComponent("Layout");
             }
-            if (StringUtils.isBlank(menu.getTitle()) || StringUtils.isBlank(menu.getComponent())) {
+            menu.setSubCount(0);
+            if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
+                    && (StringUtils.isBlank(menu.getTitle()) || StringUtils.isBlank(menu.getComponent()))) {
                 LOGGER.error("addMenu failed, title or component is empty, menu:{}", menu);
                 response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
                 return response;
@@ -88,6 +96,65 @@ public class MenuController {
             response = menuService.addMenu(menu);
         } catch (Exception e) {
             response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @LogByMethod("/admin/menu/editMenu")
+    @ApiOperation(value = "修改菜单", notes = "修改菜单", response = Response.class)
+    @PutMapping("/editMenu")
+    public Response editMenu(@RequestBody Menu menu) {
+        Response response = Response.ok();
+        try {
+            MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menu.getMenuType());
+            if (menuType == null) {
+                LOGGER.error("editMenu failed, cannot find menuType, menu:{}", menu);
+                response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+                return response;
+            }
+            if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
+                menu.setComponent("Layout");
+            }
+            if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
+                    && (StringUtils.isBlank(menu.getTitle()) || StringUtils.isBlank(menu.getComponent()))) {
+                LOGGER.error("editMenu failed, title or component is empty, menu:{}", menu);
+                response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+                return response;
+            }
+
+            response = menuService.editMenu(menu);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @LogByMethod("/admin/menu/delMenu")
+    @ApiOperation(value = "删除菜单", notes = "删除菜单", response = Response.class)
+    @DeleteMapping("/delMenu")
+    public Response delMenu(@RequestBody Set<String> ids) {
+        Response response = Response.ok();
+
+        Set<MenuDto> menuDtos = new LinkedHashSet<>();
+        try {
+            // 获取所有需要删除的菜单信息
+            for (String id : ids) {
+                // 获取当前菜单信息
+                menuDtos.add(menuService.getMenuById(id));
+                // 获取所有子菜单信息
+                List<MenuDto> childrenList = menuService.getMenusByPid(id);
+                menuDtos.addAll(menuService.getChildren(childrenList, menuDtos));
+            }
+            // 对id进行去重
+            List<String> delIds = menuDtos.stream()
+                    .filter(BaseUtil.distinctByKey(MenuDto::getId))
+                    .map(MenuDto::getId)
+                    .collect(Collectors.toList());
+            response = menuService.delMenu(delIds);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
             throw e;
         }
         return response;

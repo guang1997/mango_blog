@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.entity.dto.MenuDto;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -27,4 +30,10 @@ public interface MenuService extends IService<Menu> {
     List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos);
 
     Response addMenu(Menu menu);
+
+    Response editMenu(Menu menu);
+
+    Response delMenu(List<String> ids);
+
+    Set<MenuDto> getChildren(List<MenuDto> childrenList, Set<MenuDto> menuDtos);
 }

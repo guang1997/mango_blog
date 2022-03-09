@@ -4,9 +4,49 @@
     <update id="updateSubCount">
         UPDATE t_menu SET sub_count = #{subCount} WHERE id = #{id}
     </update>
+    <update id="updateByTitle" parameterType="com.myblog.service.security.entity.Menu">
+        UPDATE t_menu
+        <set>
+            is_deleted = 0,
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null">
+                pid = #{pid,jdbcType=VARCHAR},
+            </if>
+            <if test="icon != null">
+                icon = #{icon,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="hidden != null">
+                hidden = #{hidden,jdbcType=INTEGER},
+            </if>
+            <if test="component != null">
+                component = #{component,jdbcType=VARCHAR},
+            </if>
+            <if test="path != null">
+                path = #{path,jdbcType=VARCHAR},
+            </if>
+            <if test="menuType != null">
+                menu_type = #{menuType,jdbcType=INTEGER},
+            </if>
+            <if test="permission != null">
+                permission = #{permission,jdbcType=VARCHAR},
+            </if>
+            <if test="subCount != null">
+                sub_count = #{subCount,jdbcType=INTEGER},
+            </if>
+        </set>
+        where title=#{title,jdbcType=VARBINARY} and pid=#{pid,jdbcType=INTEGER}
+    </update>
 
     <select id="getMenuByRoles" resultType="com.myblog.service.security.entity.Menu">
-        SELECT t1.id, t1.name, t1.title, t1.pid, t1.icon, t1.sort, t1.is_deleted, t1.create_time, t1.update_time, t1.hidden,
+        SELECT t1.id, t1.name, t1.title, t1.pid, t1.icon, t1.sort, t1.create_time, t1.update_time, t1.hidden,
          t1.component, t1.path
         FROM t_menu t1
         LEFT JOIN t_role_menu t2
@@ -14,6 +54,6 @@
         <foreach collection="roles" item="role" separator="," open="(" close=")">
             #{role.id}
         </foreach>
-        ORDER BY t1.sort DESC
+        ORDER BY t1.sort ASC
     </select>
 </mapper>

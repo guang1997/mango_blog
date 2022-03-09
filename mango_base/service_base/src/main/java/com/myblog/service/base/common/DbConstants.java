@@ -18,5 +18,6 @@ public interface DbConstants {
     interface Menu{
         String name = "name";
         String component = "component";
+        String title = "title";
     }
 }

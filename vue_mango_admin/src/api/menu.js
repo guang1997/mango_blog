@@ -8,11 +8,10 @@ export function getAllMenu(data) {
   })
 }
 
-export function getMenuById(data) {
+export function getMenuById(id) {
   return request({
-    url: '/admin/menu/getMenuById',
-    method: 'get',
-    data
+    url: '/admin/menu/getMenuById?id=' + id,
+    method: 'get'
   })
 }
 
@@ -30,5 +29,19 @@ export function add(data) {
     data
   })
 }
+export function del(ids) {
+  return request({
+    url: '/admin/menu/delMenu',
+    method: 'delete',
+    data:ids
+  })
+}
 
-export default { getAllMenu, getMenuById, getMenusByPid, add }
+export function edit(data) {
+  return request({
+    url: '/admin/menu/editMenu',
+    method: 'put',
+    data
+  })
+}
+export default { getAllMenu, getMenuById, getMenusByPid, add, del, edit}
