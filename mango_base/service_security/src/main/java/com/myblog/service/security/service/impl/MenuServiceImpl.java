@@ -85,7 +85,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         }
         QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
         QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
-        wrapper.eq(DbConstants.Base.pid, pid);
+        wrapper.eq(DbConstants.Base.PID, pid);
         return toDto(menuMapper.selectList(wrapper));
     }
 
@@ -101,7 +101,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (Objects.equals("0", menuDto.getPid())) {
             QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
             QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
-            wrapper.eq(DbConstants.Base.pid,  "0");
+            wrapper.eq(DbConstants.Base.PID,  "0");
             menuDtos.addAll(toDto(menuMapper.selectList(wrapper)));
             return menuDtos;
         }
@@ -140,9 +140,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         // 校验菜单是否已经存在
         QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
         QueryWrapper<Menu> queryWrapper = decorator.createBaseQueryWrapper();
-        queryWrapper.eq(DbConstants.Menu.title, menu.getTitle());
+        queryWrapper.eq(DbConstants.Menu.TITLE, menu.getTitle());
         if (!Objects.equals("Layout", menu.getComponent())) {
-            queryWrapper.or().eq(DbConstants.Menu.component, menu.getComponent());
+            queryWrapper.or().eq(DbConstants.Menu.COMPONENT, menu.getComponent());
         }
         List<Menu> menus = menuMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(menus)) {
@@ -164,7 +164,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             return Response.ok();
         }
         QueryWrapper<Menu> countWrapper = decorator.createBaseQueryWrapper();
-        countWrapper.eq(DbConstants.Base.pid, menu.getPid());
+        countWrapper.eq(DbConstants.Base.PID, menu.getPid());
         Integer subCount = menuMapper.selectCount(countWrapper);
         if (menuMapper.updateSubCount(menu.getPid(), ++subCount) < 1) {
             LOGGER.error("addMenu failed by updateSubCount, menu:{}", menu);

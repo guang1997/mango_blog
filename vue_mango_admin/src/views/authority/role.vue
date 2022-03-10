@@ -16,6 +16,34 @@
         <el-form-item label="角色名称" prop="name">
           <el-input v-model="form.name" style="width: 380px;" />
         </el-form-item>
+          <el-form-item label="数据范围" prop="dataScope">
+          <el-select v-model="form.dataScope" style="width: 140px" placeholder="请选择数据范围" @change="changeScope">
+            <el-option
+              v-for="item in dateScopes"
+              :key="item"
+              :label="item.name"
+              :value="item.code"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="form.dataScope === 1" label="数据权限" prop="users">
+           <el-select v-model="adminDatas" style="width: 380px" placeholder="请选择数据权限">
+            <el-option
+              v-for="item in adminDatas"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+          <!-- <treeselect
+            v-model="adminDatas"
+            :load-options="loadAdmin"
+            :options="administrators"
+            multiple
+            style="width: 380px"
+            placeholder="请选择"
+          /> -->
+        </el-form-item>
         <el-form-item label="描述信息" prop="description">
           <el-input v-model="form.description" style="width: 380px;" rows="5" type="textarea" />
         </el-form-item>
@@ -88,17 +116,16 @@
 </template>
 
 <script>
-import crudRoles from '@/api/role'
-// import { getDepts, getDeptSuperior } from '@/api/system/dept'
-import { getMenusByPid, getChildren } from '@/api/menu'
-import CRUD, { presenter, header, form, crud } from '@crud/crud'
-import rrOperation from '@crud/RR.operation'
-import crudOperation from '@crud/CRUD.operation'
-import udOperation from '@crud/UD.operation'
-import pagination from '@crud/Pagination'
+import crudRoles from '@/api/authority/role'
+import { getAdminByIds, getAllAdmin } from '@/api/authority/admin'
+import { getMenusByPid, getChildren } from '@/api/authority/menu'
+import CRUD, { presenter, header, form, crud } from '@/components/Crud/crud'
+import rrOperation from '@/components/Crud/RR.operation'
+import crudOperation from '@/components/Crud/CRUD.operation'
+import udOperation from '@/components/Crud/UD.operation'
+import pagination from '@/components/Crud/Pagination'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import DateRangePicker from '@/components/DateRangePicker'
 
 const defaultForm = { id: null, name: null, summary: null }
@@ -106,15 +133,15 @@ export default {
   name: 'Role',
   components: { Treeselect, pagination, crudOperation, rrOperation, udOperation, DateRangePicker },
   cruds() {
-    return CRUD({ title: '角色', url: '/admin/role/getAllRole', crudMethod: { ...crudRoles }})
+    return CRUD({ title: '角色', url: '/admin/role/getAllRole', crudMethod: { ...crudRoles }, methodType:'post'})
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   data() {
     return {
       defaultProps: { children: 'children', label: 'label', isLeaf: 'leaf' },
-      dateScopes: ['全部', '本级', '自定义'], level: 3,
+      dateScopes: [{code:0, name:'全部'}, {code:1, name:'自定义'}], level: 3,
       currentId: 0, menuLoading: false, showButton: false,
-      menus: [], menuIds: [], // depts: [], deptDatas: [], // 多选时使用
+      menus: [], menuIds: [],  administrators: [], adminDatas: [], // 多选时使用
       permission: {
         add: ['admin', 'roles:add'],
         edit: ['admin', 'roles:edit'],
@@ -130,11 +157,6 @@ export default {
       }
     }
   },
-  created() {
-    // crudRoles.getLevel().then(data => {
-    //   this.level = data.level
-    // })
-  },
   methods: {
     getMenuDatas(node, resolve) {
       setTimeout(() => {
@@ -146,42 +168,42 @@ export default {
     [CRUD.HOOK.afterRefresh]() {
       this.$refs.menu.setCheckedKeys([])
     },
-    // 新增前初始化部门信息
+    // 新增前初始化管理员信息
     [CRUD.HOOK.beforeToAdd](crud, form) {
-      // this.deptDatas = []
+      this.adminDatas = []
       form.menus = null
     },
-    // 编辑前初始化自定义数据权限的部门信息
+    // 编辑前初始化自定义数据权限的用户信息
     [CRUD.HOOK.beforeToEdit](crud, form) {
-      // this.deptDatas = []
-      // if (form.dataScope === '自定义') {
-      //   this.getSupDepts(form.depts)
-      // }
-      // const _this = this
-      // form.depts.forEach(function(dept) {
-      //   _this.deptDatas.push(dept.id)
-      // })
+      this.adminDatas = []
+      if (form.dataScope === 1) {
+        this.getAdminByIds(form.administrators)
+      }
+      const _this = this
+      form.administrators.forEach(function(administrator) {
+        _this.adminDatas.push(administrator.id)
+      })
       // 将角色的菜单清空，避免日志入库数据过长
       form.menus = null
     },
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
-      // if (crud.form.dataScope === '自定义' && this.deptDatas.length === 0) {
-      //   this.$message({
-      //     message: '自定义数据权限不能为空',
-      //     type: 'warning'
-      //   })
-      //   return false
-      // } else if (crud.form.dataScope === '自定义') {
-      //   const depts = []
-      //   this.deptDatas.forEach(function(data) {
-      //     const dept = { id: data }
-      //     depts.push(dept)
-      //   })
-      //   crud.form.depts = depts
-      // } else {
-      //   crud.form.depts = []
-      // }
+      if (crud.form.dataScope === 1 && this.adminDatas.length === 0) {
+        this.$message({
+          message: '自定义数据权限不能为空',
+          type: 'warning'
+        })
+        return false
+      } else if (crud.form.dataScope === 1) {
+        const administrators = []
+        this.adminDatas.forEach(function(data) {
+          const administrator = { id: data }
+          administrators.push(administrator)
+        })
+        crud.form.administrators = administrators
+      } else {
+        crud.form.administrators = []
+      }
       return true
     },
     // 触发单选
@@ -253,28 +275,27 @@ export default {
         }
       })
     },
-    // 获取部门数据
-    // getDepts() {
-    //   getDepts({ enabled: true }).then(res => {
-    //     this.depts = res.content.map(function(obj) {
-    //       if (obj.hasChildren) {
-    //         obj.children = null
-    //       }
-    //       return obj
-    //     })
-    //   })
-    // },
-    // getSupDepts(depts) {
-    //   const ids = []
-    //   depts.forEach(dept => {
-    //     ids.push(dept.id)
-    //   })
-    //   getDeptSuperior(ids).then(res => {
-    //     const date = res.content
-    //     this.buildDepts(date)
-    //     this.depts = date
-    //   })
-    // },
+    // 获取管理员数据
+    getAllAdmin() {
+      getAllAdmin({searchAll:true}).then(res => {
+        this.adminDatas = res.data.data;
+        // this.administrators = res.data.data.map(function(obj) {
+        //   if (obj.hasChildren) {
+        //     obj.children = null
+        //   }
+        //   return obj
+        // })
+      })
+    },
+    getAdminByIds(administrators) {
+      const ids = []
+      administrators.forEach(administrator => {
+        ids.push(administrator.id)
+      })
+      getAdminByIds(ids).then(res => {
+        this.administrators = res.data.data
+      })
+    },
     // buildDepts(depts) {
     //   depts.forEach(data => {
     //     if (data.children) {
@@ -285,7 +306,7 @@ export default {
     //     }
     //   })
     // },
-    // 获取弹窗内部门数据
+    // 获取弹窗内管理员数据
     // loadDepts({ action, parentNode, callback }) {
     //   if (action === LOAD_CHILDREN_OPTIONS) {
     //     getDepts({ enabled: true, pid: parentNode.id }).then(res => {
@@ -301,15 +322,15 @@ export default {
     //     })
     //   }
     // },
-    // 如果数据权限为自定义则获取部门数据
-    // changeScope() {
-    //   if (this.form.dataScope === '自定义') {
-    //     this.getDepts()
-    //   }
-    // },
-    // checkboxT(row) {
-    //   return row.level >= this.level
-    // }
+    // 如果数据权限为自定义则获取管理员数据
+    changeScope() {
+      if (this.form.dataScope === 1) {
+        this.getAllAdmin()
+      }
+    },
+    checkboxT(row) {
+      return row.level >= this.level
+    }
   }
 }
 </script>

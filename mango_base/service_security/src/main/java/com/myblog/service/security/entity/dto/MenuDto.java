@@ -8,8 +8,6 @@ import java.util.List;
 @Data
 public class MenuDto extends BaseDto {
 
-    private String id;
-
     private String pid;
 
     private Boolean hidden;

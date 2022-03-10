@@ -51,4 +51,4 @@ export function edit(data) {
     data
   })
 }
-export default { getAllMenu, getMenuById, getMenusByPid, add, del, edit}
+export default { getAllMenu, getSuperior, getMenusByPid, add, del, edit}

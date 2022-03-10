@@ -119,7 +119,7 @@
 </template>
 
 <script>
-import crudMenu from "@/api/menu";
+import crudMenu from "@/api/authority/menu";
 import IconSelect from "@/components/IconSelect";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -160,13 +160,6 @@ export default {
       title: "菜单",
       url: "/admin/menu/getMenusByPid",
       crudMethod: { ...crudMenu },
-      optShow: {
-        add: true,
-        edit: true,
-        del: true,
-        download: false,
-        reset: false,
-      },
       page: { page: undefined, size: undefined },
     });
   },

@@ -8,6 +8,14 @@ export function initData(url, params) {
   })
 }
 
+export function initPostData(url, data) {
+  return request({
+    url: url,
+    method: 'post',
+    data
+  })
+}
+
 export function download(url, params) {
   return request({
     url: url + '?' + qs.stringify(params, { indices: false }),

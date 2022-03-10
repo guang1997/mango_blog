@@ -42,13 +42,13 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         // 根据用户名查询是否存在该用户
         QueryWrapper<Admin> adminWrapper = new QueryWrapper<>();
         if (isEmail) {
-            adminWrapper.eq(DbConstants.Admin.email, username);
+            adminWrapper.eq(DbConstants.Admin.EMAIL, username);
         } else if (isMobile) {
-            adminWrapper.eq(DbConstants.Admin.mobile, username);
+            adminWrapper.eq(DbConstants.Admin.MOBILE, username);
         } else {
-            adminWrapper.eq(DbConstants.Admin.username, username);
+            adminWrapper.eq(DbConstants.Admin.USERNAME, username);
         }
-        adminWrapper.eq(DbConstants.Base.isDeleted, "0");
+        adminWrapper.eq(DbConstants.Base.IS_DELETED, "0");
         Admin admin = baseMapper.selectOne(adminWrapper);
         if (admin == null) {
             LOGGER.error("admin login failed, cannot find admin by userName:{}", username);

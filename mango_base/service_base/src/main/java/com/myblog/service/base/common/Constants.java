@@ -26,5 +26,8 @@ public interface Constants {
         String DEFAULT_VALUE = "defaultValue";
         String LIST = "list";
         String DATA = "data";
+        String PAGE = "page";
+        String SIZE = "size";
+        String TOTAL = "total";
     }
 }

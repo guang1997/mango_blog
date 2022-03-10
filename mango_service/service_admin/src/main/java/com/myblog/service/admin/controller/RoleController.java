@@ -7,6 +7,7 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.Role;
+import com.myblog.service.security.entity.vo.RoleVo;
 import com.myblog.service.security.service.MenuService;
 import com.myblog.service.security.service.RoleService;
 import io.swagger.annotations.ApiOperation;
@@ -37,6 +38,19 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
 
+    @LogByMethod("/admin/role/getAllRole")
+    @ApiOperation(value = "分页查询角色", notes = "分页查询角色", response = Response.class)
+    @PostMapping("/getAllRole")
+    public Response getAllRole(@RequestBody RoleVo roleVo) {
+        Response response = Response.ok();
+        try {
+            response = roleService.getRoleByPage(roleVo);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
 
     @LogByMethod("/admin/role/addRole")
     @ApiOperation(value = "新增角色", notes = "新增角色", response = Response.class)

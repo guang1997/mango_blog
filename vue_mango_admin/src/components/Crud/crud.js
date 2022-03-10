@@ -47,8 +47,8 @@ function CRUD(options) {
       add: true,
       edit: true,
       del: true,
-      download: true,
-      reset: true
+      download: false,
+      reset: false
     },
     // 自定义一些扩展属性
     props: {},
@@ -64,6 +64,8 @@ function CRUD(options) {
       // 总数据条数
       total: 0
     },
+    // 请求方式
+    methodType: 'get'
   }
   options = mergeOptions(defaultOptions, options)
   const data = {
@@ -131,29 +133,56 @@ function CRUD(options) {
       return new Promise((resolve, reject) => {
         crud.loading = true
         // 请求数据
-        initData(crud.url, crud.getQueryParams()).then(res => {
-          const table = crud.getTable()
-          if (table && table.lazy) { // 懒加载子节点数据，清掉已加载的数据
-            table.store.states.treeData = {}
-            table.store.states.lazyTreeNodeMap = {}
-          }
-          if(res.data.total) {
-            crud.page.total = res.data.total
-          }
-          if(res.data.data) {
-            crud.data = res.data.data
-          }
-          crud.resetDataStatus()
-          // time 毫秒后显示表格
-          setTimeout(() => {
+        if (this.methodType === 'get') {
+          initData(crud.url, crud.getQueryParams()).then(res => {
+            const table = crud.getTable()
+            if (table && table.lazy) { // 懒加载子节点数据，清掉已加载的数据
+              table.store.states.treeData = {}
+              table.store.states.lazyTreeNodeMap = {}
+            }
+            if(res.data.total) {
+              crud.page.total = res.data.total
+            }
+            if(res.data.data) {
+              crud.data = res.data.data
+            }
+            crud.resetDataStatus()
+            // time 毫秒后显示表格
+            setTimeout(() => {
+              crud.loading = false
+              callVmHook(crud, CRUD.HOOK.afterRefresh)
+            }, crud.time)
+            resolve(res)
+          }).catch(err => {
             crud.loading = false
-            callVmHook(crud, CRUD.HOOK.afterRefresh)
-          }, crud.time)
-          resolve(res)
-        }).catch(err => {
-          crud.loading = false
-          reject(err)
-        })
+            reject(err)
+          })
+        } else if (methodType === 'post') {
+          initData(crud.url, crud.getQueryParams()).then(res => {
+            const table = crud.getTable()
+            if (table && table.lazy) { // 懒加载子节点数据，清掉已加载的数据
+              table.store.states.treeData = {}
+              table.store.states.lazyTreeNodeMap = {}
+            }
+            if(res.data.total) {
+              crud.page.total = res.data.total
+            }
+            if(res.data.data) {
+              crud.data = res.data.data
+            }
+            crud.resetDataStatus()
+            // time 毫秒后显示表格
+            setTimeout(() => {
+              crud.loading = false
+              callVmHook(crud, CRUD.HOOK.afterRefresh)
+            }, crud.time)
+            resolve(res)
+          }).catch(err => {
+            crud.loading = false
+            reject(err)
+          })
+        }
+      
       })
     },
     /**

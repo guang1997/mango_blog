@@ -16,10 +16,6 @@ public class MenuVo extends BaseVo {
 
     private Boolean hidden;
 
-//    private String redirect;
-
-//    private Boolean alwaysShow;
-
     private String name;
 
     private String component;

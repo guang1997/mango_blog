@@ -1,5 +1,6 @@
 package com.myblog.service.base.common;
 
+import com.myblog.service.base.entity.vo.BaseVo;
 import com.myblog.service.base.util.JsonUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,6 +8,7 @@ import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 @Data

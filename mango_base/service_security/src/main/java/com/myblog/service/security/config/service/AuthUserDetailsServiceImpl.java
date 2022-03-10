@@ -43,7 +43,7 @@ public class AuthUserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws LoginException {
         QueryWrapper<Admin> adminQueryWrapper = new QueryWrapper<>();
-        adminQueryWrapper.eq(DbConstants.Admin.username, username);
+        adminQueryWrapper.eq(DbConstants.Admin.USERNAME, username);
         Admin admin = adminService.getOne(adminQueryWrapper);
         if (admin == null) {
             return null;
