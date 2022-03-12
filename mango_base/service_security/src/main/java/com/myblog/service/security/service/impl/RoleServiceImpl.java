@@ -5,20 +5,24 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.BeanUtil;
+import com.myblog.service.base.util.ThreadSafeDateFormat;
+import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.Role;
+import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.entity.vo.RoleVo;
 import com.myblog.service.security.mapper.RoleMapper;
 import com.myblog.service.security.service.RoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>
@@ -31,12 +35,11 @@ import java.util.Objects;
 @Service
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
 
-    @Autowired
-    private RoleMapper roleMapper;
+    private static Logger LOGGER = LoggerFactory.getLogger(RoleServiceImpl.class);
 
     @Override
     public List<Role> getRolesByUserName(String username) {
-        return roleMapper.getRolesByUserName(username);
+        return baseMapper.getRolesByUserName(username);
     }
 
     /**
@@ -45,11 +48,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
-    public Response getRoleByPage(RoleVo roleVo) {
-        // 全量查询返回所有数据
-        if (!Objects.equals(null, roleVo) && roleVo.getSearchAll()) {
-            return Response.ok().data(Constants.ReplyField.DATA, toDto(roleMapper.selectList(null)));
-        }
+    public Response getRoleByPage(RoleVo roleVo) throws Exception {
         Response response = Response.ok();
         int page = 1;
         int size = 10;
@@ -62,12 +61,91 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             queryWrapper.like(DbConstants.Role.ROLE_NAME, roleVo.getBlurry());
             queryWrapper.or().like(DbConstants.Role.SUMMARY, roleVo.getBlurry());
         }
-        roleMapper.selectPage(rolePage, queryWrapper);
-        response.data(Constants.ReplyField.DATA, toDto(rolePage.getRecords()));
+        if (!CollectionUtils.isEmpty(roleVo.getCreateTime()) && Objects.equals(2, roleVo.getCreateTime().size())) {
+            Date beginDate = ThreadSafeDateFormat.parse(roleVo.getCreateTime().get(0), ThreadSafeDateFormat.DATETIME);
+            Date endDate = ThreadSafeDateFormat.parse(roleVo.getCreateTime().get(1), ThreadSafeDateFormat.DATETIME);
+            queryWrapper.between(DbConstants.Base.CREATE_TIME, beginDate, endDate);
+        }
+        baseMapper.selectPage(rolePage, queryWrapper);
+        // 获取角色菜单信息
+        List<RoleDto> roleDtos = toDto(rolePage.getRecords());
+        for (RoleDto roleDto : roleDtos) {
+            List<MenuDto> menuDtos = baseMapper.selectRoleMenu(roleDto.getId());
+            roleDto.setMenus(menuDtos);
+        }
+
+        response.data(Constants.ReplyField.DATA, roleDtos);
         response.data(Constants.ReplyField.TOTAL, rolePage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);
         response.data(Constants.ReplyField.SIZE, size);
         return response;
+    }
+
+    /**
+     * 保存角色信息
+     * @param role
+     * @return
+     */
+    @Override
+    public Response addRole(Role role) {
+        // 校验管理员是否已经存在
+        QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Role.ROLE_NAME, role.getRoleName());
+        List<Role> menus = baseMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(menus)) {
+            LOGGER.error("addRole failed, role already exist in db, role:{}", role);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
+        if (baseMapper.insert(role) < 1) {
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
+        return Response.ok();
+    }
+
+    /**
+     * 删除角色
+     * @param ids
+     * @return
+     */
+    @Override
+    public Response delRole(Set<String> ids) {
+        // 如果角色已经绑定了用户，那么不删除该角色
+        List<String> delFailedRoleNames = new ArrayList<>();
+        List<String> delSuccessedRoleIds = new ArrayList<>();
+        for (String id : ids) {
+            List<String> adminIdsByRoleId = baseMapper.getAdminIdsByRoleId(id);
+            if (!CollectionUtils.isEmpty(adminIdsByRoleId)) {
+                Role role = baseMapper.selectById(id);
+                LOGGER.warn("delete role failed, the role:{} has been bound", role);
+                delFailedRoleNames.add(role.getRoleName());
+                continue;
+            }
+            if (baseMapper.deleteById(id) < 1) {
+                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            }
+            delSuccessedRoleIds.add(id);
+        }
+        if (!CollectionUtils.isEmpty(delSuccessedRoleIds)) {
+            baseMapper.batchDeleteRoleAdminByRoleId(delSuccessedRoleIds);
+        }
+        if (CollectionUtils.isEmpty(delFailedRoleNames)) {
+            return Response.ok();
+        }
+        return Response.error().message(delFailedRoleNames.toString() + "已绑定用户, 未删除成功");
+    }
+
+    /**
+     * 修改角色
+     * @param role
+     * @return
+     */
+    @Override
+    public Response editRole(Role role) {
+        if (baseMapper.updateById(role) < 1) {
+            LOGGER.error("editRole failed, role:{}", role);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+        return Response.ok();
     }
 
     private List<RoleDto> toDto(List<Role> roleList) {

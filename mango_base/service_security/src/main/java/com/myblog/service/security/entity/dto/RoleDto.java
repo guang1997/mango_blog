@@ -4,6 +4,8 @@ import com.myblog.service.base.entity.dto.BaseDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class RoleDto extends BaseDto {
 
@@ -11,4 +13,5 @@ public class RoleDto extends BaseDto {
 
     private String summary;
 
+    private List<MenuDto> menus;
 }

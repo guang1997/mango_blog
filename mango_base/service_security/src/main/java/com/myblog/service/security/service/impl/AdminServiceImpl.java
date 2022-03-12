@@ -1,10 +1,13 @@
 package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
+import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.CheckUtils;
 import com.myblog.service.security.config.entity.vo.AdminVO;
 import com.myblog.service.security.entity.Admin;
+import com.myblog.service.security.entity.vo.AdminVo;
 import com.myblog.service.security.mapper.AdminMapper;
 import com.myblog.service.security.service.AdminService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -63,5 +66,18 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         }
 
         return admin;
+    }
+
+    /**
+     * 分页查询管理员信息
+     * @param adminVo
+     * @return
+     */
+    @Override
+    public Response getAdminByPage(AdminVo adminVo) {
+        if (adminVo.isSearchAll()) {
+            return Response.ok().data(Constants.ReplyField.DATA, baseMapper.selectList(null));
+        }
+        return null;
     }
 }

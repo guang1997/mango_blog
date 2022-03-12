@@ -85,24 +85,6 @@ DELETE FROM `t_blog`;
 /*!40000 ALTER TABLE `t_blog` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_blog` ENABLE KEYS */;
 
--- 导出  表 mango_blog.t_blog_sort 结构
-CREATE TABLE IF NOT EXISTS `t_blog_sort` (
-  `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
-  `sort_name` varchar(255) DEFAULT NULL COMMENT '分类内容',
-  `content` varchar(255) DEFAULT NULL COMMENT '分类简介',
-  `create_time` timestamp NOT NULL COMMENT '创建时间',
-  `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '状态',
-  `sort` int DEFAULT '0' COMMENT '排序字段，越小越靠前',
-  `click_count` int DEFAULT '0' COMMENT '点击数',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客分类表';
-
--- 正在导出表  mango_blog.t_blog_sort 的数据：~0 rows (大约)
-DELETE FROM `t_blog_sort`;
-/*!40000 ALTER TABLE `t_blog_sort` DISABLE KEYS */;
-/*!40000 ALTER TABLE `t_blog_sort` ENABLE KEYS */;
-
 -- 导出  表 mango_blog.t_comment 结构
 CREATE TABLE IF NOT EXISTS `t_comment` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
@@ -228,10 +210,10 @@ DELETE FROM `t_picture`;
 -- 导出  表 mango_blog.t_role 结构
 CREATE TABLE IF NOT EXISTS `t_role` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色id',
-  `role_name` varchar(255) NOT NULL COMMENT '角色名',
+  `role_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色名',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `summary` varchar(255) DEFAULT NULL COMMENT '角色介绍',
+  `summary` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '角色介绍',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='角色表';
 
@@ -240,7 +222,8 @@ DELETE FROM `t_role`;
 /*!40000 ALTER TABLE `t_role` DISABLE KEYS */;
 INSERT INTO `t_role` (`id`, `role_name`, `create_time`, `update_time`, `summary`) VALUES
 	('1395268474480156673', 'admin', '2021-10-02 22:52:24', '2021-10-02 22:52:25', '管理员'),
-	('1395268474480156674', 'visitor', '2021-12-02 21:58:50', '2021-12-02 21:58:50', '游客');
+	('1395268474480156674', 'visitor', '2021-12-02 21:58:50', '2021-12-02 21:58:50', '游客'),
+	('1502546893753643010', '12', '2022-03-12 15:27:50', '2022-03-12 15:27:50', '12');
 /*!40000 ALTER TABLE `t_role` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role_admin 结构
@@ -258,7 +241,8 @@ DELETE FROM `t_role_admin`;
 /*!40000 ALTER TABLE `t_role_admin` DISABLE KEYS */;
 INSERT INTO `t_role_admin` (`id`, `role_id`, `admin_id`, `create_time`, `update_time`) VALUES
 	('1495268474480156673', '1395268474480156673', '1295268474480156673', '2021-10-02 22:52:34', '2021-10-02 22:52:35'),
-	('1495268474480156674', '1395268474480156673', '1595268474480156674', '2021-12-02 22:09:43', '2021-12-02 22:09:43');
+	('1495268474480156674', '1395268474480156673', '1595268474480156674', '2021-12-02 22:09:43', '2021-12-02 22:09:43'),
+	('1502546893753643010', '1502546893753643010', '1595268474480156674', '2022-03-12 16:18:38', '2022-03-12 16:18:38');
 /*!40000 ALTER TABLE `t_role_admin` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role_menu 结构
@@ -304,6 +288,23 @@ INSERT INTO `t_role_permission` (`id`, `role_id`, `permission_id`, `create_time`
 	('1695268474480156675', '1395268474480156673', '1295268474480156675', '2021-11-28 15:22:07', '2021-11-28 15:22:08'),
 	('1695268474480156676', '1395268474480156673', '1295268474480156676', '2021-11-28 15:22:33', '2021-11-28 15:22:33');
 /*!40000 ALTER TABLE `t_role_permission` ENABLE KEYS */;
+
+-- 导出  表 mango_blog.t_sort 结构
+CREATE TABLE IF NOT EXISTS `t_sort` (
+  `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
+  `sort_name` varchar(255) DEFAULT NULL COMMENT '分类内容',
+  `content` varchar(255) DEFAULT NULL COMMENT '分类简介',
+  `create_time` timestamp NOT NULL COMMENT '创建时间',
+  `update_time` timestamp NOT NULL COMMENT '更新时间',
+  `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '状态',
+  `click_count` int DEFAULT '0' COMMENT '点击数',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客分类表';
+
+-- 正在导出表  mango_blog.t_sort 的数据：~0 rows (大约)
+DELETE FROM `t_sort`;
+/*!40000 ALTER TABLE `t_sort` DISABLE KEYS */;
+/*!40000 ALTER TABLE `t_sort` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_sys_dict_data 结构
 CREATE TABLE IF NOT EXISTS `t_sys_dict_data` (
@@ -365,7 +366,6 @@ CREATE TABLE IF NOT EXISTS `t_tag` (
   `click_count` int DEFAULT '0' COMMENT '标签简介',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `sort` int DEFAULT '0' COMMENT '排序字段，越小越靠前',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='标签表';
 

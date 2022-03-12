@@ -64,6 +64,7 @@ public class MenuController {
         Set<MenuDto> menuDtos = new LinkedHashSet<>();
         try {
             MenuDto menuDto = menuService.getMenuById(id);
+            menuDtos.add(menuDto);
             List<MenuDto> childrenList = menuService.getMenusByPid(id);
             menuDtos.addAll(menuService.getChildren(childrenList, menuDtos));
             List<String> resultIds = menuDtos.stream()

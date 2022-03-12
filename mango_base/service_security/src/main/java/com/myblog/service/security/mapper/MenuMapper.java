@@ -22,4 +22,6 @@ public interface MenuMapper extends BaseMapper<Menu> {
     int updateSubCount(@Param("id") String id, @Param("subCount") Integer subCount);
 
     int updateByTitle(Menu menu);
+
+    int batchDeleteRoleMenuByMenuId(@Param("menuIds") List<String> menuIds);
 }

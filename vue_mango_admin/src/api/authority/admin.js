@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getAllAdmin(data) {
+export function getAdminByPage(data) {
   return request({
-    url: '/admin/menu/getAllMenu',
+    url: '/admin/manager/getAdminByPage',
     method: 'post',
     data
   })
@@ -10,10 +10,10 @@ export function getAllAdmin(data) {
 
 export function getAdminByIds(data) {
     return request({
-      url: '/admin/menu/getAdminByIds',
+      url: '/admin/manager/getAdminByIds',
       method: 'post',
       data
     })
   }
 
-export default { getAllAdmin, getAdminByIds}
+export default { getAdminByPage, getAdminByIds}

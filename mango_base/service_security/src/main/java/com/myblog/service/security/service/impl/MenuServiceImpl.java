@@ -36,10 +36,6 @@ import java.util.*;
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(MenuServiceImpl.class);
-
-    @Autowired
-    private MenuMapper menuMapper;
-
     /**
      * 根据角色获取对应菜单，用于渲染侧边栏
      * @param roles
@@ -47,7 +43,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      */
     @Override
     public List<Menu> getMenuByRoles(List<Role> roles) {
-        return menuMapper.getMenuByRoles(roles);
+        return baseMapper.getMenuByRoles(roles);
     }
 
     /**
@@ -57,7 +53,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      */
     @Override
     public MenuDto getMenuById(String id) {
-        Menu menu = menuMapper.selectById(id);
+        Menu menu = baseMapper.selectById(id);
         if (menu == null) {
             LOGGER.error("getMenuById:[{}] failed from db", id);
             throw new RuntimeException("cannot find menu from db");
@@ -86,7 +82,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
         QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
         wrapper.eq(DbConstants.Base.PID, pid);
-        return toDto(menuMapper.selectList(wrapper));
+        return toDto(baseMapper.selectList(wrapper));
     }
 
     /**
@@ -102,7 +98,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
             QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
             wrapper.eq(DbConstants.Base.PID,  "0");
-            menuDtos.addAll(toDto(menuMapper.selectList(wrapper)));
+            menuDtos.addAll(toDto(baseMapper.selectList(wrapper)));
             return menuDtos;
         }
         // 获取与当前菜单同级别的菜单信息
@@ -144,7 +140,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (!Objects.equals("Layout", menu.getComponent())) {
             queryWrapper.or().eq(DbConstants.Menu.COMPONENT, menu.getComponent());
         }
-        List<Menu> menus = menuMapper.selectList(queryWrapper);
+        List<Menu> menus = baseMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(menus)) {
             LOGGER.error("addMenu failed, menu already exist in db, menu:{}", menu);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
@@ -152,8 +148,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (StringUtils.isBlank(menu.getName())) {
             menu.setName(menu.getTitle());
         }
-        if (menuMapper.updateByTitle(menu) < 1) {
-            if (menuMapper.insert(menu) < 1) {
+        if (baseMapper.updateByTitle(menu) < 1) {
+            if (baseMapper.insert(menu) < 1) {
                 LOGGER.error("addMenu failed, menu:{}", menu);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
@@ -165,8 +161,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         }
         QueryWrapper<Menu> countWrapper = decorator.createBaseQueryWrapper();
         countWrapper.eq(DbConstants.Base.PID, menu.getPid());
-        Integer subCount = menuMapper.selectCount(countWrapper);
-        if (menuMapper.updateSubCount(menu.getPid(), ++subCount) < 1) {
+        Integer subCount = baseMapper.selectCount(countWrapper);
+        if (baseMapper.updateSubCount(menu.getPid(), ++subCount) < 1) {
             LOGGER.error("addMenu failed by updateSubCount, menu:{}", menu);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
@@ -182,16 +178,16 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     public Response editMenu(Menu menu) {
         // 获取旧的菜单信息，用于更新父菜单的subCount
         MenuDto oldMenu = this.getMenuById(menu.getId());
-        if (menuMapper.updateById(menu) < 1) {
+        if (baseMapper.updateById(menu) < 1) {
             LOGGER.error("editMenu failed, menu:{}", menu);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
 
         if (!Objects.equals(oldMenu.getPid(), menu.getPid())) {
-            Menu oldParentMenu = menuMapper.selectById(oldMenu.getPid());
-            Menu newParentMenu = menuMapper.selectById(menu.getPid());
-            menuMapper.updateSubCount(oldParentMenu.getId(), oldParentMenu.getSubCount() - 1);
-            menuMapper.updateSubCount(newParentMenu.getId(), newParentMenu.getSubCount() + 1);
+            Menu oldParentMenu = baseMapper.selectById(oldMenu.getPid());
+            Menu newParentMenu = baseMapper.selectById(menu.getPid());
+            baseMapper.updateSubCount(oldParentMenu.getId(), oldParentMenu.getSubCount() - 1);
+            baseMapper.updateSubCount(newParentMenu.getId(), newParentMenu.getSubCount() + 1);
         }
         return Response.ok();
     }
@@ -203,10 +199,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      */
     @Override
     public Response delMenu(List<String> ids) {
-        if (menuMapper.deleteBatchIds(ids) < 1) {
+        if (baseMapper.deleteBatchIds(ids) < 1) {
             LOGGER.error("delMenu failed, ids:{}", ids);
             return Response.setResult(ResultCodeEnum.DELETE_FAILED);
         }
+        // 清除角色和菜单中间表
+        baseMapper.batchDeleteRoleMenuByMenuId(ids);
         return Response.ok();
     }
 

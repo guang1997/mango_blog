@@ -3,6 +3,7 @@ package com.myblog.service.security.entity.vo;
 import com.myblog.service.base.entity.vo.BaseVo;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +15,5 @@ public class RoleVo extends BaseVo {
      */
     private String blurry;
 
-    private Boolean searchAll;
-
-    private List<Date> createTime;
+    private List<String> createTime;
 }

@@ -1,5 +1,6 @@
-import { initData, download } from '@/api/data'
+import { initData, initPostData, download } from '@/api/data'
 import { parseTime, downloadFile } from '@/utils/index'
+import commonUtil from '@/utils/commonUtil';
 import Vue from 'vue'
 
 /**
@@ -58,7 +59,7 @@ function CRUD(options) {
     debug: false,///.
     page: {
       // 页码
-      page: 0,
+      page: 1,
       // 每页数据条数
       size: 10,
       // 总数据条数
@@ -133,50 +134,58 @@ function CRUD(options) {
       return new Promise((resolve, reject) => {
         crud.loading = true
         // 请求数据
-        if (this.methodType === 'get') {
+        if (crud.methodType === 'get') {
           initData(crud.url, crud.getQueryParams()).then(res => {
-            const table = crud.getTable()
-            if (table && table.lazy) { // 懒加载子节点数据，清掉已加载的数据
-              table.store.states.treeData = {}
-              table.store.states.lazyTreeNodeMap = {}
+            if (res.code === commonUtil.ECode.SUCCESS) {
+              const table = crud.getTable()
+              if (table && table.lazy) { // 懒加载子节点数据，清掉已加载的数据
+                table.store.states.treeData = {}
+                table.store.states.lazyTreeNodeMap = {}
+              }
+              if(res.data.total) {
+                crud.page.total = res.data.total
+              }
+              if(res.data.data) {
+                crud.data = res.data.data
+              }
+              crud.resetDataStatus()
+              // time 毫秒后显示表格
+              setTimeout(() => {
+                crud.loading = false
+                callVmHook(crud, CRUD.HOOK.afterRefresh)
+              }, crud.time)
+              resolve(res)
+            } else {
+              commonUtil.FUNCTIONS.message.error(res.message)
             }
-            if(res.data.total) {
-              crud.page.total = res.data.total
-            }
-            if(res.data.data) {
-              crud.data = res.data.data
-            }
-            crud.resetDataStatus()
-            // time 毫秒后显示表格
-            setTimeout(() => {
-              crud.loading = false
-              callVmHook(crud, CRUD.HOOK.afterRefresh)
-            }, crud.time)
-            resolve(res)
           }).catch(err => {
             crud.loading = false
             reject(err)
           })
-        } else if (methodType === 'post') {
-          initData(crud.url, crud.getQueryParams()).then(res => {
-            const table = crud.getTable()
-            if (table && table.lazy) { // 懒加载子节点数据，清掉已加载的数据
-              table.store.states.treeData = {}
-              table.store.states.lazyTreeNodeMap = {}
+        } else if (crud.methodType === 'post') {
+          initPostData(crud.url, crud.getQueryParams()).then(res => {
+            if (res.code === commonUtil.ECode.SUCCESS) {
+              const table = crud.getTable()
+              if (table && table.lazy) { // 懒加载子节点数据，清掉已加载的数据
+                table.store.states.treeData = {}
+                table.store.states.lazyTreeNodeMap = {}
+              }
+              if(res.data.total) {
+                crud.page.total = res.data.total
+              }
+              if(res.data.data) {
+                crud.data = res.data.data
+              }
+              crud.resetDataStatus()
+              // time 毫秒后显示表格
+              setTimeout(() => {
+                crud.loading = false
+                callVmHook(crud, CRUD.HOOK.afterRefresh)
+              }, crud.time)
+              resolve(res)
+            } else {
+              commonUtil.FUNCTIONS.message.error(res.message)
             }
-            if(res.data.total) {
-              crud.page.total = res.data.total
-            }
-            if(res.data.data) {
-              crud.data = res.data.data
-            }
-            crud.resetDataStatus()
-            // time 毫秒后显示表格
-            setTimeout(() => {
-              crud.loading = false
-              callVmHook(crud, CRUD.HOOK.afterRefresh)
-            }, crud.time)
-            resolve(res)
           }).catch(err => {
             crud.loading = false
             reject(err)
@@ -257,7 +266,7 @@ function CRUD(options) {
       }
       // 清除表单验证
       if (crud.findVM('form').$refs['form']) {
-        crud.findVM('form').$refs['form'].clearValidate()
+        crud.findVM('form').$refs['form'].resetFields()
       }
     },
     /**
@@ -343,15 +352,21 @@ function CRUD(options) {
       if (!delAll) {
         dataStatus.delete = CRUD.STATUS.PROCESSING
       }
-      return crud.crudMethod.del(ids).then(() => {
-        if (delAll) {
-          crud.delAllLoading = false
-        } else dataStatus.delete = CRUD.STATUS.PREPARED
-        crud.dleChangePage(1)
-        crud.delSuccessNotify()
-        callVmHook(crud, CRUD.HOOK.afterDelete, data)
-        crud.refresh()
+      return crud.crudMethod.del(ids).then((res) => {
+        if(res.code === commonUtil.ECode.SUCCESS) {
+          if (delAll) {
+            crud.delAllLoading = false
+          } else dataStatus.delete = CRUD.STATUS.PREPARED
+          crud.dleChangePage(1)
+          crud.delSuccessNotify()
+          callVmHook(crud, CRUD.HOOK.afterDelete, data)
+          crud.refresh()
+        } else {
+          commonUtil.FUNCTIONS.message.error(res.message)
+        }
+       
       }).catch(() => {
+
         if (delAll) {
           crud.delAllLoading = false
         } else dataStatus.delete = CRUD.STATUS.PREPARED
@@ -382,7 +397,7 @@ function CRUD(options) {
       })
       if(crud.page.page && crud.page.size) {
         return {
-          page: crud.page.page - 1,
+          page: crud.page.page,
           size: crud.page.size,
           ...crud.query,
           ...crud.params
@@ -448,7 +463,7 @@ function CRUD(options) {
       }
       // add by ghl 2020-10-04  页面重复添加信息时，下拉框的校验会存在，需要找工取消
       if (crud.findVM('form').$refs['form']) {
-        crud.findVM('form').$refs['form'].clearValidate()
+        crud.findVM('form').$refs['form'].resetFields()
       }
     },
     /**

@@ -44,6 +44,12 @@
         </set>
         where title=#{title,jdbcType=VARBINARY} and pid=#{pid,jdbcType=INTEGER}
     </update>
+    <delete id="batchDeleteRoleMenuByMenuId">
+        DELETE FROM t_role_menu WHERE menu_id IN
+        <foreach collection="menuIds" item="menuId" separator="," open="(" close=")">
+            #{menuId}
+        </foreach>
+    </delete>
 
     <select id="getMenuByRoles" resultType="com.myblog.service.security.entity.Menu">
         SELECT t1.id, t1.name, t1.title, t1.pid, t1.icon, t1.sort, t1.create_time, t1.update_time, t1.hidden,

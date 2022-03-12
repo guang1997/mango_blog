@@ -15,7 +15,7 @@ export function getSuperior(id) {
   })
 }
 
-export function getChildren() {
+export function getChildren(id) {
   return request({
     url: '/admin/menu/getChildren?id=' + id,
     method: 'get'
