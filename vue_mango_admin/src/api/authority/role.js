@@ -8,6 +8,13 @@ export function getAllRole(data) {
   })
 }
 
+export function getRoleById(id) {
+  return request({
+    url: '/admin/role/getRoleById?id=' + id,
+    method: 'get'
+  })
+}
+
 export function add(data) {
   return request({
     url: '/admin/role/addRole',
@@ -30,4 +37,11 @@ export function edit(data) {
     data
   })
 }
-export default { getAllRole, add, del, edit}
+export function editMenu(data) {
+  return request({
+    url: '/admin/role/menu',
+    method: 'post',
+    data
+  })
+}
+export default { getAllRole, add, del, edit, editMenu, getRoleById}

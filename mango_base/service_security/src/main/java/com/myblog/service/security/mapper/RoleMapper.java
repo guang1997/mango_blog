@@ -2,6 +2,7 @@ package com.myblog.service.security.mapper;
 
 import com.myblog.service.security.entity.Role;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.myblog.service.security.entity.RoleMenu;
 import com.myblog.service.security.entity.dto.MenuDto;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,5 +24,9 @@ public interface RoleMapper extends BaseMapper<Role> {
 
     int batchDeleteRoleAdminByRoleId(@Param("roleIds") List<String> roleIds);
 
-    List<MenuDto> selectRoleMenu(String roleId);
+    int deleteRoleMenuByRoleId(@Param("roleId") String roleId);
+
+    List<MenuDto> selectRoleMenu(@Param("roleId") String roleId);
+
+    int insertRoleMenu(@Param("roleMenu") RoleMenu roleMenu);
 }

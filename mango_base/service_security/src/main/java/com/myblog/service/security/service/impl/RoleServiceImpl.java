@@ -1,28 +1,36 @@
 package com.myblog.service.security.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.util.BaseUtil;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
-import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.Role;
+import com.myblog.service.security.entity.RoleAdmin;
+import com.myblog.service.security.entity.RoleMenu;
 import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.entity.vo.RoleVo;
+import com.myblog.service.security.mapper.RoleAdminMapper;
 import com.myblog.service.security.mapper.RoleMapper;
+import com.myblog.service.security.mapper.RoleMenuMapper;
 import com.myblog.service.security.service.RoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -36,6 +44,12 @@ import java.util.*;
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(RoleServiceImpl.class);
+
+    @Autowired
+    private RoleMenuMapper roleMenuMapper;
+
+    @Autowired
+    private RoleAdminMapper roleAdminMapper;
 
     @Override
     public List<Role> getRolesByUserName(String username) {
@@ -126,7 +140,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             delSuccessedRoleIds.add(id);
         }
         if (!CollectionUtils.isEmpty(delSuccessedRoleIds)) {
-            baseMapper.batchDeleteRoleAdminByRoleId(delSuccessedRoleIds);
+            QueryWrapper<RoleAdmin> roleMenuQueryWrapper = new QueryWrapper<>();
+            roleMenuQueryWrapper.in(DbConstants.Base.ROLE_ID, delSuccessedRoleIds);
+            roleAdminMapper.delete(roleMenuQueryWrapper);
         }
         if (CollectionUtils.isEmpty(delFailedRoleNames)) {
             return Response.ok();
@@ -148,6 +164,52 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         return Response.ok();
     }
 
+    /**
+     * 给角色授权菜单
+     * @param role
+     * @return
+     */
+    @Override
+    public Response updateMenu(Role role) {
+        // 先删掉该角色绑定的所有菜单的信息
+        baseMapper.deleteRoleMenuByRoleId(role.getId());
+
+        // 再将菜单绑定给角色
+        List<RoleMenu> roleMenus = role.getMenus().stream()
+                .filter(BaseUtil.distinctByKey(MenuDto::getId))
+                .map(dto -> toRoleMenu(dto.getId(), role.getId()))
+                .collect(Collectors.toList());
+
+        for (RoleMenu roleMenu : roleMenus) {
+            if (roleMenuMapper.insert(roleMenu) < 1) {
+                LOGGER.error("updateMenu failed, role:{}, roleMenus:{}", role, roleMenus);
+                return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            }
+        }
+        return Response.ok();
+    }
+
+    /**
+     * 根据id获取角色信息，包含菜单相关信息
+     * @param role
+     * @return
+     */
+    @Override
+    public Response getRoleById(Role role) {
+        RoleDto roleDto = new RoleDto();
+        BeanUtil.copyProperties(role, roleDto);
+        roleDto.setId(role.getId());
+        roleDto.setCreateTime(role.getCreateTime());
+        roleDto.setMenus(baseMapper.selectRoleMenu(roleDto.getId()));
+        return Response.ok().data(Constants.ReplyField.DATA, roleDto);
+    }
+
+    private RoleMenu toRoleMenu(String menuId, String roleId) {
+        RoleMenu roleMenu = new RoleMenu();
+        roleMenu.setMenuId(menuId);
+        roleMenu.setRoleId(roleId);
+        return roleMenu;
+    }
     private List<RoleDto> toDto(List<Role> roleList) {
         List<RoleDto> roleDtos = new ArrayList<>();
         for (Role role : roleList) {

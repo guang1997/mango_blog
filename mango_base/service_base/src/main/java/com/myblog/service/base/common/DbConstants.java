@@ -9,6 +9,7 @@ public interface DbConstants {
         String PID = "pid";
         String CREATE_TIME = "create_time";
         String UPDATE_TIME = "update_time";
+        String ROLE_ID = "role_id";
     }
 
     interface Admin{
@@ -28,5 +29,13 @@ public interface DbConstants {
     interface Role{
         String ROLE_NAME = "role_name";
         String SUMMARY = "summary";
+    }
+
+    interface RoleMenu{
+        String MENU_ID = "menu_id";
+    }
+
+    interface RoleAdmin{
+        String ADMIN_ID = "admin_id";
     }
 }

@@ -28,4 +28,8 @@ public interface RoleService extends IService<Role> {
     Response delRole(Set<String> ids);
 
     Response editRole(Role role);
+
+    Response updateMenu(Role role);
+
+    Response getRoleById(Role role);
 }

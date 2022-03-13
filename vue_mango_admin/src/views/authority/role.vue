@@ -247,7 +247,7 @@ export default {
     },
     menuChange(menu) {
       // 获取该节点的所有子节点，id 包含自身
-      getChildren(menu.id).then((res) => {
+      getChildren(menu.id).then(res => {
         // 判断是否在 menuIds 中，如果存在则删除，否则添加
         const childIds = res.data.data;
         if (this.menuIds.indexOf(menu.id) !== -1) {
@@ -279,23 +279,29 @@ export default {
       });
       crudRoles
         .editMenu(role)
-        .then(() => {
-          this.crud.notify("保存成功", CRUD.NOTIFICATION_TYPE.SUCCESS);
-          this.menuLoading = false;
-          this.update();
+        .then((res) => {
+           if (res.code === this.$ECode.SUCCESS) {
+            this.crud.notify("保存成功", CRUD.NOTIFICATION_TYPE.SUCCESS);
+            this.menuLoading = false;
+            this.update();
+          } else {
+            this.$commonUtil.message.error(res.message);
+          }
+          
         })
         .catch((err) => {
           this.menuLoading = false;
-          console.log(err.response.data.message);
+          // console.log(err.response.data.message);
         });
     },
     // 改变数据
     update() {
       // 无刷新更新 表格数据
-      crudRoles.get(this.currentId).then((res) => {
+      crudRoles.getRoleById(this.currentId).then((res) => {
         for (let i = 0; i < this.crud.data.length; i++) {
-            if (res.id === this.crud.data[i].id) {
-              this.crud.data[i] = res;
+            if (res.data.data.id === this.crud.data[i].id) {
+              this.crud.data[i] = res.data.data;
+              console.log("this.crud.data[i]", this.crud.data[i])
               break;
             }
           }

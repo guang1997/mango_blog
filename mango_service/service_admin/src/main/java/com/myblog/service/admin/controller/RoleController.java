@@ -51,6 +51,21 @@ public class RoleController {
         return response;
     }
 
+    @LogByMethod("/admin/role/getRoleById")
+    @ApiOperation(value = "根据id获取角色信息", notes = "根据id获取角色信息", response = Response.class)
+    @GetMapping("/getRoleById")
+    public Response getRoleById(String id) {
+        Response response = Response.ok();
+        try {
+            Role role = roleService.getById(id);
+            response = roleService.getRoleById(role);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
     @LogByMethod("/admin/role/addRole")
     @ApiOperation(value = "新增角色", notes = "新增角色", response = Response.class)
     @PostMapping("/addRole")
@@ -91,6 +106,25 @@ public class RoleController {
         Response response = Response.ok();
         try {
             response = roleService.delRole(ids);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @LogByMethod("/admin/role/menu")
+    @ApiOperation(value = "保存菜单", notes = "保存菜单", response = Response.class)
+    @PostMapping("/menu")
+    public Response menu(@RequestBody Role role) {
+        Response response = Response.ok();
+        try {
+            if (StringUtils.isBlank(role.getId())) {
+                LOGGER.error("editMenu failed, roleId cannot be null, role:{}", role);
+                response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
+                return response;
+            }
+            response = roleService.updateMenu(role);
         } catch (Exception e) {
             response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
             throw e;
