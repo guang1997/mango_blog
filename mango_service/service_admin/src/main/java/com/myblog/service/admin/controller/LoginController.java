@@ -7,9 +7,9 @@ import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.RedisUtil;
 import com.myblog.service.security.config.entity.MySecurityProperties;
-import com.myblog.service.security.config.entity.vo.AdminVO;
-import com.myblog.service.security.entity.vo.MenuVo;
-import com.myblog.service.security.entity.vo.Meta;
+import com.myblog.service.security.entity.dto.AdminDto;
+import com.myblog.service.security.entity.dto.MenuDto;
+import com.myblog.service.security.entity.dto.Meta;
 import com.myblog.service.security.util.TreeUtil;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
@@ -82,10 +82,10 @@ public class LoginController {
     @LogByMethod("/admin/auth/login")
     @ApiOperation(value = "登录", notes = "登录", response = Response.class)
     @AnonymousPostMapping(value = "/login")
-    public Response login(@RequestBody AdminVO adminVO, HttpServletRequest request) throws UnknownHostException {
+    public Response login(@RequestBody AdminDto adminDto, HttpServletRequest request) throws UnknownHostException {
         Response response = Response.ok();
-        if (adminVO == null || StringUtils.isEmpty(adminVO.getUsername()) || StringUtils.isEmpty(adminVO.getPassword())) {
-            LOGGER.error("admin:{} login error", adminVO);
+        if (adminDto == null || StringUtils.isEmpty(adminDto.getUsername()) || StringUtils.isEmpty(adminDto.getPassword())) {
+            LOGGER.error("admin:{} login error", adminDto);
             return response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message(ResultCodeEnum.LOGIN_ERROR.getMessage());
         }
         try {
@@ -99,7 +99,7 @@ public class LoginController {
                 }
             }
 
-            Admin admin = adminService.checkLogin(adminVO);
+            Admin admin = adminService.checkLogin(adminDto);
             if (admin == null) {
                 return response.code(ResultCodeEnum.LOGIN_ERROR_LOCKED.getCode()).message(String.format(ResultCodeEnum.LOGIN_ERROR_LOCKED.getMessage(), setLoginCommit(ipAddress)));
             }
@@ -107,14 +107,14 @@ public class LoginController {
             List<Role> roles =  roleService.getRolesByUserName(admin.getUsername());
 
             // 创建token
-            long rememberMe = (adminVO.getRememberMe() == null || !adminVO.getRememberMe())
+            long rememberMe = (adminDto.getRememberMe() == null || !adminDto.getRememberMe())
                     ? properties.getExpiresSecond() : properties.getRememberMeExpiresSecond();
             // 从缓存中获取token
             String token = redisUtil.get(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
             if (StringUtils.isBlank(token)) {
                 token = jwtTokenUtil.createToken(admin, roles, rememberMe, properties.getBase64Secret());
                 //把新的token存储到缓存中
-                redisUtil.setEx(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + adminVO.getUsername(), token, rememberMe / ( 1000 * 60 * 60 ), TimeUnit.HOURS);
+                redisUtil.setEx(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + adminDto.getUsername(), token, rememberMe / ( 1000 * 60 * 60 ), TimeUnit.HOURS);
                 LOGGER.info("cannot find token from redis cache, create it:{}", token);
             }
             //将token返回到页面
@@ -236,11 +236,11 @@ public class LoginController {
                 return response.code(ResultCodeEnum.GET_USERMENU_ERROR.getCode()).message(ResultCodeEnum.GET_USERMENU_ERROR.getMessage());
             }
             // 组装菜单信息给页面
-            List<MenuVo> menuVos = new ArrayList<>();
+            List<MenuDto> menuDtos = new ArrayList<>();
             for (Menu menu : menus) {
-                menuVos.add(convertToMenuVo(menu, roleNames));
+                menuDtos.add(convertToMenuDto(menu, roleNames));
             }
-            List<MenuVo> resultList = TreeUtil.toTree(menuVos, "0");
+            List<MenuDto> resultList = TreeUtil.toMenuDtoTree(menuDtos, "0");
             response.data(Constants.ReplyField.MENU, resultList);
         } catch (Exception e) {
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
@@ -249,15 +249,15 @@ public class LoginController {
         return response;
     }
 
-    private MenuVo convertToMenuVo(Menu menu, List<String> roleNames) {
-        MenuVo menuVo = new MenuVo();
-        BeanUtil.copyProperties(menu, menuVo);
-        menuVo.setChildren(new ArrayList<>());
-        menuVo.setId(menu.getId());
-        menuVo.setCreateTime(menu.getCreateTime());
+    private MenuDto convertToMenuDto(Menu menu, List<String> roleNames) {
+        MenuDto menuDto = new MenuDto();
+        BeanUtil.copyProperties(menu, menuDto);
+        menuDto.setChildren(new ArrayList<>());
+        menuDto.setId(menu.getId());
+        menuDto.setCreateTime(menu.getCreateTime());
         Meta meta = new Meta(roleNames, menu.getTitle(), menu.getIcon());
-        menuVo.setMeta(meta);
-        return menuVo;
+        menuDto.setMeta(meta);
+        return menuDto;
     }
 
     /**

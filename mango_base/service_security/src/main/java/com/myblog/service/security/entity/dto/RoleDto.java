@@ -1,7 +1,6 @@
 package com.myblog.service.security.entity.dto;
 
 import com.myblog.service.base.entity.dto.BaseDto;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -14,4 +13,11 @@ public class RoleDto extends BaseDto {
     private String summary;
 
     private List<MenuDto> menus;
+
+    /**
+     * 模糊查询用
+     */
+    private String blurry;
+
+    private List<String> createTimes;
 }

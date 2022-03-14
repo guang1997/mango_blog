@@ -3,7 +3,7 @@ package com.myblog.service.security.service;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.security.entity.Role;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.myblog.service.security.entity.vo.RoleVo;
+import com.myblog.service.security.entity.dto.RoleDto;
 
 import java.text.ParseException;
 import java.util.List;
@@ -21,7 +21,7 @@ public interface RoleService extends IService<Role> {
 
     List<Role> getRolesByUserName(String username);
 
-    Response getRoleByPage(RoleVo roleVo) throws Exception;
+    Response getRoleByPage(RoleDto roleDto) throws Exception;
 
     Response addRole(Role role);
 

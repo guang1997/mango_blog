@@ -5,7 +5,7 @@ import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.security.entity.Role;
-import com.myblog.service.security.entity.vo.RoleVo;
+import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.service.RoleService;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -37,13 +35,13 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
 
-    @LogByMethod("/admin/role/getAllRole")
+    @LogByMethod("/admin/role/getRoleByPage")
     @ApiOperation(value = "分页查询角色", notes = "分页查询角色", response = Response.class)
-    @PostMapping("/getAllRole")
-    public Response getAllRole(@RequestBody RoleVo roleVo) throws Exception {
+    @PostMapping("/getRoleByPage")
+    public Response getRoleByPage(@RequestBody RoleDto roleDto) throws Exception {
         Response response = Response.ok();
         try {
-            response = roleService.getRoleByPage(roleVo);
+            response = roleService.getRoleByPage(roleDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
             throw e;

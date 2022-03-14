@@ -4,10 +4,8 @@ package com.myblog.service.admin.controller;
 import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
-import com.myblog.service.base.util.*;
-import com.myblog.service.security.entity.vo.AdminVo;
+import com.myblog.service.security.entity.dto.AdminDto;
 import com.myblog.service.security.service.AdminService;
-import com.myblog.service.security.service.RoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -37,10 +35,10 @@ public class AdminController {
     @LogByMethod("/admin/manager/getAdminByPage")
     @ApiOperation(value = "分页查询管理员信息", notes = "分页查询管理员信息", response = Response.class)
     @PostMapping("/getAdminByPage")
-    public Response getAdminByPage(@RequestBody AdminVo adminVo) {
+    public Response getAdminByPage(@RequestBody AdminDto adminDto) {
         Response response = Response.ok();
         try {
-            response = adminService.getAdminByPage(adminVo);
+            response = adminService.getAdminByPage(adminDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
             throw e;

@@ -3,20 +3,16 @@ package com.myblog.service.security.config.util;
 
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.security.config.entity.AuthUser;
-import com.myblog.service.security.config.entity.vo.AdminVO;
 import com.myblog.service.security.entity.Admin;
 import com.myblog.service.security.entity.Role;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.*;

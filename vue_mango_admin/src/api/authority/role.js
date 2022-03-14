@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getAllRole(data) {
+export function getRoleByPage(data) {
   return request({
-    url: '/admin/role/getAllRole',
+    url: '/admin/role/getRoleByPage',
     method: 'post',
     data
   })
@@ -44,4 +44,4 @@ export function editMenu(data) {
     data
   })
 }
-export default { getAllRole, add, del, edit, editMenu, getRoleById}
+export default { getRoleByPage, add, del, edit, editMenu, getRoleById}

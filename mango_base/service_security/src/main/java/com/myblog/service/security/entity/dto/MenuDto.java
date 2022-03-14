@@ -4,6 +4,7 @@ import com.myblog.service.base.entity.dto.BaseDto;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Objects;
 
 @Data
 public class MenuDto extends BaseDto {
@@ -32,8 +33,14 @@ public class MenuDto extends BaseDto {
 
     private Integer subCount;
 
+    private Meta meta;
+
+    /**
+     * 是否为子节点
+     * @return
+     */
     public Boolean getLeaf() {
-        return subCount <= 0;
+        return !Objects.isNull(subCount) && subCount <= 0;
     }
 
     public String getLabel() {
@@ -41,6 +48,6 @@ public class MenuDto extends BaseDto {
     }
 
     public Boolean getHasChildren() {
-        return subCount > 0;
+        return !Objects.isNull(subCount) && subCount > 0;
     }
 }

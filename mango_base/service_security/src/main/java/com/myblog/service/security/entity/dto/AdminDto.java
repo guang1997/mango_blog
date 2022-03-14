@@ -1,5 +1,6 @@
-package com.myblog.service.security.config.entity.vo;
+package com.myblog.service.security.entity.dto;
 
+import com.myblog.service.base.entity.dto.BaseDto;
 import com.myblog.service.security.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,9 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = "password")
-public class AdminVO {
-
-    private String id;
+public class AdminDto extends BaseDto {
 
     private String username;
 

@@ -16,7 +16,6 @@ import com.myblog.service.security.entity.RoleAdmin;
 import com.myblog.service.security.entity.RoleMenu;
 import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.entity.dto.RoleDto;
-import com.myblog.service.security.entity.vo.RoleVo;
 import com.myblog.service.security.mapper.RoleAdminMapper;
 import com.myblog.service.security.mapper.RoleMapper;
 import com.myblog.service.security.mapper.RoleMenuMapper;
@@ -58,34 +57,34 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     /**
      * 分页查询角色信息
-     * @param roleVo
+     * @param roleDto
      * @return
      */
     @Override
-    public Response getRoleByPage(RoleVo roleVo) throws Exception {
+    public Response getRoleByPage(RoleDto roleDto) throws Exception {
         Response response = Response.ok();
         int page = 1;
         int size = 10;
-        if (!Objects.isNull(roleVo.getPage())) page = roleVo.getPage();
-        if (!Objects.isNull(roleVo.getSize())) size = roleVo.getSize();
+        if (!Objects.isNull(roleDto.getPage())) page = roleDto.getPage();
+        if (!Objects.isNull(roleDto.getSize())) size = roleDto.getSize();
 
         Page<Role> rolePage = new Page<>(page, size);
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
-        if (StringUtils.isNotBlank(roleVo.getBlurry())) {
-            queryWrapper.like(DbConstants.Role.ROLE_NAME, roleVo.getBlurry());
-            queryWrapper.or().like(DbConstants.Role.SUMMARY, roleVo.getBlurry());
+        if (StringUtils.isNotBlank(roleDto.getBlurry())) {
+            queryWrapper.like(DbConstants.Role.ROLE_NAME, roleDto.getBlurry());
+            queryWrapper.or().like(DbConstants.Role.SUMMARY, roleDto.getBlurry());
         }
-        if (!CollectionUtils.isEmpty(roleVo.getCreateTime()) && Objects.equals(2, roleVo.getCreateTime().size())) {
-            Date beginDate = ThreadSafeDateFormat.parse(roleVo.getCreateTime().get(0), ThreadSafeDateFormat.DATETIME);
-            Date endDate = ThreadSafeDateFormat.parse(roleVo.getCreateTime().get(1), ThreadSafeDateFormat.DATETIME);
+        if (!CollectionUtils.isEmpty(roleDto.getCreateTimes()) && Objects.equals(2, roleDto.getCreateTimes().size())) {
+            Date beginDate = ThreadSafeDateFormat.parse(roleDto.getCreateTimes().get(0), ThreadSafeDateFormat.DATETIME);
+            Date endDate = ThreadSafeDateFormat.parse(roleDto.getCreateTimes().get(1), ThreadSafeDateFormat.DATETIME);
             queryWrapper.between(DbConstants.Base.CREATE_TIME, beginDate, endDate);
         }
         baseMapper.selectPage(rolePage, queryWrapper);
         // 获取角色菜单信息
         List<RoleDto> roleDtos = toDto(rolePage.getRecords());
-        for (RoleDto roleDto : roleDtos) {
-            List<MenuDto> menuDtos = baseMapper.selectRoleMenu(roleDto.getId());
-            roleDto.setMenus(menuDtos);
+        for (RoleDto dto : roleDtos) {
+            List<MenuDto> menuDtos = baseMapper.selectRoleMenu(dto.getId());
+            dto.setMenus(menuDtos);
         }
 
         response.data(Constants.ReplyField.DATA, roleDtos);

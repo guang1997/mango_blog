@@ -1,4 +1,4 @@
-package com.myblog.service.security.entity.vo;
+package com.myblog.service.security.entity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

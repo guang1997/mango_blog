@@ -1,20 +1,17 @@
 package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.CheckUtils;
-import com.myblog.service.security.config.entity.vo.AdminVO;
 import com.myblog.service.security.entity.Admin;
-import com.myblog.service.security.entity.vo.AdminVo;
+import com.myblog.service.security.entity.dto.AdminDto;
 import com.myblog.service.security.mapper.AdminMapper;
 import com.myblog.service.security.service.AdminService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,9 +30,9 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     private static Logger LOGGER = LoggerFactory.getLogger(AdminServiceImpl.class);
 
     @Override
-    public Admin checkLogin(AdminVO adminVO) {
-        String username = adminVO.getUsername();
-        String password = adminVO.getPassword();
+    public Admin checkLogin(AdminDto adminDto) {
+        String username = adminDto.getUsername();
+        String password = adminDto.getPassword();
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             LOGGER.error("admin login failed, userName:{}", username);
             return null;
@@ -74,10 +71,8 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      * @return
      */
     @Override
-    public Response getAdminByPage(AdminVo adminVo) {
-        if (adminVo.isSearchAll()) {
-            return Response.ok().data(Constants.ReplyField.DATA, baseMapper.selectList(null));
-        }
+    public Response getAdminByPage(AdminDto adminDto) {
+
         return null;
     }
 }

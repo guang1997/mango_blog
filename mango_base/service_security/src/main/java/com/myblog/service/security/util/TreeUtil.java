@@ -4,7 +4,6 @@ package com.myblog.service.security.util;
 
 import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.dto.MenuDto;
-import com.myblog.service.security.entity.vo.MenuVo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,28 +15,6 @@ import java.util.List;
  * @date 2021/09/28
  */
 public class TreeUtil {
-
-    public static List<MenuVo> toTree(List<MenuVo> treeList, String pid) {
-        List<MenuVo> retList = new ArrayList<>();
-        for (MenuVo parent : treeList) {
-            if (pid.equals(parent.getPid())) {
-                retList.add(findChildren(parent, treeList));
-            }
-        }
-        return retList;
-    }
-
-    private static MenuVo findChildren(MenuVo parent, List<MenuVo> treeList) {
-        for (MenuVo child : treeList) {
-            if (parent.getId().equals(child.getPid())) {
-                if (parent.getChildren() == null) {
-                    parent.setChildren(new ArrayList<>());
-                }
-                parent.getChildren().add(findChildren(child, treeList));
-            }
-        }
-        return parent;
-    }
 
     public static List<Menu> toMenuTree(List<Menu> treeList, String pid) {
         List<Menu> retList = new ArrayList<>();

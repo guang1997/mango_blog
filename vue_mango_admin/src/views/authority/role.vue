@@ -13,7 +13,7 @@
           class="filter-item"
           @keyup.enter.native="crud.toQuery"
         />
-        <date-range-picker v-model="query.createTime" class="date-item" />
+        <date-range-picker v-model="query.createTimes" class="date-item" />
         <rrOperation />
       </div>
       <crudOperation :permission="permission" />
@@ -178,7 +178,7 @@ export default {
   cruds() {
     return CRUD({
       title: "角色",
-      url: "/admin/role/getAllRole",
+      url: "/admin/role/getRoleByPage",
       crudMethod: { ...crudRoles },
       methodType: "post",
     });
