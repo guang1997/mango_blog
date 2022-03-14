@@ -300,8 +300,7 @@ export default {
       crudRoles.getRoleById(this.currentId).then((res) => {
         for (let i = 0; i < this.crud.data.length; i++) {
             if (res.data.data.id === this.crud.data[i].id) {
-              this.crud.data[i] = res.data.data;
-              console.log("this.crud.data[i]", this.crud.data[i])
+              this.crud.data[i] = res.data.data
               break;
             }
           }

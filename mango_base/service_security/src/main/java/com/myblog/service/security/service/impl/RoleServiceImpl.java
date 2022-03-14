@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -51,8 +52,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     private RoleAdminMapper roleAdminMapper;
 
     @Override
-    public List<Role> getRolesByUserName(String username) {
-        return baseMapper.getRolesByUserName(username);
+    public List<Role> getRolesByUserId(String userId) {
+        return baseMapper.getRolesByUserId(userId);
     }
 
     /**
@@ -96,19 +97,20 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     /**
      * 保存角色信息
-     * @param role
+     * @param roleDto
      * @return
      */
     @Override
-    public Response addRole(Role role) {
+    public Response addRole(RoleDto roleDto) {
         // 校验管理员是否已经存在
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Role.ROLE_NAME, role.getRoleName());
+        queryWrapper.eq(DbConstants.Role.ROLE_NAME, roleDto.getRoleName());
         List<Role> menus = baseMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(menus)) {
-            LOGGER.error("addRole failed, role already exist in db, role:{}", role);
+            LOGGER.error("addRole failed, role already exist in db, role:{}", roleDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
+        Role role = toRole(roleDto);
         if (baseMapper.insert(role) < 1) {
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
@@ -151,11 +153,12 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     /**
      * 修改角色
-     * @param role
+     * @param roleDto
      * @return
      */
     @Override
-    public Response editRole(Role role) {
+    public Response editRole(RoleDto roleDto) {
+        Role role = toRole(roleDto);
         if (baseMapper.updateById(role) < 1) {
             LOGGER.error("editRole failed, role:{}", role);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
@@ -163,25 +166,34 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         return Response.ok();
     }
 
+    private Role toRole(RoleDto roleDto) {
+        Role role = new Role();
+        BeanUtil.copyProperties(roleDto, role);
+        if (StringUtils.isNotBlank(roleDto.getId())) {
+            role.setId(roleDto.getId());
+        }
+        return role;
+    }
+
     /**
      * 给角色授权菜单
-     * @param role
+     * @param roleDto
      * @return
      */
     @Override
-    public Response updateMenu(Role role) {
+    public Response updateMenu(RoleDto roleDto) {
         // 先删掉该角色绑定的所有菜单的信息
-        baseMapper.deleteRoleMenuByRoleId(role.getId());
+        baseMapper.deleteRoleMenuByRoleId(roleDto.getId());
 
         // 再将菜单绑定给角色
-        List<RoleMenu> roleMenus = role.getMenus().stream()
+        List<RoleMenu> roleMenus = roleDto.getMenus().stream()
                 .filter(BaseUtil.distinctByKey(MenuDto::getId))
-                .map(dto -> toRoleMenu(dto.getId(), role.getId()))
+                .map(dto -> toRoleMenu(dto.getId(), roleDto.getId()))
                 .collect(Collectors.toList());
 
         for (RoleMenu roleMenu : roleMenus) {
             if (roleMenuMapper.insert(roleMenu) < 1) {
-                LOGGER.error("updateMenu failed, role:{}, roleMenus:{}", role, roleMenus);
+                LOGGER.error("updateMenu failed, role:{}, roleMenus:{}", roleDto, roleMenus);
                 return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
             }
         }

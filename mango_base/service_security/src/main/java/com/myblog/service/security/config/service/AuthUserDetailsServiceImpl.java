@@ -49,7 +49,7 @@ public class AuthUserDetailsServiceImpl implements UserDetailsService {
             return null;
         }else {
             //查找角色
-            List<Role> roles =  roleService.getRolesByUserName(username);
+            List<Role> roles =  roleService.getRolesByUserId(admin.getId());
             List<SimpleGrantedAuthority> authorities = new ArrayList<>();
             for (Role role : roles) {
                 authorities.add(new SimpleGrantedAuthority(role.getRoleName()));

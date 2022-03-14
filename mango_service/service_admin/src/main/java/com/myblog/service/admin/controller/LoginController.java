@@ -7,7 +7,7 @@ import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.RedisUtil;
 import com.myblog.service.security.config.entity.MySecurityProperties;
-import com.myblog.service.security.entity.dto.AdminDto;
+import com.myblog.service.security.entity.dto.LoginDto;
 import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.entity.dto.Meta;
 import com.myblog.service.security.util.TreeUtil;
@@ -82,10 +82,10 @@ public class LoginController {
     @LogByMethod("/admin/auth/login")
     @ApiOperation(value = "登录", notes = "登录", response = Response.class)
     @AnonymousPostMapping(value = "/login")
-    public Response login(@RequestBody AdminDto adminDto, HttpServletRequest request) throws UnknownHostException {
+    public Response login(@RequestBody LoginDto loginDto, HttpServletRequest request) throws UnknownHostException {
         Response response = Response.ok();
-        if (adminDto == null || StringUtils.isEmpty(adminDto.getUsername()) || StringUtils.isEmpty(adminDto.getPassword())) {
-            LOGGER.error("admin:{} login error", adminDto);
+        if (loginDto == null || StringUtils.isEmpty(loginDto.getUsername()) || StringUtils.isEmpty(loginDto.getPassword())) {
+            LOGGER.error("admin:{} login error", loginDto);
             return response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message(ResultCodeEnum.LOGIN_ERROR.getMessage());
         }
         try {
@@ -99,22 +99,22 @@ public class LoginController {
                 }
             }
 
-            Admin admin = adminService.checkLogin(adminDto);
+            Admin admin = adminService.checkLogin(loginDto);
             if (admin == null) {
                 return response.code(ResultCodeEnum.LOGIN_ERROR_LOCKED.getCode()).message(String.format(ResultCodeEnum.LOGIN_ERROR_LOCKED.getMessage(), setLoginCommit(ipAddress)));
             }
             //查找角色
-            List<Role> roles =  roleService.getRolesByUserName(admin.getUsername());
+            List<Role> roles =  roleService.getRolesByUserId(admin.getId());
 
             // 创建token
-            long rememberMe = (adminDto.getRememberMe() == null || !adminDto.getRememberMe())
+            long rememberMe = (loginDto.getRememberMe() == null || !loginDto.getRememberMe())
                     ? properties.getExpiresSecond() : properties.getRememberMeExpiresSecond();
             // 从缓存中获取token
             String token = redisUtil.get(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
             if (StringUtils.isBlank(token)) {
                 token = jwtTokenUtil.createToken(admin, roles, rememberMe, properties.getBase64Secret());
                 //把新的token存储到缓存中
-                redisUtil.setEx(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + adminDto.getUsername(), token, rememberMe / ( 1000 * 60 * 60 ), TimeUnit.HOURS);
+                redisUtil.setEx(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + loginDto.getUsername(), token, rememberMe / ( 1000 * 60 * 60 ), TimeUnit.HOURS);
                 LOGGER.info("cannot find token from redis cache, create it:{}", token);
             }
             //将token返回到页面
@@ -227,7 +227,7 @@ public class LoginController {
                 return response.code(ResultCodeEnum.GET_USERMENU_ERROR.getCode()).message(ResultCodeEnum.GET_USERMENU_ERROR.getMessage());
             }
             // 获取用户角色信息
-            List<Role> roles = roleService.getRolesByUserName(admin.getUsername());
+            List<Role> roles = roleService.getRolesByUserId(admin.getId());
             List<String> roleNames = roles.stream().map(Role::getRoleName).collect(Collectors.toList());
             // 根据角色信息获取用户菜单列表
             List<Menu> menus = menuService.getMenuByRoles(roles);

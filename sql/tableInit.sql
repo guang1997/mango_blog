@@ -25,22 +25,16 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
   `gender` varchar(1) DEFAULT NULL COMMENT '性别(1:男2:女)',
   `avatar` varchar(100) DEFAULT NULL COMMENT '个人头像',
   `email` varchar(60) DEFAULT NULL COMMENT '邮箱',
-  `birthday` date DEFAULT NULL COMMENT '出生年月日',
   `mobile` varchar(11) DEFAULT NULL COMMENT '手机',
-  `summary` varchar(200) DEFAULT NULL COMMENT '自我简介最多150字',
-  `token` varchar(225) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户token信息',
   `login_count` int unsigned DEFAULT '0' COMMENT '登录次数',
   `last_login_time` datetime DEFAULT NULL COMMENT '最后登录时间',
   `last_login_ip` varchar(50) DEFAULT '127.0.0.1' COMMENT '最后登录IP',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `nick_name` varchar(255) DEFAULT NULL COMMENT '昵称',
+  `nickname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '昵称',
   `qq_number` varchar(255) DEFAULT NULL COMMENT 'QQ号',
   `we_chat` varchar(255) DEFAULT NULL COMMENT '微信号',
-  `occupation` varchar(255) DEFAULT NULL COMMENT '职业',
-  `github` varchar(255) DEFAULT NULL COMMENT 'github地址',
-  `gitee` varchar(255) DEFAULT NULL COMMENT 'gitee地址',
-  `person_resume` text COMMENT '履历',
+  `enabled` tinyint unsigned DEFAULT '0' COMMENT '账号状态1:禁用0:启用',
   `is_deleted` tinyint DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='管理员表';
@@ -48,9 +42,9 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
 -- 正在导出表  mango_blog.t_admin 的数据：~2 rows (大约)
 DELETE FROM `t_admin`;
 /*!40000 ALTER TABLE `t_admin` DISABLE KEYS */;
-INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `birthday`, `mobile`, `summary`, `token`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nick_name`, `qq_number`, `we_chat`, `occupation`, `github`, `gitee`, `person_resume`, `is_deleted`) VALUES
-	('1295268474480156673', 'admin', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '1997-04-12', '18761616251', '这是简介', NULL, 1, '2021-09-26 16:56:37', '127.0.0.1', '2021-09-26 16:56:46', '2021-09-26 16:56:47', '李斯特', '72174823', '18761616251', '程序员', NULL, NULL, NULL, 0),
-	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '2021-12-02', '18888888888', NULL, NULL, 0, '2021-12-02 22:01:18', '127.0.0.1', '2021-12-02 22:01:22', '2021-12-02 22:01:23', '游客', '111111', '111111', '游客', NULL, NULL, NULL, 0);
+INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `mobile`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `enabled`, `is_deleted`) VALUES
+	('1295268474480156673', 'admin', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18761616251', 1, '2021-09-26 16:56:37', '127.0.0.1', '2021-09-26 16:56:46', '2021-09-26 16:56:47', '李斯特', '72174823', '18761616251', 0, 0),
+	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 0, '2021-12-02 22:01:18', '127.0.0.1', '2021-12-02 22:01:22', '2021-12-02 22:01:23', '游客', '111111', '111111', 0, 0);
 /*!40000 ALTER TABLE `t_admin` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_blog 结构
@@ -197,7 +191,7 @@ DELETE FROM `t_menu`;
 /*!40000 ALTER TABLE `t_menu` DISABLE KEYS */;
 INSERT INTO `t_menu` (`id`, `name`, `title`, `pid`, `icon`, `sort`, `is_deleted`, `create_time`, `update_time`, `hidden`, `component`, `path`, `redirect`, `permission`, `menu_type`, `sub_count`) VALUES
 	('1195268474480156673', '权限管理', '权限管理', '0', 'authority', 2, 0, '2021-10-07 21:49:36', '2022-03-09 17:01:06', 0, 'Layout', '/authority', NULL, '', 0, 4),
-	('1195268474480156674', '管理员管理', '管理员管理', '1195268474480156673', 'user', 1, 0, '2021-10-07 22:38:13', '2022-03-09 17:27:43', 0, 'authority/admin', 'admin', NULL, 'admin:list', 1, 0),
+	('1195268474480156674', '管理员管理', '管理员管理', '1195268474480156673', 'user', 1, 0, '2021-10-07 22:38:13', '2022-03-09 17:27:43', 0, 'authority/admin', 'admin', NULL, 'admin:list', 1, 2),
 	('1195268474480156675', '菜单管理', '菜单管理', '1195268474480156673', 'authority', 2, 0, '2021-10-07 22:50:12', '2022-03-09 17:27:53', 0, 'authority/menu', 'menu', NULL, 'menu:list', 1, 4),
 	('1195268474480156676', '添加菜单', '添加菜单', '1195268474480156675', NULL, 1, 0, '2021-12-04 22:16:29', '2022-03-09 17:00:45', 0, NULL, NULL, NULL, 'menu:add', 2, 0),
 	('1195268474480156677', '博客管理', '博客管理', '0', 'blog', 1, 0, '2022-03-07 14:11:22', '2022-03-09 17:36:59', 0, 'Layout', '/blog', NULL, '', 0, 2),
@@ -207,7 +201,8 @@ INSERT INTO `t_menu` (`id`, `name`, `title`, `pid`, `icon`, `sort`, `is_deleted`
 	('1501369279194071042', '字典管理', '字典管理', '1501368407743528962', 'authority', 999, 0, '2022-03-09 09:28:25', '2022-03-09 09:28:25', 0, 'system/dictionary', 'dictionary', NULL, 'dictionary:list', 1, 0),
 	('1501369997368082434', '删除菜单', '删除菜单', '1195268474480156675', NULL, 3, 0, '2022-03-09 09:31:16', '2022-03-09 17:26:48', 0, NULL, NULL, NULL, 'menu:del', 2, 0),
 	('1501483509264281601', '修改菜单', '修改菜单', '1195268474480156675', NULL, 2, 0, '2022-03-09 17:02:19', '2022-03-09 17:02:19', 0, NULL, NULL, NULL, 'menu:edit', 2, 0),
-	('1501490155294052354', '角色管理', '角色管理', '1195268474480156673', 'peoples', 3, 0, '2022-03-09 17:28:44', '2022-03-09 17:29:09', 0, 'authority/role', 'role', NULL, 'role:list', 1, 0);
+	('1501490155294052354', '角色管理', '角色管理', '1195268474480156673', 'peoples', 3, 0, '2022-03-09 17:28:44', '2022-03-09 17:29:09', 0, 'authority/role', 'role', NULL, 'role:list', 1, 0),
+	('1503383805083586562', '添加管理员', '添加管理员', '1195268474480156674', NULL, 999, 0, '2022-03-14 22:53:25', '2022-03-14 22:53:25', 0, NULL, NULL, NULL, 'admin:add', 2, 0);
 /*!40000 ALTER TABLE `t_menu` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_permission 结构
@@ -261,7 +256,7 @@ CREATE TABLE IF NOT EXISTS `t_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='角色表';
 
--- 正在导出表  mango_blog.t_role 的数据：~2 rows (大约)
+-- 正在导出表  mango_blog.t_role 的数据：~3 rows (大约)
 DELETE FROM `t_role`;
 /*!40000 ALTER TABLE `t_role` DISABLE KEYS */;
 INSERT INTO `t_role` (`id`, `role_name`, `create_time`, `update_time`, `summary`) VALUES
@@ -281,7 +276,7 @@ CREATE TABLE IF NOT EXISTS `t_role_admin` (
   UNIQUE KEY `ROLE_ADMIN_UK` (`role_id`,`admin_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='角色管理员中间表';
 
--- 正在导出表  mango_blog.t_role_admin 的数据：~2 rows (大约)
+-- 正在导出表  mango_blog.t_role_admin 的数据：~3 rows (大约)
 DELETE FROM `t_role_admin`;
 /*!40000 ALTER TABLE `t_role_admin` DISABLE KEYS */;
 INSERT INTO `t_role_admin` (`id`, `role_id`, `admin_id`, `create_time`, `update_time`) VALUES
@@ -305,6 +300,9 @@ CREATE TABLE IF NOT EXISTS `t_role_menu` (
 DELETE FROM `t_role_menu`;
 /*!40000 ALTER TABLE `t_role_menu` DISABLE KEYS */;
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`) VALUES
+	('1503383316199706625', '1395268474480156674', '1195268474480156677', '2022-03-14 22:51:29', '2022-03-14 22:51:29'),
+	('1503383317231505410', '1395268474480156674', '1195268474480156678', '2022-03-14 22:51:29', '2022-03-14 22:51:29'),
+	('1503383318091337730', '1395268474480156674', '1195268474480156679', '2022-03-14 22:51:29', '2022-03-14 22:51:29'),
 	('1795268474480156673', '1395268474480156673', '1195268474480156673', '2021-10-02 22:57:28', '2021-10-02 22:57:29'),
 	('1795268474480156674', '1395268474480156673', '1195268474480156674', '2021-10-05 16:38:46', '2021-10-05 16:38:46'),
 	('1795268474480156675', '1395268474480156673', '1195268474480156675', '2021-11-28 16:41:09', '2021-11-28 16:41:10'),

@@ -37,7 +37,4 @@ public class Role extends BaseEntity {
 
     @ApiModelProperty(value = "角色介绍")
     private String summary;
-
-    @TableField(exist = false)
-    private List<MenuDto> menus;
 }

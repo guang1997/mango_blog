@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+
 /**
  * <p>
  * 管理员表
@@ -35,7 +37,7 @@ public class AdminController {
     @LogByMethod("/admin/manager/getAdminByPage")
     @ApiOperation(value = "分页查询管理员信息", notes = "分页查询管理员信息", response = Response.class)
     @PostMapping("/getAdminByPage")
-    public Response getAdminByPage(@RequestBody AdminDto adminDto) {
+    public Response getAdminByPage(@RequestBody AdminDto adminDto) throws ParseException {
         Response response = Response.ok();
         try {
             response = adminService.getAdminByPage(adminDto);

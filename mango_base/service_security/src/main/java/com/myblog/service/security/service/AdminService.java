@@ -4,6 +4,9 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.security.entity.Admin;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.security.entity.dto.AdminDto;
+import com.myblog.service.security.entity.dto.LoginDto;
+
+import java.text.ParseException;
 
 /**
  * <p>
@@ -15,7 +18,7 @@ import com.myblog.service.security.entity.dto.AdminDto;
  */
 public interface AdminService extends IService<Admin> {
 
-    Admin checkLogin(AdminDto adminDto);
+    Admin checkLogin(LoginDto loginDto);
 
-    Response getAdminByPage(AdminDto adminDto);
+    Response getAdminByPage(AdminDto adminDto) throws ParseException;
 }

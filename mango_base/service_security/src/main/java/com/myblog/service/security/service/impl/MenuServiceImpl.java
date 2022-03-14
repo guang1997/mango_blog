@@ -128,26 +128,28 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     /**
      * 添加菜单
-     * @param menu
+     * @param menuDto
      * @return
      */
     @Override
-    public Response addMenu(Menu menu) {
+    public Response addMenu(MenuDto menuDto) {
         // 校验菜单是否已经存在
         QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
         QueryWrapper<Menu> queryWrapper = decorator.createBaseQueryWrapper();
-        queryWrapper.eq(DbConstants.Menu.TITLE, menu.getTitle());
-        if (!Objects.equals("Layout", menu.getComponent())) {
-            queryWrapper.or().eq(DbConstants.Menu.COMPONENT, menu.getComponent());
+        queryWrapper.eq(DbConstants.Menu.TITLE, menuDto.getTitle());
+        if (!Objects.equals("Layout", menuDto.getComponent())) {
+            queryWrapper.or().eq(DbConstants.Menu.COMPONENT, menuDto.getComponent());
         }
         List<Menu> menus = baseMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(menus)) {
-            LOGGER.error("addMenu failed, menu already exist in db, menu:{}", menu);
+            LOGGER.error("addMenu failed, menu already exist in db, menu:{}", menuDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        if (StringUtils.isBlank(menu.getName())) {
-            menu.setName(menu.getTitle());
+        if (StringUtils.isBlank(menuDto.getName())) {
+            menuDto.setName(menuDto.getTitle());
         }
+        Menu menu = toMenu(menuDto);
+        // 如果已经有同名切被删除的菜单，那么只更新
         if (baseMapper.updateByTitle(menu) < 1) {
             if (baseMapper.insert(menu) < 1) {
                 LOGGER.error("addMenu failed, menu:{}", menu);
@@ -169,15 +171,25 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         return Response.ok();
     }
 
+    private Menu toMenu(MenuDto menuDto) {
+        Menu menu = new Menu();
+        BeanUtil.copyProperties(menuDto, menu);
+        if (StringUtils.isNotBlank(menuDto.getId())) {
+            menu.setId(menuDto.getId());
+        }
+        return menu;
+    }
+
     /**
      * 更新菜单
-     * @param menu
+     * @param menuDto
      * @return
      */
     @Override
-    public Response editMenu(Menu menu) {
+    public Response editMenu(MenuDto menuDto) {
         // 获取旧的菜单信息，用于更新父菜单的subCount
-        MenuDto oldMenu = this.getMenuById(menu.getId());
+        MenuDto oldMenu = this.getMenuById(menuDto.getId());
+        Menu menu = toMenu(menuDto);
         if (baseMapper.updateById(menu) < 1) {
             LOGGER.error("editMenu failed, menu:{}", menu);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);

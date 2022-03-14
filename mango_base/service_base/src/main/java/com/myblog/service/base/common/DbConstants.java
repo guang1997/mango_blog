@@ -18,6 +18,8 @@ public interface DbConstants {
         String EMAIL = "email";
         String MOBILE = "mobile";
         String STATUS = "status";
+        String NICKNAME = "nickname";
+        String GENDER = "gender";
     }
 
     interface Menu{

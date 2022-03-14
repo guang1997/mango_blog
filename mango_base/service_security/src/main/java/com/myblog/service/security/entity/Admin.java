@@ -44,17 +44,8 @@ public class Admin extends BaseEntity {
     @ApiModelProperty(value = "邮箱")
     private String email;
 
-    @ApiModelProperty(value = "出生年月日")
-    private Date birthday;
-
     @ApiModelProperty(value = "手机")
     private String mobile;
-
-    @ApiModelProperty(value = "自我简介最多150字")
-    private String summary;
-
-    @ApiModelProperty(value = "用户token信息")
-    private String token;
 
     @ApiModelProperty(value = "登录次数")
     private Integer loginCount;
@@ -66,7 +57,7 @@ public class Admin extends BaseEntity {
     private String lastLoginIp;
 
     @ApiModelProperty(value = "昵称")
-    private String nickName;
+    private String nickname;
 
     @ApiModelProperty(value = "QQ号")
     private String qqNumber;
@@ -74,17 +65,8 @@ public class Admin extends BaseEntity {
     @ApiModelProperty(value = "微信号")
     private String weChat;
 
-    @ApiModelProperty(value = "职业")
-    private String occupation;
-
-    @ApiModelProperty(value = "github地址")
-    private String github;
-
-    @ApiModelProperty(value = "gitee地址")
-    private String gitee;
-
-    @ApiModelProperty(value = "履历")
-    private String personResume;
+    @ApiModelProperty(value = "账号状态1:禁用0:启用")
+    private Integer enabled;
 
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic

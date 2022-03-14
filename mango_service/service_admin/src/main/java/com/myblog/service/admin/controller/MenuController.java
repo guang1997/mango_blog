@@ -97,26 +97,26 @@ public class MenuController {
     @LogByMethod("/admin/menu/addMenu")
     @ApiOperation(value = "新增菜单", notes = "新增菜单", response = Response.class)
     @PostMapping("/addMenu")
-    public Response addMenu(@RequestBody Menu menu) {
+    public Response addMenu(@RequestBody MenuDto menuDto) {
         Response response = Response.ok();
         try {
-            MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menu.getMenuType());
+            MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menuDto.getMenuType());
             if (menuType == null) {
-                LOGGER.error("addMenu failed, cannot find menuType, menu:{}", menu);
+                LOGGER.error("addMenu failed, cannot find menuType, menu:{}", menuDto);
                 response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
                 return response;
             }
             if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
-                menu.setComponent("Layout");
+                menuDto.setComponent("Layout");
             }
-            menu.setSubCount(0);
+            menuDto.setSubCount(0);
             if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
-                    && (StringUtils.isBlank(menu.getTitle()) || StringUtils.isBlank(menu.getComponent()))) {
-                LOGGER.error("addMenu failed, title or component is empty, menu:{}", menu);
+                    && (StringUtils.isBlank(menuDto.getTitle()) || StringUtils.isBlank(menuDto.getComponent()))) {
+                LOGGER.error("addMenu failed, title or component is empty, menu:{}", menuDto);
                 response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
                 return response;
             }
-            response = menuService.addMenu(menu);
+            response = menuService.addMenu(menuDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
             throw e;
@@ -127,26 +127,26 @@ public class MenuController {
     @LogByMethod("/admin/menu/editMenu")
     @ApiOperation(value = "修改菜单", notes = "修改菜单", response = Response.class)
     @PutMapping("/editMenu")
-    public Response editMenu(@RequestBody Menu menu) {
+    public Response editMenu(@RequestBody MenuDto menuDto) {
         Response response = Response.ok();
         try {
-            MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menu.getMenuType());
+            MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menuDto.getMenuType());
             if (menuType == null) {
-                LOGGER.error("editMenu failed, cannot find menuType, menu:{}", menu);
+                LOGGER.error("editMenu failed, cannot find menuType, menu:{}", menuDto);
                 response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
                 return response;
             }
             if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
-                menu.setComponent("Layout");
+                menuDto.setComponent("Layout");
             }
             if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
-                    && (StringUtils.isBlank(menu.getTitle()) || StringUtils.isBlank(menu.getComponent()))) {
-                LOGGER.error("editMenu failed, title or component is empty, menu:{}", menu);
+                    && (StringUtils.isBlank(menuDto.getTitle()) || StringUtils.isBlank(menuDto.getComponent()))) {
+                LOGGER.error("editMenu failed, title or component is empty, menu:{}", menuDto);
                 response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
                 return response;
             }
 
-            response = menuService.editMenu(menu);
+            response = menuService.editMenu(menuDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
             throw e;

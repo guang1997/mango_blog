@@ -67,15 +67,15 @@ public class RoleController {
     @LogByMethod("/admin/role/addRole")
     @ApiOperation(value = "新增角色", notes = "新增角色", response = Response.class)
     @PostMapping("/addRole")
-    public Response addRole(@RequestBody Role role) {
+    public Response addRole(@RequestBody RoleDto roleDto) {
         Response response = Response.ok();
         try {
-            if (StringUtils.isBlank(role.getRoleName())) {
-                LOGGER.error("addMenu failed, roleName cannot be null, role:{}", role);
+            if (StringUtils.isBlank(roleDto.getRoleName())) {
+                LOGGER.error("addMenu failed, roleName cannot be null, role:{}", roleDto);
                 response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
                 return response;
             }
-            response = roleService.addRole(role);
+            response = roleService.addRole(roleDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
             throw e;
@@ -86,10 +86,10 @@ public class RoleController {
     @LogByMethod("/admin/role/editRole")
     @ApiOperation(value = "修改角色", notes = "修改角色", response = Response.class)
     @PutMapping("/editRole")
-    public Response editRole(@RequestBody Role role) {
+    public Response editRole(@RequestBody RoleDto roleDto) {
         Response response = Response.ok();
         try {
-            response = roleService.editRole(role);
+            response = roleService.editRole(roleDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
             throw e;
@@ -114,15 +114,15 @@ public class RoleController {
     @LogByMethod("/admin/role/menu")
     @ApiOperation(value = "保存菜单", notes = "保存菜单", response = Response.class)
     @PostMapping("/menu")
-    public Response menu(@RequestBody Role role) {
+    public Response menu(@RequestBody RoleDto roleDto) {
         Response response = Response.ok();
         try {
-            if (StringUtils.isBlank(role.getId())) {
-                LOGGER.error("editMenu failed, roleId cannot be null, role:{}", role);
+            if (StringUtils.isBlank(roleDto.getId())) {
+                LOGGER.error("editMenu failed, roleId cannot be null, role:{}", roleDto);
                 response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
                 return response;
             }
-            response = roleService.updateMenu(role);
+            response = roleService.updateMenu(roleDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
             throw e;

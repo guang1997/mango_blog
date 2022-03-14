@@ -29,9 +29,9 @@ public interface MenuService extends IService<Menu> {
 
     List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos);
 
-    Response addMenu(Menu menu);
+    Response addMenu(MenuDto menuDto);
 
-    Response editMenu(Menu menu);
+    Response editMenu(MenuDto menuDto);
 
     Response delMenu(List<String> ids);
 

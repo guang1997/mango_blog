@@ -1,7 +1,6 @@
 package com.myblog.service.admin.controller;
 
 
-import com.myblog.service.admin.entity.vo.DictTypeVo;
 import com.myblog.service.admin.service.SysDictDataService;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
@@ -31,36 +30,36 @@ public class SysDictDataController {
     @Autowired
     private SysDictDataService sysDictDataService;
 
-    @ApiOperation(value = "根据字典类型获取字典数据", notes = "根据字典类型获取字典数据", response = Response.class)
-    @PostMapping("/getListByDictType")
-    public Response getListByDictType(@RequestBody DictTypeVo dictTypeVO) {
-        Response response = Response.ok();
-        if (dictTypeVO == null || StringUtils.isEmpty(dictTypeVO.getDictType())) {
-            return response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-        }
-        try {
-            response = sysDictDataService.getListByDictType(dictTypeVO.getDictType());
-        } catch (Exception e) {
-            LOGGER.error("getListByDictType Exception:", e);
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-        }
-        return response;
-    }
-
-    @ApiOperation(value = "根据字典类型集合获取字典数据", notes = "根据字典类型集合获取字典数据", response = Response.class)
-    @PostMapping("/getListByDictTypeList")
-    public Response getListByDictTypeList(@RequestBody DictTypeVo dictTypeVO) {
-        Response response = Response.ok();
-        if (dictTypeVO == null || CollectionUtils.isEmpty(dictTypeVO.getDictTypes())) {
-            return response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-        }
-        try {
-            response = sysDictDataService.getListByDictTypeList(dictTypeVO.getDictTypes());
-        } catch (Exception e) {
-            LOGGER.error("getListByDictTypeList Exception:", e);
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-        }
-        return response;
-    }
+//    @ApiOperation(value = "根据字典类型获取字典数据", notes = "根据字典类型获取字典数据", response = Response.class)
+//    @PostMapping("/getListByDictType")
+//    public Response getListByDictType(@RequestBody DictTypeVo dictTypeVO) {
+//        Response response = Response.ok();
+//        if (dictTypeVO == null || StringUtils.isEmpty(dictTypeVO.getDictType())) {
+//            return response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+//        }
+//        try {
+//            response = sysDictDataService.getListByDictType(dictTypeVO.getDictType());
+//        } catch (Exception e) {
+//            LOGGER.error("getListByDictType Exception:", e);
+//            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+//        }
+//        return response;
+//    }
+//
+//    @ApiOperation(value = "根据字典类型集合获取字典数据", notes = "根据字典类型集合获取字典数据", response = Response.class)
+//    @PostMapping("/getListByDictTypeList")
+//    public Response getListByDictTypeList(@RequestBody DictTypeVo dictTypeVO) {
+//        Response response = Response.ok();
+//        if (dictTypeVO == null || CollectionUtils.isEmpty(dictTypeVO.getDictTypes())) {
+//            return response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+//        }
+//        try {
+//            response = sysDictDataService.getListByDictTypeList(dictTypeVO.getDictTypes());
+//        } catch (Exception e) {
+//            LOGGER.error("getListByDictTypeList Exception:", e);
+//            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+//        }
+//        return response;
+//    }
 }
 

@@ -19,17 +19,17 @@ import java.util.Set;
  */
 public interface RoleService extends IService<Role> {
 
-    List<Role> getRolesByUserName(String username);
+    List<Role> getRolesByUserId(String userId);
 
     Response getRoleByPage(RoleDto roleDto) throws Exception;
 
-    Response addRole(Role role);
+    Response addRole(RoleDto roleDto);
 
     Response delRole(Set<String> ids);
 
-    Response editRole(Role role);
+    Response editRole(RoleDto roleDto);
 
-    Response updateMenu(Role role);
+    Response updateMenu(RoleDto roleDto);
 
     Response getRoleById(Role role);
 }
