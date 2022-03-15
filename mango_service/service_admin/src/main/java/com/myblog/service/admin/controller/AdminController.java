@@ -85,7 +85,7 @@ public class AdminController {
     public Response delAdmin(@RequestBody Set<String> ids) {
         Response response = Response.ok();
         try {
-//            response = adminService.delAdmin(ids);
+            response = adminService.delAdmin(ids);
         } catch (Exception e) {
             response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
             throw e;

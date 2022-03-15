@@ -7,6 +7,7 @@ import com.myblog.service.security.entity.dto.AdminDto;
 import com.myblog.service.security.entity.dto.LoginDto;
 
 import java.text.ParseException;
+import java.util.Set;
 
 /**
  * <p>
@@ -23,4 +24,6 @@ public interface AdminService extends IService<Admin> {
     Response getAdminByPage(AdminDto adminDto) throws ParseException;
 
     Response addAdmin(AdminDto adminDto);
+
+    Response delAdmin(Set<String> ids);
 }

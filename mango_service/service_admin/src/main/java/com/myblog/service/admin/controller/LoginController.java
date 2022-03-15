@@ -84,6 +84,7 @@ public class LoginController {
     @AnonymousPostMapping(value = "/login")
     public Response login(@RequestBody LoginDto loginDto, HttpServletRequest request) throws UnknownHostException {
         Response response = Response.ok();
+        String token = "";
         if (loginDto == null || StringUtils.isEmpty(loginDto.getUsername()) || StringUtils.isEmpty(loginDto.getPassword())) {
             LOGGER.error("admin:{} login error", loginDto);
             return response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message(ResultCodeEnum.LOGIN_ERROR.getMessage());
@@ -110,7 +111,7 @@ public class LoginController {
             long rememberMe = (loginDto.getRememberMe() == null || !loginDto.getRememberMe())
                     ? properties.getExpiresSecond() : properties.getRememberMeExpiresSecond();
             // 从缓存中获取token
-            String token = redisUtil.get(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
+            token = redisUtil.get(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
             if (StringUtils.isBlank(token)) {
                 token = jwtTokenUtil.createToken(admin, roles, rememberMe, properties.getBase64Secret());
                 //把新的token存储到缓存中

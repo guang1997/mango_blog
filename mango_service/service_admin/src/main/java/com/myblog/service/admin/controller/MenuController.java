@@ -7,7 +7,6 @@ import com.myblog.service.base.common.MenuTypeEnum;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.BaseUtil;
-import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.service.MenuService;
 import com.myblog.service.security.util.TreeUtil;

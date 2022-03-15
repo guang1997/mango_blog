@@ -4,11 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
+import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.common.Response;
-import com.myblog.service.base.util.BeanUtil;
-import com.myblog.service.base.util.CheckUtils;
-import com.myblog.service.base.util.QueryWrapperDecorator;
-import com.myblog.service.base.util.ThreadSafeDateFormat;
+import com.myblog.service.base.util.*;
 import com.myblog.service.security.entity.Admin;
 import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.entity.dto.AdminDto;
@@ -28,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>
@@ -48,6 +43,9 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
     @Autowired
     private RoleMapper roleMapper;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public Admin checkLogin(LoginDto loginDto) {
@@ -136,6 +134,17 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Override
     public Response addAdmin(AdminDto adminDto) {
         return null;
+    }
+
+    @Override
+    public Response delAdmin(Set<String> ids) {
+        for (String id : ids) {
+            Admin admin = baseMapper.selectById(id);
+            // 清理缓存信息
+            redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
+            baseMapper.deleteById(id);
+        }
+        return Response.ok();
     }
 
     private List<AdminDto> toDto(List<Admin> admins) {
