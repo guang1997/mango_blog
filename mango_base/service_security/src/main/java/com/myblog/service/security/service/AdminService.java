@@ -21,4 +21,6 @@ public interface AdminService extends IService<Admin> {
     Admin checkLogin(LoginDto loginDto);
 
     Response getAdminByPage(AdminDto adminDto) throws ParseException;
+
+    Response addAdmin(AdminDto adminDto);
 }

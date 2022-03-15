@@ -5,15 +5,18 @@ import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.security.entity.dto.AdminDto;
+import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.service.AdminService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.Set;
 
 /**
  * <p>
@@ -47,5 +50,48 @@ public class AdminController {
         }
         return response;
     }
+
+    @LogByMethod("/admin/manager/addAdmin")
+    @ApiOperation(value = "新增管理员", notes = "新增管理员", response = Response.class)
+    @PostMapping("/addAdmin")
+    public Response addAdmin(@RequestBody AdminDto adminDto) {
+        Response response = Response.ok();
+        try {
+            response = adminService.addAdmin(adminDto);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @LogByMethod("/admin/manager/editAdmin")
+    @ApiOperation(value = "修改管理员", notes = "修改管理员", response = Response.class)
+    @PutMapping("/editAdmin")
+    public Response editRole(@RequestBody RoleDto roleDto) {
+        Response response = Response.ok();
+        try {
+//            response = roleService.editRole(roleDto);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @LogByMethod("/admin/manager/delAdmin")
+    @ApiOperation(value = "删除管理员", notes = "删除管理员", response = Response.class)
+    @DeleteMapping("/delAdmin")
+    public Response delAdmin(@RequestBody Set<String> ids) {
+        Response response = Response.ok();
+        try {
+//            response = adminService.delAdmin(ids);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
 }
 

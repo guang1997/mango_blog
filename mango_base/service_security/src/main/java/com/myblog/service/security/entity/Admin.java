@@ -65,8 +65,8 @@ public class Admin extends BaseEntity {
     @ApiModelProperty(value = "微信号")
     private String weChat;
 
-    @ApiModelProperty(value = "账号状态1:禁用0:启用")
-    private Integer enabled;
+    @ApiModelProperty(value = "账号状态1:启用0:禁用")
+    private Boolean enabled;
 
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic

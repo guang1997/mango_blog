@@ -14,6 +14,8 @@ public class RoleDto extends BaseDto {
 
     private List<MenuDto> menus;
 
+    private Boolean searchAll;
+
     /**
      * 模糊查询用
      */

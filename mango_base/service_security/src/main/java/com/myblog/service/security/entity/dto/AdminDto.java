@@ -1,12 +1,15 @@
 package com.myblog.service.security.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.myblog.service.base.entity.dto.BaseDto;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
+@ToString(exclude = "password")
 public class AdminDto extends BaseDto {
 
     private String username;
@@ -17,16 +20,13 @@ public class AdminDto extends BaseDto {
 
     private String avatar;
 
-    private String id;
-
-    private Date createTime;
-
     private String email;
 
     private String mobile;
 
     private Integer loginCount;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "GMT+8")
     private Date lastLoginTime;
 
     private String lastLoginIp;
@@ -37,13 +37,13 @@ public class AdminDto extends BaseDto {
 
     private String weChat;
 
-    private Integer enabled;
+    private Boolean enabled;
 
-    private List<RoleDto> roleDtos;
+    private List<RoleDto> roles;
     /**
      * 模糊查询用
      */
     private String blurry;
 
-    private List<String> createTimes;
+    private List<String> lastLoginTimes;
 }

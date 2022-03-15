@@ -64,6 +64,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public Response getRoleByPage(RoleDto roleDto) throws Exception {
         Response response = Response.ok();
+        if (!Objects.isNull(roleDto.getSearchAll()) && roleDto.getSearchAll()) {
+            QueryWrapper<Role> allQueryWrapper = new QueryWrapper<>();
+            allQueryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+            return response.data(Constants.ReplyField.DATA, toDto(baseMapper.selectList(allQueryWrapper)));
+        }
         int page = 1;
         int size = 10;
         if (!Objects.isNull(roleDto.getPage())) page = roleDto.getPage();

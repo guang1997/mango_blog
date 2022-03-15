@@ -15,5 +15,26 @@ export function getAdminByIds(data) {
       data
     })
   }
-
-export default { getAdminByPage, getAdminByIds}
+  export function add(data) {
+    return request({
+      url: '/admin/manager/addAdmin',
+      method: 'post',
+      data
+    })
+  }
+  export function del(ids) {
+    return request({
+      url: '/admin/manager/delAdmin',
+      method: 'delete',
+      data:ids
+    })
+  }
+  
+  export function edit(data) {
+    return request({
+      url: '/admin/manager/editAdmin',
+      method: 'put',
+      data
+    })
+  }
+export default { getAdminByPage, getAdminByIds, add, edit, del}

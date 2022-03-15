@@ -99,20 +99,23 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         if (!Objects.isNull(adminDto.getSize())) size = adminDto.getSize();
         Page<Admin> adminPage = new Page<>(page, size);
 
-        QueryWrapperDecorator<Admin> decorator = new QueryWrapperDecorator<>();
-        QueryWrapper<Admin> queryWrapper = decorator.createBaseQueryWrapper();
+        QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
         if (StringUtils.isNotBlank(adminDto.getBlurry())) {
-            queryWrapper.eq(DbConstants.Admin.USERNAME, adminDto.getBlurry())
+            queryWrapper.like(DbConstants.Admin.USERNAME, adminDto.getBlurry())
                     .or()
-                    .eq(DbConstants.Admin.NICKNAME, adminDto.getBlurry());
+                    .like(DbConstants.Admin.NICKNAME, adminDto.getBlurry());
         }
         if (StringUtils.isNotBlank(adminDto.getGender())) {
             queryWrapper.eq(DbConstants.Admin.GENDER, adminDto.getGender());
         }
-        if (!CollectionUtils.isEmpty(adminDto.getCreateTimes()) && Objects.equals(2, adminDto.getCreateTimes().size())) {
-            Date beginDate = ThreadSafeDateFormat.parse(adminDto.getCreateTimes().get(0), ThreadSafeDateFormat.DATETIME);
-            Date endDate = ThreadSafeDateFormat.parse(adminDto.getCreateTimes().get(1), ThreadSafeDateFormat.DATETIME);
-            queryWrapper.between(DbConstants.Base.CREATE_TIME, beginDate, endDate);
+        if (!Objects.isNull(adminDto.getEnabled())) {
+            queryWrapper.eq(DbConstants.Admin.ENABLED, adminDto.getEnabled());
+        }
+        if (!CollectionUtils.isEmpty(adminDto.getLastLoginTimes()) && Objects.equals(2, adminDto.getLastLoginTimes().size())) {
+            Date beginDate = ThreadSafeDateFormat.parse(adminDto.getLastLoginTimes().get(0), ThreadSafeDateFormat.DATETIME);
+            Date endDate = ThreadSafeDateFormat.parse(adminDto.getLastLoginTimes().get(1), ThreadSafeDateFormat.DATETIME);
+            queryWrapper.between(DbConstants.Admin.LAST_LOGIN_TIME, beginDate, endDate);
         }
 
         baseMapper.selectPage(adminPage, queryWrapper);
@@ -125,6 +128,16 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         return response;
     }
 
+    /**
+     * 创建admin
+     * @param adminDto
+     * @return
+     */
+    @Override
+    public Response addAdmin(AdminDto adminDto) {
+        return null;
+    }
+
     private List<AdminDto> toDto(List<Admin> admins) {
         List<AdminDto> adminDtos = new ArrayList<>();
         for (Admin admin : admins) {
@@ -134,7 +147,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             adminDto.setCreateTime(admin.getCreateTime());
             // 查询角色信息
             List<RoleDto> roleDtos = toRoleDto(roleMapper.getRolesByUserId(admin.getId()));
-            adminDto.setRoleDtos(roleDtos);
+            adminDto.setRoles(roleDtos);
             adminDtos.add(adminDto);
         }
         return adminDtos;

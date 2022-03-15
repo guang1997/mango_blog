@@ -17,9 +17,10 @@ public interface DbConstants {
         String PASSWORD = "password";
         String EMAIL = "email";
         String MOBILE = "mobile";
-        String STATUS = "status";
+        String ENABLED = "enabled";
         String NICKNAME = "nickname";
         String GENDER = "gender";
+        String LAST_LOGIN_TIME = "last_login_time";
     }
 
     interface Menu{

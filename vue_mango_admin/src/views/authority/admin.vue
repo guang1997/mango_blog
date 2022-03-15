@@ -8,45 +8,77 @@
           v-model="query.blurry"
           size="small"
           clearable
-          placeholder="输入名称或者描述搜索"
+          placeholder="输入用户名或者昵称搜索"
           style="width: 200px"
           class="filter-item"
           @keyup.enter.native="crud.toQuery"
         />
-        <date-range-picker v-model="query.createTimes" class="date-item" />
+        <el-select v-model="query.gender" clearable size="small" placeholder="性别" class="filter-item" style="width: 90px" @change="crud.toQuery">
+          <el-option v-for="item in genderTypeOptions" :key="item.key" :label="item.value" :value="item.key" />
+        </el-select>
+        <el-select v-model="query.enabled" clearable size="small" placeholder="状态" class="filter-item" style="width: 90px" @change="crud.toQuery">
+          <el-option v-for="item in enabledTypeOptions" :key="item.key" :label="item.value" :value="item.key" />
+        </el-select>
+        <date-range-picker v-model="query.lastLoginTimes" class="date-item" />
         <rrOperation />
       </div>
       <crudOperation :permission="permission" />
     </div>
-    <!-- 表单渲染 -->
-    <el-dialog
-      append-to-body
-      :close-on-click-modal="false"
-      :before-close="crud.cancelCU"
-      :visible.sync="crud.status.cu > 0"
-      :title="crud.status.title"
-      width="520px"
-    >
-      <el-form
-        ref="form"
-        :inline="true"
-        :model="form"
-        :rules="rules"
-        size="small"
-        label-width="80px"
-      >
-        <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="form.roleName" style="width: 380px" />
-        </el-form-item>
-        <el-form-item label="描述信息" prop="summary">
-          <el-input
-            v-model="form.summary"
-            style="width: 380px"
-            rows="5"
-            type="textarea"
-          />
-        </el-form-item>
-      </el-form>
+          <!--表单渲染-->
+        <el-dialog append-to-body :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="crud.status.title" width="570px">
+          <el-form ref="form" :inline="true" :model="form" :rules="rules" size="small" label-width="66px">
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="form.username" @keydown.native="keydown($event)" />
+            </el-form-item>
+            <el-form-item label="电话" prop="phone">
+              <el-input v-model.number="form.mobile" />
+            </el-form-item>
+            <el-form-item label="昵称" prop="nickName">
+              <el-input v-model="form.nickname" @keydown.native="keydown($event)" />
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+              <el-input v-model="form.email" />
+            </el-form-item>
+             <el-form-item label="qq" prop="qqNumber">
+              <el-input v-model="form.qqNumber" />
+            </el-form-item>
+             <el-form-item label="微信" prop="weChat">
+              <el-input v-model="form.weChat" />
+            </el-form-item>
+            <el-form-item label="性别">
+              <el-radio-group v-model="form.gender" style="width: 178px">
+                <el-radio label="男">男</el-radio>
+                <el-radio label="女">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="状态">
+              <el-radio-group v-model="form.enabled" >
+                <el-radio
+                  v-for="item in enabledTypeOptions"
+                  :key="item.key"
+                  :label="item.value"
+                >{{ item.value }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item style="margin-bottom: 0;" label="角色" prop="roles">
+              <el-select
+                v-model="roleDatas"
+                style="width: 437px"
+                multiple
+                placeholder="请选择"
+                @remove-tag="deleteTag"
+                @change="changeRole"
+              >
+                <el-option
+                  v-for="item in roles"
+                  :key="item.name"
+                  :disabled="level !== 1 && item.level <= level"
+                  :label="item.name"
+                  :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="text" @click="crud.cancelCU">取消</el-button>
         <el-button
@@ -70,34 +102,45 @@
             style="width: 100%"
             :data="crud.data"
             @selection-change="crud.selectionChangeHandler"
-            @current-change="handleCurrentChange"
           >
             <el-table-column type="selection" width="55" />
             <el-table-column label="头像" width="120" align="center">
               <template slot-scope="scope">
                 <img
-                  v-if="scope.row.photoList"
-                  :src="scope.row.photoList[0]"
+                  :src="scope.row.avatar"
                   style="width: 100px;height: 100px;"
                 >
               </template>
             </el-table-column>
             <el-table-column :show-overflow-tooltip="true" prop="username" label="用户名" />
-            <el-table-column :show-overflow-tooltip="true" prop="nickName" label="昵称" />
-            <el-table-column label="性别" width="60" align="center">
+            <el-table-column :show-overflow-tooltip="true" prop="nickname" label="昵称" />
+            <el-table-column label="状态" align="center" prop="enabled">
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.enabled"
+                active-color="#409EFF"
+                inactive-color="#F56C6C"
+                @change="changeEnabled(scope.row, scope.row.enabled)"
+              />
+            </template>
+          </el-table-column>
+            <el-table-column label="性别" width="100" align="center">
               <template slot-scope="scope">
-                <el-tag v-if="scope.row.gender==1" type="success">男</el-tag>
-                <el-tag v-if="scope.row.gender==2" type="danger">女</el-tag>
+                <el-tag v-if="scope.row.gender==='1'" type="success">男</el-tag>
+                <el-tag v-if="scope.row.gender==='2'" type="danger">女</el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="登录次数" width="200" prop="loginCout">
+            <el-table-column label="登录次数" width="100" prop="loginCout">
               <template slot-scope="scope">
                 <span>{{ scope.row.loginCount }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="拥有角色" width="150" prop="role">
+            <el-table-column label="拥有角色" width="200" prop="role">
               <template slot-scope="scope">
-                <el-tag v-if="scope.row.role" type="danger">{{scope.row.role.roleName}}</el-tag>
+                <div v-for="item in scope.row.roles" :key="item.id" :value="item">
+                  <el-tag style="margin-bottom: 10px">{{item.roleName}}</el-tag>
+                </div>
+                
               </template>
             </el-table-column>
             <el-table-column label="登录IP" width="160" prop="lastLoginIp">
@@ -133,7 +176,8 @@
 
 <script>
 import crudAdmins from "@/api/authority/admin";
-import { getMenusByPid, getChildren } from "@/api/authority/menu";
+import {getRoleByPage} from "@/api/authority/role";
+import { isvalidPhone } from '@/utils/validate'
 import CRUD, { presenter, header, form, crud } from "@/components/Crud/crud";
 import rrOperation from "@/components/Crud/RR.operation";
 import crudOperation from "@/components/Crud/CRUD.operation";
@@ -142,7 +186,7 @@ import pagination from "@/components/Crud/Pagination";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import DateRangePicker from "@/components/DateRangePicker";
-
+let userRoles = []
 const defaultForm = { id: null, name: null, summary: null };
 export default {
   name: "Admin",
@@ -164,127 +208,147 @@ export default {
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   data() {
+    // 自定义验证
+    const validPhone = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入电话号码'))
+      } else if (!isvalidPhone(value)) {
+        callback(new Error('请输入正确的11位手机号码'))
+      } else {
+        callback()
+      }
+    }
     return {
       defaultProps: { children: "children", label: "label", isLeaf: "leaf" },
-      dateScopes: [
-        { code: 0, name: "全部" },
-        { code: 1, name: "自定义" },
-      ],
-      level: 3,
       currentId: 0,
       menuLoading: false,
       showButton: false,
-      menus: [],
-      menuIds: [],
+      roleDatas: [],
+      roles: [],
       permission: {
-        add: ["admin", "roles:add"],
-        edit: ["admin", "roles:edit"],
-        del: ["admin", "roles:del"],
+        add: ["admin", "admin:add"],
+        edit: ["admin", "admin:edit"],
+        del: ["admin", "admin:del"],
       },
+      enabledTypeOptions: [
+        { key: 'true', value: '激活' },
+        { key: 'false', value: '禁用' }
+      ],
+      genderTypeOptions: [
+        { key: 1, value: '男' },
+        { key: 2, value: '女' }
+      ],
       rules: {
-        name: [{ required: true, message: "请输入名称", trigger: "blur" }],
-        permission: [
-          { required: true, message: "请输入权限", trigger: "blur" },
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
-      },
+        nickName: [
+          { required: true, message: '请输入用户昵称', trigger: 'blur' },
+          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+        ],
+        phone: [
+          { required: true, trigger: 'blur', validator: validPhone }
+        ]
+      }
     };
   },
   methods: {
-    getMenuDatas(node, resolve) {
-      setTimeout(() => {
-        getMenusByPid(node.data.id ? node.data.id : 0).then((res) => {
-          if (res.code === this.$ECode.SUCCESS) {
-            resolve(res.data.data);
-          } else {
-            this.$commonUtil.message.error(res.message);
-          }
-        });
-      }, 100);
+    // 新增前将多选的值设置为空
+    [CRUD.HOOK.beforeToAdd]() {
+      this.roleDatas = []
     },
-    [CRUD.HOOK.afterRefresh]() {
-      this.$refs.menu.setCheckedKeys([]);
+    // 提交前做的操作
+    [CRUD.HOOK.afterValidateCU](crud) {
+      if (this.roleDatas.length === 0) {
+        this.$message({
+          message: '角色不能为空',
+          type: 'warning'
+        })
+        return false
+      }
+      crud.form.roles = userRoles
+      return true
     },
-    // 新增前初始化信息
-    [CRUD.HOOK.beforeToAdd](crud, form) {
-      form.menus = null;
+    // 新增与编辑前做的操作
+    [CRUD.HOOK.afterToCU](crud, form) {
+      this.getRoles()
+      if (form.id == null) {
+        this.getDepts()
+      } else {
+        this.getSupDepts(form.dept.id)
+      }
+      this.getRoleLevel()
+      form.enabled = form.enabled.toString()
     },
-    // 触发单选
-    handleCurrentChange(val) {
-      if (val) {
-        const _this = this;
-        // 清空菜单的选中
-        this.$refs.menu.setCheckedKeys([]);
-        // 保存当前的角色id
-        this.currentId = val.id;
-        // 初始化默认选中的key
-        this.menuIds = [];
-        val.menus.forEach(function (data) {
-          _this.menuIds.push(data.id);
-        });
-        this.showButton = true;
+    // 新增前将多选的值设置为空
+    [CRUD.HOOK.beforeToAdd]() {
+      this.jobDatas = []
+      this.roleDatas = []
+    },
+    // 初始化编辑时候的角色与岗位
+    [CRUD.HOOK.beforeToEdit](crud, form) {
+      this.getJobs(this.form.dept.id)
+      this.jobDatas = []
+      this.roleDatas = []
+      userRoles = []
+      const _this = this
+      form.roles.forEach(function(role, index) {
+        _this.roleDatas.push(role.id)
+        const rol = { id: role.id }
+        userRoles.push(rol)
+      })
+    },
+     changeRole(value) {
+      userRoles = []
+      value.forEach(function(data, index) {
+        const role = { id: data }
+        userRoles.push(role)
+      })
+    },
+    deleteTag(value) {
+      userRoles.forEach(function(data, index) {
+        if (data.id === value) {
+          userRoles.splice(index, value)
+        }
+      })
+    },
+     // 禁止输入空格
+    keydown(e) {
+      if (e.keyCode === 32) {
+        e.returnValue = false
       }
     },
-    menuChange(menu) {
-      // 获取该节点的所有子节点，id 包含自身
-      getChildren(menu.id).then(res => {
-        // 判断是否在 menuIds 中，如果存在则删除，否则添加
-        const childIds = res.data.data;
-        if (this.menuIds.indexOf(menu.id) !== -1) {
-          for (let i = 0; i < childIds.length; i++) {
-            const index = this.menuIds.indexOf(childIds[i]);
-            if (index !== -1) {
-              this.menuIds.splice(index, 1);
-            }
-          }
+    // 获取弹窗内角色数据
+    getRoles() {
+      getRoleByPage().then(res => {
+        if(res.code === this.$ECode.SUCCESS) {
+          this.roles = res.data.data
         } else {
-          for (let i = 0; i < childIds.length; i++) {
-            const index = this.menuIds.indexOf(childIds[i]);
-            if (index === -1) {
-              this.menuIds.push(childIds[i]);
-            }
-          }
+          this.$commonUtil.message.error(res.message);
         }
-        this.$refs.menu.setCheckedKeys(this.menuIds);
-      });
+      }).catch(() => { })
     },
-    // 保存菜单
-    saveMenu() {
-      this.menuLoading = true;
-      const role = { id: this.currentId, menus: [] };
-      // 得到已选中的 key 值
-      this.menuIds.forEach(function (id) {
-        const menu = { id: id };
-        role.menus.push(menu);
-      });
-      crudRoles
-        .editMenu(role)
-        .then((res) => {
-           if (res.code === this.$ECode.SUCCESS) {
-            this.crud.notify("保存成功", CRUD.NOTIFICATION_TYPE.SUCCESS);
-            this.menuLoading = false;
-            this.update();
-          } else {
-            this.$commonUtil.message.error(res.message);
-          }
-          
+   
+    // 改变状态
+    changeEnabled(data, val) {
+      this.$confirm('此操作将 "' + (val ? "激活" : "禁用") + '" ' + data.username + ', 是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        crudAdmins.edit(data).then(res => {
+          this.crud.notify("" + '成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+        }).catch(() => {
+          data.enabled = !data.enabled
         })
-        .catch((err) => {
-          this.menuLoading = false;
-          // console.log(err.response.data.message);
-        });
-    },
-    // 改变数据
-    update() {
-      // 无刷新更新 表格数据
-      crudRoles.getRoleById(this.currentId).then((res) => {
-        for (let i = 0; i < this.crud.data.length; i++) {
-            if (res.data.data.id === this.crud.data[i].id) {
-              this.crud.data[i] = res.data.data;
-              console.log("this.crud.data[i]", this.crud.data[i])
-              break;
-            }
-          }
-      });
+      }).catch(() => {
+        data.enabled = !data.enabled
+      })
     },
   },
 };
