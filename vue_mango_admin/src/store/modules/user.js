@@ -36,6 +36,9 @@ const user = {
     },
     SET_LOAD_MENUS: (state, loadMenus) => {
       state.loadMenus = loadMenus
+    },
+    SET_USER: (state, user) => {
+      state.user = user
     }
   },
   actions: {
@@ -80,6 +83,7 @@ const user = {
 
         commit('SET_NAME', data.username)
         commit('SET_AVATAR', data.avatar)
+        commit('SET_USER', data)
         resolve(response)
         }).catch(error => {
           reject(error)
@@ -93,6 +97,7 @@ const user = {
           removeToken() // must remove  token  first
           resetRouter()
           commit('SET_ROLES', [])
+          commit('SET_USER', {})
           resolve()
         }).catch(error => {
           reject(error)

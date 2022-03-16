@@ -71,12 +71,22 @@
               >
                 <el-option
                   v-for="item in roles"
-                  :key="item.name"
-                  :disabled="level !== 1 && item.level <= level"
-                  :label="item.name"
+                  :key="item.id"
+                  :label="item.roleName"
                   :value="item.id"
                 />
               </el-select>
+            </el-form-item>
+             <el-form-item label="头像" prop="avatar">
+              <el-upload
+                class="avatar-uploader"
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload">
+                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              </el-upload>
             </el-form-item>
           </el-form>
       <div slot="footer" class="dialog-footer">
@@ -162,14 +172,13 @@
               fixed="right"
             >
               <template slot-scope="scope">
-                <udOperation :data="scope.row" :permission="permission" />
+                <udOperation :data="scope.row" :permission="permission" :disabled-dle="scope.row.id === user.id"/>
               </template>
             </el-table-column>
           </el-table>
           <!--分页组件-->
           <pagination />
         </el-card>
-      </el-col>
     </el-row>
   </div>
 </template>
@@ -186,6 +195,7 @@ import pagination from "@/components/Crud/Pagination";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import DateRangePicker from "@/components/DateRangePicker";
+import { mapGetters } from 'vuex'
 let userRoles = []
 const defaultForm = { id: null, name: null, summary: null };
 export default {
@@ -206,6 +216,11 @@ export default {
       methodType: "post",
     });
   },
+  computed: {
+    ...mapGetters([
+      'user'
+    ])
+  },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   data() {
     // 自定义验证
@@ -225,6 +240,7 @@ export default {
       showButton: false,
       roleDatas: [],
       roles: [],
+      imageUrl: '',
       permission: {
         add: ["admin", "admin:add"],
         edit: ["admin", "admin:edit"],
@@ -277,13 +293,9 @@ export default {
     // 新增与编辑前做的操作
     [CRUD.HOOK.afterToCU](crud, form) {
       this.getRoles()
-      if (form.id == null) {
-        this.getDepts()
-      } else {
-        this.getSupDepts(form.dept.id)
+      if(form.enabled) {
+          form.enabled = form.enabled.toString()
       }
-      this.getRoleLevel()
-      form.enabled = form.enabled.toString()
     },
     // 新增前将多选的值设置为空
     [CRUD.HOOK.beforeToAdd]() {
@@ -303,6 +315,22 @@ export default {
         userRoles.push(rol)
       })
     },
+    handleAvatarSuccess(res, file) {
+      console.log("file", file)
+        this.imageUrl = URL.createObjectURL(file.raw);
+      },
+      beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+        return isJPG && isLt2M;
+      },
      changeRole(value) {
       userRoles = []
       value.forEach(function(data, index) {
@@ -325,7 +353,8 @@ export default {
     },
     // 获取弹窗内角色数据
     getRoles() {
-      getRoleByPage().then(res => {
+      const param = {searchAll:'true'}
+      getRoleByPage(param).then(res => {
         if(res.code === this.$ECode.SUCCESS) {
           this.roles = res.data.data
         } else {
@@ -373,4 +402,27 @@ export default {
   border: 0;
   padding: 0;
 }
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
 </style>

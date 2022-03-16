@@ -154,6 +154,7 @@ public class LoginController {
             response.data(Constants.ReplyField.ROLES, roles)
                     .data(Constants.ReplyField.TOKEN, token)
                     .data(Constants.ReplyField.USER_NAME, authUser.getUsername())
+                    .data(Constants.ReplyField.ID, authUser.getId())
                     .data(Constants.ReplyField.AVATAR, authUser.getAvatar());
         } catch (Exception e) {
             response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
