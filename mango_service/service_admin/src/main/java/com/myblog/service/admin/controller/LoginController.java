@@ -118,7 +118,11 @@ public class LoginController {
                 redisUtil.setEx(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + loginDto.getUsername(), token, rememberMe / ( 1000 * 60 * 60 ), TimeUnit.HOURS);
                 LOGGER.info("cannot find token from redis cache, create it:{}", token);
             }
-            //将token返回到页面
+            // 登录成功之后更新数据库信息
+            admin.setLastLoginIp(IpUtils.getIpAddr(request));
+            admin.setLastLoginTime(new Date());
+            adminService.updateById(admin);
+            // 将token返回到页面
             response.data(Constants.ReplyField.TOKEN, token);
         } catch (Exception e) {
             response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message(ResultCodeEnum.LOGIN_ERROR.getMessage());

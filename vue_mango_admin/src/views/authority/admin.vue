@@ -80,9 +80,10 @@
              <el-form-item label="头像" prop="avatar">
               <el-upload
                 class="avatar-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
+                :action="uploadURL()"
                 :show-file-list="false"
                 :on-success="handleAvatarSuccess"
+                :auto-upload="false"
                 :before-upload="beforeAvatarUpload">
                 <img v-if="imageUrl" :src="imageUrl" class="avatar">
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -315,6 +316,9 @@ export default {
         userRoles.push(rol)
       })
     },
+    uploadURL() {
+      return "";
+    },
     handleAvatarSuccess(res, file) {
       console.log("file", file)
         this.imageUrl = URL.createObjectURL(file.raw);
@@ -403,18 +407,19 @@ export default {
   padding: 0;
 }
 .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  margin: 0, 0, 0, 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
   .avatar-uploader .el-upload:hover {
     border-color: #409EFF;
   }
   .avatar-uploader-icon {
     font-size: 28px;
-    color: #8c939d;
+    color: #06449b;
     width: 178px;
     height: 178px;
     line-height: 178px;
