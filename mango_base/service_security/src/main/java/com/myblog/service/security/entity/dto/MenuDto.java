@@ -40,7 +40,7 @@ public class MenuDto extends BaseDto {
      * @return
      */
     public Boolean getLeaf() {
-        return !Objects.isNull(subCount) && subCount <= 0;
+        return Objects.nonNull(subCount) && subCount <= 0;
     }
 
     public String getLabel() {
@@ -48,6 +48,6 @@ public class MenuDto extends BaseDto {
     }
 
     public Boolean getHasChildren() {
-        return !Objects.isNull(subCount) && subCount > 0;
+        return Objects.nonNull(subCount) && subCount > 0;
     }
 }

@@ -93,8 +93,8 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Response response = Response.ok();
         int page = 1;
         int size = 10;
-        if (!Objects.isNull(adminDto.getPage())) page = adminDto.getPage();
-        if (!Objects.isNull(adminDto.getSize())) size = adminDto.getSize();
+        if (Objects.nonNull(adminDto.getPage())) page = adminDto.getPage();
+        if (Objects.nonNull(adminDto.getSize())) size = adminDto.getSize();
         Page<Admin> adminPage = new Page<>(page, size);
 
         QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
@@ -107,7 +107,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         if (StringUtils.isNotBlank(adminDto.getGender())) {
             queryWrapper.eq(DbConstants.Admin.GENDER, adminDto.getGender());
         }
-        if (!Objects.isNull(adminDto.getEnabled())) {
+        if (Objects.nonNull(adminDto.getEnabled())) {
             queryWrapper.eq(DbConstants.Admin.ENABLED, adminDto.getEnabled());
         }
         if (!CollectionUtils.isEmpty(adminDto.getLastLoginTimes()) && Objects.equals(2, adminDto.getLastLoginTimes().size())) {

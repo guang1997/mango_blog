@@ -64,14 +64,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public Response getRoleByPage(RoleDto roleDto) throws Exception {
         Response response = Response.ok();
-        if (!Objects.isNull(roleDto.getSearchAll()) && roleDto.getSearchAll()) {
+        if (Objects.nonNull(roleDto.getSearchAll()) && roleDto.getSearchAll()) {
             QueryWrapper<Role> allQueryWrapper = new QueryWrapper<>();
             return response.data(Constants.ReplyField.DATA, toDto(baseMapper.selectList(allQueryWrapper)));
         }
         int page = 1;
         int size = 10;
-        if (!Objects.isNull(roleDto.getPage())) page = roleDto.getPage();
-        if (!Objects.isNull(roleDto.getSize())) size = roleDto.getSize();
+        if (Objects.nonNull(roleDto.getPage())) page = roleDto.getPage();
+        if (Objects.nonNull(roleDto.getSize())) size = roleDto.getSize();
 
         Page<Role> rolePage = new Page<>(page, size);
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
@@ -116,6 +116,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         }
         Role role = toRole(roleDto);
         if (baseMapper.insert(role) < 1) {
+            LOGGER.error("addRole failed by unknown error, role:{}", role);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return Response.ok();
@@ -140,6 +141,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
                 continue;
             }
             if (baseMapper.deleteById(id) < 1) {
+                LOGGER.error("delRole failed by unknown error, roleId:{}", id);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
             delSuccessedRoleIds.add(id);
@@ -164,7 +166,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     public Response editRole(RoleDto roleDto) {
         Role role = toRole(roleDto);
         if (baseMapper.updateById(role) < 1) {
-            LOGGER.error("editRole failed, role:{}", role);
+            LOGGER.error("editRole failed by unknown error, role:{}", roleDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();
@@ -197,7 +199,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
         for (RoleMenu roleMenu : roleMenus) {
             if (roleMenuMapper.insert(roleMenu) < 1) {
-                LOGGER.error("updateMenu failed, role:{}, roleMenus:{}", roleDto, roleMenus);
+                LOGGER.error("updateMenu failed by unknown error, role:{}, roleMenus:{}", roleDto, roleMenu);
                 return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
             }
         }
@@ -225,6 +227,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         roleMenu.setRoleId(roleId);
         return roleMenu;
     }
+
     private List<RoleDto> toDto(List<Role> roleList) {
         List<RoleDto> roleDtos = new ArrayList<>();
         for (Role role : roleList) {

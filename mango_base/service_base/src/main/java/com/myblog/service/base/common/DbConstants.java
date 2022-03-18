@@ -41,4 +41,12 @@ public interface DbConstants {
     interface RoleAdmin{
         String ADMIN_ID = "admin_id";
     }
+
+    interface Tag {
+        String TAG_NAME = "tag_name";
+    }
+
+    interface BlogTag {
+        String TAG_ID = "tag_id";
+    }
 }

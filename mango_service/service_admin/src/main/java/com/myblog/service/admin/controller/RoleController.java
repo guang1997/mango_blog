@@ -71,13 +71,13 @@ public class RoleController {
         Response response = Response.ok();
         try {
             if (StringUtils.isBlank(roleDto.getRoleName())) {
-                LOGGER.error("addMenu failed, roleName cannot be null, role:{}", roleDto);
+                LOGGER.error("addRole failed, roleName cannot be null, role:{}", roleDto);
                 response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
                 return response;
             }
             response = roleService.addRole(roleDto);
         } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
             throw e;
         }
         return response;
@@ -105,7 +105,7 @@ public class RoleController {
         try {
             response = roleService.delRole(ids);
         } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
             throw e;
         }
         return response;

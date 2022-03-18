@@ -59,7 +59,7 @@ public class AdminController {
         try {
             response = adminService.addAdmin(adminDto);
         } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
             throw e;
         }
         return response;
@@ -87,7 +87,7 @@ public class AdminController {
         try {
             response = adminService.delAdmin(ids);
         } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
             throw e;
         }
         return response;

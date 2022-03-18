@@ -237,8 +237,6 @@ export default {
     return {
       defaultProps: { children: "children", label: "label", isLeaf: "leaf" },
       currentId: 0,
-      menuLoading: false,
-      showButton: false,
       roleDatas: [],
       roles: [],
       imageUrl: '',
@@ -300,13 +298,11 @@ export default {
     },
     // 新增前将多选的值设置为空
     [CRUD.HOOK.beforeToAdd]() {
-      this.jobDatas = []
       this.roleDatas = []
     },
     // 初始化编辑时候的角色与岗位
     [CRUD.HOOK.beforeToEdit](crud, form) {
       this.getJobs(this.form.dept.id)
-      this.jobDatas = []
       this.roleDatas = []
       userRoles = []
       const _this = this

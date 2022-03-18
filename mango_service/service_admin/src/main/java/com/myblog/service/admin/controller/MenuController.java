@@ -33,13 +33,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/admin/menu")
 public class MenuController {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(MenuController.class);
 
     @Autowired
     private MenuService menuService;
 
     @LogByMethod("/admin/menu/getSuperior")
-    @ApiOperation(value = "根据id获取菜单及上级菜单信息", notes = "根据id获取菜单及上级菜单信息", response = Response.class)
+    @ApiOperation(value = "根据id获取同级与上级菜单信息", notes = "根据id获取同级与上级菜单信息", response = Response.class)
     @GetMapping("/getSuperior")
     public Response getSuperior(@RequestParam("id") String id) {
         Response response = Response.ok();

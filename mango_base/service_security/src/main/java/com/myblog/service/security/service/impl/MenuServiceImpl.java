@@ -1,24 +1,19 @@
 package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.BeanUtil;
-import com.myblog.service.base.util.QueryWrapperDecorator;
 import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.mapper.MenuMapper;
 import com.myblog.service.security.service.MenuService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.myblog.service.security.util.TreeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -79,8 +74,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (StringUtils.isBlank(pid)) {
             pid = "0";
         }
-        QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
-        QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
+        QueryWrapper<Menu> wrapper = new QueryWrapper<>();
+        wrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        wrapper.orderByAsc(DbConstants.Base.SORT);
         wrapper.eq(DbConstants.Base.PID, pid);
         return toDto(baseMapper.selectList(wrapper));
     }
@@ -95,8 +91,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     public List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos) {
         // 如果是0，说明是最高级别的菜单了
         if (Objects.equals("0", menuDto.getPid())) {
-            QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
-            QueryWrapper<Menu> wrapper = decorator.createBaseQueryWrapper();
+            QueryWrapper<Menu> wrapper = new QueryWrapper<>();
+            wrapper.eq(DbConstants.Base.IS_DELETED, 0);
+            wrapper.orderByAsc(DbConstants.Base.SORT);
             wrapper.eq(DbConstants.Base.PID,  "0");
             menuDtos.addAll(toDto(baseMapper.selectList(wrapper)));
             return menuDtos;
@@ -134,8 +131,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Override
     public Response addMenu(MenuDto menuDto) {
         // 校验菜单是否已经存在
-        QueryWrapperDecorator<Menu> decorator = new QueryWrapperDecorator<>();
-        QueryWrapper<Menu> queryWrapper = decorator.createBaseQueryWrapper();
+        QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        queryWrapper.orderByAsc(DbConstants.Base.SORT);
         queryWrapper.eq(DbConstants.Menu.TITLE, menuDto.getTitle());
         if (!Objects.equals("Layout", menuDto.getComponent())) {
             queryWrapper.or().eq(DbConstants.Menu.COMPONENT, menuDto.getComponent());
@@ -152,7 +150,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         // 如果已经有同名切被删除的菜单，那么只更新
         if (baseMapper.updateByTitle(menu) < 1) {
             if (baseMapper.insert(menu) < 1) {
-                LOGGER.error("addMenu failed, menu:{}", menu);
+                LOGGER.error("addMenu failed by unknown error, menu:{}", menu);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
         }
@@ -161,7 +159,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (Objects.equals("0", menu.getPid())) {
             return Response.ok();
         }
-        QueryWrapper<Menu> countWrapper = decorator.createBaseQueryWrapper();
+        QueryWrapper<Menu> countWrapper = new QueryWrapper<>();
+        countWrapper.eq(DbConstants.Base.IS_DELETED, 0);
         countWrapper.eq(DbConstants.Base.PID, menu.getPid());
         Integer subCount = baseMapper.selectCount(countWrapper);
         if (baseMapper.updateSubCount(menu.getPid(), ++subCount) < 1) {
@@ -212,7 +211,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Override
     public Response delMenu(List<String> ids) {
         if (baseMapper.deleteBatchIds(ids) < 1) {
-            LOGGER.error("delMenu failed, ids:{}", ids);
+            LOGGER.error("delMenu failed by unknown error, ids:{}", ids);
             return Response.setResult(ResultCodeEnum.DELETE_FAILED);
         }
         // 清除角色和菜单中间表
