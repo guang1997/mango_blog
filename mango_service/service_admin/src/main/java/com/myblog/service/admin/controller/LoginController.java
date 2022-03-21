@@ -91,18 +91,19 @@ public class LoginController {
         }
         try {
             // 校验用户是否失败次数过多
-            String ipAddress = IpUtils.getIpAddr(request);
-            String limitCount = redisUtil.get(RedisConstants.LOGIN_LIMIT + RedisConstants.DIVISION + ipAddress);
+            String key = String.join(RedisConstants.DIVISION, RedisConstants.LOGIN_LIMIT, loginDto.getUsername(), IpUtils.getIpAddr(request));
+            String limitCount = redisUtil.get(key);
             if (StringUtils.isNotEmpty(limitCount)) {
                 int tempLimitCount = Integer.parseInt(limitCount);
-                if (tempLimitCount >= loginLimitCount) {
+                if (tempLimitCount <= 1) {
                     return response.code(ResultCodeEnum.LOGIN_LOCKED.getCode()).message(ResultCodeEnum.LOGIN_LOCKED.getMessage());
                 }
             }
 
             Admin admin = adminService.checkLogin(loginDto);
             if (admin == null) {
-                return response.code(ResultCodeEnum.LOGIN_ERROR_LOCKED.getCode()).message(String.format(ResultCodeEnum.LOGIN_ERROR_LOCKED.getMessage(), setLoginCommit(ipAddress)));
+                return response.code(ResultCodeEnum.LOGIN_ERROR_LOCKED.getCode()).message(String.format(ResultCodeEnum.LOGIN_ERROR_LOCKED.getMessage(),
+                        setLoginCommit(key)));
             }
             //查找角色
             List<Role> roles =  roleService.getRolesByUserId(admin.getId());
@@ -269,20 +270,20 @@ public class LoginController {
     /**
      * 设置登录次数
      *
-     * @param ipAddress
+     * @param key
      * @return
      */
-    private Integer setLoginCommit(String ipAddress) {
-        String key = RedisConstants.LOGIN_LIMIT + RedisConstants.DIVISION + ipAddress;
+    private Integer setLoginCommit(String key) {
         String loginCountStr = redisUtil.get(key);
         Integer limitCount = this.loginLimitCount;
-        if (StringUtils.isEmpty(loginCountStr)) {
+        if (StringUtils.isBlank(loginCountStr)) {
+            // 第一次登陆失败时放到缓存中
             redisUtil.setEx(key, String.valueOf(--limitCount), 30, TimeUnit.MINUTES);
-        } else {
-            int loginCount = Integer.parseInt(loginCountStr);
-            limitCount -= ++loginCount;
-            redisUtil.setEx(key, String.valueOf(limitCount), 30, TimeUnit.MINUTES);
+            return limitCount;
         }
-        return limitCount;
+        // 之后每登陆错误一次，次数就减1
+        int loginCount = Integer.parseInt(loginCountStr);
+        redisUtil.setEx(key, String.valueOf(--loginCount), 30, TimeUnit.MINUTES);
+        return loginCount;
     }
 }

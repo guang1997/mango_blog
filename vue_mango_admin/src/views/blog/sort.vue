@@ -5,7 +5,7 @@
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-input
-          v-model="query.tagName"
+          v-model="query.sortName"
           size="small"
           clearable
           placeholder="输入标签名搜索"
@@ -22,20 +22,20 @@
         <el-dialog append-to-body :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="crud.status.title" width="580px">
           <el-form ref="form" :inline="true" :model="form" size="small" label-width="80px">
             <el-form-item
-              label="标签名称"
-              prop="tagName"
+              label="分类名称"
+              prop="sortName"
             >
               <el-input
-                v-model="form.tagName"
-                placeholder="标签名称"
+                v-model="form.sortName"
+                placeholder="分类名称"
                 style="width: 178px"
               />
             </el-form-item>
-            <el-form-item label="标签排序" prop="sort">
+            <el-form-item label="分类级别" prop="sortLevel">
               <el-input-number
-                v-model.number="form.sort"
-                :min="0"
-                :max="999"
+                v-model.number="form.sortLevel"
+                :min="1"
+                :max="3"
                 controls-position="right"
                 style="width: 178px"
               />
@@ -60,10 +60,10 @@
       </div>
     </el-dialog>
     <el-row :gutter="15">
-      <!--标签管理-->
+      <!--分类管理-->
         <el-card class="box-card" shadow="never">
           <div slot="header" class="clearfix">
-            <span class="role-span">标签列表</span>
+            <span class="role-span">分类列表</span>
           </div>
           <el-table
             ref="table"
@@ -76,10 +76,10 @@
           >
             <el-table-column type="selection" width="55" />
 
-            <el-table-column :show-overflow-tooltip="true" prop="tagName" label="标签名" width="200"/>
+            <el-table-column :show-overflow-tooltip="true" prop="sortName" label="标签名" width="200"/>
             <el-table-column :show-overflow-tooltip="true" prop="summary" label="标签描述" width="300"/>
             <el-table-column label="点击数" width="150" prop="clickCount" />
-            <el-table-column :show-overflow-tooltip="true" prop="sort" label="排序字段" width="200"/>
+            <el-table-column :show-overflow-tooltip="true" prop="sortLevelName" label="分类级别" width="200"/>
 
             <el-table-column label="创建时间"  prop="createTime" />
             <el-table-column
@@ -102,16 +102,16 @@
 </template>
 
 <script>
-import crudTags from "@/api/blog/tag";
+import crudSorts from "@/api/blog/sort";
 import CRUD, { presenter, header, form, crud } from "@/components/Crud/crud";
 import rrOperation from "@/components/Crud/RR.operation";
 import crudOperation from "@/components/Crud/CRUD.operation";
 import udOperation from "@/components/Crud/UD.operation";
 import pagination from "@/components/Crud/Pagination";
 import DateRangePicker from "@/components/DateRangePicker";
-const defaultForm = { id: null, name: null, summary: null, sort: 999,};
+const defaultForm = { id: null, name: null, summary: null, sortLevel: 1};
 export default {
-  name: "Tag",
+  name: "Sort",
   components: {
     pagination,
     crudOperation,
@@ -121,9 +121,9 @@ export default {
   },
   cruds() {
     return CRUD({
-      title: "标签",
-      url: "/admin/tag/getTagByPage",
-      crudMethod: { ...crudTags },
+      title: "分类",
+      url: "/admin/sort/getSortByPage",
+      crudMethod: { ...crudSorts },
       methodType: "post",
     });
   },
@@ -132,18 +132,18 @@ export default {
     return {
       currentId: 0,
       permission: {
-        add: ["admin", "tag:add"],
-        edit: ["admin", "tag:edit"],
-        del: ["admin", "tag:del"],
+        add: ["admin", "sort:add"],
+        edit: ["admin", "sort:edit"],
+        del: ["admin", "sort:del"],
       },
     };
   },
   methods: {
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
-      if (!crud.form || !crud.form.tagName) {
+      if (!crud.form || !crud.form.sortName) {
         this.$message({
-          message: '角色名不能为空',
+          message: '分类名不能为空',
           type: 'warning'
         })
         return false

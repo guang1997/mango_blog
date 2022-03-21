@@ -76,7 +76,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         }
         QueryWrapper<Menu> wrapper = new QueryWrapper<>();
         wrapper.eq(DbConstants.Base.IS_DELETED, 0);
-        wrapper.orderByAsc(DbConstants.Base.SORT);
+        wrapper.orderByDesc(DbConstants.Base.SORT);
         wrapper.eq(DbConstants.Base.PID, pid);
         return toDto(baseMapper.selectList(wrapper));
     }
@@ -93,7 +93,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (Objects.equals("0", menuDto.getPid())) {
             QueryWrapper<Menu> wrapper = new QueryWrapper<>();
             wrapper.eq(DbConstants.Base.IS_DELETED, 0);
-            wrapper.orderByAsc(DbConstants.Base.SORT);
+            wrapper.orderByDesc(DbConstants.Base.SORT);
             wrapper.eq(DbConstants.Base.PID,  "0");
             menuDtos.addAll(toDto(baseMapper.selectList(wrapper)));
             return menuDtos;
@@ -133,7 +133,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         // 校验菜单是否已经存在
         QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
-        queryWrapper.orderByAsc(DbConstants.Base.SORT);
+        queryWrapper.orderByDesc(DbConstants.Base.SORT);
         queryWrapper.eq(DbConstants.Menu.TITLE, menuDto.getTitle());
         if (!Objects.equals("Layout", menuDto.getComponent())) {
             queryWrapper.or().eq(DbConstants.Menu.COMPONENT, menuDto.getComponent());

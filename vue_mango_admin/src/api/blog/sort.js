@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getTagByPage(data) {
+export function getSortByPage(data) {
   return request({
-    url: '/admin/tag/getTagByPage',
+    url: '/admin/sort/getSortByPage',
     method: 'post',
     data
   })
@@ -10,14 +10,14 @@ export function getTagByPage(data) {
 
   export function add(data) {
     return request({
-      url: '/admin/tag/addTag',
+      url: '/admin/sort/addSort',
       method: 'post',
       data
     })
   }
   export function del(ids) {
     return request({
-      url: '/admin/tag/delTags',
+      url: '/admin/sort/delSorts',
       method: 'delete',
       data:ids
     })
@@ -25,9 +25,9 @@ export function getTagByPage(data) {
   
   export function edit(data) {
     return request({
-      url: '/admin/tag/editTag',
+      url: '/admin/sort/editSort',
       method: 'put',
       data
     })
   }
-export default { getTagByPage, add, edit, del}
+export default { getSortByPage, add, edit, del}

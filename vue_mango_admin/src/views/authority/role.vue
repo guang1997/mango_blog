@@ -164,7 +164,7 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import DateRangePicker from "@/components/DateRangePicker";
 
-const defaultForm = { id: null, name: null, summary: null };
+const defaultForm = { id: null, name: null, summary: null, sort: 999, };
 export default {
   name: "Role",
   components: {

@@ -27,17 +27,17 @@ public class Sort extends BaseEntity {
 
     private static final long serialVersionUID=1L;
 
-    @ApiModelProperty(value = "分类内容")
+    @ApiModelProperty(value = "分类名称")
     private String sortName;
 
-    @ApiModelProperty(value = "分类简介")
-    private String content;
+    @ApiModelProperty(value = "分类描述")
+    private String summary;
 
     @ApiModelProperty(value = "点击数")
     private Integer clickCount;
 
-    @ApiModelProperty(value = "排序字段，越小越靠前")
-    private Integer sort;
+    @ApiModelProperty(value = "分类级别")
+    private Integer sortLevel;
 
 
 }

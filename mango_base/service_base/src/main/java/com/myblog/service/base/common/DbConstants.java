@@ -49,4 +49,13 @@ public interface DbConstants {
     interface BlogTag {
         String TAG_ID = "tag_id";
     }
+
+    interface Sort {
+        String SORT_NAME = "sort_name";
+        String SORT_LEVEL = "sort_level";
+    }
+
+    interface Blog {
+        String BLOG_SORT_ID = "blog_sort_id";
+    }
 }

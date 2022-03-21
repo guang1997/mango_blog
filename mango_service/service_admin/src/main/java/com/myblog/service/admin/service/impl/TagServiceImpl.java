@@ -60,14 +60,14 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         if (Objects.nonNull(tagDto.getSize())) size = tagDto.getSize();
 
         if (StringUtils.isNotBlank(tagDto.getTagName())) {
-            queryWrapper.eq(DbConstants.Tag.TAG_NAME, tagDto.getTagName());
+            queryWrapper.like(DbConstants.Tag.TAG_NAME, tagDto.getTagName());
         }
         if (!CollectionUtils.isEmpty(tagDto.getCreateTimes()) && Objects.equals(2, tagDto.getCreateTimes().size())) {
             Date beginDate = ThreadSafeDateFormat.parse(tagDto.getCreateTimes().get(0), ThreadSafeDateFormat.DATETIME);
             Date endDate = ThreadSafeDateFormat.parse(tagDto.getCreateTimes().get(1), ThreadSafeDateFormat.DATETIME);
             queryWrapper.between(DbConstants.Base.CREATE_TIME, beginDate, endDate);
         }
-        queryWrapper.orderByAsc(DbConstants.Base.SORT);
+        queryWrapper.orderByDesc(DbConstants.Base.SORT);
         Page<Tag> tagPage = new Page<>(page, size);
 
         baseMapper.selectPage(tagPage, queryWrapper);
@@ -124,29 +124,30 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     @Override
     public Response delTags(Set<String> ids) {
         // 如果标签已经绑定了博客，那么不删除该标签
-        List<String> delFailedRoleNames = new ArrayList<>();
+        List<String> delFailedTagNames = new ArrayList<>();
         for (String id : ids) {
             List<String> blogIdsByTagId = baseMapper.selectBlogIdsByTagId(id);
             if (!CollectionUtils.isEmpty(blogIdsByTagId)) {
                 Tag tag = baseMapper.selectById(id);
                 LOGGER.warn("delete tag failed, the tag:{} has been bound", tag);
-                delFailedRoleNames.add(tag.getTagName());
+                delFailedTagNames.add(tag.getTagName());
                 continue;
             }
             if (baseMapper.deleteById(id) < 1) {
                 LOGGER.error("delTags failed by unknown error, roleId:{}", id);
-                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }
-        if (CollectionUtils.isEmpty(delFailedRoleNames)) {
+        if (CollectionUtils.isEmpty(delFailedTagNames)) {
             return Response.ok();
         }
-        return Response.error().message(delFailedRoleNames.toString() + "已绑定用户, 未删除成功");
+        return Response.error().message(delFailedTagNames.toString() + "已绑定用户, 未删除成功");
     }
 
     private Tag toTag(TagDto tagDto) {
         Tag tag = new Tag();
         BeanUtil.copyProperties(tagDto, tag);
+        tag.setId(tagDto.getId());
         return tag;
     }
 

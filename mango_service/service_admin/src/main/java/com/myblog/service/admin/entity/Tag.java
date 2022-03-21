@@ -30,8 +30,8 @@ public class Tag extends BaseEntity {
     @ApiModelProperty(value = "标签名称")
     private String tagName;
 
-    @ApiModelProperty(value = "标签简介")
-    private String content;
+    @ApiModelProperty(value = "标签描述")
+    private String summary;
 
     @ApiModelProperty(value = "点击数")
     private Integer clickCount;

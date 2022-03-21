@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- 主机:                           127.0.0.1
--- 服务器版本:                        8.0.27 - MySQL Community Server - GPL
+-- 服务器版本:                        8.0.26 - MySQL Community Server - GPL
 -- 服务器操作系统:                      Win64
--- HeidiSQL 版本:                  10.2.0.5704
+-- HeidiSQL 版本:                  11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -10,6 +10,7 @@
 /*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
 -- 导出 mango_blog 的数据库结构
@@ -17,6 +18,7 @@ CREATE DATABASE IF NOT EXISTS `mango_blog` /*!40100 DEFAULT CHARACTER SET utf8mb
 USE `mango_blog`;
 
 -- 导出  表 mango_blog.t_admin 结构
+DROP TABLE IF EXISTS `t_admin`;
 CREATE TABLE IF NOT EXISTS `t_admin` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名',
@@ -26,14 +28,14 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
   `email` varchar(60) DEFAULT NULL COMMENT '邮箱',
   `mobile` varchar(11) DEFAULT NULL COMMENT '手机',
   `login_count` int unsigned DEFAULT '0' COMMENT '登录次数',
-  `last_login_time` timestamp NULL DEFAULT NULL COMMENT '最后登录时间',
+  `last_login_time` datetime DEFAULT NULL COMMENT '最后登录时间',
   `last_login_ip` varchar(50) DEFAULT '127.0.0.1' COMMENT '最后登录IP',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `nickname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '昵称',
   `qq_number` varchar(255) DEFAULT NULL COMMENT 'QQ号',
   `we_chat` varchar(255) DEFAULT NULL COMMENT '微信号',
-  `enabled` tinyint unsigned DEFAULT '1' COMMENT '账号状态1:启用0:禁用',
+  `enabled` tinyint unsigned DEFAULT '0' COMMENT '账号状态1:禁用0:启用',
   `is_deleted` tinyint DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='管理员表';
@@ -42,11 +44,12 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
 DELETE FROM `t_admin`;
 /*!40000 ALTER TABLE `t_admin` DISABLE KEYS */;
 INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `mobile`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `enabled`, `is_deleted`) VALUES
-	('1295268474480156673', 'admin', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18761616251', 1, '2022-03-18 09:34:41', '192.168.97.41', '2021-09-26 16:56:46', '2022-03-18 09:34:41', '李斯特', '72174823', '18761616251', 1, 0),
+	('1295268474480156673', 'admin', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18761616251', 1, '2022-03-19 07:05:29', '192.168.1.7', '2021-09-26 16:56:46', '2022-03-19 07:05:29', '李斯特', '72174823', '18761616251', 1, 0),
 	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 0, '2021-12-02 22:01:18', '127.0.0.1', '2021-12-02 22:01:22', '2021-12-02 22:01:23', '游客', '111111', '111111', 1, 0);
 /*!40000 ALTER TABLE `t_admin` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_blog 结构
+DROP TABLE IF EXISTS `t_blog`;
 CREATE TABLE IF NOT EXISTS `t_blog` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `title` varchar(200) DEFAULT NULL COMMENT '博客标题',
@@ -66,7 +69,7 @@ CREATE TABLE IF NOT EXISTS `t_blog` (
   `blog_sort_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '博客分类ID',
   `level` tinyint(1) DEFAULT '0' COMMENT '推荐等级(0:正常)',
   `is_publish` varchar(1) DEFAULT '1' COMMENT '是否发布：0：否，1：是',
-  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
   `open_comment` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否开启评论(0:否 1:是)',
   `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '类型【0 博客， 1：推广】',
   `outside_link` varchar(1024) DEFAULT NULL COMMENT '外链【如果是推广，那么将跳转到外链】',
@@ -80,6 +83,7 @@ DELETE FROM `t_blog`;
 /*!40000 ALTER TABLE `t_blog` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_blog_tag 结构
+DROP TABLE IF EXISTS `t_blog_tag`;
 CREATE TABLE IF NOT EXISTS `t_blog_tag` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `blog_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '博客ID',
@@ -96,6 +100,7 @@ DELETE FROM `t_blog_tag`;
 /*!40000 ALTER TABLE `t_blog_tag` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_comment 结构
+DROP TABLE IF EXISTS `t_comment`;
 CREATE TABLE IF NOT EXISTS `t_comment` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `user_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户id',
@@ -118,6 +123,7 @@ DELETE FROM `t_comment`;
 /*!40000 ALTER TABLE `t_comment` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_exception_log 结构
+DROP TABLE IF EXISTS `t_exception_log`;
 CREATE TABLE IF NOT EXISTS `t_exception_log` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `exception_json` mediumtext COMMENT '异常对象json格式',
@@ -139,6 +145,7 @@ DELETE FROM `t_exception_log`;
 /*!40000 ALTER TABLE `t_exception_log` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_link 结构
+DROP TABLE IF EXISTS `t_link`;
 CREATE TABLE IF NOT EXISTS `t_link` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `title` varchar(255) DEFAULT NULL COMMENT '友情链接标题',
@@ -148,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `t_link` (
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '状态',
-  `sort` int DEFAULT '0' COMMENT '排序字段，越小越靠前',
+  `sort` int DEFAULT '0' COMMENT '排序字段，越大越靠前',
   `link_status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '友链状态： 0 申请中， 1：已上线，  2：已下架',
   `user_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '申请用户ID',
   `admin_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '操作管理员ID',
@@ -163,13 +170,14 @@ DELETE FROM `t_link`;
 /*!40000 ALTER TABLE `t_link` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_menu 结构
+DROP TABLE IF EXISTS `t_menu`;
 CREATE TABLE IF NOT EXISTS `t_menu` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `name` varchar(255) NOT NULL COMMENT '菜单名称',
   `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '菜单标题',
   `pid` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '父id',
   `icon` varchar(50) DEFAULT NULL COMMENT '图标',
-  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
+  `sort` int DEFAULT '0' COMMENT '排序字段，越大越靠前',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '是否已删除 1:是 0:否',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
@@ -183,7 +191,7 @@ CREATE TABLE IF NOT EXISTS `t_menu` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='菜单表';
 
--- 正在导出表  mango_blog.t_menu 的数据：~13 rows (大约)
+-- 正在导出表  mango_blog.t_menu 的数据：~14 rows (大约)
 DELETE FROM `t_menu`;
 /*!40000 ALTER TABLE `t_menu` DISABLE KEYS */;
 INSERT INTO `t_menu` (`id`, `name`, `title`, `pid`, `icon`, `sort`, `is_deleted`, `create_time`, `update_time`, `hidden`, `component`, `path`, `redirect`, `permission`, `menu_type`, `sub_count`) VALUES
@@ -204,6 +212,7 @@ INSERT INTO `t_menu` (`id`, `name`, `title`, `pid`, `icon`, `sort`, `is_deleted`
 /*!40000 ALTER TABLE `t_menu` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_picture 结构
+DROP TABLE IF EXISTS `t_picture`;
 CREATE TABLE IF NOT EXISTS `t_picture` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `file_id` varchar(255) DEFAULT NULL COMMENT '图片id',
@@ -221,12 +230,13 @@ DELETE FROM `t_picture`;
 /*!40000 ALTER TABLE `t_picture` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role 结构
+DROP TABLE IF EXISTS `t_role`;
 CREATE TABLE IF NOT EXISTS `t_role` (
-  `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色id',
-  `role_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色名',
+  `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
+  `role_name` varchar(255) NOT NULL COMMENT '角色名',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `summary` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '角色介绍',
+  `summary` varchar(255) DEFAULT NULL COMMENT '角色介绍',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='角色表';
 
@@ -240,6 +250,7 @@ INSERT INTO `t_role` (`id`, `role_name`, `create_time`, `update_time`, `summary`
 /*!40000 ALTER TABLE `t_role` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role_admin 结构
+DROP TABLE IF EXISTS `t_role_admin`;
 CREATE TABLE IF NOT EXISTS `t_role_admin` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `role_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色ID',
@@ -247,7 +258,7 @@ CREATE TABLE IF NOT EXISTS `t_role_admin` (
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `IDX_ROLEID_ADMINID_UNIQUE` (`role_id`,`admin_id`)
+  UNIQUE KEY `ROLE_ADMIN_UK` (`role_id`,`admin_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='角色管理员中间表';
 
 -- 正在导出表  mango_blog.t_role_admin 的数据：~3 rows (大约)
@@ -260,6 +271,7 @@ INSERT INTO `t_role_admin` (`id`, `role_id`, `admin_id`, `create_time`, `update_
 /*!40000 ALTER TABLE `t_role_admin` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role_menu 结构
+DROP TABLE IF EXISTS `t_role_menu`;
 CREATE TABLE IF NOT EXISTS `t_role_menu` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `role_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色ID',
@@ -267,7 +279,7 @@ CREATE TABLE IF NOT EXISTS `t_role_menu` (
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `IDX_ROLEID_MENUID_UNIQUE` (`role_id`,`menu_id`)
+  UNIQUE KEY `ROLE_MENU_UK` (`role_id`,`menu_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- 正在导出表  mango_blog.t_role_menu 的数据：~11 rows (大约)
@@ -288,23 +300,27 @@ INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_ti
 /*!40000 ALTER TABLE `t_role_menu` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_sort 结构
+DROP TABLE IF EXISTS `t_sort`;
 CREATE TABLE IF NOT EXISTS `t_sort` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `sort_name` varchar(255) DEFAULT NULL COMMENT '分类内容',
-  `content` varchar(255) DEFAULT NULL COMMENT '分类简介',
+  `summary` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '分类描述',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `click_count` int DEFAULT '0' COMMENT '点击数',
-  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
+  `sort_level` int DEFAULT '0' COMMENT '分类级别',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客分类表';
 
--- 正在导出表  mango_blog.t_sort 的数据：~0 rows (大约)
+-- 正在导出表  mango_blog.t_sort 的数据：~2 rows (大约)
 DELETE FROM `t_sort`;
 /*!40000 ALTER TABLE `t_sort` DISABLE KEYS */;
+INSERT INTO `t_sort` (`id`, `sort_name`, `summary`, `create_time`, `update_time`, `click_count`, `sort_level`) VALUES
+	('1505006369916694530', '测试', '测试', '2022-03-19 10:20:55', '2022-03-19 10:27:49', 0, 2);
 /*!40000 ALTER TABLE `t_sort` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_sys_dict_data 结构
+DROP TABLE IF EXISTS `t_sys_dict_data`;
 CREATE TABLE IF NOT EXISTS `t_sys_dict_data` (
   `id` varchar(19) NOT NULL COMMENT '主键',
   `dict_type_id` varchar(255) DEFAULT NULL COMMENT '字典类型ID',
@@ -319,7 +335,7 @@ CREATE TABLE IF NOT EXISTS `t_sys_dict_data` (
   `is_deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典数据表';
 
@@ -334,6 +350,7 @@ INSERT INTO `t_sys_dict_data` (`id`, `dict_type_id`, `dict_label`, `dict_value`,
 /*!40000 ALTER TABLE `t_sys_dict_data` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_sys_dict_type 结构
+DROP TABLE IF EXISTS `t_sys_dict_type`;
 CREATE TABLE IF NOT EXISTS `t_sys_dict_type` (
   `id` varchar(19) NOT NULL COMMENT '主键',
   `dict_name` varchar(255) DEFAULT NULL COMMENT '字典名称',
@@ -344,7 +361,7 @@ CREATE TABLE IF NOT EXISTS `t_sys_dict_type` (
   `is_deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典类型表';
 
@@ -357,14 +374,15 @@ INSERT INTO `t_sys_dict_type` (`id`, `dict_name`, `dict_type`, `create_admin_uid
 /*!40000 ALTER TABLE `t_sys_dict_type` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_tag 结构
+DROP TABLE IF EXISTS `t_tag`;
 CREATE TABLE IF NOT EXISTS `t_tag` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
-  `tag_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '标签名称',
-  `content` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '标签简介',
-  `click_count` int NOT NULL DEFAULT '0' COMMENT '点击数',
-  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
+  `tag_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '标签内容',
+  `summary` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '标签描述',
+  `click_count` int DEFAULT '0' COMMENT '点击数',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
+  `sort` int DEFAULT '0' COMMENT '排序字段，越大越靠前',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='标签表';
 
@@ -374,6 +392,7 @@ DELETE FROM `t_tag`;
 /*!40000 ALTER TABLE `t_tag` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_todo 结构
+DROP TABLE IF EXISTS `t_todo`;
 CREATE TABLE IF NOT EXISTS `t_todo` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `admin_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '管理员id',
@@ -391,6 +410,7 @@ DELETE FROM `t_todo`;
 /*!40000 ALTER TABLE `t_todo` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_user 结构
+DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE IF NOT EXISTS `t_user` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `user_name` varchar(255) NOT NULL COMMENT '用户名',
@@ -420,6 +440,7 @@ DELETE FROM `t_user`;
 /*!40000 ALTER TABLE `t_user` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_web_config 结构
+DROP TABLE IF EXISTS `t_web_config`;
 CREATE TABLE IF NOT EXISTS `t_web_config` (
   `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '主键',
   `logo` varchar(255) NOT NULL COMMENT 'logo(文件ID)',
@@ -453,6 +474,7 @@ DELETE FROM `t_web_config`;
 /*!40000 ALTER TABLE `t_web_config` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_web_visit 结构
+DROP TABLE IF EXISTS `t_web_visit`;
 CREATE TABLE IF NOT EXISTS `t_web_visit` (
   `id` varchar(19) NOT NULL COMMENT '主键',
   `user_id` varchar(255) DEFAULT NULL COMMENT '用户id',
@@ -472,5 +494,6 @@ DELETE FROM `t_web_visit`;
 /*!40000 ALTER TABLE `t_web_visit` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;

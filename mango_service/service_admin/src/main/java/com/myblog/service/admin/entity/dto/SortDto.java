@@ -6,15 +6,17 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class TagDto extends BaseDto {
+public class SortDto extends BaseDto {
 
-    private String tagName;
+    private String sortName;
 
     private String summary;
 
     private Integer clickCount;
 
-    private Integer sort;
+    private Integer sortLevel;
+
+    private String sortLevelName;
 
     private List<String> createTimes;
 }
