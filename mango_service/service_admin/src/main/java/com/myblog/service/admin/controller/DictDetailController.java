@@ -49,35 +49,35 @@ public class DictDetailController {
     }
 
     @LogByMethod("/admin/dictDetail/addDictDetail")
-    @ApiOperation(value = "新增字典", notes = "新增字典", response = Response.class)
+    @ApiOperation(value = "新增字典详情", notes = "新增字典详情", response = Response.class)
     @PostMapping("/addDictDetail")
     public Response addDictDetail(@RequestBody DictDetailDto dictDetailDto) {
         Response response = Response.ok();
         try {
             if (StringUtils.isBlank(dictDetailDto.getDictLabel())) {
-                LOGGER.error("addDict failed, dictName cannot be null, dict:{}", dictDto);
+                LOGGER.error("addDictDetail failed, dictLabel cannot be null, dictDetail:{}", dictDetailDto);
                 response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
                 return response;
             }
-            response = dictService.addDict(dictDto);
+            response = dictDetailService.addDictDetail(dictDetailDto);
         } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
+            response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
             throw e;
         }
         return response;
     }
 
-    @LogByMethod("/admin/dictDetail/editDict")
-    @ApiOperation(value = "修改字典", notes = "修改字典", response = Response.class)
-    @PutMapping("/editDict")
-    public Response editDict(@RequestBody DictDto dictDto) {
+    @LogByMethod("/admin/dictDetail/editDictDetail")
+    @ApiOperation(value = "修改字典详情", notes = "修改字典详情", response = Response.class)
+    @PutMapping("/editDictDetail")
+    public Response editDictDetail(@RequestBody DictDetailDto dictDetailDto) {
         Response response = Response.ok();
         try {
-            if (StringUtils.isBlank(dictDto.getDictName())) {
-                LOGGER.error("editDict failed, dictName cannot be null, dict:{}", dictDto);
+            if (StringUtils.isBlank(dictDetailDto.getDictLabel())) {
+                LOGGER.error("editDictDetail failed, dictLabel cannot be null, dictDetail:{}", dictDetailDto);
                 return response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
             }
-            response = dictService.editDict(dictDto);
+            response = dictDetailService.editDictDetail(dictDetailDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
             throw e;
@@ -85,13 +85,13 @@ public class DictDetailController {
         return response;
     }
 
-    @LogByMethod("/admin/dictDetail/delDict")
-    @ApiOperation(value = "删除字典", notes = "删除字典", response = Response.class)
-    @DeleteMapping("/delDict")
-    public Response delTags(@RequestBody Set<String> ids) {
+    @LogByMethod("/admin/dictDetail/delDictDetails")
+    @ApiOperation(value = "删除字典详情", notes = "删除字典详情", response = Response.class)
+    @DeleteMapping("/delDictDetails")
+    public Response delDictDetails(@RequestBody Set<String> ids) {
         Response response = Response.ok();
         try {
-            response = dictService.delDict(ids);
+            response = dictDetailService.delDictDetails(ids);
         } catch (Exception e) {
             response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
             throw e;
