@@ -1,0 +1,66 @@
+package com.myblog.service.admin.entity;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.myblog.service.base.entity.BaseEntity;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+/**
+ * <p>
+ * 字典详细数据表
+ * </p>
+ *
+ * @author 李斯特
+ * @since 2022-03-21
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+@TableName("t_dict_detail")
+@ApiModel(value="DictDetail对象", description="字典详细数据表")
+public class DictDetail extends BaseEntity {
+
+    private static final long serialVersionUID=1L;
+
+    @ApiModelProperty(value = "字典类型ID")
+    private String dictId;
+
+    @ApiModelProperty(value = "字典标签")
+    private String dictLabel;
+
+    @ApiModelProperty(value = "字典键值")
+    private String dictValue;
+
+    @ApiModelProperty(value = "样式属性（其他样式扩展）")
+    private String cssClass;
+
+    @ApiModelProperty(value = "表格回显样式")
+    private String listClass;
+
+    @ApiModelProperty(value = "是否默认（1是 0否）,默认为0")
+    private Boolean isDefault;
+
+    @ApiModelProperty(value = "创建人id")
+    private String createAdminId;
+
+    @ApiModelProperty(value = "最后更新人id")
+    private String updateAdminId;
+
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
+    @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
+    @TableField("is_deleted")
+    private Boolean deleted;
+
+    @ApiModelProperty(value = "排序字段，越大越靠前")
+    private Integer sort;
+
+
+}
