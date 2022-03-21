@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
 DELETE FROM `t_admin`;
 /*!40000 ALTER TABLE `t_admin` DISABLE KEYS */;
 INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `mobile`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `enabled`, `is_deleted`) VALUES
-	('1295268474480156673', 'admin', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18761616251', 1, '2022-03-18 09:34:41', '192.168.97.41', '2021-09-26 16:56:46', '2022-03-18 09:34:41', '李斯特', '72174823', '18761616251', 1, 0),
+	('1295268474480156673', 'admin', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18761616251', 1, '2022-03-21 10:47:40', '192.168.97.41', '2021-09-26 16:56:46', '2022-03-21 10:47:40', '李斯特', '72174823', '18761616251', 1, 0),
 	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 0, '2021-12-02 22:01:18', '127.0.0.1', '2021-12-02 22:01:22', '2021-12-02 22:01:23', '游客', '111111', '111111', 1, 0);
 /*!40000 ALTER TABLE `t_admin` ENABLE KEYS */;
 
@@ -116,6 +116,53 @@ CREATE TABLE IF NOT EXISTS `t_comment` (
 DELETE FROM `t_comment`;
 /*!40000 ALTER TABLE `t_comment` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_comment` ENABLE KEYS */;
+
+-- 导出  表 mango_blog.t_dict 结构
+CREATE TABLE IF NOT EXISTS `t_dict` (
+  `id` varchar(19) NOT NULL COMMENT '主键',
+  `dict_name` varchar(255) DEFAULT NULL COMMENT '字典名称',
+  `summary` varchar(255) DEFAULT NULL COMMENT '描述',
+  `is_deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
+  `create_time` timestamp NOT NULL COMMENT '创建时间',
+  `update_time` timestamp NOT NULL COMMENT '更新时间',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越大越靠前',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典表';
+
+-- 正在导出表  mango_blog.t_dict 的数据：~2 rows (大约)
+DELETE FROM `t_dict`;
+/*!40000 ALTER TABLE `t_dict` DISABLE KEYS */;
+INSERT INTO `t_dict` (`id`, `dict_name`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
+	('1695268474480156673', 'sys_yes_no', '系统是否列表', 0, '2021-11-28 15:29:00', '2021-11-28 15:29:01', 0),
+	('1695268474480156674', 'sys_menu_level', '菜单等级列表', 0, '2021-11-28 16:17:54', '2021-11-28 16:17:54', 1);
+/*!40000 ALTER TABLE `t_dict` ENABLE KEYS */;
+
+-- 导出  表 mango_blog.t_dict_detail 结构
+CREATE TABLE IF NOT EXISTS `t_dict_detail` (
+  `id` varchar(19) NOT NULL COMMENT '主键',
+  `dict_id` varchar(255) DEFAULT NULL COMMENT '字典类型ID',
+  `dict_label` varchar(255) DEFAULT NULL COMMENT '字典标签',
+  `dict_value` varchar(255) DEFAULT NULL COMMENT '字典键值',
+  `css_class` varchar(255) DEFAULT NULL COMMENT '样式属性（其他样式扩展）',
+  `list_class` varchar(255) DEFAULT NULL COMMENT '表格回显样式',
+  `is_default` tinyint(1) DEFAULT '0' COMMENT '是否默认（1是 0否）,默认为0',
+  `summary` varchar(255) DEFAULT NULL COMMENT '备注',
+  `is_deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
+  `create_time` timestamp NOT NULL COMMENT '创建时间',
+  `update_time` timestamp NOT NULL COMMENT '更新时间',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越大越靠前',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典详细数据表';
+
+-- 正在导出表  mango_blog.t_dict_detail 的数据：~4 rows (大约)
+DELETE FROM `t_dict_detail`;
+/*!40000 ALTER TABLE `t_dict_detail` DISABLE KEYS */;
+INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_class`, `list_class`, `is_default`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
+	('1795268474480156673', '1695268474480156673', '是', '1', NULL, 'success', 0, '系统是否', 0, '2021-11-28 15:30:20', '2021-11-28 15:30:21', 0),
+	('1795268474480156674', '1695268474480156673', '否', '0', NULL, 'warning', 0, '系统是否', 0, '2021-11-28 15:32:48', '2021-11-28 15:32:51', 1),
+	('1795268474480156675', '1695268474480156674', '一级菜单', '1', NULL, 'success', 0, '菜单等级', 0, '2021-11-28 16:18:31', '2021-11-28 16:18:32', 2),
+	('1795268474480156676', '1695268474480156674', '二级菜单', '2', NULL, 'warning', 0, '菜单等级', 0, '2021-11-28 16:20:03', '2021-11-28 16:20:04', 3);
+/*!40000 ALTER TABLE `t_dict_detail` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_exception_log 结构
 CREATE TABLE IF NOT EXISTS `t_exception_log` (
@@ -291,11 +338,11 @@ INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_ti
 CREATE TABLE IF NOT EXISTS `t_sort` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `sort_name` varchar(255) DEFAULT NULL COMMENT '分类内容',
-  `content` varchar(255) DEFAULT NULL COMMENT '分类简介',
+  `summary` varchar(255) DEFAULT NULL COMMENT '分类描述',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `click_count` int DEFAULT '0' COMMENT '点击数',
-  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
+  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越大越靠前',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客分类表';
 
@@ -304,63 +351,11 @@ DELETE FROM `t_sort`;
 /*!40000 ALTER TABLE `t_sort` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_sort` ENABLE KEYS */;
 
--- 导出  表 mango_blog.t_sys_dict_data 结构
-CREATE TABLE IF NOT EXISTS `t_sys_dict_data` (
-  `id` varchar(19) NOT NULL COMMENT '主键',
-  `dict_type_id` varchar(255) DEFAULT NULL COMMENT '字典类型ID',
-  `dict_label` varchar(255) DEFAULT NULL COMMENT '字典标签',
-  `dict_value` varchar(255) DEFAULT NULL COMMENT '字典键值',
-  `css_class` varchar(255) DEFAULT NULL COMMENT '样式属性（其他样式扩展）',
-  `list_class` varchar(255) DEFAULT NULL COMMENT '表格回显样式',
-  `is_default` tinyint(1) DEFAULT '0' COMMENT '是否默认（1是 0否）,默认为0',
-  `create_admin_id` varchar(32) DEFAULT NULL COMMENT '创建人id',
-  `update_admin_id` varchar(32) DEFAULT NULL COMMENT '最后更新人id',
-  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
-  `is_deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
-  `create_time` timestamp NOT NULL COMMENT '创建时间',
-  `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典数据表';
-
--- 正在导出表  mango_blog.t_sys_dict_data 的数据：~4 rows (大约)
-DELETE FROM `t_sys_dict_data`;
-/*!40000 ALTER TABLE `t_sys_dict_data` DISABLE KEYS */;
-INSERT INTO `t_sys_dict_data` (`id`, `dict_type_id`, `dict_label`, `dict_value`, `css_class`, `list_class`, `is_default`, `create_admin_id`, `update_admin_id`, `remark`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
-	('1795268474480156673', '1695268474480156673', '是', '1', NULL, 'success', 0, '1595268474480156673', '1595268474480156673', '系统是否', 0, '2021-11-28 15:30:20', '2021-11-28 15:30:21', 0),
-	('1795268474480156674', '1695268474480156673', '否', '0', NULL, 'warning', 0, '1595268474480156673', '1595268474480156673', '系统是否', 0, '2021-11-28 15:32:48', '2021-11-28 15:32:51', 1),
-	('1795268474480156675', '1695268474480156674', '一级菜单', '1', NULL, 'success', 0, '1595268474480156673', '1595268474480156673', '菜单等级', 0, '2021-11-28 16:18:31', '2021-11-28 16:18:32', 2),
-	('1795268474480156676', '1695268474480156674', '二级菜单', '2', NULL, 'warning', 0, '1595268474480156673', '1595268474480156673', '菜单等级', 0, '2021-11-28 16:20:03', '2021-11-28 16:20:04', 3);
-/*!40000 ALTER TABLE `t_sys_dict_data` ENABLE KEYS */;
-
--- 导出  表 mango_blog.t_sys_dict_type 结构
-CREATE TABLE IF NOT EXISTS `t_sys_dict_type` (
-  `id` varchar(19) NOT NULL COMMENT '主键',
-  `dict_name` varchar(255) DEFAULT NULL COMMENT '字典名称',
-  `dict_type` varchar(255) DEFAULT NULL COMMENT '字典类型',
-  `create_admin_uid` varchar(32) NOT NULL COMMENT '创建人id',
-  `update_admin_uid` varchar(32) NOT NULL COMMENT '最后更新人id',
-  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
-  `is_deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
-  `create_time` timestamp NOT NULL COMMENT '创建时间',
-  `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典类型表';
-
--- 正在导出表  mango_blog.t_sys_dict_type 的数据：~2 rows (大约)
-DELETE FROM `t_sys_dict_type`;
-/*!40000 ALTER TABLE `t_sys_dict_type` DISABLE KEYS */;
-INSERT INTO `t_sys_dict_type` (`id`, `dict_name`, `dict_type`, `create_admin_uid`, `update_admin_uid`, `remark`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
-	('1695268474480156673', '系统是否', 'sys_yes_no', '1595268474480156673', '1595268474480156673', '系统是否列表', 0, '2021-11-28 15:29:00', '2021-11-28 15:29:01', 0),
-	('1695268474480156674', '菜单等级', 'sys_menu_level', '1595268474480156673', '1595268474480156673', '菜单等级列表', 0, '2021-11-28 16:17:54', '2021-11-28 16:17:54', 1);
-/*!40000 ALTER TABLE `t_sys_dict_type` ENABLE KEYS */;
-
 -- 导出  表 mango_blog.t_tag 结构
 CREATE TABLE IF NOT EXISTS `t_tag` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `tag_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '标签名称',
-  `content` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '标签简介',
+  `summary` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '标签描述',
   `click_count` int NOT NULL DEFAULT '0' COMMENT '点击数',
   `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越小越靠前',
   `create_time` timestamp NOT NULL COMMENT '创建时间',

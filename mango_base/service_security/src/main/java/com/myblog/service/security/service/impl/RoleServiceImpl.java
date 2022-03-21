@@ -77,7 +77,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(roleDto.getBlurry())) {
             queryWrapper.like(DbConstants.Role.ROLE_NAME, roleDto.getBlurry());
-            queryWrapper.or().like(DbConstants.Role.SUMMARY, roleDto.getBlurry());
+            queryWrapper.or().like(DbConstants.Base.SUMMARY, roleDto.getBlurry());
         }
         if (!CollectionUtils.isEmpty(roleDto.getCreateTimes()) && Objects.equals(2, roleDto.getCreateTimes().size())) {
             Date beginDate = ThreadSafeDateFormat.parse(roleDto.getCreateTimes().get(0), ThreadSafeDateFormat.DATETIME);
