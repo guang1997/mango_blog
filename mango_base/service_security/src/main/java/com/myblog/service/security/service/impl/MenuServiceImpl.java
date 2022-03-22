@@ -147,7 +147,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             menuDto.setName(menuDto.getTitle());
         }
         Menu menu = toMenu(menuDto);
-        // 如果已经有同名切被删除的菜单，那么只更新
+        // 如果已经有同名且被删除的菜单，那么只更新
+        menu.setCreateTime(new Date());
+        menu.setUpdateTime(new Date());
         if (baseMapper.updateByTitle(menu) < 1) {
             if (baseMapper.insert(menu) < 1) {
                 LOGGER.error("addMenu failed by unknown error, menu:{}", menu);

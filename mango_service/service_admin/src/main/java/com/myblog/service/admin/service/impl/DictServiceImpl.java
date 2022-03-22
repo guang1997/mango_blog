@@ -1,11 +1,14 @@
 package com.myblog.service.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.admin.controller.AdminController;
 import com.myblog.service.admin.entity.Dict;
+import com.myblog.service.admin.entity.DictDetail;
 import com.myblog.service.admin.entity.dto.DictDto;
 import com.myblog.service.admin.entity.dto.TagDto;
+import com.myblog.service.admin.mapper.DictDetailMapper;
 import com.myblog.service.admin.mapper.DictMapper;
 import com.myblog.service.admin.service.DictService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,12 +20,10 @@ import com.myblog.service.base.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -36,6 +37,10 @@ import java.util.Set;
 public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements DictService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(DictServiceImpl.class);
+
+    @Autowired
+    private DictDetailMapper dictDetailMapper;
+
     /**
      * 分页查询字典信息
      * @param dictDto
@@ -83,10 +88,16 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         Dict dict = toDict(dictDto);
-        if (baseMapper.insert(dict) < 1) {
-            LOGGER.error("addDict failed by unknown error, dict:{}", dictDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        // 如果已经有同名且被删除的字典，那么只更新
+        dict.setCreateTime(new Date());
+        dict.setUpdateTime(new Date());
+        if (baseMapper.updateByDictName(dict) < 1) {
+            if (baseMapper.insert(dict) < 1) {
+                LOGGER.error("addDict failed by unknown error, dict:{}", dictDto);
+                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            }
         }
+
         return Response.ok();
     }
 
@@ -97,8 +108,8 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public Response editDict(DictDto dictDto) {
-        Dict tag = toDict(dictDto);
-        if (baseMapper.updateById(tag) < 1) {
+        Dict dict = toDict(dictDto);
+        if (baseMapper.updateById(dict) < 1) {
             LOGGER.error("editDict failed by unknown error, dict:{}", dictDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
@@ -112,12 +123,26 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public Response delDict(Set<String> ids) {
-        return null;
+        for (String id : ids) {
+            // 删除字典时需要删除对应的字典详情
+            UpdateWrapper<DictDetail> dictDetailUpdateWrapper = new UpdateWrapper<>();
+            dictDetailUpdateWrapper.eq(DbConstants.DictDetail.DICT_ID, id);
+            dictDetailMapper.delete(dictDetailUpdateWrapper);
+            // 然后删除对应的字典
+            if (baseMapper.deleteById(id) < 1) {
+                LOGGER.error("delDict failed by unknown error, dictId:{}", id);
+                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+            }
+        }
+        return Response.ok();
     }
 
     private Dict toDict(DictDto dictDto) {
         Dict dict = new Dict();
         BeanUtil.copyProperties(dictDto, dict);
+        if (StringUtils.isNotBlank(dictDto.getId())) {
+            dict.setId(dictDto.getId());
+        }
         return dict;
     }
 

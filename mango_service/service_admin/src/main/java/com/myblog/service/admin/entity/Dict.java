@@ -1,9 +1,6 @@
 package com.myblog.service.admin.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import com.myblog.service.base.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,8 +32,8 @@ public class Dict extends BaseEntity {
     private String summary;
 
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
-    @TableField("is_deleted")
-    private Boolean deleted;
+    @TableLogic
+    private Integer isDeleted;
 
     @ApiModelProperty(value = "排序字段，越大越靠前")
     private Integer sort;

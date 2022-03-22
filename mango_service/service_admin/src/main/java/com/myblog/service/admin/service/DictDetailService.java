@@ -24,4 +24,6 @@ public interface DictDetailService extends IService<DictDetail> {
     Response delDictDetails(Set<String> ids);
 
     Response addDictDetail(DictDetailDto dictDetailDto);
+
+    Response getDetailsByDictName(String dictName);
 }

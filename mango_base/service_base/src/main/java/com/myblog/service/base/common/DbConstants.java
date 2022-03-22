@@ -61,4 +61,8 @@ public interface DbConstants {
 	interface Dict {
         String DICT_NAME = "dict_name";
     }
+    interface DictDetail {
+        String DICT_ID = "dict_id";
+        String DICT_LABEL = "dict_label";
+    }
 }

@@ -203,10 +203,7 @@ export default {
         del: ["admin", "roles:del"],
       },
       rules: {
-        name: [{ required: true, message: "请输入名称", trigger: "blur" }],
-        permission: [
-          { required: true, message: "请输入权限", trigger: "blur" },
-        ],
+        roleName: [{ required: true, message: "请输入名称", trigger: "blur" }],
       },
     };
   },

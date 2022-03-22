@@ -41,6 +41,12 @@
             <if test="subCount != null">
                 sub_count = #{subCount,jdbcType=INTEGER},
             </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
         </set>
         where title=#{title,jdbcType=VARBINARY} and pid=#{pid,jdbcType=INTEGER}
     </update>

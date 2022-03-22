@@ -3,6 +3,8 @@ package com.myblog.service.admin.mapper;
 import com.myblog.service.admin.entity.DictDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 字典详细数据表 Mapper 接口
@@ -13,4 +15,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface DictDetailMapper extends BaseMapper<DictDetail> {
 
+    int updateByDictLabel(DictDetail dictDetail);
+
+    List<DictDetail> getDetailsByDictName(String dictName);
 }

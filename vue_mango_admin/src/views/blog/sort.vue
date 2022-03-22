@@ -20,7 +20,7 @@
     </div>
           <!--表单渲染-->
         <el-dialog append-to-body :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="crud.status.title" width="580px">
-          <el-form ref="form" :inline="true" :model="form" size="small" label-width="80px">
+          <el-form ref="form" :inline="true" :model="form" size="small" label-width="80px" :rules="rules">
             <el-form-item
               label="分类名称"
               prop="sortName"
@@ -135,6 +135,9 @@ export default {
         add: ["admin", "sort:add"],
         edit: ["admin", "sort:edit"],
         del: ["admin", "sort:del"],
+      },
+      rules: {
+        sortName: [{ required: true, message: "请输入名称", trigger: "blur" }],
       },
     };
   },

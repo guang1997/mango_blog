@@ -26,6 +26,7 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-21
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/admin/dict")
 public class DictController {

@@ -2,4 +2,42 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.myblog.service.admin.mapper.DictDetailMapper">
 
+    <update id="updateByDictLabel">
+        UPDATE t_dict_detail
+        <set>
+            is_deleted = 0,
+            <if test="dictId != null">
+                dict_id = #{dictId,jdbcType=VARCHAR},
+            </if>
+            <if test="dictLabel != null">
+                dict_label = #{dictLabel,jdbcType=VARCHAR},
+            </if>
+            <if test="dictValue != null">
+                dict_value = #{dictValue,jdbcType=VARCHAR},
+            </if>
+            <if test="cssClass != null">
+                css_class = #{cssClass,jdbcType=VARCHAR},
+            </if>
+            <if test="listClass != null">
+                list_class = #{listClass,jdbcType=VARCHAR},
+            </if>
+            <if test="isDefault != null">
+                is_default = #{isDefault,jdbcType=INTEGER},
+            </if>
+            <if test="summary != null">
+                summary = #{summary,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        WHERE dict_label = #{dictLabel,jdbcType=VARCHAR}
+    </update>
+    <select id="getDetailsByDictName" resultType="com.myblog.service.admin.entity.DictDetail"></select>
 </mapper>

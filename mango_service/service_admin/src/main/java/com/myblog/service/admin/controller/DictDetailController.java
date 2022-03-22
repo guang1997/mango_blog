@@ -1,6 +1,7 @@
 package com.myblog.service.admin.controller;
 
 
+import com.myblog.service.admin.entity.DictDetail;
 import com.myblog.service.admin.entity.dto.DictDetailDto;
 import com.myblog.service.admin.entity.dto.DictDto;
 import com.myblog.service.admin.service.DictDetailService;
@@ -25,6 +26,7 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-21
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/admin/dictDetail")
 public class DictDetailController {
@@ -41,6 +43,23 @@ public class DictDetailController {
         Response response = Response.ok();
         try {
             response = dictDetailService.getDictDetailByPage(dictDetailDto);
+        } catch (Exception e) {
+            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+            throw e;
+        }
+        return response;
+    }
+
+    @ApiOperation(value = "根据字典类型获取字典数据", notes = "根据字典类型获取字典数据", response = Response.class)
+    @PostMapping("/getDetailsByDictName")
+    public Response getDetailsByDictName(@RequestBody DictDetailDto dictDetailDto) {
+        Response response = Response.ok();
+        if (dictDetailDto == null || StringUtils.isBlank(dictDetailDto.getDictName())) {
+            LOGGER.error("getDetailsByDictName failed, dictName cannot be null, dictDetailDto:{}", dictDetailDto);
+            return response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
+        }
+        try {
+            response = dictDetailService.getDetailsByDictName(dictDetailDto.getDictName());
         } catch (Exception e) {
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
             throw e;

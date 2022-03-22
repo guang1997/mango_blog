@@ -7,6 +7,8 @@ import lombok.Data;
 public class DictDetailDto extends BaseDto {
     private String dictId;
 
+    private String dictName;
+
     private String dictLabel;
 
     private String dictValue;
@@ -17,11 +19,7 @@ public class DictDetailDto extends BaseDto {
 
     private Boolean isDefault;
 
-    private String createAdminId;
-
-    private String updateAdminId;
-
-    private String remark;
+    private String summary;
 
     private Integer sort;
 }
