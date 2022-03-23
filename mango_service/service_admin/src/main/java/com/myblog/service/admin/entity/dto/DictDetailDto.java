@@ -17,8 +17,6 @@ public class DictDetailDto extends BaseDto {
 
     private String listClass;
 
-    private Boolean isDefault;
-
     private String summary;
 
     private Integer sort;

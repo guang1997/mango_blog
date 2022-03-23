@@ -21,9 +21,6 @@
             <if test="listClass != null">
                 list_class = #{listClass,jdbcType=VARCHAR},
             </if>
-            <if test="isDefault != null">
-                is_default = #{isDefault,jdbcType=INTEGER},
-            </if>
             <if test="summary != null">
                 summary = #{summary,jdbcType=VARCHAR},
             </if>

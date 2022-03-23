@@ -139,16 +139,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
             LOGGER.warn("getDetailsByDictName failed, cannot find dictDetails from db, dictName:{}", dictName);
             return Response.ok();
         }
-        String defaultValue = null;
-        for (DictDetail dictDetail : detailList) {
-            // 获取默认值
-            if (dictDetail.getIsDefault()) {
-                defaultValue = dictDetail.getDictValue();
-                break;
-            }
-        }
         Map<String, Object> result = new HashMap<>();
-        result.put(Constants.ReplyField.DEFAULT_VALUE, defaultValue);
         result.put(Constants.ReplyField.DATA, detailList);
         redisUtil.setEx(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictName, JsonUtils.objectToJson(result), 1, TimeUnit.DAYS);
         return Response.ok().data(result);

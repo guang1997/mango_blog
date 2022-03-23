@@ -40,9 +40,6 @@ public class DictDetail extends BaseEntity {
     @ApiModelProperty(value = "表格回显样式")
     private String listClass;
 
-    @ApiModelProperty(value = "是否默认（1是 0否）,默认为0")
-    private Boolean isDefault;
-
     @ApiModelProperty(value = "备注")
     private String summary;
 

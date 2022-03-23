@@ -29,12 +29,6 @@
         <el-form-item label="扩展样式" prop="cssClass">
           <el-input v-model="form.cssClass" style="width: 140px;" auto-complete="off"></el-input>
         </el-form-item>
-         <el-form-item label="是否默认" prop="isDefault">
-              <el-radio-group v-model="form.isDefault" style="width: 140px">
-                <el-radio :label="true">是</el-radio>
-                <el-radio :label="false">否</el-radio>
-              </el-radio-group>
-            </el-form-item>
           <el-form-item label="排序" prop="sort">
             <el-input-number v-model.number="form.sort" :min="0" :max="999" controls-position="right" style="width: 140px;" />
           </el-form-item>
@@ -59,12 +53,7 @@
         </el-table-column>
         <el-table-column prop="dictLabel" label="字典标签" />
         <el-table-column prop="dictValue" label="字典值" width="80"/>
-         <el-table-column prop="dictValue" label="是否默认" width="80">
-            <template slot-scope="scope">
-              <el-tag type="success" v-if="scope.row.isDefault===true">是</el-tag>
-              <el-tag type="warning" v-if="scope.row.isDefault===false">否</el-tag>
-            </template>
-         </el-table-column>
+       
          <el-table-column label="回显样式" width="100" align="center">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.listClass == 'default'">{{scope.row.listClass}}</el-tag>
