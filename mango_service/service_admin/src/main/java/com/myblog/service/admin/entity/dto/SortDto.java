@@ -16,7 +16,5 @@ public class SortDto extends BaseDto {
 
     private Integer sortLevel;
 
-    private String sortLevelName;
-
     private List<String> createTimes;
 }

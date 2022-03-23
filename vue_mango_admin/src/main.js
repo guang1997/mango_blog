@@ -20,6 +20,8 @@ import VueParticles from 'vue-particles'
 // 权限指令
 import checkPer from '@/utils/permission'
 
+// 数据字典
+import dict from '@/components/Dict'
 
 // 全局工具类
 import prototype from '@/utils/prototype'
@@ -39,6 +41,7 @@ if (process.env.NODE_ENV === 'production') {
 Vue.use(checkPer)
 Vue.use(VueParticles)
 Vue.use(prototype)
+Vue.use(dict)
 // set ElementUI lang to EN
 // Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明

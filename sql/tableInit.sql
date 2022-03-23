@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- 主机:                           127.0.0.1
--- 服务器版本:                        8.0.27 - MySQL Community Server - GPL
+-- 服务器版本:                        8.0.26 - MySQL Community Server - GPL
 -- 服务器操作系统:                      Win64
--- HeidiSQL 版本:                  10.2.0.5704
+-- HeidiSQL 版本:                  11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -10,6 +10,7 @@
 /*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
 -- 导出 mango_blog 的数据库结构
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
 DELETE FROM `t_admin`;
 /*!40000 ALTER TABLE `t_admin` DISABLE KEYS */;
 INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `mobile`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `enabled`, `is_deleted`) VALUES
-	('1295268474480156673', 'admin', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18761616251', 1, '2022-03-22 10:39:40', '192.168.97.41', '2021-09-26 16:56:46', '2022-03-22 10:39:40', '李斯特', '72174823', '18761616251', 1, 0),
+	('1295268474480156673', 'admin', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18761616251', 1, '2022-03-23 23:38:05', '192.168.1.7', '2021-09-26 16:56:46', '2022-03-23 23:38:05', '李斯特', '72174823', '18761616251', 1, 0),
 	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 0, '2021-12-02 22:01:18', '127.0.0.1', '2021-12-02 22:01:22', '2021-12-02 22:01:23', '游客', '111111', '111111', 1, 0);
 /*!40000 ALTER TABLE `t_admin` ENABLE KEYS */;
 
@@ -134,12 +135,14 @@ CREATE TABLE IF NOT EXISTS `t_dict` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典表';
 
--- 正在导出表  mango_blog.t_dict 的数据：~2 rows (大约)
+-- 正在导出表  mango_blog.t_dict 的数据：~3 rows (大约)
 DELETE FROM `t_dict`;
 /*!40000 ALTER TABLE `t_dict` DISABLE KEYS */;
 INSERT INTO `t_dict` (`id`, `dict_name`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
 	('1506155694696247297', 'sys_yes_no', '系统是否', 0, '2022-03-22 14:27:55', '2022-03-22 14:27:55', 0),
-	('1506174838367870978', 'sys_menu_type', '菜单类型', 0, '2022-03-22 15:43:59', '2022-03-22 15:44:07', 0);
+	('1506174838367870978', 'sys_menu_type', '菜单类型', 0, '2022-03-22 15:43:59', '2022-03-22 15:44:07', 0),
+	('1506640128227151874', 'sys_status', '状态', 0, '2022-03-23 22:32:53', '2022-03-23 22:32:53', 0),
+	('1506648391412879362', 'sys_sort_type', '分类级别', 0, '2022-03-23 23:05:43', '2022-03-23 23:05:43', 0);
 /*!40000 ALTER TABLE `t_dict` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_dict_detail 结构
@@ -151,7 +154,6 @@ CREATE TABLE IF NOT EXISTS `t_dict_detail` (
   `dict_value` varchar(255) DEFAULT NULL COMMENT '字典键值',
   `css_class` varchar(255) DEFAULT NULL COMMENT '样式属性（其他样式扩展）',
   `list_class` varchar(255) DEFAULT NULL COMMENT '表格回显样式',
-  `is_default` tinyint(1) DEFAULT '0' COMMENT '是否默认（1是 0否）,默认为0',
   `summary` varchar(255) DEFAULT NULL COMMENT '备注',
   `is_deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
@@ -160,15 +162,20 @@ CREATE TABLE IF NOT EXISTS `t_dict_detail` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典详细数据表';
 
--- 正在导出表  mango_blog.t_dict_detail 的数据：~4 rows (大约)
+-- 正在导出表  mango_blog.t_dict_detail 的数据：~7 rows (大约)
 DELETE FROM `t_dict_detail`;
 /*!40000 ALTER TABLE `t_dict_detail` DISABLE KEYS */;
-INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_class`, `list_class`, `is_default`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
-	('1506162082013065218', '1506155694696247297', '是', '1', NULL, 'success', 0, '系统是否 是', 0, '2022-03-22 14:53:18', '2022-03-22 16:17:49', 2),
-	('1506171019126923265', '1506155694696247297', '否', '0', NULL, 'warning', 1, '系统是否 否', 0, '2022-03-22 15:28:49', '2022-03-22 15:35:13', 1),
-	('1506196718315483137', '1506174838367870978', '目录', '0', NULL, 'default', 0, '菜单类型 目录', 0, '2022-03-22 17:10:56', '2022-03-22 17:19:19', 3),
-	('1506198945411215362', '1506174838367870978', '菜单', '1', NULL, 'success', 1, '菜单类型 菜单', 0, '2022-03-22 17:19:47', '2022-03-22 17:19:47', 2),
-	('1506199049916493825', '1506174838367870978', '按钮', '2', '', 'warning', 0, '菜单类型 按钮', 0, '2022-03-22 17:20:12', '2022-03-22 17:20:23', 1);
+INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_class`, `list_class`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
+	('1506162082013065218', '1506155694696247297', '是', '1', NULL, 'success', '系统是否 是', 0, '2022-03-22 14:53:18', '2022-03-22 16:17:49', 2),
+	('1506171019126923265', '1506155694696247297', '否', '0', NULL, 'warning', '系统是否 否', 0, '2022-03-22 15:28:49', '2022-03-22 15:35:13', 1),
+	('1506196718315483137', '1506174838367870978', '目录', '0', NULL, 'default', '菜单类型 目录', 0, '2022-03-22 17:10:56', '2022-03-22 17:19:19', 3),
+	('1506198945411215362', '1506174838367870978', '菜单', '1', NULL, 'success', '菜单类型 菜单', 0, '2022-03-22 17:19:47', '2022-03-22 17:19:47', 2),
+	('1506199049916493825', '1506174838367870978', '按钮', '2', '', 'warning', '菜单类型 按钮', 0, '2022-03-22 17:20:12', '2022-03-22 17:20:23', 1),
+	('1506640400328429570', '1506640128227151874', '禁用', '1', NULL, 'danger', '系统状态 禁用', 0, '2022-03-23 22:33:58', '2022-03-23 22:34:27', 1),
+	('1506640493521670145', '1506640128227151874', '启用', '0', NULL, 'success', '系统状态 启用', 0, '2022-03-23 22:34:20', '2022-03-23 22:34:20', 2),
+	('1506648554332229633', '1506648391412879362', '一级分类', '1', NULL, 'success', '分类级别 一级', 0, '2022-03-23 23:06:22', '2022-03-23 23:07:29', 3),
+	('1506648617326481409', '1506648391412879362', '二级分类', '2', NULL, 'primary', '分类级别 二级', 0, '2022-03-23 23:06:37', '2022-03-23 23:07:10', 2),
+	('1506648738428620801', '1506648391412879362', '三级分类', '3', NULL, 'info', '分类级别 三级', 0, '2022-03-23 23:07:06', '2022-03-23 23:07:06', 1);
 /*!40000 ALTER TABLE `t_dict_detail` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_exception_log 结构
@@ -240,7 +247,7 @@ CREATE TABLE IF NOT EXISTS `t_menu` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='菜单表';
 
--- 正在导出表  mango_blog.t_menu 的数据：~14 rows (大约)
+-- 正在导出表  mango_blog.t_menu 的数据：~15 rows (大约)
 DELETE FROM `t_menu`;
 /*!40000 ALTER TABLE `t_menu` DISABLE KEYS */;
 INSERT INTO `t_menu` (`id`, `name`, `title`, `pid`, `icon`, `sort`, `is_deleted`, `create_time`, `update_time`, `hidden`, `component`, `path`, `redirect`, `permission`, `menu_type`, `sub_count`) VALUES
@@ -332,7 +339,7 @@ CREATE TABLE IF NOT EXISTS `t_role_menu` (
   UNIQUE KEY `ROLE_MENU_UK` (`role_id`,`menu_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- 正在导出表  mango_blog.t_role_menu 的数据：~11 rows (大约)
+-- 正在导出表  mango_blog.t_role_menu 的数据：~14 rows (大约)
 DELETE FROM `t_role_menu`;
 /*!40000 ALTER TABLE `t_role_menu` DISABLE KEYS */;
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`) VALUES
@@ -369,7 +376,9 @@ CREATE TABLE IF NOT EXISTS `t_sort` (
 DELETE FROM `t_sort`;
 /*!40000 ALTER TABLE `t_sort` DISABLE KEYS */;
 INSERT INTO `t_sort` (`id`, `sort_name`, `summary`, `create_time`, `update_time`, `click_count`, `sort_level`) VALUES
-	('1505006369916694530', '测试', '测试', '2022-03-19 10:20:55', '2022-03-19 10:27:49', 0, 2);
+	('1505006369916694530', '测试', '测试', '2022-03-19 10:20:55', '2022-03-19 10:27:49', 0, 2),
+	('1506662963603652609', '测试1', NULL, '2022-03-24 00:03:38', '2022-03-24 00:03:38', 0, 1),
+	('1506663003336294401', '测试3', NULL, '2022-03-24 00:03:47', '2022-03-24 00:03:47', 0, 3);
 /*!40000 ALTER TABLE `t_sort` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_tag 结构
@@ -381,12 +390,15 @@ CREATE TABLE IF NOT EXISTS `t_tag` (
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `sort` int DEFAULT '0' COMMENT '排序字段，越大越靠前',
+  `tag_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '标签名',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='标签表';
 
 -- 正在导出表  mango_blog.t_tag 的数据：~0 rows (大约)
 DELETE FROM `t_tag`;
 /*!40000 ALTER TABLE `t_tag` DISABLE KEYS */;
+INSERT INTO `t_tag` (`id`, `summary`, `click_count`, `create_time`, `update_time`, `sort`, `tag_name`) VALUES
+	('1506663317590327298', NULL, 0, '2022-03-24 00:05:02', '2022-03-24 00:05:02', 999, '测试');
 /*!40000 ALTER TABLE `t_tag` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_todo 结构
@@ -492,5 +504,6 @@ DELETE FROM `t_web_visit`;
 /*!40000 ALTER TABLE `t_web_visit` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;

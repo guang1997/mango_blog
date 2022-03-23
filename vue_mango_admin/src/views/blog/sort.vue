@@ -8,7 +8,7 @@
           v-model="query.sortName"
           size="small"
           clearable
-          placeholder="输入标签名搜索"
+          placeholder="输入分类名搜索"
           style="width: 200px"
           class="filter-item"
           @keyup.enter.native="crud.toQuery"
@@ -76,14 +76,21 @@
           >
             <el-table-column type="selection" width="55" />
 
-            <el-table-column :show-overflow-tooltip="true" prop="sortName" label="标签名" width="200"/>
-            <el-table-column :show-overflow-tooltip="true" prop="summary" label="标签描述" width="300"/>
+            <el-table-column :show-overflow-tooltip="true" prop="sortName" label="分类名" width="200"/>
+            <el-table-column :show-overflow-tooltip="true" prop="summary" label="分类描述" width="300"/>
             <el-table-column label="点击数" width="150" prop="clickCount" />
-            <el-table-column :show-overflow-tooltip="true" prop="sortLevelName" label="分类级别" width="200"/>
+            <el-table-column label="分类级别" width="200">
+              <template slot-scope="scope">
+                <template>
+                  <el-tag v-for="item in filterSysSortType(scope.row.sortLevel)" 
+                  :type="item.listClass" :key="item.id">{{item.dictLabel}}</el-tag>
+                </template>
+              </template>
+            </el-table-column>
 
             <el-table-column label="创建时间"  prop="createTime" />
             <el-table-column
-              v-if="checkPer(['admin', 'tag:edit', 'tag:del'])"
+              v-if="checkPer(['admin', 'sort:edit', 'sort:del'])"
               label="操作"
               width="130px"
               align="center"
@@ -128,6 +135,7 @@ export default {
     });
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
+  dicts:['sys_sort_type'],
   data() {
     return {
       currentId: 0,
@@ -140,6 +148,13 @@ export default {
         sortName: [{ required: true, message: "请输入名称", trigger: "blur" }],
       },
     };
+  },
+  computed: {
+    filterSysSortType() {
+      return function(sortLevel) {
+        return this.dict.sys_sort_type.filter(item => item.dictValue == sortLevel)
+      }
+    }
   },
   methods: {
     // 提交前做的操作

@@ -54,10 +54,10 @@
             <el-form-item label="状态">
               <el-radio-group v-model="form.enabled" >
                 <el-radio
-                  v-for="item in enabledTypeOptions"
-                  :key="item.key"
-                  :label="item.value"
-                >{{ item.value }}</el-radio>
+                  v-for="item in dict.sys_status"
+                  :key="item.id"
+                  :label="item.dictValue"
+                >{{ item.dictLabel }}</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item style="margin-bottom: 0;" label="角色" prop="roles">
@@ -223,6 +223,8 @@ export default {
     ])
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
+  // 数据字典
+  dicts: ['sys_status'],
   data() {
     // 自定义验证
     const validPhone = (rule, value, callback) => {

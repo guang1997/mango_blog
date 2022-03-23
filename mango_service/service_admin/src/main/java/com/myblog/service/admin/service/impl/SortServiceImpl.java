@@ -157,10 +157,10 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
             BeanUtil.copyProperties(sort, sortDto);
             sortDto.setId(sort.getId());
             sortDto.setCreateTime(sort.getCreateTime());
-            SortLevelEnum sortLevelEnum = SortLevelEnum.getSortLevelEnumByCode(sortDto.getSortLevel());
-            if (Objects.nonNull(sortLevelEnum)) {
-                sortDto.setSortLevelName(sortLevelEnum.getName());
-            }
+//            SortLevelEnum sortLevelEnum = SortLevelEnum.getSortLevelEnumByCode(sortDto.getSortLevel());
+//            if (Objects.nonNull(sortLevelEnum)) {
+//                sortDto.setSortLevelName(sortLevelEnum.getName());
+//            }
             sortDtos.add(sortDto);
         }
         return sortDtos;
