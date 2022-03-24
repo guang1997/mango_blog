@@ -2,21 +2,20 @@ package com.myblog.service.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.myblog.service.admin.controller.TagController;
-import com.myblog.service.admin.entity.BlogTag;
 import com.myblog.service.admin.entity.Tag;
 import com.myblog.service.admin.entity.dto.TagDto;
-import com.myblog.service.admin.mapper.BlogTagMapper;
 import com.myblog.service.admin.mapper.TagMapper;
 import com.myblog.service.admin.service.TagService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myblog.service.base.annotation.service.ServiceContext;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +35,14 @@ import java.util.*;
  * @since 2022-03-18
  */
 @Service
+@ServiceContext(serviceName = "TagService", dbClazz = Tag.class, dtoClazz = TagDto.class)
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);
 
+
     @Autowired
-    private BlogTagMapper blogTagMapper;
+    private ServiceConvertHandler serviceConvertHandler;
 
     /**
      * 分页查询标签信息
@@ -50,7 +51,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * @throws ParseException
      */
     @Override
-    public Response getTagByPage(TagDto tagDto) throws ParseException {
+    public Response getTagByPage(TagDto tagDto) throws Exception {
         Response response = Response.ok();
         QueryWrapper<Tag> queryWrapper = new QueryWrapper<>();
 
@@ -72,7 +73,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
 
         baseMapper.selectPage(tagPage, queryWrapper);
 
-        List<TagDto> tagDtos = toDto(tagPage.getRecords());
+        List<BaseDto> tagDtos = serviceConvertHandler.toDto(tagPage.getRecords(), this.getServiceName());
         response.data(Constants.ReplyField.DATA, tagDtos);
         response.data(Constants.ReplyField.TOTAL, tagPage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);

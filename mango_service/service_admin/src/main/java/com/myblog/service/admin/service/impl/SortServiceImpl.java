@@ -9,7 +9,10 @@ import com.myblog.service.admin.mapper.BlogMapper;
 import com.myblog.service.admin.mapper.SortMapper;
 import com.myblog.service.admin.service.SortService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myblog.service.base.annotation.service.ServiceContext;
 import com.myblog.service.base.common.*;
+import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import com.myblog.service.security.entity.Admin;
@@ -32,6 +35,7 @@ import java.util.*;
  * @since 2022-03-18
  */
 @Service
+@ServiceContext(serviceName = "SortService", dbClazz = Sort.class, dtoClazz = SortDto.class)
 public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements SortService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SortServiceImpl.class);
@@ -39,13 +43,17 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
     @Autowired
     private BlogMapper blogMapper;
 
+    @Autowired
+    private ServiceConvertHandler serviceConvertHandler;
+
+
     /**
      * 分页查询分类信息
      * @param sortDto
      * @return
      */
     @Override
-    public Response getSortByPage(SortDto sortDto) throws ParseException {
+    public Response getSortByPage(SortDto sortDto) throws Exception {
         Response response = Response.ok();
         QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
 
@@ -68,7 +76,7 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
 
         baseMapper.selectPage(sortPage, queryWrapper);
 
-        List<SortDto> sortDtos = toDto(sortPage.getRecords());
+        List<BaseDto> sortDtos = serviceConvertHandler.toDto(sortPage.getRecords(), this.getServiceName());
         response.data(Constants.ReplyField.DATA, sortDtos);
         response.data(Constants.ReplyField.TOTAL, sortPage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);
@@ -157,10 +165,6 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
             BeanUtil.copyProperties(sort, sortDto);
             sortDto.setId(sort.getId());
             sortDto.setCreateTime(sort.getCreateTime());
-//            SortLevelEnum sortLevelEnum = SortLevelEnum.getSortLevelEnumByCode(sortDto.getSortLevel());
-//            if (Objects.nonNull(sortLevelEnum)) {
-//                sortDto.setSortLevelName(sortLevelEnum.getName());
-//            }
             sortDtos.add(sortDto);
         }
         return sortDtos;

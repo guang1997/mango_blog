@@ -12,10 +12,13 @@ import com.myblog.service.admin.mapper.DictDetailMapper;
 import com.myblog.service.admin.mapper.DictMapper;
 import com.myblog.service.admin.service.DictService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myblog.service.base.annotation.service.ServiceContext;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.base.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -33,6 +36,7 @@ import java.util.*;
  * @author 李斯特
  * @since 2022-03-21
  */
+@ServiceContext(serviceName = "DictService", dbClazz = Dict.class, dtoClazz = DictDto.class)
 @Service
 public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements DictService {
 
@@ -41,13 +45,17 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     @Autowired
     private DictDetailMapper dictDetailMapper;
 
+    @Autowired
+    private ServiceConvertHandler serviceConvertHandler;
+
+
     /**
      * 分页查询字典信息
      * @param dictDto
      * @return
      */
     @Override
-    public Response getDictByPage(DictDto dictDto) {
+    public Response getDictByPage(DictDto dictDto) throws Exception{
         Response response = Response.ok();
         QueryWrapper<Dict> queryWrapper = new QueryWrapper<>();
 
@@ -66,7 +74,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
 
         baseMapper.selectPage(dictPage, queryWrapper);
 
-        List<DictDto> dictDtos = toDto(dictPage.getRecords());
+        List<BaseDto> dictDtos = serviceConvertHandler.toDto(dictPage.getRecords(), this.getServiceName());
         response.data(Constants.ReplyField.DATA, dictDtos);
         response.data(Constants.ReplyField.TOTAL, dictPage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);

@@ -2,8 +2,9 @@ package com.myblog.service.admin.controller;
 
 
 import com.myblog.service.admin.entity.dto.DictDto;
-import com.myblog.service.admin.entity.dto.TagDto;
+import com.myblog.service.admin.entity.dto.LinkDto;
 import com.myblog.service.admin.service.DictService;
+import com.myblog.service.admin.service.LinkService;
 import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.common.Response;
@@ -20,32 +21,29 @@ import java.util.Set;
 
 /**
  * <p>
- * 字典表 前端控制器
+ * 友情链接表 前端控制器
  * </p>
  *
  * @author 李斯特
- * @since 2022-03-21
+ * @since 2022-03-24
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/dict")
-public class DictController {
+@RequestMapping("/admin/link")
+public class LinkController {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
-
-    @Autowired
-    private DictService dictService;
+    private static Logger LOGGER = LoggerFactory.getLogger(LinkController.class);
 
     @Autowired
-    private RedisUtil redisUtil;
+    private LinkService linkService;
 
-    @LogByMethod("/admin/dict/getDictByPage")
-    @ApiOperation(value = "分页查询字典", notes = "分页查询字典", response = Response.class)
-    @PostMapping("/getDictByPage")
-    public Response getDictByPage(@RequestBody DictDto dictDto) throws Exception {
+    @LogByMethod("/admin/link/getLinkByPage")
+    @ApiOperation(value = "分页查询友情链接", notes = "分页查询友情链接", response = Response.class)
+    @PostMapping("/getLinkByPage")
+    public Response getLinkByPage(@RequestBody LinkDto linkDto) throws Exception {
         Response response = Response.ok();
         try {
-            response = dictService.getDictByPage(dictDto);
+            response = linkService.getLinkByPage(linkDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
             throw e;
@@ -53,18 +51,18 @@ public class DictController {
         return response;
     }
 
-    @LogByMethod("/admin/dict/addDict")
-    @ApiOperation(value = "新增字典", notes = "新增字典", response = Response.class)
-    @PostMapping("/addDict")
-    public Response addDict(@RequestBody DictDto dictDto) {
+    @LogByMethod("/admin/link/addLink")
+    @ApiOperation(value = "新增友情链接", notes = "新增友情链接", response = Response.class)
+    @PostMapping("/addLink")
+    public Response addLink(@RequestBody LinkDto linkDto) {
         Response response = Response.ok();
         try {
-            if (StringUtils.isBlank(dictDto.getDictName())) {
-                LOGGER.error("addDict failed, dictName cannot be null, dict:{}", dictDto);
+            if (StringUtils.isBlank(linkDto.getUrl()) || StringUtils.isBlank(linkDto.getTitle())) {
+                LOGGER.error("addLink failed, url or title cannot be null, link:{}", linkDto);
                 response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
                 return response;
             }
-            response = dictService.addDict(dictDto);
+            response = linkService.addLink(linkDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
             throw e;
@@ -72,15 +70,13 @@ public class DictController {
         return response;
     }
 
-    @LogByMethod("/admin/dict/editDict")
-    @ApiOperation(value = "修改字典", notes = "修改字典", response = Response.class)
-    @PutMapping("/editDict")
-    public Response editDict(@RequestBody DictDto dictDto) {
+    @LogByMethod("/admin/link/editLink")
+    @ApiOperation(value = "修改友情链接", notes = "修改友情链接", response = Response.class)
+    @PutMapping("/editLink")
+    public Response editLink(@RequestBody LinkDto linkDto) {
         Response response = Response.ok();
         try {
-            // 删除缓存中的数据
-            redisUtil.delete(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictDto.getDictName());
-            response = dictService.editDict(dictDto);
+            response = linkService.editLink(linkDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
             throw e;
@@ -88,13 +84,13 @@ public class DictController {
         return response;
     }
 
-    @LogByMethod("/admin/dict/delDict")
-    @ApiOperation(value = "删除字典", notes = "删除字典", response = Response.class)
-    @DeleteMapping("/delDict")
-    public Response delTags(@RequestBody Set<String> ids) {
+    @LogByMethod("/admin/link/delLink")
+    @ApiOperation(value = "删除友情链接", notes = "删除友情链接", response = Response.class)
+    @DeleteMapping("/delLink")
+    public Response delLink(@RequestBody Set<String> ids) {
         Response response = Response.ok();
         try {
-            response = dictService.delDict(ids);
+            response = linkService.delLink(ids);
         } catch (Exception e) {
             response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
             throw e;

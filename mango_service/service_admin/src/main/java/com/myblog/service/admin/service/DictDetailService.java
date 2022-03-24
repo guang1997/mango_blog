@@ -3,6 +3,8 @@ package com.myblog.service.admin.service;
 import com.myblog.service.admin.entity.DictDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.admin.entity.dto.DictDetailDto;
+import com.myblog.service.base.annotation.service.ServiceContext;
+import com.myblog.service.base.annotation.service.ServiceContextAware;
 import com.myblog.service.base.common.Response;
 
 import java.util.Set;
@@ -15,9 +17,9 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-21
  */
-public interface DictDetailService extends IService<DictDetail> {
+public interface DictDetailService extends IService<DictDetail>, ServiceContextAware {
 
-    Response getDictDetailByPage(DictDetailDto dictDetailDto);
+    Response getDictDetailByPage(DictDetailDto dictDetailDto) throws Exception;
 
     Response editDictDetail(DictDetailDto dictDetailDto);
 

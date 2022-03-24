@@ -3,14 +3,17 @@ package com.myblog.service.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.admin.entity.DictDetail;
-import com.myblog.service.admin.entity.SysDictData;
 import com.myblog.service.admin.entity.dto.DictDetailDto;
 import com.myblog.service.admin.entity.dto.DictDto;
 import com.myblog.service.admin.mapper.DictDetailMapper;
 import com.myblog.service.admin.service.DictDetailService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myblog.service.base.annotation.service.ServiceContext;
 import com.myblog.service.base.common.*;
+import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.base.util.BeanUtil;
+import com.myblog.service.base.util.DbConverter;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2022-03-21
  */
 @Service
+@ServiceContext(serviceName = "DictDetailService", dbClazz = DictDetail.class, dtoClazz = DictDetailDto.class)
 public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDetail> implements DictDetailService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(DictDetailServiceImpl.class);
@@ -39,13 +43,16 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
     @Autowired
     private RedisUtil redisUtil;
 
+    @Autowired
+    private ServiceConvertHandler serviceConvertHandler;
+
     /**
      * 分页查询字典详情
      * @param dictDetailDto
      * @return
      */
     @Override
-    public Response getDictDetailByPage(DictDetailDto dictDetailDto) {
+    public Response getDictDetailByPage(DictDetailDto dictDetailDto) throws Exception{
         Response response = Response.ok();
         QueryWrapper<DictDetail> queryWrapper = new QueryWrapper<>();
 
@@ -62,7 +69,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
 
         baseMapper.selectPage(dictDetailPage, queryWrapper);
 
-        List<DictDetailDto> dictDetailDtos = toDetailDto(dictDetailPage.getRecords());
+        List<BaseDto> dictDetailDtos = serviceConvertHandler.toDto(dictDetailPage.getRecords(), this.getServiceName());
         response.data(Constants.ReplyField.DATA, dictDetailDtos);
         response.data(Constants.ReplyField.TOTAL, dictDetailPage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);

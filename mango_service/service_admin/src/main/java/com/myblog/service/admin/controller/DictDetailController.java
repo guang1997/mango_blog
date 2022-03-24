@@ -92,10 +92,6 @@ public class DictDetailController {
     public Response editDictDetail(@RequestBody DictDetailDto dictDetailDto) {
         Response response = Response.ok();
         try {
-            if (StringUtils.isBlank(dictDetailDto.getDictLabel())) {
-                LOGGER.error("editDictDetail failed, dictLabel cannot be null, dictDetail:{}", dictDetailDto);
-                return response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
-            }
             response = dictDetailService.editDictDetail(dictDetailDto);
         } catch (Exception e) {
             response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());

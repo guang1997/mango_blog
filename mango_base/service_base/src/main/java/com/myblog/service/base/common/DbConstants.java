@@ -58,11 +58,18 @@ public interface DbConstants {
     interface Blog {
         String BLOG_SORT_ID = "blog_sort_id";
     }
+
 	interface Dict {
         String DICT_NAME = "dict_name";
     }
+
     interface DictDetail {
         String DICT_ID = "dict_id";
         String DICT_LABEL = "dict_label";
+    }
+
+    interface Link {
+        String TITLE = "title";
+        String URL = "url";
     }
 }
