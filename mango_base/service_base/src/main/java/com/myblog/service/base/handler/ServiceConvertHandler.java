@@ -1,63 +1,50 @@
 package com.myblog.service.base.handler;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.myblog.service.base.annotation.service.ServiceContextAware;
 import com.myblog.service.base.entity.BaseEntity;
 import com.myblog.service.base.entity.dto.BaseDto;
 import com.myblog.service.base.util.BeanUtil;
-import com.myblog.service.base.util.DbConverter;
-import com.myblog.service.base.util.TwoTuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
-/**
- * 实现Db和Dto的相互转换
- *
- * @author 李斯特
- * @date 2022/03/24
- */
-@Component
-public class ServiceConvertHandler {
+public interface ServiceConvertHandler<A extends BaseEntity, B extends BaseDto> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ServiceConvertHandler.class);
-
-    @Autowired
-    private List<ServiceContextAware> serviceContextAwares;
-
-    private Map<String, TwoTuple<Class<? extends BaseEntity>, Class<? extends BaseDto>>> serviceContextAwareMaps = new HashMap<>();
-
-    @PostConstruct
-    public void  init() {
-        if (CollectionUtils.isEmpty(serviceContextAwares)) {
-            throw new RuntimeException("start failed, serviceContextAwares is empty");
+    default List<B> toDtoList(List<A> dbs, Class<B> dtoClazz) throws IllegalAccessException, InstantiationException {
+        List<B> dtoList = new ArrayList<>();
+        for (A db : dbs) {
+            B dto = dtoClazz.newInstance();
+            BeanUtil.copyProperties(db, dto);
+            setDtoExtraProperties(db, dto);
+            dtoList.add(dto);
         }
-        for (ServiceContextAware service : serviceContextAwares) {
-            String serviceName = service.getServiceName();
-            serviceContextAwareMaps.put(serviceName, new TwoTuple<>(service.getDbClass(), service.getDtoClass()));
-        }
-        LOGGER.info("serviceContextAwareMaps:{} init success", serviceContextAwareMaps);
+        return dtoList;
     }
 
-    public List<BaseDto> toDto(List<? extends BaseEntity> entities, String serviceName) throws IllegalAccessException, InstantiationException {
-        List<BaseDto> baseDtos = new ArrayList<>();
-        TwoTuple<Class<? extends BaseEntity>, Class<? extends BaseDto>> twoTuple = serviceContextAwareMaps.get(serviceName);
-        Class<? extends BaseDto> dtoClazz = twoTuple.getSecond();
-        for (BaseEntity entity : entities) {
-            BaseDto baseDto = dtoClazz.newInstance();
-            BeanUtil.copyProperties(entity, baseDto);
-            baseDto.setId(entity.getId());
-            baseDto.setCreateTime(entity.getCreateTime());
-            baseDtos.add(baseDto);
+    default B toDto(A db, Class<B> dtoClazz) throws IllegalAccessException, InstantiationException {
+        B dto = dtoClazz.newInstance();
+        BeanUtil.copyProperties(db, dto);
+        setDtoExtraProperties(db, dto);
+        return dto;
+    }
+
+    default void setDtoExtraProperties(A db, B dto) {
+        dto.setId(db.getId());
+        dto.setCreateTime(db.getCreateTime());
+        dto.setUpdateTime(db.getUpdateTime());
+    }
+
+    default A toDb(B dto, Class<A> dbClazz) throws IllegalAccessException, InstantiationException {
+        A db = dbClazz.newInstance();
+        BeanUtil.copyProperties(dto, db);
+        setDbExtraProperties(db, dto);
+        return db;
+    }
+
+    default void setDbExtraProperties(A db, B dto) {
+        if (StringUtils.isNotBlank(dto.getId())) {
+            db.setId(dto.getId());
         }
-        return baseDtos;
     }
 }

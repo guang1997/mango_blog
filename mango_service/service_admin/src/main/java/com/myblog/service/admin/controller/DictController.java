@@ -2,7 +2,6 @@ package com.myblog.service.admin.controller;
 
 
 import com.myblog.service.admin.entity.dto.DictDto;
-import com.myblog.service.admin.entity.dto.TagDto;
 import com.myblog.service.admin.service.DictService;
 import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.RedisConstants;
@@ -43,63 +42,34 @@ public class DictController {
     @ApiOperation(value = "分页查询字典", notes = "分页查询字典", response = Response.class)
     @PostMapping("/getDictByPage")
     public Response getDictByPage(@RequestBody DictDto dictDto) throws Exception {
-        Response response = Response.ok();
-        try {
-            response = dictService.getDictByPage(dictDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+        return dictService.getDictByPage(dictDto);
     }
 
     @LogByMethod("/admin/dict/addDict")
     @ApiOperation(value = "新增字典", notes = "新增字典", response = Response.class)
     @PostMapping("/addDict")
-    public Response addDict(@RequestBody DictDto dictDto) {
-        Response response = Response.ok();
-        try {
-            if (StringUtils.isBlank(dictDto.getDictName())) {
-                LOGGER.error("addDict failed, dictName cannot be null, dict:{}", dictDto);
-                response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-                return response;
-            }
-            response = dictService.addDict(dictDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-            throw e;
+    public Response addDict(@RequestBody DictDto dictDto) throws Exception {
+        if (StringUtils.isBlank(dictDto.getDictName())) {
+            LOGGER.error("addDict failed, dictName cannot be null, dict:{}", dictDto);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        return response;
+        return dictService.addDict(dictDto);
     }
 
     @LogByMethod("/admin/dict/editDict")
     @ApiOperation(value = "修改字典", notes = "修改字典", response = Response.class)
     @PutMapping("/editDict")
-    public Response editDict(@RequestBody DictDto dictDto) {
-        Response response = Response.ok();
-        try {
-            // 删除缓存中的数据
-            redisUtil.delete(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictDto.getDictName());
-            response = dictService.editDict(dictDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response editDict(@RequestBody DictDto dictDto) throws Exception {
+        // 删除缓存中的数据
+        redisUtil.delete(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictDto.getDictName());
+        return dictService.editDict(dictDto);
     }
 
     @LogByMethod("/admin/dict/delDict")
     @ApiOperation(value = "删除字典", notes = "删除字典", response = Response.class)
     @DeleteMapping("/delDict")
-    public Response delTags(@RequestBody Set<String> ids) {
-        Response response = Response.ok();
-        try {
-            response = dictService.delDict(ids);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response delTags(@RequestBody Set<String> ids) throws Exception {
+        return dictService.delDict(ids);
     }
 }
 

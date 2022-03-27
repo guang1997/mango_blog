@@ -82,7 +82,7 @@ public class LoginController {
     @LogByMethod("/admin/auth/login")
     @ApiOperation(value = "登录", notes = "登录", response = Response.class)
     @AnonymousPostMapping(value = "/login")
-    public Response login(@RequestBody LoginDto loginDto, HttpServletRequest request) throws UnknownHostException {
+    public Response login(@RequestBody LoginDto loginDto, HttpServletRequest request) throws Exception {
         Response response = Response.ok();
         String token = "";
         if (loginDto == null || StringUtils.isEmpty(loginDto.getUsername()) || StringUtils.isEmpty(loginDto.getPassword())) {

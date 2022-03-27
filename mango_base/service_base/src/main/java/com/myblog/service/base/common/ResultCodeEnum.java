@@ -24,6 +24,7 @@ public enum ResultCodeEnum {
     GET_USERINFO_ERROR(false, 23010, "获取用户信息失败"),
     GET_USERMENU_ERROR(false, 23011, "获取用户菜单失败"),
     CODE_ERROR(false, 23012, "验证码错误"),
+    UPLOAD_ERROR(false, 23013, "上传失败"),
 //    SAVE_TAG_FAILED(false, 200010, "保存失败，已经存在对应标签"),
 //    SAVE_TYPE_FAILED(false, 200011, "保存失败，已经存在对应类型"),
 //

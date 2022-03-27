@@ -1,6 +1,7 @@
 package com.myblog.service.security.service;
 
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.security.entity.Menu;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.security.entity.Role;
@@ -19,21 +20,21 @@ import java.util.Set;
  * @author 李斯特
  * @since 2021-10-05
  */
-public interface MenuService extends IService<Menu> {
+public interface MenuService extends IService<Menu>, ServiceConvertHandler<Menu, MenuDto> {
 
-    List<Menu> getMenuByRoles(List<Role> roles);
+    List<Menu> getMenuByRoles(List<Role> roles) throws Exception;
 
-    MenuDto getMenuById(String id);
+    MenuDto getMenuById(String id) throws Exception;
 
-    List<MenuDto> getMenusByPid(String pid);
+    List<MenuDto> getMenusByPid(String pid) throws Exception;
 
-    List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos);
+    List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos) throws Exception;
 
-    Response addMenu(MenuDto menuDto);
+    Response addMenu(MenuDto menuDto) throws Exception;
 
-    Response editMenu(MenuDto menuDto);
+    Response editMenu(MenuDto menuDto) throws Exception;
 
-    Response delMenu(List<String> ids);
+    Response delMenu(List<String> ids) throws Exception;
 
-    Set<MenuDto> getChildren(List<MenuDto> childrenList, Set<MenuDto> menuDtos);
+    Set<MenuDto> getChildren(List<MenuDto> childrenList, Set<MenuDto> menuDtos) throws Exception;
 }

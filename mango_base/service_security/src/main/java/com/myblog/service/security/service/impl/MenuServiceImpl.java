@@ -31,8 +31,10 @@ import java.util.*;
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(MenuServiceImpl.class);
+
     /**
      * 根据角色获取对应菜单，用于渲染侧边栏
+     *
      * @param roles
      * @return
      */
@@ -43,34 +45,28 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     /**
      * 根据菜单id获取菜单信息
+     *
      * @param id
      * @return
      */
     @Override
-    public MenuDto getMenuById(String id) {
+    public MenuDto getMenuById(String id) throws Exception {
         Menu menu = baseMapper.selectById(id);
         if (menu == null) {
             LOGGER.error("getMenuById:[{}] failed from db", id);
             throw new RuntimeException("cannot find menu from db");
         }
-        MenuDto menuDto = new MenuDto();
-        BeanUtil.copyProperties(menu, menuDto);
-        menuDto.setId(menu.getId());
-        menuDto.setCreateTime(menu.getCreateTime());
-        menuDto.setUpdateTime(menu.getUpdateTime());
-        if (Objects.equals("Layout", menuDto.getComponent())) {
-            menuDto.setComponent("");
-        }
-        return menuDto;
+        return this.toDto(menu, MenuDto.class);
     }
 
     /**
      * 根据pid获取与当前菜单同级别的菜单信息
+     *
      * @param pid
      * @return
      */
     @Override
-    public List<MenuDto> getMenusByPid(String pid) {
+    public List<MenuDto> getMenusByPid(String pid) throws Exception {
         if (StringUtils.isBlank(pid)) {
             pid = "0";
         }
@@ -78,24 +74,25 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         wrapper.eq(DbConstants.Base.IS_DELETED, 0);
         wrapper.orderByDesc(DbConstants.Base.SORT);
         wrapper.eq(DbConstants.Base.PID, pid);
-        return toDto(baseMapper.selectList(wrapper));
+        return this.toDtoList(baseMapper.selectList(wrapper), MenuDto.class);
     }
 
     /**
      * 获取当前菜单和上级菜单信息
+     *
      * @param menuDto
      * @param menuDtos
      * @return
      */
     @Override
-    public List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos) {
+    public List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos) throws Exception {
         // 如果是0，说明是最高级别的菜单了
         if (Objects.equals("0", menuDto.getPid())) {
             QueryWrapper<Menu> wrapper = new QueryWrapper<>();
             wrapper.eq(DbConstants.Base.IS_DELETED, 0);
             wrapper.orderByDesc(DbConstants.Base.SORT);
-            wrapper.eq(DbConstants.Base.PID,  "0");
-            menuDtos.addAll(toDto(baseMapper.selectList(wrapper)));
+            wrapper.eq(DbConstants.Base.PID, "0");
+            menuDtos.addAll(toDtoList(baseMapper.selectList(wrapper), MenuDto.class));
             return menuDtos;
         }
         // 获取与当前菜单同级别的菜单信息
@@ -106,12 +103,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     /**
      * 获取当前菜单和下级菜单信息
+     *
      * @param childrenList
      * @param menuDtos
      * @return
      */
     @Override
-    public Set<MenuDto> getChildren(List<MenuDto> childrenList, Set<MenuDto> menuDtos) {
+    public Set<MenuDto> getChildren(List<MenuDto> childrenList, Set<MenuDto> menuDtos) throws Exception {
         for (MenuDto menuDto : childrenList) {
             menuDtos.add(menuDto);
             List<MenuDto> menusByPid = this.getMenusByPid(menuDto.getId());
@@ -125,11 +123,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     /**
      * 添加菜单
+     *
      * @param menuDto
      * @return
      */
     @Override
-    public Response addMenu(MenuDto menuDto) {
+    public Response addMenu(MenuDto menuDto) throws Exception {
         // 校验菜单是否已经存在
         QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
@@ -146,7 +145,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (StringUtils.isBlank(menuDto.getName())) {
             menuDto.setName(menuDto.getTitle());
         }
-        Menu menu = toMenu(menuDto);
+        Menu menu = this.toDb(menuDto, Menu.class);
         // 如果已经有同名且被删除的菜单，那么只更新
         menu.setCreateTime(new Date());
         menu.setUpdateTime(new Date());
@@ -172,25 +171,17 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         return Response.ok();
     }
 
-    private Menu toMenu(MenuDto menuDto) {
-        Menu menu = new Menu();
-        BeanUtil.copyProperties(menuDto, menu);
-        if (StringUtils.isNotBlank(menuDto.getId())) {
-            menu.setId(menuDto.getId());
-        }
-        return menu;
-    }
-
     /**
      * 更新菜单
+     *
      * @param menuDto
      * @return
      */
     @Override
-    public Response editMenu(MenuDto menuDto) {
+    public Response editMenu(MenuDto menuDto) throws Exception {
         // 获取旧的菜单信息，用于更新父菜单的subCount
         MenuDto oldMenu = this.getMenuById(menuDto.getId());
-        Menu menu = toMenu(menuDto);
+        Menu menu = this.toDb(menuDto, Menu.class);
         if (baseMapper.updateById(menu) < 1) {
             LOGGER.error("editMenu failed, menu:{}", menu);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
@@ -207,11 +198,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     /**
      * 删除菜单
+     *
      * @param ids
      * @return
      */
     @Override
-    public Response delMenu(List<String> ids) {
+    public Response delMenu(List<String> ids) throws Exception {
         if (baseMapper.deleteBatchIds(ids) < 1) {
             LOGGER.error("delMenu failed by unknown error, ids:{}", ids);
             return Response.setResult(ResultCodeEnum.DELETE_FAILED);
@@ -221,19 +213,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         return Response.ok();
     }
 
-    private List<MenuDto> toDto(List<Menu> menus) {
-        List<MenuDto> menuDtos = new ArrayList<>();
-        for (Menu menu : menus) {
-            MenuDto menuDto = new MenuDto();
-            BeanUtil.copyProperties(menu, menuDto);
-            menuDto.setId(menu.getId());
-            menuDto.setCreateTime(menu.getCreateTime());
-            menuDto.setUpdateTime(menu.getUpdateTime());
-            if (Objects.equals("Layout", menuDto.getComponent())) {
-                menuDto.setComponent("");
-            }
-            menuDtos.add(menuDto);
+    @Override
+    public void setDtoExtraProperties(Menu menu, MenuDto menuDto) {
+        menuDto.setId(menu.getId());
+        menuDto.setCreateTime(menu.getCreateTime());
+        menuDto.setUpdateTime(menu.getUpdateTime());
+        if (Objects.equals("Layout", menuDto.getComponent())) {
+            menuDto.setComponent("");
         }
-        return menuDtos;
     }
 }

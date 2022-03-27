@@ -41,145 +41,99 @@ public class MenuController {
     @LogByMethod("/admin/menu/getSuperior")
     @ApiOperation(value = "根据id获取同级与上级菜单信息", notes = "根据id获取同级与上级菜单信息", response = Response.class)
     @GetMapping("/getSuperior")
-    public Response getSuperior(@RequestParam("id") String id) {
+    public Response getSuperior(@RequestParam("id") String id) throws Exception {
         Response response = Response.ok();
-        Set<MenuDto> menuDtos = new LinkedHashSet<>();
-        try {
-            MenuDto menuDto = menuService.getMenuById(id);
-            menuDtos.addAll(menuService.getSuperior(menuDto, new ArrayList<>()));
-            response.data(Constants.ReplyField.DATA, TreeUtil.toMenuDtoTree(new ArrayList<>(menuDtos), "0"));
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+        MenuDto menuDto = menuService.getMenuById(id);
+        Set<MenuDto> menuDtos = new LinkedHashSet<>(menuService.getSuperior(menuDto, new ArrayList<>()));
+        return response.data(Constants.ReplyField.DATA, TreeUtil.toMenuDtoTree(new ArrayList<>(menuDtos), "0"));
     }
 
     @LogByMethod("/admin/menu/getChildren")
     @ApiOperation(value = "根据id获取当前菜单id及所有下级菜单的id", notes = "根据id获取当前菜单id及所有下级菜单的id", response = Response.class)
     @GetMapping("/getChildren")
-    public Response getChildren(@RequestParam("id") String id) {
-        Response response = Response.ok();
+    public Response getChildren(@RequestParam("id") String id) throws Exception {
         Set<MenuDto> menuDtos = new LinkedHashSet<>();
-        try {
-            MenuDto menuDto = menuService.getMenuById(id);
-            menuDtos.add(menuDto);
-            List<MenuDto> childrenList = menuService.getMenusByPid(id);
-            menuDtos.addAll(menuService.getChildren(childrenList, menuDtos));
-            List<String> resultIds = menuDtos.stream()
-                    .filter(BaseUtil.distinctByKey(MenuDto::getId))
-                    .map(MenuDto::getId)
-                    .collect(Collectors.toList());
-            response.data(Constants.ReplyField.DATA, resultIds);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+        MenuDto menuDto = menuService.getMenuById(id);
+        menuDtos.add(menuDto);
+        List<MenuDto> childrenList = menuService.getMenusByPid(id);
+        menuDtos.addAll(menuService.getChildren(childrenList, menuDtos));
+        // 取到的数据有重复的，过滤
+        List<String> resultIds = menuDtos.stream()
+                .filter(BaseUtil.distinctByKey(MenuDto::getId))
+                .map(MenuDto::getId)
+                .collect(Collectors.toList());
+        return Response.ok().data(Constants.ReplyField.DATA, resultIds);
     }
 
     @LogByMethod("/admin/menu/getMenusByPid")
     @ApiOperation(value = "根据pid获取与当前菜单同级别的菜单信息", notes = "根据pid获取与当前菜单同级别的菜单信息", response = Response.class)
     @GetMapping("/getMenusByPid")
-    public Response getMenusByPid(@RequestParam(value = "pid", required = false) String pid) {
-        Response response = Response.ok();
-        try {
-            List<MenuDto> menuDtos = menuService.getMenusByPid(pid);
-            response.data(Constants.ReplyField.DATA, menuDtos);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response getMenusByPid(@RequestParam(value = "pid", required = false) String pid) throws Exception {
+        List<MenuDto> menuDtos = menuService.getMenusByPid(pid);
+        return Response.ok().data(Constants.ReplyField.DATA, menuDtos);
     }
 
     @LogByMethod("/admin/menu/addMenu")
     @ApiOperation(value = "新增菜单", notes = "新增菜单", response = Response.class)
     @PostMapping("/addMenu")
-    public Response addMenu(@RequestBody MenuDto menuDto) {
-        Response response = Response.ok();
-        try {
-            MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menuDto.getMenuType());
-            if (menuType == null) {
-                LOGGER.error("addMenu failed, cannot find menuType, menu:{}", menuDto);
-                response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-                return response;
-            }
-            if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
-                menuDto.setComponent("Layout");
-            }
-            menuDto.setSubCount(0);
-            if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
-                    && (StringUtils.isBlank(menuDto.getTitle()) || StringUtils.isBlank(menuDto.getComponent()))) {
-                LOGGER.error("addMenu failed, title or component is empty, menu:{}", menuDto);
-                response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-                return response;
-            }
-            response = menuService.addMenu(menuDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-            throw e;
+    public Response addMenu(@RequestBody MenuDto menuDto) throws Exception {
+        MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menuDto.getMenuType());
+        if (menuType == null) {
+            LOGGER.error("addMenu failed, cannot find menuType, menu:{}", menuDto);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        return response;
+        if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
+            menuDto.setComponent("Layout");
+        }
+        menuDto.setSubCount(0);
+        if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
+                && (StringUtils.isBlank(menuDto.getTitle()) || StringUtils.isBlank(menuDto.getComponent()))) {
+            LOGGER.error("addMenu failed, title or component is empty, menu:{}", menuDto);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
+        return menuService.addMenu(menuDto);
     }
 
     @LogByMethod("/admin/menu/editMenu")
     @ApiOperation(value = "修改菜单", notes = "修改菜单", response = Response.class)
     @PutMapping("/editMenu")
-    public Response editMenu(@RequestBody MenuDto menuDto) {
-        Response response = Response.ok();
-        try {
-            MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menuDto.getMenuType());
-            if (menuType == null) {
-                LOGGER.error("editMenu failed, cannot find menuType, menu:{}", menuDto);
-                response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
-                return response;
-            }
-            if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
-                menuDto.setComponent("Layout");
-            }
-            if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
-                    && (StringUtils.isBlank(menuDto.getTitle()) || StringUtils.isBlank(menuDto.getComponent()))) {
-                LOGGER.error("editMenu failed, title or component is empty, menu:{}", menuDto);
-                response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
-                return response;
-            }
-
-            response = menuService.editMenu(menuDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
-            throw e;
+    public Response editMenu(@RequestBody MenuDto menuDto) throws Exception {
+        MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menuDto.getMenuType());
+        if (menuType == null) {
+            LOGGER.error("editMenu failed, cannot find menuType, menu:{}", menuDto);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
-        return response;
+        if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
+            menuDto.setComponent("Layout");
+        }
+        if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
+                && (StringUtils.isBlank(menuDto.getTitle()) || StringUtils.isBlank(menuDto.getComponent()))) {
+            LOGGER.error("editMenu failed, title or component is empty, menu:{}", menuDto);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+
+        return menuService.editMenu(menuDto);
     }
 
     @LogByMethod("/admin/menu/delMenu")
     @ApiOperation(value = "删除菜单", notes = "删除菜单", response = Response.class)
     @DeleteMapping("/delMenu")
-    public Response delMenu(@RequestBody Set<String> ids) {
-        Response response = Response.ok();
-
+    public Response delMenu(@RequestBody Set<String> ids) throws Exception {
         Set<MenuDto> menuDtos = new LinkedHashSet<>();
-        try {
-            // 获取所有需要删除的菜单信息
-            for (String id : ids) {
-                // 获取当前菜单信息
-                menuDtos.add(menuService.getMenuById(id));
-                // 获取所有子菜单信息
-                List<MenuDto> childrenList = menuService.getMenusByPid(id);
-                menuDtos.addAll(menuService.getChildren(childrenList, menuDtos));
-            }
-            // 对id进行去重
-            List<String> delIds = menuDtos.stream()
-                    .filter(BaseUtil.distinctByKey(MenuDto::getId))
-                    .map(MenuDto::getId)
-                    .collect(Collectors.toList());
-            response = menuService.delMenu(delIds);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
-            throw e;
+        // 获取所有需要删除的菜单信息
+        for (String id : ids) {
+            // 获取当前菜单信息
+            menuDtos.add(menuService.getMenuById(id));
+            // 获取所有子菜单信息
+            List<MenuDto> childrenList = menuService.getMenusByPid(id);
+            menuDtos.addAll(menuService.getChildren(childrenList, menuDtos));
         }
-        return response;
+        // 对id进行去重
+        List<String> delIds = menuDtos.stream()
+                .filter(BaseUtil.distinctByKey(MenuDto::getId))
+                .map(MenuDto::getId)
+                .collect(Collectors.toList());
+        return menuService.delMenu(delIds);
     }
 }
 

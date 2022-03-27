@@ -4,16 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.admin.entity.DictDetail;
 import com.myblog.service.admin.entity.dto.DictDetailDto;
-import com.myblog.service.admin.entity.dto.DictDto;
 import com.myblog.service.admin.mapper.DictDetailMapper;
 import com.myblog.service.admin.service.DictDetailService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.myblog.service.base.annotation.service.ServiceContext;
 import com.myblog.service.base.common.*;
-import com.myblog.service.base.entity.dto.BaseDto;
-import com.myblog.service.base.handler.ServiceConvertHandler;
-import com.myblog.service.base.util.BeanUtil;
-import com.myblog.service.base.util.DbConverter;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -35,16 +29,12 @@ import java.util.concurrent.TimeUnit;
  * @since 2022-03-21
  */
 @Service
-@ServiceContext(serviceName = "DictDetailService", dbClazz = DictDetail.class, dtoClazz = DictDetailDto.class)
 public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDetail> implements DictDetailService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(DictDetailServiceImpl.class);
 
     @Autowired
     private RedisUtil redisUtil;
-
-    @Autowired
-    private ServiceConvertHandler serviceConvertHandler;
 
     /**
      * 分页查询字典详情
@@ -69,7 +59,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
 
         baseMapper.selectPage(dictDetailPage, queryWrapper);
 
-        List<BaseDto> dictDetailDtos = serviceConvertHandler.toDto(dictDetailPage.getRecords(), this.getServiceName());
+        List<DictDetailDto> dictDetailDtos = this.toDtoList(dictDetailPage.getRecords(), DictDetailDto.class);
         response.data(Constants.ReplyField.DATA, dictDetailDtos);
         response.data(Constants.ReplyField.TOTAL, dictDetailPage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);
@@ -78,8 +68,8 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
     }
 
     @Override
-    public Response editDictDetail(DictDetailDto dictDetailDto) {
-        DictDetail tag = toDictDetail(dictDetailDto);
+    public Response editDictDetail(DictDetailDto dictDetailDto) throws Exception{
+        DictDetail tag = this.toDb(dictDetailDto, DictDetail.class);
         if (baseMapper.updateById(tag) < 1) {
             LOGGER.error("editDictDetail failed by unknown error, dictDetail:{}", dictDetailDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
@@ -87,17 +77,8 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
         return Response.ok();
     }
 
-    private DictDetail toDictDetail(DictDetailDto dictDetailDto) {
-        DictDetail dictDetail = new DictDetail();
-        BeanUtil.copyProperties(dictDetailDto, dictDetail);
-        if (StringUtils.isNotBlank(dictDetailDto.getId())) {
-            dictDetail.setId(dictDetailDto.getId());
-        }
-        return dictDetail;
-    }
-
     @Override
-    public Response delDictDetails(Set<String> ids) {
+    public Response delDictDetails(Set<String> ids) throws Exception{
         for (String id : ids) {
             if (baseMapper.deleteById(id) < 1) {
                 LOGGER.error("delDictDetails failed by unknown error, dictDetailId:{}", id);
@@ -108,14 +89,14 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
     }
 
     @Override
-    public Response addDictDetail(DictDetailDto dictDetailDto) {
+    public Response addDictDetail(DictDetailDto dictDetailDto) throws Exception{
         QueryWrapper<DictDetail> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.DictDetail.DICT_LABEL, dictDetailDto.getDictLabel());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
             LOGGER.error("addDictDetail failed, dictLabel is already exist, dictDetailDto:{}", dictDetailDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        DictDetail dictDetail = toDictDetail(dictDetailDto);
+        DictDetail dictDetail = this.toDb(dictDetailDto, DictDetail.class);
         // 如果已经有同名且被删除的字典，那么只更新
         dictDetail.setCreateTime(new Date());
         dictDetail.setUpdateTime(new Date());
@@ -150,18 +131,5 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
         result.put(Constants.ReplyField.DATA, detailList);
         redisUtil.setEx(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictName, JsonUtils.objectToJson(result), 1, TimeUnit.DAYS);
         return Response.ok().data(result);
-    }
-
-
-    private List<DictDetailDto> toDetailDto(List<DictDetail> dictDetails) {
-        List<DictDetailDto> dictDetailDtos = new ArrayList<>();
-        for (DictDetail dictDetail : dictDetails) {
-            DictDetailDto dictDetailDto = new DictDetailDto();
-            BeanUtil.copyProperties(dictDetail, dictDetailDto);
-            dictDetailDto.setId(dictDetail.getId());
-            dictDetailDto.setCreateTime(dictDetail.getCreateTime());
-            dictDetailDtos.add(dictDetailDto);
-        }
-        return dictDetailDtos;
     }
 }

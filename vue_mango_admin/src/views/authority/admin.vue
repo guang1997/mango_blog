@@ -14,10 +14,10 @@
           @keyup.enter.native="crud.toQuery"
         />
         <el-select v-model="query.gender" clearable size="small" placeholder="性别" class="filter-item" style="width: 90px" @change="crud.toQuery">
-          <el-option v-for="item in genderTypeOptions" :key="item.key" :label="item.value" :value="item.key" />
+          <el-option v-for="item in dict.sys_gender" :key="item.id" :label="item.dictLabel" :value="item.dictValue" />
         </el-select>
         <el-select v-model="query.enabled" clearable size="small" placeholder="状态" class="filter-item" style="width: 90px" @change="crud.toQuery">
-          <el-option v-for="item in enabledTypeOptions" :key="item.key" :label="item.value" :value="item.key" />
+          <el-option v-for="item in dict.sys_status" :key="item.id" :label="item.dictLabel" :value="item.dictValue" />
         </el-select>
         <date-range-picker v-model="query.lastLoginTimes" class="date-item" />
         <rrOperation />
@@ -31,9 +31,9 @@
               <el-input v-model="form.username" @keydown.native="keydown($event)" />
             </el-form-item>
             <el-form-item label="电话" prop="phone">
-              <el-input v-model.number="form.mobile" />
+              <el-input v-model.number="form.phone" />
             </el-form-item>
-            <el-form-item label="昵称" prop="nickName">
+            <el-form-item label="昵称" prop="nickname">
               <el-input v-model="form.nickname" @keydown.native="keydown($event)" />
             </el-form-item>
             <el-form-item label="邮箱" prop="email">
@@ -77,17 +77,18 @@
                 />
               </el-select>
             </el-form-item>
-             <el-form-item label="头像" prop="avatar">
-              <el-upload
-                class="avatar-uploader"
-                :action="uploadURL()"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-                :auto-upload="false"
-                :before-upload="beforeAvatarUpload">
-                <img v-if="imageUrl" :src="imageUrl" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload>
+
+            <el-form-item label="头像">
+                <el-upload
+                          :show-file-list="false"
+                          :on-change="handleChange"
+                          class="avatar-uploader"
+                          action="/admin/oss/upload?modelName=avatar"
+                          :auto-upload="false"
+                          accept="image/png,image/gif,image/jpg,image/jpeg">
+                    <img v-if="form.avatar" :src="form.avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"/>
+                </el-upload>
             </el-form-item>
           </el-form>
       <div slot="footer" class="dialog-footer">
@@ -224,7 +225,7 @@ export default {
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   // 数据字典
-  dicts: ['sys_status'],
+  dicts: ['sys_status', 'sys_gender'],
   data() {
     // 自定义验证
     const validPhone = (rule, value, callback) => {
@@ -247,20 +248,12 @@ export default {
         edit: ["admin", "admin:edit"],
         del: ["admin", "admin:del"],
       },
-      enabledTypeOptions: [
-        { key: 'true', value: '激活' },
-        { key: 'false', value: '禁用' }
-      ],
-      genderTypeOptions: [
-        { key: 1, value: '男' },
-        { key: 2, value: '女' }
-      ],
       rules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
-        nickName: [
+        nickname: [
           { required: true, message: '请输入用户昵称', trigger: 'blur' },
           { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ],
@@ -302,9 +295,8 @@ export default {
     [CRUD.HOOK.beforeToAdd]() {
       this.roleDatas = []
     },
-    // 初始化编辑时候的角色与岗位
+    // 初始化编辑时的角色
     [CRUD.HOOK.beforeToEdit](crud, form) {
-      this.getJobs(this.form.dept.id)
       this.roleDatas = []
       userRoles = []
       const _this = this
@@ -314,17 +306,18 @@ export default {
         userRoles.push(rol)
       })
     },
-    uploadURL() {
-      return "";
-    },
-    handleAvatarSuccess(res, file) {
+    handleChange(res, file) {
       console.log("file", file)
-        this.imageUrl = URL.createObjectURL(file.raw);
+      // this.form.file = file;
+        // this.form.avater = URL.createObjectURL(file.raw);
+        // let fileUrl = [];
+        // fileUrl.push(file.raw);
+        // this.form.avatar = window.URL.createObjectURL(fileUrl)
       },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg';
         const isLt2M = file.size / 1024 / 1024 < 2;
-
+        debugger
         if (!isJPG) {
           this.$message.error('上传头像图片只能是 JPG 格式!');
         }
@@ -404,26 +397,24 @@ export default {
   border: 0;
   padding: 0;
 }
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  margin: 0, 0, 0, 10px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
-  }
-  .avatar-uploader-icon {
+.avatar-uploader .avatar-uploader-icon {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;  
+      
     font-size: 28px;
-    color: #06449b;
+    color: #8c939d;
     width: 178px;
     height: 178px;
     line-height: 178px;
     text-align: center;
   }
-  .avatar {
+  .avatar-uploader .avatar-uploader-icon:hover {
+    border-color: #409EFF;
+  }    
+  .avatar-uploader img {
     width: 178px;
     height: 178px;
     display: block;

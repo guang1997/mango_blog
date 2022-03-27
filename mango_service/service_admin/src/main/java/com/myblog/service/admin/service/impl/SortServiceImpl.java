@@ -9,13 +9,9 @@ import com.myblog.service.admin.mapper.BlogMapper;
 import com.myblog.service.admin.mapper.SortMapper;
 import com.myblog.service.admin.service.SortService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.myblog.service.base.annotation.service.ServiceContext;
 import com.myblog.service.base.common.*;
-import com.myblog.service.base.entity.dto.BaseDto;
-import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
-import com.myblog.service.security.entity.Admin;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -35,17 +30,12 @@ import java.util.*;
  * @since 2022-03-18
  */
 @Service
-@ServiceContext(serviceName = "SortService", dbClazz = Sort.class, dtoClazz = SortDto.class)
 public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements SortService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SortServiceImpl.class);
 
     @Autowired
     private BlogMapper blogMapper;
-
-    @Autowired
-    private ServiceConvertHandler serviceConvertHandler;
-
 
     /**
      * 分页查询分类信息
@@ -76,7 +66,7 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
 
         baseMapper.selectPage(sortPage, queryWrapper);
 
-        List<BaseDto> sortDtos = serviceConvertHandler.toDto(sortPage.getRecords(), this.getServiceName());
+        List<SortDto> sortDtos = this.toDtoList(sortPage.getRecords(), SortDto.class);
         response.data(Constants.ReplyField.DATA, sortDtos);
         response.data(Constants.ReplyField.TOTAL, sortPage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);
@@ -90,14 +80,14 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
      * @return
      */
     @Override
-    public Response addSort(SortDto sortDto) {
+    public Response addSort(SortDto sortDto) throws Exception{
         QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Sort.SORT_NAME, sortDto.getSortName());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
             LOGGER.error("addSort failed, sortName is already exist, tag:{}", sortDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        Sort tag = toSort(sortDto);
+        Sort tag = this.toDb(sortDto, Sort.class);
         if (baseMapper.insert(tag) < 1) {
             LOGGER.error("addSort failed by unknown error, sort:{}", sortDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
@@ -111,8 +101,8 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
      * @return
      */
     @Override
-    public Response editSort(SortDto sortDto) {
-        Sort sort = toSort(sortDto);
+    public Response editSort(SortDto sortDto) throws Exception{
+        Sort sort = this.toDb(sortDto, Sort.class);
         if (baseMapper.updateById(sort) < 1) {
             LOGGER.error("editSort failed by unknown error, sort:{}", sortDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
@@ -126,7 +116,7 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
      * @return
      */
     @Override
-    public Response delSorts(Set<String> ids) {
+    public Response delSorts(Set<String> ids) throws Exception{
         // 如果分类已经绑定了博客，那么不删除该分类
         List<String> delFailedSortNames = new ArrayList<>();
         for (String id : ids) {
@@ -140,7 +130,7 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
                 continue;
             }
             if (baseMapper.deleteById(id) < 1) {
-                LOGGER.error("delSorts failed by unknown error, roleId:{}", id);
+                LOGGER.error("delSorts failed by unknown error, sortId:{}", id);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }
@@ -148,26 +138,6 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
             return Response.ok();
         }
         return Response.error().message(delFailedSortNames.toString() + "已绑定用户, 未删除成功");
-    }
-
-    private Sort toSort(SortDto sortDto) {
-        Sort sort = new Sort();
-        BeanUtil.copyProperties(sortDto, sort);
-        sort.setId(sortDto.getId());
-        return sort;
-    }
-
-
-    private List<SortDto> toDto(List<Sort> sorts) {
-        List<SortDto> sortDtos = new ArrayList<>();
-        for (Sort sort : sorts) {
-            SortDto sortDto = new SortDto();
-            BeanUtil.copyProperties(sort, sortDto);
-            sortDto.setId(sort.getId());
-            sortDto.setCreateTime(sort.getCreateTime());
-            sortDtos.add(sortDto);
-        }
-        return sortDtos;
     }
 
 }

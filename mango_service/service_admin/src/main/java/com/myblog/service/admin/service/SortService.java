@@ -3,10 +3,9 @@ package com.myblog.service.admin.service;
 import com.myblog.service.admin.entity.Sort;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.admin.entity.dto.SortDto;
-import com.myblog.service.base.annotation.service.ServiceContextAware;
+import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.base.common.Response;
 
-import java.text.ParseException;
 import java.util.Set;
 
 /**
@@ -17,13 +16,13 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-18
  */
-public interface SortService extends IService<Sort>, ServiceContextAware {
+public interface SortService extends IService<Sort>, ServiceConvertHandler<Sort, SortDto> {
 
     Response getSortByPage(SortDto sortDto) throws Exception;
 
-    Response addSort(SortDto sortDto);
+    Response addSort(SortDto sortDto) throws Exception;
 
-    Response editSort(SortDto sortDto);
+    Response editSort(SortDto sortDto) throws Exception;
 
-    Response delSorts(Set<String> ids);
+    Response delSorts(Set<String> ids) throws Exception;
 }

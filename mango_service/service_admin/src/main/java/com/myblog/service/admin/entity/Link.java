@@ -39,12 +39,6 @@ public class Link extends BaseEntity {
     @ApiModelProperty(value = "友链状态： 0 申请中， 1：已上线，  2：已下架")
     private Integer linkStatus;
 
-    @ApiModelProperty(value = "申请用户ID")
-    private String userId;
-
-    @ApiModelProperty(value = "操作管理员ID")
-    private String adminId;
-
     @ApiModelProperty(value = "网站图标")
     private String fileId;
 

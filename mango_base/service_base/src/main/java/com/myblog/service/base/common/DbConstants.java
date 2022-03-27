@@ -71,5 +71,6 @@ public interface DbConstants {
     interface Link {
         String TITLE = "title";
         String URL = "url";
+        String LINK_STATUS = "link_status";
     }
 }

@@ -48,7 +48,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     private RedisUtil redisUtil;
 
     @Override
-    public Admin checkLogin(LoginDto loginDto) {
+    public Admin checkLogin(LoginDto loginDto) throws Exception{
         String username = loginDto.getUsername();
         String password = loginDto.getPassword();
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
@@ -89,7 +89,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      * @return
      */
     @Override
-    public Response getAdminByPage(AdminDto adminDto) throws ParseException {
+    public Response getAdminByPage(AdminDto adminDto) throws Exception {
         Response response = Response.ok();
         int page = 1;
         int size = 10;
@@ -117,7 +117,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         }
 
         baseMapper.selectPage(adminPage, queryWrapper);
-        List<AdminDto> adminDtos = toDto(adminPage.getRecords());
+        List<AdminDto> adminDtos = this.toDtoList(adminPage.getRecords(), AdminDto.class);
 
         response.data(Constants.ReplyField.DATA, adminDtos);
         response.data(Constants.ReplyField.TOTAL, adminPage.getTotal());
@@ -134,11 +134,11 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Override
     public Response addAdmin(AdminDto adminDto) {
 
-        return null;
+        return Response.ok();
     }
 
     @Override
-    public Response delAdmin(Set<String> ids) {
+    public Response delAdmin(Set<String> ids) throws Exception{
         for (String id : ids) {
             Admin admin = baseMapper.selectById(id);
             // 清理缓存信息
@@ -148,19 +148,14 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         return Response.ok();
     }
 
-    private List<AdminDto> toDto(List<Admin> admins) {
-        List<AdminDto> adminDtos = new ArrayList<>();
-        for (Admin admin : admins) {
-            AdminDto adminDto = new AdminDto();
-            BeanUtil.copyProperties(admin, adminDto);
-            adminDto.setId(admin.getId());
-            adminDto.setCreateTime(admin.getCreateTime());
-            // 查询角色信息
-            List<RoleDto> roleDtos = toRoleDto(roleMapper.getRolesByUserId(admin.getId()));
-            adminDto.setRoles(roleDtos);
-            adminDtos.add(adminDto);
-        }
-        return adminDtos;
+    @Override
+    public void setDtoExtraProperties(Admin admin, AdminDto adminDto) {
+        adminDto.setId(admin.getId());
+        adminDto.setCreateTime(admin.getCreateTime());
+        adminDto.setUpdateTime(admin.getUpdateTime());
+        // 查询角色信息
+        List<RoleDto> roleDtos = toRoleDto(roleMapper.getRolesByUserId(admin.getId()));
+        adminDto.setRoles(roleDtos);
     }
 
     private List<RoleDto> toRoleDto(List<Role> roleList) {

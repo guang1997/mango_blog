@@ -1,12 +1,9 @@
 package com.myblog.service.admin.controller;
 
 
-import com.myblog.service.admin.entity.DictDetail;
 import com.myblog.service.admin.entity.dto.DictDetailDto;
-import com.myblog.service.admin.entity.dto.DictDto;
 import com.myblog.service.admin.service.DictDetailService;
 import com.myblog.service.base.annotation.aspect.LogByMethod;
-import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import io.swagger.annotations.ApiOperation;
@@ -40,14 +37,7 @@ public class DictDetailController {
     @ApiOperation(value = "分页查询字典详情", notes = "分页查询字典详情", response = Response.class)
     @PostMapping("/getDictDetailByPage")
     public Response getDictDetailByPage(@RequestBody DictDetailDto dictDetailDto) throws Exception {
-        Response response = Response.ok();
-        try {
-            response = dictDetailService.getDictDetailByPage(dictDetailDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+        return dictDetailService.getDictDetailByPage(dictDetailDto);
     }
 
     @ApiOperation(value = "根据字典类型获取字典数据", notes = "根据字典类型获取字典数据", response = Response.class)
@@ -58,60 +48,32 @@ public class DictDetailController {
             LOGGER.error("getDetailsByDictName failed, dictName cannot be null, dictDetailDto:{}", dictDetailDto);
             return response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
         }
-        try {
-            response = dictDetailService.getDetailsByDictName(dictDetailDto.getDictName());
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+        return dictDetailService.getDetailsByDictName(dictDetailDto.getDictName());
     }
 
     @LogByMethod("/admin/dictDetail/addDictDetail")
     @ApiOperation(value = "新增字典详情", notes = "新增字典详情", response = Response.class)
     @PostMapping("/addDictDetail")
-    public Response addDictDetail(@RequestBody DictDetailDto dictDetailDto) {
-        Response response = Response.ok();
-        try {
-            if (StringUtils.isBlank(dictDetailDto.getDictLabel())) {
-                LOGGER.error("addDictDetail failed, dictLabel cannot be null, dictDetail:{}", dictDetailDto);
-                response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-                return response;
-            }
-            response = dictDetailService.addDictDetail(dictDetailDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-            throw e;
+    public Response addDictDetail(@RequestBody DictDetailDto dictDetailDto) throws Exception {
+        if (StringUtils.isBlank(dictDetailDto.getDictLabel())) {
+            LOGGER.error("addDictDetail failed, dictLabel cannot be null, dictDetail:{}", dictDetailDto);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        return response;
+        return dictDetailService.addDictDetail(dictDetailDto);
     }
 
     @LogByMethod("/admin/dictDetail/editDictDetail")
     @ApiOperation(value = "修改字典详情", notes = "修改字典详情", response = Response.class)
     @PutMapping("/editDictDetail")
-    public Response editDictDetail(@RequestBody DictDetailDto dictDetailDto) {
-        Response response = Response.ok();
-        try {
-            response = dictDetailService.editDictDetail(dictDetailDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response editDictDetail(@RequestBody DictDetailDto dictDetailDto) throws Exception {
+        return dictDetailService.editDictDetail(dictDetailDto);
     }
 
     @LogByMethod("/admin/dictDetail/delDictDetails")
     @ApiOperation(value = "删除字典详情", notes = "删除字典详情", response = Response.class)
     @DeleteMapping("/delDictDetails")
-    public Response delDictDetails(@RequestBody Set<String> ids) {
-        Response response = Response.ok();
-        try {
-            response = dictDetailService.delDictDetails(ids);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response delDictDetails(@RequestBody Set<String> ids) throws Exception {
+        return dictDetailService.delDictDetails(ids);
     }
 }
 

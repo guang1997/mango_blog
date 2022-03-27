@@ -1,6 +1,7 @@
 package com.myblog.service.admin.controller;
 
 
+import com.myblog.service.admin.service.OssService;
 import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.text.ParseException;
 import java.util.Set;
@@ -40,29 +42,15 @@ public class AdminController {
     @LogByMethod("/admin/manager/getAdminByPage")
     @ApiOperation(value = "分页查询管理员信息", notes = "分页查询管理员信息", response = Response.class)
     @PostMapping("/getAdminByPage")
-    public Response getAdminByPage(@RequestBody AdminDto adminDto) throws ParseException {
-        Response response = Response.ok();
-        try {
-            response = adminService.getAdminByPage(adminDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response getAdminByPage(@RequestBody AdminDto adminDto) throws Exception {
+        return adminService.getAdminByPage(adminDto);
     }
 
     @LogByMethod("/admin/manager/addAdmin")
     @ApiOperation(value = "新增管理员", notes = "新增管理员", response = Response.class)
     @PostMapping("/addAdmin")
-    public Response addAdmin(@RequestBody AdminDto adminDto) {
-        Response response = Response.ok();
-        try {
-            response = adminService.addAdmin(adminDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response addAdmin(@RequestBody AdminDto adminDto) throws Exception {
+        return adminService.addAdmin(adminDto);
     }
 
     @LogByMethod("/admin/manager/editAdmin")
@@ -82,15 +70,8 @@ public class AdminController {
     @LogByMethod("/admin/manager/delAdmin")
     @ApiOperation(value = "删除管理员", notes = "删除管理员", response = Response.class)
     @DeleteMapping("/delAdmin")
-    public Response delAdmin(@RequestBody Set<String> ids) {
-        Response response = Response.ok();
-        try {
-            response = adminService.delAdmin(ids);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response delAdmin(@RequestBody Set<String> ids) throws Exception {
+        return adminService.delAdmin(ids);
     }
 
 }

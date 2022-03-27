@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.myblog.service.base.entity.dto.BaseDto;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
@@ -37,7 +38,7 @@ public class AdminDto extends BaseDto {
 
     private String weChat;
 
-    private Boolean enabled;
+    private Integer enabled;
 
     private List<RoleDto> roles;
     /**

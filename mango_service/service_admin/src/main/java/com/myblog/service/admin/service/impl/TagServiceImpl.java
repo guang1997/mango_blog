@@ -7,7 +7,6 @@ import com.myblog.service.admin.entity.dto.TagDto;
 import com.myblog.service.admin.mapper.TagMapper;
 import com.myblog.service.admin.service.TagService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.myblog.service.base.annotation.service.ServiceContext;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
@@ -35,14 +34,9 @@ import java.util.*;
  * @since 2022-03-18
  */
 @Service
-@ServiceContext(serviceName = "TagService", dbClazz = Tag.class, dtoClazz = TagDto.class)
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);
-
-
-    @Autowired
-    private ServiceConvertHandler serviceConvertHandler;
 
     /**
      * 分页查询标签信息
@@ -73,7 +67,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
 
         baseMapper.selectPage(tagPage, queryWrapper);
 
-        List<BaseDto> tagDtos = serviceConvertHandler.toDto(tagPage.getRecords(), this.getServiceName());
+        List<TagDto> tagDtos = this.toDtoList(tagPage.getRecords(), TagDto.class);
         response.data(Constants.ReplyField.DATA, tagDtos);
         response.data(Constants.ReplyField.TOTAL, tagPage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);
@@ -87,14 +81,14 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * @return
      */
     @Override
-    public Response addTag(TagDto tagDto) {
+    public Response addTag(TagDto tagDto) throws Exception{
         QueryWrapper<Tag> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Tag.TAG_NAME, tagDto.getTagName());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
             LOGGER.error("addTag failed, tagName is already exist, tag:{}", tagDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        Tag tag = toTag(tagDto);
+        Tag tag = this.toDb(tagDto, Tag.class);
         if (baseMapper.insert(tag) < 1) {
             LOGGER.error("addTag failed by unknown error, tag:{}", tagDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
@@ -108,8 +102,8 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * @return
      */
     @Override
-    public Response editTag(TagDto tagDto) {
-        Tag tag = toTag(tagDto);
+    public Response editTag(TagDto tagDto) throws Exception{
+        Tag tag = this.toDb(tagDto, Tag.class);
         if (baseMapper.updateById(tag) < 1) {
             LOGGER.error("editTag failed by unknown error, tag:{}", tagDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
@@ -123,7 +117,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * @return
      */
     @Override
-    public Response delTags(Set<String> ids) {
+    public Response delTags(Set<String> ids) throws Exception{
         // 如果标签已经绑定了博客，那么不删除该标签
         List<String> delFailedTagNames = new ArrayList<>();
         for (String id : ids) {
@@ -135,7 +129,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                 continue;
             }
             if (baseMapper.deleteById(id) < 1) {
-                LOGGER.error("delTags failed by unknown error, roleId:{}", id);
+                LOGGER.error("delTags failed by unknown error, tagId:{}", id);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }
@@ -144,25 +138,4 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         }
         return Response.error().message(delFailedTagNames.toString() + "已绑定用户, 未删除成功");
     }
-
-    private Tag toTag(TagDto tagDto) {
-        Tag tag = new Tag();
-        BeanUtil.copyProperties(tagDto, tag);
-        tag.setId(tagDto.getId());
-        return tag;
-    }
-
-    private List<TagDto> toDto(List<Tag> tags) {
-        List<TagDto> tagDtos = new ArrayList<>();
-        for (Tag tag : tags) {
-            TagDto tagDto = new TagDto();
-            BeanUtil.copyProperties(tag, tagDto);
-            tagDto.setId(tag.getId());
-            tagDto.setCreateTime(tag.getCreateTime());
-            tagDtos.add(tagDto);
-        }
-        return tagDtos;
-    }
-
-
 }

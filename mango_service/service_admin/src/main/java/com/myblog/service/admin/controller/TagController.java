@@ -6,7 +6,6 @@ import com.myblog.service.admin.service.TagService;
 import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
-import com.myblog.service.security.entity.dto.RoleDto;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,61 +37,32 @@ public class TagController {
     @ApiOperation(value = "分页查询标签", notes = "分页查询标签", response = Response.class)
     @PostMapping("/getTagByPage")
     public Response getTagByPage(@RequestBody TagDto tagDto) throws Exception {
-        Response response = Response.ok();
-        try {
-            response = tagService.getTagByPage(tagDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+        return tagService.getTagByPage(tagDto);
     }
 
     @LogByMethod("/admin/tag/addTag")
     @ApiOperation(value = "新增标签", notes = "新增标签", response = Response.class)
     @PostMapping("/addTag")
-    public Response addTag(@RequestBody TagDto tagDto) {
-        Response response = Response.ok();
-        try {
-            if (StringUtils.isBlank(tagDto.getTagName())) {
-                LOGGER.error("addTag failed, tagName cannot be null, role:{}", tagDto);
-                response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-                return response;
-            }
-            response = tagService.addTag(tagDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.SAVE_FAILED.getCode()).message(ResultCodeEnum.SAVE_FAILED.getMessage());
-            throw e;
+    public Response addTag(@RequestBody TagDto tagDto) throws Exception {
+        if (StringUtils.isBlank(tagDto.getTagName())) {
+            LOGGER.error("addTag failed, tagName cannot be null, role:{}", tagDto);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        return response;
+        return tagService.addTag(tagDto);
     }
 
     @LogByMethod("/admin/tag/editTag")
     @ApiOperation(value = "修改标签", notes = "修改标签", response = Response.class)
     @PutMapping("/editTag")
-    public Response editTag(@RequestBody TagDto tagDto) {
-        Response response = Response.ok();
-        try {
-            response = tagService.editTag(tagDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response editTag(@RequestBody TagDto tagDto) throws Exception {
+        return tagService.editTag(tagDto);
     }
 
     @LogByMethod("/admin/tag/delTags")
     @ApiOperation(value = "删除标签", notes = "删除标签", response = Response.class)
     @DeleteMapping("/delTags")
-    public Response delTags(@RequestBody Set<String> ids) {
-        Response response = Response.ok();
-        try {
-            response = tagService.delTags(ids);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.DELETE_FAILED.getCode()).message(ResultCodeEnum.DELETE_FAILED.getMessage());
-            throw e;
-        }
-        return response;
+    public Response delTags(@RequestBody Set<String> ids) throws Exception {
+        return tagService.delTags(ids);
     }
 
 }

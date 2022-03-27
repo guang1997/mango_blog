@@ -133,5 +133,10 @@
             <groupId>com.esotericsoftware</groupId>
             <artifactId>reflectasm</artifactId>
         </dependency>
+        <!--aliyunOSS-->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+        </dependency>
     </dependencies>
 </project>

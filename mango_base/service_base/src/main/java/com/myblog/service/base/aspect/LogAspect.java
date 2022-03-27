@@ -54,6 +54,7 @@ public class LogAspect {
             classLogger.info("method:{} invoke success, cost:{}, response:{}", methodName, (System.currentTimeMillis() - start), response);
         } catch (Exception e) {
             classLogger.error("method:" + methodName + " invoke failed, exception:", e);
+            throw e;
         }
         return response;
     }

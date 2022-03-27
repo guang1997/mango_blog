@@ -3,8 +3,7 @@ package com.myblog.service.admin.service;
 import com.myblog.service.admin.entity.Link;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.admin.entity.dto.LinkDto;
-import com.myblog.service.base.annotation.service.ServiceContext;
-import com.myblog.service.base.annotation.service.ServiceContextAware;
+import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.base.common.Response;
 
 import java.util.Set;
@@ -17,13 +16,13 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-24
  */
-public interface LinkService extends IService<Link>, ServiceContextAware {
+public interface LinkService extends IService<Link>, ServiceConvertHandler<Link, LinkDto> {
 
     Response getLinkByPage(LinkDto linkDto) throws Exception;
 
-    Response addLink(LinkDto linkDto);
+    Response addLink(LinkDto linkDto) throws Exception;
 
-    Response editLink(LinkDto linkDto);
+    Response editLink(LinkDto linkDto) throws Exception;
 
-    Response delLink(Set<String> ids);
+    Response delLink(Set<String> ids) throws Exception;
 }

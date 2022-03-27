@@ -19,6 +19,7 @@ public class ThreadSafeDateFormat {
     public static final String DATETIME_MILL_PURE = "yyyyMMddHHmmssSSS";
     public static final String DATE = "yyyy-MM-dd";
     public static final String DATE_PURE = "yyyyMMdd";
+    public static final String DATE_PURE_SPLIT = "yyyy/MM/dd";
     public static final String TIME = "HH:mm:ss";
     public static final String TIME_PURE = "HHmmss";
     public static final String TIME_MILL_PURE = "HHmmssSSS";

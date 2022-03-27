@@ -1,8 +1,6 @@
 package com.myblog.service.security.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
@@ -25,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -66,7 +63,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         Response response = Response.ok();
         if (Objects.nonNull(roleDto.getSearchAll()) && roleDto.getSearchAll()) {
             QueryWrapper<Role> allQueryWrapper = new QueryWrapper<>();
-            return response.data(Constants.ReplyField.DATA, toDto(baseMapper.selectList(allQueryWrapper)));
+            return response.data(Constants.ReplyField.DATA, this.toDtoList(baseMapper.selectList(allQueryWrapper), RoleDto.class));
         }
         int page = 1;
         int size = 10;
@@ -86,7 +83,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         }
         baseMapper.selectPage(rolePage, queryWrapper);
         // 获取角色菜单信息
-        List<RoleDto> roleDtos = toDto(rolePage.getRecords());
+        List<RoleDto> roleDtos = this.toDtoList(rolePage.getRecords(), RoleDto.class);
         for (RoleDto dto : roleDtos) {
             List<MenuDto> menuDtos = baseMapper.selectRoleMenu(dto.getId());
             dto.setMenus(menuDtos);
@@ -105,7 +102,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
-    public Response addRole(RoleDto roleDto) {
+    public Response addRole(RoleDto roleDto) throws Exception{
         // 校验管理员是否已经存在
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Role.ROLE_NAME, roleDto.getRoleName());
@@ -114,7 +111,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             LOGGER.error("addRole failed, role already exist in db, role:{}", roleDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        Role role = toRole(roleDto);
+        Role role = this.toDb(roleDto, Role.class);
         if (baseMapper.insert(role) < 1) {
             LOGGER.error("addRole failed by unknown error, role:{}", role);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
@@ -163,22 +160,13 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
-    public Response editRole(RoleDto roleDto) {
-        Role role = toRole(roleDto);
+    public Response editRole(RoleDto roleDto) throws Exception{
+        Role role = this.toDb(roleDto, Role.class);
         if (baseMapper.updateById(role) < 1) {
             LOGGER.error("editRole failed by unknown error, role:{}", roleDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();
-    }
-
-    private Role toRole(RoleDto roleDto) {
-        Role role = new Role();
-        BeanUtil.copyProperties(roleDto, role);
-        if (StringUtils.isNotBlank(roleDto.getId())) {
-            role.setId(roleDto.getId());
-        }
-        return role;
     }
 
     /**
@@ -187,7 +175,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
-    public Response updateMenu(RoleDto roleDto) {
+    public Response updateMenu(RoleDto roleDto) throws Exception{
         // 先删掉该角色绑定的所有菜单的信息
         baseMapper.deleteRoleMenuByRoleId(roleDto.getId());
 
@@ -212,11 +200,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
-    public Response getRoleById(Role role) {
-        RoleDto roleDto = new RoleDto();
-        BeanUtil.copyProperties(role, roleDto);
-        roleDto.setId(role.getId());
-        roleDto.setCreateTime(role.getCreateTime());
+    public Response getRoleById(Role role) throws Exception{
+        RoleDto roleDto = this.toDto(role, RoleDto.class);
         roleDto.setMenus(baseMapper.selectRoleMenu(roleDto.getId()));
         return Response.ok().data(Constants.ReplyField.DATA, roleDto);
     }
@@ -226,18 +211,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         roleMenu.setMenuId(menuId);
         roleMenu.setRoleId(roleId);
         return roleMenu;
-    }
-
-    private List<RoleDto> toDto(List<Role> roleList) {
-        List<RoleDto> roleDtos = new ArrayList<>();
-        for (Role role : roleList) {
-            RoleDto roleDto = new RoleDto();
-            BeanUtil.copyProperties(role, roleDto);
-            roleDto.setId(role.getId());
-            roleDto.setCreateTime(role.getCreateTime());
-            roleDtos.add(roleDto);
-        }
-        return roleDtos;
     }
 
 }

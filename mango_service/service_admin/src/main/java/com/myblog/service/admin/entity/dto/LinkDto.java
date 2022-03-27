@@ -14,10 +14,6 @@ public class LinkDto extends BaseDto {
 
     private Integer linkStatus;
 
-    private String userId;
-
-    private String adminId;
-
     private String fileId;
 
     private String blurry;

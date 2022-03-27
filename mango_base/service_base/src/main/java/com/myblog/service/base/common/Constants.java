@@ -2,14 +2,11 @@ package com.myblog.service.base.common;
 
 public interface Constants {
 
-    interface Status {
-        int ACTIVATED = 1;
-        int FREEZED = 0;
-    }
-
     interface Symbol {
         String COMMA1 = ",";
         String COMMA2 = "-";
+        String COMMA3 = ".";
+        String COMMA4 = "/";
     }
 
     interface ReplyField {
@@ -29,5 +26,6 @@ public interface Constants {
         String PAGE = "page";
         String SIZE = "size";
         String TOTAL = "total";
+        String URL = "url";
     }
 }

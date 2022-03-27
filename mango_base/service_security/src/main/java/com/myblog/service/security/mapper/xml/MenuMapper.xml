@@ -66,6 +66,6 @@
         <foreach collection="roles" item="role" separator="," open="(" close=")">
             #{role.id}
         </foreach>
-        ORDER BY t1.sort ASC
+        ORDER BY t1.sort DESC
     </select>
 </mapper>

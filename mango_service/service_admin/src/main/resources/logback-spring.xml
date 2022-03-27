@@ -109,22 +109,12 @@
         </rollingPolicy>
     </appender>
 
-    <!--开发环境-->
-    <springProfile name="dev">
-        <!--可以灵活设置此处，从而控制日志的输出，和上面的级别相比，哪个高就用哪个-->
-        <root level="DEBUG">
-            <appender-ref ref="CONSOLE" />
-            <appender-ref ref="INFO_FILE" />
-            <appender-ref ref="WARN_FILE" />
-            <appender-ref ref="ERROR_FILE" />
-        </root>
-    </springProfile>
-
-    <!--生产环境-->
-    <springProfile name="pro">
-        <root level="ERROR">
-            <appender-ref ref="ERROR_FILE" />
-        </root>
-    </springProfile>
+    <!--可以灵活设置此处，从而控制日志的输出，和上面的级别相比，哪个高就用哪个-->
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="INFO_FILE" />
+        <appender-ref ref="WARN_FILE" />
+        <appender-ref ref="ERROR_FILE" />
+    </root>
 
 </configuration>
