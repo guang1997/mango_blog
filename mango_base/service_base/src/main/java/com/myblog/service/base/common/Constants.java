@@ -27,5 +27,15 @@ public interface Constants {
         String SIZE = "size";
         String TOTAL = "total";
         String URL = "url";
+        String SYS = "sys";
+        String CPU = "cpu";
+        String MEMORY = "memory";
+        String SWAP = "swap";
+        String DISK = "disk";
+        String TIME = "time";
+    }
+
+    interface SystemConstant {
+        String WIN = "win";
     }
 }
