@@ -281,15 +281,15 @@ export default {
     this.webSocketInit();
   },
   created() {
-    this.init()
+    this.init();
   },
   destroyed() {
     if (this.monitor) {
       clearInterval(this.monitor);
     }
     if (this.socket) {
-      this.socket.close()
-      this.$router.go(0)
+      this.socket.onclose();
+      this.$router.go(0);
     }
   },
   methods: {
@@ -297,7 +297,6 @@ export default {
       if (typeof WebSocket === "undefined") {
         // 如果不支持websocket那么直接定时查询
         this.init();
-        debugger
         this.monitor = window.setInterval(() => {
           setTimeout(() => {
             this.init();
@@ -312,6 +311,7 @@ export default {
         this.socket.onerror = this.error;
         // 监听socket消息
         this.socket.onmessage = this.getMessage;
+        this.socket.onclose = this.close;
       }
     },
     init() {
@@ -333,31 +333,28 @@ export default {
       });
     },
     open() {
-       console.log("socket已经连接");
+      console.log("socket已经连接");
     },
-    error () {
-      
-    },
-    getMessage (msg) {
+    error() {},
+    getMessage(msg) {
       // var jsonObj = JSON.parse(msg);
       var jsonObj = JSON.parse(msg.data);
-        this.data = jsonObj.data;
-        this.show = true;
-        if (this.cpuInfo.xAxis.data.length >= 8) {
-          this.cpuInfo.xAxis.data.shift();
-          this.memoryInfo.xAxis.data.shift();
-          this.cpuInfo.series[0].data.shift();
-          this.memoryInfo.series[0].data.shift();
-        }
-        this.cpuInfo.xAxis.data.push(jsonObj.data.time);
-        this.memoryInfo.xAxis.data.push(jsonObj.data.time);
-        this.cpuInfo.series[0].data.push(parseFloat(jsonObj.data.cpu.used));
-        this.memoryInfo.series[0].data.push(
-          parseFloat(jsonObj.data.memory.usageRate)
-        );
+      this.data = jsonObj.data;
+      this.show = true;
+      if (this.cpuInfo.xAxis.data.length >= 8) {
+        this.cpuInfo.xAxis.data.shift();
+        this.memoryInfo.xAxis.data.shift();
+        this.cpuInfo.series[0].data.shift();
+        this.memoryInfo.series[0].data.shift();
+      }
+      this.cpuInfo.xAxis.data.push(jsonObj.data.time);
+      this.memoryInfo.xAxis.data.push(jsonObj.data.time);
+      this.cpuInfo.series[0].data.push(parseFloat(jsonObj.data.cpu.used));
+      this.memoryInfo.series[0].data.push(
+        parseFloat(jsonObj.data.memory.usageRate)
+      );
     },
-    send: function () {
-    },
+    send: function () {},
     close: function () {
       console.log("socket已经关闭");
     },

@@ -23,7 +23,7 @@
       append-to-body
       :close-on-click-modal="false"
       :before-close="crud.cancelCU"
-      :visible.sync="crud.status.cu > 0"
+      :visible="crud.status.cu > 0"
       :title="crud.status.title"
       width="520px"
     >
@@ -187,11 +187,6 @@ export default {
   data() {
     return {
       defaultProps: { children: "children", label: "label", isLeaf: "leaf" },
-      dateScopes: [
-        { code: 0, name: "全部" },
-        { code: 1, name: "自定义" },
-      ],
-      level: 3,
       currentId: 0,
       menuLoading: false,
       showButton: false,

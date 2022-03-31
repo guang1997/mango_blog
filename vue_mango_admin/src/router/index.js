@@ -36,7 +36,7 @@ export const constantRoutes = [
   {
     path: '/login',
     meta: { title: '登录', noCache: true },
-    component: (resolve) => require(['@/views/login/index'], resolve),
+    component: () => require(['@/views/login/index']),
     hidden: true
   },
   {
@@ -47,7 +47,7 @@ export const constantRoutes = [
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
-      component: (resolve) => require(['@/views/dashboard/index'], resolve),
+      component: () => require(['@/views/dashboard/index']),
       meta: {
         title: '首页',
         icon: 'dashboard',
@@ -60,12 +60,12 @@ export const constantRoutes = [
   // 404 page must be placed at the end !!!
   {
     path: '/401',
-    component: (resolve) => require(['@/views/error-page/401'], resolve),
+    component: () => require(['@/views/error-page/401']),
     hidden: true
   },
   {
     path: '/404',
-    component: (resolve) => require(['@/views/error-page/404']. resolve),
+    component: () => require(['@/views/error-page/404']),
     hidden: true
   }
 
