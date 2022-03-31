@@ -79,6 +79,12 @@
                 <artifactId>spring-boot-starter-security</artifactId>
                 <version>${springboot.version}</version>
             </dependency>
+            <!-- websocket -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-websocket</artifactId>
+                <version>${springboot.version}</version>
+            </dependency>
 
             <!--Spring Cloud-->
             <dependency>
