@@ -19,7 +19,7 @@
       <crudOperation :permission="permission" />
     </div>
           <!--表单渲染-->
-        <el-dialog append-to-body :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="crud.status.title" width="580px">
+        <el-dialog append-to-body :close-on-click-modal="false" :before-close="crud.cancelCU" :visible="crud.status.cu > 0" :title="crud.status.title" width="580px">
           <el-form ref="form" :inline="true" :model="form" size="small" label-width="80px" :rules="rules">
             <el-form-item
               label="标签名称"

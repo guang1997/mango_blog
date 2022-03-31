@@ -86,6 +86,13 @@
                 <version>${springboot.version}</version>
             </dependency>
 
+            <!-- 引入druid数据源 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>1.1.17</version>
+            </dependency>
+
             <!--Spring Cloud-->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
