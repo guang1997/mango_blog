@@ -1,9 +1,10 @@
 package com.myblog.service.admin.config.websocket;
 
 import com.myblog.service.admin.service.MonitorService;
-import com.myblog.service.admin.service.WebScoketServer;
 import com.myblog.service.base.util.JsonUtils;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,22 +15,24 @@ import java.io.IOException;
 @Component
 public class MonitorJob {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(MonitorJob.class);
+
     @Autowired
     private MonitorService monitorService;
 
     @Autowired
     private WebScoketServer webScoketServer;
 
-    @Scheduled(cron = "0/5 * * * * ?")
-    public void test() {
+    @Scheduled(cron = "0/3 * * * * ?")
+    public void sendMonitorMessage() {
         try {
-            System.out.println(webScoketServer.getOnlineCount());
             if (webScoketServer.getOnlineCount() > 0) {
-                System.out.println("sendMessage");
-                webScoketServer.sendMessage(JsonUtils.objectToJson(monitorService.getServers()));
+                String response = JsonUtils.objectToJson(monitorService.getServers());
+                webScoketServer.sendMessage(response);
+                LOGGER.trace("send monitor message to web success, response:{}", response);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error("send monitor message to web failed, exception:", e);
         }
     }
 }
