@@ -187,11 +187,6 @@ export default {
   data() {
     return {
       defaultProps: { children: "children", label: "label", isLeaf: "leaf" },
-      dateScopes: [
-        { code: 0, name: "全部" },
-        { code: 1, name: "自定义" },
-      ],
-      level: 3,
       currentId: 0,
       menuLoading: false,
       showButton: false,

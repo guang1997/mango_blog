@@ -2,7 +2,6 @@ package com.myblog.service.admin.config.websocket;
 
 import com.myblog.service.admin.controller.AdminController;
 import com.myblog.service.admin.service.MonitorService;
-import com.myblog.service.admin.service.WebScoketServer;
 import com.myblog.service.base.util.JsonUtils;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import java.io.IOException;
 @Component
 public class MonitorJob {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(MonitorJob.class);
 
     @Autowired
     private MonitorService monitorService;
