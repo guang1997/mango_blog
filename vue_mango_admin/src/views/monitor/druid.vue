@@ -9,7 +9,7 @@
   export default {
     data() {
       return {
-        druidAdminUrl: "http://localhost:10001/druid",
+        druidAdminUrl: process.env.VUE_APP_DRUID_ADMIN
       }
     },
     mounted() {

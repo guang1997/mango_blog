@@ -203,7 +203,7 @@ export default {
       monitor: null,
       socket: "",
       data: {},
-      path: "ws:/localhost:10001/admin/websocket",
+      path: process.env.VUE_APP_MONITOR_WEBSOCKET_URL,
       cpuInfo: {
         tooltip: {
           trigger: "axis",

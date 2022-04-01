@@ -44,11 +44,12 @@
         <apache.xmlbeans.version>3.1.0</apache.xmlbeans.version>
         <springboot.version>2.2.1.RELEASE</springboot.version>
         <quartz.version>2.3.0</quartz.version>
-        <druid.version>1.1.21</druid.version>
+        <druid.version>1.1.17</druid.version>
         <reflectasm.version>1.11.9</reflectasm.version>
         <oshi.version>5.7.1</oshi.version>
         <jna.version>5.8.0</jna.version>
         <hutool.version>5.3.4</hutool.version>
+        <log4j.version>1.2.17</log4j.version>
     </properties>
 
     <dependencyManagement>
@@ -90,9 +91,13 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
-                <version>1.1.17</version>
+                <version>${druid.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
             <!--Spring Cloud-->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -225,11 +230,11 @@
                 <version>${gson.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>commons-dbutils</groupId>
-                <artifactId>commons-dbutils</artifactId>
-                <version>${commons-dbutils.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>commons-dbutils</groupId>-->
+<!--                <artifactId>commons-dbutils</artifactId>-->
+<!--                <version>${commons-dbutils.version}</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>com.alibaba</groupId>
