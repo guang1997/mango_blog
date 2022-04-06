@@ -17,11 +17,13 @@ public interface DbConstants {
         String USERNAME = "username";
         String PASSWORD = "password";
         String EMAIL = "email";
-        String MOBILE = "mobile";
+        String PHONE = "phone";
         String ENABLED = "enabled";
         String NICKNAME = "nickname";
         String GENDER = "gender";
         String LAST_LOGIN_TIME = "last_login_time";
+        String QQ_NUMBER = "qq_number";
+        String WE_CHAT = "we_chat";
     }
 
     interface Menu{

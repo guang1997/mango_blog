@@ -192,6 +192,7 @@ import ECharts from "vue-echarts";
 import "echarts/lib/chart/line";
 import "echarts/lib/component/polar";
 import { getServers } from "@/api/monitor/monitor";
+  import { mapGetters } from 'vuex';
 export default {
   name: "ServerMonitor",
   components: {
@@ -203,7 +204,7 @@ export default {
       monitor: null,
       socket: "",
       data: {},
-      path: process.env.VUE_APP_MONITOR_WEBSOCKET_URL,
+      path: null,
       cpuInfo: {
         tooltip: {
           trigger: "axis",
@@ -276,11 +277,17 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapGetters([
+      'monitorWebsocketApi'
+    ])
+  },
   mounted() {
     // 初始化
     this.webSocketInit();
   },
   created() {
+    this.path = this.monitorWebsocketApi
     this.init();
   },
   destroyed() {

@@ -9,6 +9,7 @@ import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.BaseUtil;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
+import com.myblog.service.security.config.util.SecurityUtils;
 import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.entity.RoleAdmin;
 import com.myblog.service.security.entity.RoleMenu;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -102,6 +104,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Response addRole(RoleDto roleDto) throws Exception{
         // 校验管理员是否已经存在
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
@@ -125,11 +128,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Response delRole(Set<String> ids) {
         // 如果角色已经绑定了用户，那么不删除该角色
         List<String> delFailedRoleNames = new ArrayList<>();
         List<String> delSuccessedRoleIds = new ArrayList<>();
         for (String id : ids) {
+            Role deleteRole = baseMapper.selectById(id);
+            validRoleLevel(deleteRole.getLevel(), deleteRole.getRoleName());
             List<String> adminIdsByRoleId = baseMapper.getAdminIdsByRoleId(id);
             if (!CollectionUtils.isEmpty(adminIdsByRoleId)) {
                 Role role = baseMapper.selectById(id);
@@ -160,7 +166,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Response editRole(RoleDto roleDto) throws Exception{
+        Role dbRole = baseMapper.selectById(roleDto.getId());
+        validRoleLevel(dbRole.getLevel(), dbRole.getRoleName());
         Role role = this.toDb(roleDto, Role.class);
         if (baseMapper.updateById(role) < 1) {
             LOGGER.error("editRole failed by unknown error, role:{}", roleDto);
@@ -175,7 +184,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Response updateMenu(RoleDto roleDto) throws Exception{
+        Role dbRole = baseMapper.selectById(roleDto.getId());
+        validRoleLevel(dbRole.getLevel(), dbRole.getRoleName());
         // 先删掉该角色绑定的所有菜单的信息
         baseMapper.deleteRoleMenuByRoleId(roleDto.getId());
 
@@ -213,4 +225,36 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         return roleMenu;
     }
 
+    /**
+     * 校验角色级别是否大于被操作角色的级别，数字越小，角色权限越大
+     * @param level
+     * @return
+     */
+    private void validRoleLevel(Integer level, String roleName) {
+        if (level == null) {
+            throw new RuntimeException("找不到被操作角色的级别");
+        }
+        List<Role> roles = baseMapper.getRolesByUserId(SecurityUtils.getCurrentUserId());
+        if (CollectionUtils.isEmpty(roles)) {
+            throw new RuntimeException("当前用户未绑定角色");
+        }
+        Set<String> roleNames = roles.stream().map(Role::getRoleName).collect(Collectors.toSet());
+        // 如果所绑定的角色与被操作的角色名称相同，那么可以对其进行操作
+        if (roleNames.contains(roleName)) {
+            return;
+        }
+        int currentLevel = roles.stream().mapToInt(Role::getLevel).min().getAsInt();
+        if (currentLevel > level) {
+            throw new RuntimeException("权限不足，你的角色级别：" + currentLevel + "，低于操作的角色级别：" + level);
+        }
+    }
+
+    public void validRoleLevelByUserId(String userId) {
+        List<Role> roles = baseMapper.getRolesByUserId(userId);
+        Role role = roles.stream().min(Comparator.comparingInt(Role::getLevel)).orElse(null);
+        if (Objects.isNull(role)) {
+            throw new RuntimeException("当前用户未绑定角色");
+        }
+        validRoleLevel(role.getLevel(), role.getRoleName());
+    }
 }

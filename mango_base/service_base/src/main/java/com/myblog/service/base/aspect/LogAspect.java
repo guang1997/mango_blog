@@ -1,5 +1,6 @@
 package com.myblog.service.base.aspect;
 
+import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.JsonUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -54,7 +55,7 @@ public class LogAspect {
             classLogger.info("method:{} invoke success, cost:{}, response:{}", methodName, (System.currentTimeMillis() - start), response);
         } catch (Exception e) {
             classLogger.error("method:" + methodName + " invoke failed, exception:", e);
-            throw e;
+            return Response.error().message(e.getMessage());
         }
         return response;
     }

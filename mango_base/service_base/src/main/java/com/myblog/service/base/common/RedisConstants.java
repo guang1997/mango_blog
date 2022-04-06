@@ -9,4 +9,6 @@ public interface RedisConstants {
     String DIVISION = ":";
 
     String REDIS_DICT_TYPE = "REDIS_DICT_TYPE";
+
+    String EMAIL_CODE = "EMAIL_CODE";
 }

@@ -24,6 +24,11 @@
            <!-- <el-dropdown-item>
               <span style="display:block;" @click="aboutMe">关于我</span>
             </el-dropdown-item> -->
+            <router-link to="/user/center">
+            <el-dropdown-item>
+              个人中心
+            </el-dropdown-item>
+          </router-link>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">退出登录</span>
           </el-dropdown-item>

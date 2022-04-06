@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Map;
 
+/**
+ * 阿里云OSS配置类
+ *
+ * @author 李斯特
+ * 2022年4月4日
+ */
 @Component
 @ConfigurationProperties(prefix="aliyun.oss")
 @Data

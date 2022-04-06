@@ -14,6 +14,12 @@ import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 配置websocket
+ *
+ * @author 李斯特
+ * 2022年4月4日
+ */
 @Data
 @Component
 @ServerEndpoint("/admin/websocket")

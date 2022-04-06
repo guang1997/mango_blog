@@ -21,5 +21,7 @@ public class RoleDto extends BaseDto {
      */
     private String blurry;
 
+    private Integer level;
+
     private List<String> createTimes;
 }

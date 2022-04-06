@@ -12,6 +12,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * 服务监控页面定时任务
+ *
+ * @author 李斯特
+ * 2022年4月4日
+ */
 @Data
 @Component
 public class MonitorJob {
@@ -27,6 +33,7 @@ public class MonitorJob {
     @Scheduled(cron = "0/3 * * * * ?")
     public void test() {
         try {
+            // 如果有用户打开了服务监控页面，那么使用websocket往所有连接到websocket的页面发送消息
             if (webScoketServer.getOnlineCount() > 0) {
                 String response = JsonUtils.objectToJson(monitorService.getServers());
                 webScoketServer.sendMessage(response);

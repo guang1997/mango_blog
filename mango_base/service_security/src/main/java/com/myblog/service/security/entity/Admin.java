@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 /**
@@ -24,6 +25,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("t_admin")
+@ToString(exclude = "password")
 @ApiModel(value="Admin对象", description="管理员表")
 public class Admin extends BaseEntity {
 
@@ -45,7 +47,7 @@ public class Admin extends BaseEntity {
     private String email;
 
     @ApiModelProperty(value = "手机")
-    private String mobile;
+    private String phone;
 
     @ApiModelProperty(value = "登录次数")
     private Integer loginCount;

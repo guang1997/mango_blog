@@ -122,6 +122,7 @@ public class LoginController {
             // 登录成功之后更新数据库信息
             admin.setLastLoginIp(IpUtils.getIpAddr(request));
             admin.setLastLoginTime(new Date());
+            admin.setLoginCount(admin.getLoginCount() + 1);
             adminService.updateById(admin);
             // 将token返回到页面
             response.data(Constants.ReplyField.TOKEN, token);
@@ -146,8 +147,13 @@ public class LoginController {
         try {
             String token = request.getHeader(Constants.ReplyField.HEADER);
             AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
-            if (authUser == null) {
+            if (Objects.isNull(authUser)) {
                 LOGGER.error("getAdminInfo Error, authUser:{}", authUser);
+                return response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
+            }
+            Admin admin = adminService.getById(authUser.getId());
+            if (Objects.isNull(admin)) {
+                LOGGER.error("getAdminInfo Error, admin is null, authUser:{}", authUser);
                 return response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
             }
             Collection<? extends GrantedAuthority> authorities = authUser.getAuthorities();
@@ -158,9 +164,15 @@ public class LoginController {
 
             response.data(Constants.ReplyField.ROLES, roles)
                     .data(Constants.ReplyField.TOKEN, token)
-                    .data(Constants.ReplyField.USER_NAME, authUser.getUsername())
+                    .data(Constants.ReplyField.USERNAME, admin.getUsername())
+                    .data(Constants.ReplyField.NICKNAME, admin.getNickname())
+                    .data(Constants.ReplyField.PHONE, admin.getPhone())
+                    .data(Constants.ReplyField.EMAIL, admin.getEmail())
+                    .data(Constants.ReplyField.GENDER, admin.getGender())
+                    .data(Constants.ReplyField.QQ_NUMBER, admin.getQqNumber())
+                    .data(Constants.ReplyField.WE_CHAT, admin.getWeChat())
                     .data(Constants.ReplyField.ID, authUser.getId())
-                    .data(Constants.ReplyField.AVATAR, authUser.getAvatar());
+                    .data(Constants.ReplyField.AVATAR, admin.getAvatar());
         } catch (Exception e) {
             response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
             throw e;

@@ -23,7 +23,7 @@ public class AdminDto extends BaseDto {
 
     private String email;
 
-    private String mobile;
+    private String phone;
 
     private Integer loginCount;
 

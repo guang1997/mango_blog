@@ -79,16 +79,19 @@
             </el-form-item>
 
             <el-form-item label="头像">
-                <el-upload
-                          :show-file-list="false"
-                          :on-change="handleChange"
-                          class="avatar-uploader"
-                          action="/admin/oss/upload?modelName=avatar"
-                          :auto-upload="false"
-                          accept="image/png,image/gif,image/jpg,image/jpeg">
-                    <img v-if="form.avatar" :src="form.avatar">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"/>
-                </el-upload>
+                 <div style="text-align: center">
+                    <div class="el-upload">
+                      <img :src="userAvatar ? userAvatar : Avatar" title="点击上传头像" class="avatar" @click="toggleShow" style="margin-top:20px">
+                      <myUpload
+                        :modelValue.sync="show"
+                        field="file"
+                        :headers="headers"
+                        :url="imagesUploadApi"
+                        :params="{moduleName:'avatar'}"
+                        @crop-upload-success="cropUploadSuccess"
+                      />
+                    </div>
+                  </div>
             </el-form-item>
           </el-form>
       <div slot="footer" class="dialog-footer">
@@ -198,8 +201,11 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import DateRangePicker from "@/components/DateRangePicker";
 import { mapGetters } from 'vuex'
+import myUpload from 'vue-image-crop-upload'
+import { getToken } from '@/utils/auth'
+import Avatar from '@/assets/images/avatar.png'
 let userRoles = []
-const defaultForm = { id: null, name: null, summary: null };
+const defaultForm = { id: null, username: null, nickname: null, gender: '男', email: null, enabled: 'false', roles: [], phone: null, avatar: null, qqNumber:null, weChat:null }
 export default {
   name: "Admin",
   components: {
@@ -209,6 +215,7 @@ export default {
     rrOperation,
     udOperation,
     DateRangePicker,
+    myUpload
   },
   cruds() {
     return CRUD({
@@ -220,7 +227,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'user'
+      'user',
+      'imagesUploadApi'
     ])
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
@@ -264,7 +272,13 @@ export default {
         phone: [
           { required: true, trigger: 'blur', validator: validPhone }
         ]
-      }
+      },
+      show: false,
+       headers: {
+        'Authorization': getToken()
+      },
+      Avatar: Avatar,
+      userAvatar: null,
     };
   },
   methods: {
@@ -374,6 +388,12 @@ export default {
         data.enabled = !data.enabled
       })
     },
+     toggleShow() {
+      this.show = !this.show
+    },
+    cropUploadSuccess(jsonData, field) {
+      crud.form.avatar = jsonData.data.url
+    },
   },
 };
 </script>
@@ -397,26 +417,9 @@ export default {
   border: 0;
   padding: 0;
 }
-.avatar-uploader .avatar-uploader-icon {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;  
-      
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
-  }
-  .avatar-uploader .avatar-uploader-icon:hover {
-    border-color: #409EFF;
-  }    
-  .avatar-uploader img {
-    width: 178px;
-    height: 178px;
-    display: block;
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
   }
 </style>

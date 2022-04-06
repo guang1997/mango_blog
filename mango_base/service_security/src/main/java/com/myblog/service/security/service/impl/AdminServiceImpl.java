@@ -2,15 +2,13 @@ package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.myblog.service.base.common.Constants;
-import com.myblog.service.base.common.DbConstants;
-import com.myblog.service.base.common.RedisConstants;
-import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.*;
 import com.myblog.service.base.util.*;
 import com.myblog.service.security.entity.Admin;
 import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.entity.dto.AdminDto;
 import com.myblog.service.security.entity.dto.LoginDto;
+import com.myblog.service.security.entity.dto.PassAndEmailDto;
 import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.mapper.AdminMapper;
 import com.myblog.service.security.mapper.RoleMapper;
@@ -47,6 +45,9 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Autowired
     private RedisUtil redisUtil;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public Admin checkLogin(LoginDto loginDto) throws Exception{
         String username = loginDto.getUsername();
@@ -62,7 +63,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         if (isEmail) {
             adminWrapper.eq(DbConstants.Admin.EMAIL, username);
         } else if (isMobile) {
-            adminWrapper.eq(DbConstants.Admin.MOBILE, username);
+            adminWrapper.eq(DbConstants.Admin.PHONE, username);
         } else {
             adminWrapper.eq(DbConstants.Admin.USERNAME, username);
         }
@@ -73,8 +74,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             return null;
         }
         // 对密码进行动态加盐处理
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
-        boolean matchPassword = encoder.matches(password, admin.getPassword());
+        boolean matchPassword = passwordEncoder.matches(password, admin.getPassword());
         if (!matchPassword) {
             LOGGER.error("admin login failed, password is error");
             return null;
@@ -137,6 +137,12 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         return Response.ok();
     }
 
+    /**
+     * 删除管理员
+     * @param ids
+     * @return
+     * @throws Exception
+     */
     @Override
     public Response delAdmin(Set<String> ids) throws Exception{
         for (String id : ids) {
@@ -144,6 +150,44 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             // 清理缓存信息
             redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
             baseMapper.deleteById(id);
+        }
+        return Response.ok();
+    }
+
+    /**
+     * 从个人中心页面更改管理员信息
+     * @param adminDto
+     * @return
+     */
+    @Override
+    public Response editAdminFromCenter(AdminDto adminDto) throws InstantiationException, IllegalAccessException {
+        Admin admin = baseMapper.selectById(adminDto.getId());
+
+        QueryWrapper<Admin> phoneQueryWrapper = new QueryWrapper<>();
+        phoneQueryWrapper.eq(DbConstants.Admin.PHONE, adminDto.getPhone());
+        Admin adminByPhone = baseMapper.selectOne(phoneQueryWrapper);
+        if (Objects.nonNull(adminByPhone) && !Objects.equals(admin.getId(), adminByPhone.getId())) {
+            LOGGER.error("editAdminFromCenter failed, phone is already exist, admin:{}", adminDto);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED_BY_PHONE_EXIST);
+        }
+
+        QueryWrapper<Admin> qqNumberQueryWrapper = new QueryWrapper<>();
+        qqNumberQueryWrapper.eq(DbConstants.Admin.QQ_NUMBER, adminDto.getQqNumber());
+        Admin adminByQQNumber = baseMapper.selectOne(qqNumberQueryWrapper);
+        if (Objects.nonNull(adminByQQNumber) && !Objects.equals(admin.getId(), adminByQQNumber.getId())) {
+            LOGGER.error("editAdminFromCenter failed, qqNumber is already exist, admin:{}", adminDto);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED_BY_QQ_NUMBER_EXIST);
+        }
+        QueryWrapper<Admin> weChatQueryWrapper = new QueryWrapper<>();
+        weChatQueryWrapper.eq(DbConstants.Admin.WE_CHAT, adminDto.getWeChat());
+        Admin adminByWeChat = baseMapper.selectOne(weChatQueryWrapper);
+        if (Objects.nonNull(adminByWeChat) && !Objects.equals(admin.getId(), adminByWeChat.getId())) {
+            LOGGER.error("editAdminFromCenter failed, weChat is already exist, admin:{}", adminDto);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED_BY_WE_CHAT_EXIST);
+        }
+        if (baseMapper.updateById(this.toDb(adminDto, Admin.class)) < 1) {
+            LOGGER.error("editAdminFromCenter failed by unknown error, admin:{}", adminDto);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();
     }

@@ -56,7 +56,20 @@ export const constantRoutes = [
       }
     }]
   },
-
+  {
+    path: '/user',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: 'center',
+        component: (resolve) => require(['@/views/authority/center'], resolve),
+        name: '个人中心',
+        meta: { title: '个人中心' }
+      }
+    ]
+  },
   // 404 page must be placed at the end !!!
   {
     path: '/401',

@@ -48,7 +48,7 @@ public class CheckUtils {
         }
         boolean isMobile = false;
         try {
-            Pattern pattern = Pattern.compile(CHECK_EMAIL_REGEX);
+            Pattern pattern = Pattern.compile(CHECK_MOBILE_REGEX);
             Matcher matcher = pattern.matcher(mobile);
             isMobile = matcher.matches();
         } catch (Exception e) {

@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名',
   `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '密码',
   `gender` varchar(1) DEFAULT NULL COMMENT '性别(1:男2:女)',
-  `avatar` varchar(100) DEFAULT NULL COMMENT '个人头像',
+  `avatar` varchar(225) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '个人头像',
   `email` varchar(60) DEFAULT NULL COMMENT '邮箱',
-  `mobile` varchar(11) DEFAULT NULL COMMENT '手机',
+  `phone` varchar(11) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '手机',
   `login_count` int unsigned DEFAULT '0' COMMENT '登录次数',
   `last_login_time` datetime DEFAULT NULL COMMENT '最后登录时间',
   `last_login_ip` varchar(50) DEFAULT '127.0.0.1' COMMENT '最后登录IP',
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
 -- 正在导出表  mango_blog.t_admin 的数据：~2 rows (大约)
 DELETE FROM `t_admin`;
 /*!40000 ALTER TABLE `t_admin` DISABLE KEYS */;
-INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `mobile`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `enabled`, `is_deleted`) VALUES
-	('1295268474480156673', 'admin', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18761616251', 1, '2022-03-31 23:34:49', '192.168.1.7', '2021-09-26 16:56:46', '2022-03-31 23:34:49', '李斯特', '72174823', '18761616251', 1, 0),
-	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 0, '2021-12-02 22:01:18', '127.0.0.1', '2021-12-02 22:01:22', '2021-12-02 22:01:23', '游客', '111111', '111111', 1, 0);
+INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `phone`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `enabled`, `is_deleted`) VALUES
+	('1295268474480156673', 'admin', '$2a$10$ZYi1kqMMQczWDw86u76uPu79CneIE1G0h4dw89a4tjZhrQCWa8QaW', '1', 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', 'guang1997qqq@163.com', '18761616251', 3, '2022-04-06 22:44:43', '192.168.1.7', '2021-09-26 16:56:46', '2022-04-06 22:44:43', '李斯特', '872174823', '18761616251', 1, 0),
+	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', '1', 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 1, '2022-04-06 22:37:27', '192.168.1.7', '2021-12-02 22:01:22', '2022-04-06 22:37:27', '游客', '111111', '111111', 1, 0);
 /*!40000 ALTER TABLE `t_admin` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_blog 结构
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `t_dict_detail` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典详细数据表';
 
--- 正在导出表  mango_blog.t_dict_detail 的数据：~15 rows (大约)
+-- 正在导出表  mango_blog.t_dict_detail 的数据：~13 rows (大约)
 DELETE FROM `t_dict_detail`;
 /*!40000 ALTER TABLE `t_dict_detail` DISABLE KEYS */;
 INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_class`, `list_class`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
@@ -178,6 +178,27 @@ INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_c
 	('1507914027598393346', '1507913784651722753', '已上线', '1', NULL, 'success', '友链状态 已上线', 0, '2022-03-27 10:54:55', '2022-03-27 10:54:55', 2),
 	('1507914160700436482', '1507913784651722753', '已下架', '2', NULL, 'danger', '友链状态 已下架', 0, '2022-03-27 10:55:26', '2022-03-27 10:55:26', 3);
 /*!40000 ALTER TABLE `t_dict_detail` ENABLE KEYS */;
+
+-- 导出  表 mango_blog.t_email_config 结构
+CREATE TABLE IF NOT EXISTS `t_email_config` (
+  `id` varchar(19) NOT NULL COMMENT 'ID',
+  `from_user` varchar(255) DEFAULT NULL COMMENT '发件人',
+  `host` varchar(255) DEFAULT NULL COMMENT '邮件服务器SMTP地址',
+  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '密码',
+  `port` int DEFAULT NULL COMMENT '端口',
+  `user` varchar(255) DEFAULT NULL COMMENT '发件者用户名',
+  `subject` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '邮件主题',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=COMPACT COMMENT='邮箱配置';
+
+-- 正在导出表  mango_blog.t_email_config 的数据：~0 rows (大约)
+DELETE FROM `t_email_config`;
+/*!40000 ALTER TABLE `t_email_config` DISABLE KEYS */;
+INSERT INTO `t_email_config` (`id`, `from_user`, `host`, `password`, `port`, `user`, `subject`, `create_time`, `update_time`) VALUES
+	('1595268474480156679', 'mango_blog@163.com', 'smtp.163.com', 'WVNMVElMUk9OVlJDSlNOTw==', 25, 'mango_blog', 'MANGO_BLOG后台管理系统', NULL, NULL);
+/*!40000 ALTER TABLE `t_email_config` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_exception_log 结构
 CREATE TABLE IF NOT EXISTS `t_exception_log` (
@@ -213,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `t_link` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='友情链接表';
 
--- 正在导出表  mango_blog.t_link 的数据：~1 rows (大约)
+-- 正在导出表  mango_blog.t_link 的数据：~2 rows (大约)
 DELETE FROM `t_link`;
 /*!40000 ALTER TABLE `t_link` DISABLE KEYS */;
 INSERT INTO `t_link` (`id`, `title`, `summary`, `url`, `create_time`, `update_time`, `link_status`, `file_id`) VALUES
@@ -241,7 +262,7 @@ CREATE TABLE IF NOT EXISTS `t_menu` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='菜单表';
 
--- 正在导出表  mango_blog.t_menu 的数据：~18 rows (大约)
+-- 正在导出表  mango_blog.t_menu 的数据：~17 rows (大约)
 DELETE FROM `t_menu`;
 /*!40000 ALTER TABLE `t_menu` DISABLE KEYS */;
 INSERT INTO `t_menu` (`id`, `name`, `title`, `pid`, `icon`, `sort`, `is_deleted`, `create_time`, `update_time`, `hidden`, `component`, `path`, `redirect`, `permission`, `menu_type`, `sub_count`) VALUES
@@ -289,16 +310,17 @@ CREATE TABLE IF NOT EXISTS `t_role` (
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `summary` varchar(255) DEFAULT NULL COMMENT '角色介绍',
+  `level` int unsigned DEFAULT NULL COMMENT '级别，数值越小，级别越大',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='角色表';
 
 -- 正在导出表  mango_blog.t_role 的数据：~3 rows (大约)
 DELETE FROM `t_role`;
 /*!40000 ALTER TABLE `t_role` DISABLE KEYS */;
-INSERT INTO `t_role` (`id`, `role_name`, `create_time`, `update_time`, `summary`) VALUES
-	('1395268474480156673', 'admin', '2021-10-02 22:52:24', '2021-10-02 22:52:25', '管理员'),
-	('1395268474480156674', 'visitor', '2021-12-02 21:58:50', '2021-12-02 21:58:50', '游客'),
-	('1502546893753643010', '12', '2022-03-12 15:27:50', '2022-03-12 15:27:50', '12');
+INSERT INTO `t_role` (`id`, `role_name`, `create_time`, `update_time`, `summary`, `level`) VALUES
+	('1395268474480156673', 'admin', '2021-10-02 22:52:24', '2022-04-06 22:58:14', '管理员', 1),
+	('1395268474480156674', 'visitor', '2021-12-02 21:58:50', '2022-04-04 23:59:19', '游客', 2),
+	('1502546893753643010', '12', '2022-03-12 15:27:50', '2022-03-12 15:27:50', '12', 3);
 /*!40000 ALTER TABLE `t_role` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role_admin 结构
@@ -370,7 +392,7 @@ CREATE TABLE IF NOT EXISTS `t_sort` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客分类表';
 
--- 正在导出表  mango_blog.t_sort 的数据：~4 rows (大约)
+-- 正在导出表  mango_blog.t_sort 的数据：~3 rows (大约)
 DELETE FROM `t_sort`;
 /*!40000 ALTER TABLE `t_sort` DISABLE KEYS */;
 INSERT INTO `t_sort` (`id`, `sort_name`, `summary`, `create_time`, `update_time`, `click_count`, `sort_level`) VALUES
@@ -392,7 +414,7 @@ CREATE TABLE IF NOT EXISTS `t_tag` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='标签表';
 
--- 正在导出表  mango_blog.t_tag 的数据：~2 rows (大约)
+-- 正在导出表  mango_blog.t_tag 的数据：~0 rows (大约)
 DELETE FROM `t_tag`;
 /*!40000 ALTER TABLE `t_tag` DISABLE KEYS */;
 INSERT INTO `t_tag` (`id`, `summary`, `click_count`, `create_time`, `update_time`, `sort`, `tag_name`) VALUES

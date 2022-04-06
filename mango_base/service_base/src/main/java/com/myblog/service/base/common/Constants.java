@@ -14,7 +14,13 @@ public interface Constants {
         String TOKEN = "token";
         String ROLES = "roles";
         String AVATAR = "avatar";
-        String USER_NAME = "username";
+        String USERNAME = "username";
+        String NICKNAME = "nickname";
+        String PHONE = "phone";
+        String EMAIL = "email";
+        String QQ_NUMBER = "qqNumber";
+        String WE_CHAT = "weChat";
+        String GENDER = "gender";
         String CREATE_TIME = "createTime";
         String EXPIRES_SECOND = "expiresSecond";
         String SECRET_KEY = "secretKey";
@@ -33,6 +39,7 @@ public interface Constants {
         String SWAP = "swap";
         String DISK = "disk";
         String TIME = "time";
+        String CODE = "code";
     }
 
     interface SystemConstant {

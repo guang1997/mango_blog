@@ -74,7 +74,6 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
           const data = response.data
-
         if (data && data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
           commit('SET_ROLES', data.roles)
         } else {
@@ -89,6 +88,12 @@ const user = {
           reject(error)
         })
       })
+    },
+     // 更新用户信息
+     UpdateInfo({ commit, data }) {
+      commit('SET_NAME', data.username)
+      commit('SET_AVATAR', data.avatar)
+      commit('SET_USER', data)
     },
     // 登出
     Logout({ commit }) {

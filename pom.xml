@@ -50,6 +50,7 @@
         <jna.version>5.8.0</jna.version>
         <hutool.version>5.3.4</hutool.version>
         <log4j.version>1.2.17</log4j.version>
+        <mail.version>1.4.7</mail.version>
     </properties>
 
     <dependencyManagement>
@@ -266,8 +267,13 @@
             </dependency>
             <dependency>
                 <groupId>cn.hutool</groupId>
-                <artifactId>hutool-core</artifactId>
+                <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>${mail.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

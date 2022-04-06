@@ -14,6 +14,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * druid监控配置类
+ *
+ * @author 李斯特
+ * 2022年4月4日
+ */
 @Configuration
 public class DruidConfig {
 

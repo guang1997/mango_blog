@@ -6,6 +6,7 @@ import com.myblog.service.security.entity.Admin;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.security.entity.dto.AdminDto;
 import com.myblog.service.security.entity.dto.LoginDto;
+import com.myblog.service.security.entity.dto.PassAndEmailDto;
 
 import java.text.ParseException;
 import java.util.Set;
@@ -27,4 +28,6 @@ public interface AdminService extends IService<Admin>, ServiceConvertHandler<Adm
     Response addAdmin(AdminDto adminDto) throws Exception;
 
     Response delAdmin(Set<String> ids) throws Exception;
+
+    Response editAdminFromCenter(AdminDto adminDto) throws InstantiationException, IllegalAccessException;
 }

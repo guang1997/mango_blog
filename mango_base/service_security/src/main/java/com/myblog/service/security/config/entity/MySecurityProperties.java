@@ -37,6 +37,7 @@ public class MySecurityProperties {
      */
     private String base64Secret;
 
+    private String rsaPrivateKey;
     /**
      * 令牌过期时间 此处单位/毫秒
      */

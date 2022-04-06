@@ -37,4 +37,7 @@ public class Role extends BaseEntity {
 
     @ApiModelProperty(value = "角色介绍")
     private String summary;
+
+    @ApiModelProperty(value = "级别，数值越小，级别越大")
+    private Integer level;
 }

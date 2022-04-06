@@ -1,17 +1,18 @@
 <template>
 <div class="app-container">
-    <iframe id="myIframe" :src="druidAdminUrl" width="100%" height="780px;"></iframe>
+    <iframe id="myIframe" :src="druidApi" width="100%" height="780px;"></iframe>
   </div>
 </template>
 
 <script>
   import {Loading} from "element-ui";
+  import { mapGetters } from 'vuex';
   export default {
-    data() {
-      return {
-        druidAdminUrl: process.env.VUE_APP_DRUID_ADMIN
-      }
-    },
+    computed: {
+    ...mapGetters([
+      'druidApi'
+    ])
+  },
     mounted() {
       let iframe = document.getElementById("myIframe")
       let uploadLoading = Loading.service({

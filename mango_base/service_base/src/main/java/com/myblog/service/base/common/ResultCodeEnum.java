@@ -25,6 +25,10 @@ public enum ResultCodeEnum {
     GET_USERMENU_ERROR(false, 23011, "获取用户菜单失败"),
     CODE_ERROR(false, 23012, "验证码错误"),
     UPLOAD_ERROR(false, 23013, "上传失败"),
+    UPDATE_FAILED_BY_QQ_NUMBER_EXIST(false, 23014, "更新失败，QQ号已存在"),
+    UPDATE_FAILED_BY_WE_CHAT_EXIST(false, 23015, "更新失败，微信号已存在"),
+    UPDATE_FAILED_BY_PHONE_EXIST(false, 23016, "更新失败，手机号已存在"),
+    SEND_CODE_FAILED(false, 23017, "发送验证码失败"),
 //    SAVE_TAG_FAILED(false, 200010, "保存失败，已经存在对应标签"),
 //    SAVE_TYPE_FAILED(false, 200011, "保存失败，已经存在对应类型"),
 //

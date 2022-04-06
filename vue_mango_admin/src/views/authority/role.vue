@@ -38,6 +38,14 @@
         <el-form-item label="角色名称" prop="roleName">
           <el-input v-model="form.roleName" style="width: 380px" />
         </el-form-item>
+         <el-form-item label="角色级别" prop="level">
+              <el-input-number
+                v-model.number="form.level"
+                :min="1"
+                controls-position="right"
+                style="width: 178px"
+              />
+            </el-form-item>
         <el-form-item label="描述信息" prop="summary">
           <el-input
             v-model="form.summary"
@@ -82,6 +90,7 @@
           >
             <el-table-column type="selection" width="55" />
             <el-table-column prop="roleName" label="角色名称" />
+            <el-table-column prop="level" label="角色级别" />
             <el-table-column
               :show-overflow-tooltip="true"
               prop="summary"
