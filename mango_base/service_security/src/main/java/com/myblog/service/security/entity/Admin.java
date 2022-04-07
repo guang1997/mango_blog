@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.myblog.service.base.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import io.swagger.annotations.ApiModel;
@@ -38,7 +39,7 @@ public class Admin extends BaseEntity {
     private String password;
 
     @ApiModelProperty(value = "性别(1:男2:女)")
-    private String gender;
+    private Integer gender;
 
     @ApiModelProperty(value = "个人头像")
     private String avatar;
@@ -53,6 +54,7 @@ public class Admin extends BaseEntity {
     private Integer loginCount;
 
     @ApiModelProperty(value = "最后登录时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "GMT+8")
     private Date lastLoginTime;
 
     @ApiModelProperty(value = "最后登录IP")

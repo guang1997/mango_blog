@@ -106,11 +106,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Response addRole(RoleDto roleDto) throws Exception{
-        // 校验管理员是否已经存在
+        // 校验角色是否已经存在
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Role.ROLE_NAME, roleDto.getRoleName());
-        List<Role> menus = baseMapper.selectList(queryWrapper);
-        if (!CollectionUtils.isEmpty(menus)) {
+        List<Role> roles = baseMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(roles)) {
             LOGGER.error("addRole failed, role already exist in db, role:{}", roleDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
@@ -230,7 +230,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @param level
      * @return
      */
-    private void validRoleLevel(Integer level, String roleName) {
+    public void validRoleLevel(Integer level, String roleName) {
         if (level == null) {
             throw new RuntimeException("找不到被操作角色的级别");
         }

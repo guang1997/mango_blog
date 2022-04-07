@@ -17,7 +17,7 @@ public class AdminDto extends BaseDto {
 
     private String password;
 
-    private String gender;
+    private Integer gender;
 
     private String avatar;
 

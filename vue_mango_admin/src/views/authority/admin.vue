@@ -47,17 +47,14 @@
             </el-form-item>
             <el-form-item label="性别">
               <el-radio-group v-model="form.gender" style="width: 178px">
-                <el-radio label="男">男</el-radio>
-                <el-radio label="女">女</el-radio>
+                <el-radio :label="1">男</el-radio>
+                <el-radio :label="2">女</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="状态">
               <el-radio-group v-model="form.enabled" >
-                <el-radio
-                  v-for="item in dict.sys_status"
-                  :key="item.id"
-                  :label="item.dictValue"
-                >{{ item.dictLabel }}</el-radio>
+                <el-radio :label="0">启用</el-radio>
+                <el-radio :label="1">禁用</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item style="margin-bottom: 0;" label="角色" prop="roles">
@@ -88,6 +85,7 @@
                         :headers="headers"
                         :url="imagesUploadApi"
                         :params="{moduleName:'avatar'}"
+                        :size="size"
                         @crop-upload-success="cropUploadSuccess"
                       />
                     </div>
@@ -205,7 +203,7 @@ import myUpload from 'vue-image-crop-upload'
 import { getToken } from '@/utils/auth'
 import Avatar from '@/assets/images/avatar.png'
 let userRoles = []
-const defaultForm = { id: null, username: null, nickname: null, gender: '男', email: null, enabled: 'false', roles: [], phone: null, avatar: null, qqNumber:null, weChat:null }
+const defaultForm = { id: null, username: null, nickname: null, gender: 1, email: null, enabled: 0, roles: [], phone: null, avatar: null, qqNumber:null, weChat:null }
 export default {
   name: "Admin",
   components: {
@@ -250,7 +248,6 @@ export default {
       currentId: 0,
       roleDatas: [],
       roles: [],
-      imageUrl: '',
       permission: {
         add: ["admin", "admin:add"],
         edit: ["admin", "admin:edit"],
@@ -279,12 +276,17 @@ export default {
       },
       Avatar: Avatar,
       userAvatar: null,
+      size:2
     };
   },
   methods: {
     // 新增前将多选的值设置为空
     [CRUD.HOOK.beforeToAdd]() {
       this.roleDatas = []
+    },
+    // 添加取消之后
+    [CRUD.HOOK.afterAddCancel]() {
+      this.userAvatar = null
     },
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
@@ -296,6 +298,7 @@ export default {
         return false
       }
       crud.form.roles = userRoles
+      crud.form.avatar = this.userAvatar
       return true
     },
     // 新增与编辑前做的操作
@@ -308,6 +311,7 @@ export default {
     // 新增前将多选的值设置为空
     [CRUD.HOOK.beforeToAdd]() {
       this.roleDatas = []
+      this.userAvatar = null
     },
     // 初始化编辑时的角色
     [CRUD.HOOK.beforeToEdit](crud, form) {
@@ -320,26 +324,6 @@ export default {
         userRoles.push(rol)
       })
     },
-    handleChange(res, file) {
-      console.log("file", file)
-      // this.form.file = file;
-        // this.form.avater = URL.createObjectURL(file.raw);
-        // let fileUrl = [];
-        // fileUrl.push(file.raw);
-        // this.form.avatar = window.URL.createObjectURL(fileUrl)
-      },
-      beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        debugger
-        if (!isJPG) {
-          this.$message.error('上传头像图片只能是 JPG 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-        return isJPG && isLt2M;
-      },
      changeRole(value) {
       userRoles = []
       value.forEach(function(data, index) {
@@ -392,8 +376,8 @@ export default {
       this.show = !this.show
     },
     cropUploadSuccess(jsonData, field) {
-      crud.form.avatar = jsonData.data.url
-    },
+      this.userAvatar = jsonData.data.url
+    }
   },
 };
 </script>

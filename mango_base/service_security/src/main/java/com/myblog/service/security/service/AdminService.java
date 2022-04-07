@@ -29,5 +29,9 @@ public interface AdminService extends IService<Admin>, ServiceConvertHandler<Adm
 
     Response delAdmin(Set<String> ids) throws Exception;
 
-    Response editAdminFromCenter(AdminDto adminDto) throws InstantiationException, IllegalAccessException;
+    Response editAdminFromCenter(AdminDto adminDto) throws Exception;
+
+    Response updateEmail(PassAndEmailDto passAndEmailDto) throws Exception;
+
+    Response updatePass(PassAndEmailDto passAndEmailDto) throws Exception;
 }

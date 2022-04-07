@@ -4,13 +4,18 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.*;
 import com.myblog.service.base.util.*;
+import com.myblog.service.security.config.entity.MySecurityProperties;
+import com.myblog.service.security.config.util.RsaUtils;
+import com.myblog.service.security.config.util.SecurityUtils;
 import com.myblog.service.security.entity.Admin;
 import com.myblog.service.security.entity.Role;
+import com.myblog.service.security.entity.RoleAdmin;
 import com.myblog.service.security.entity.dto.AdminDto;
 import com.myblog.service.security.entity.dto.LoginDto;
 import com.myblog.service.security.entity.dto.PassAndEmailDto;
 import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.mapper.AdminMapper;
+import com.myblog.service.security.mapper.RoleAdminMapper;
 import com.myblog.service.security.mapper.RoleMapper;
 import com.myblog.service.security.service.AdminService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
@@ -48,8 +54,14 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private MySecurityProperties mySecurityProperties;
+
+    @Autowired
+    private RoleAdminMapper roleAdminMapper;
+
     @Override
-    public Admin checkLogin(LoginDto loginDto) throws Exception{
+    public Admin checkLogin(LoginDto loginDto) throws Exception {
         String username = loginDto.getUsername();
         String password = loginDto.getPassword();
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
@@ -85,6 +97,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
     /**
      * 分页查询管理员信息
+     *
      * @param adminDto
      * @return
      */
@@ -128,23 +141,67 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
     /**
      * 创建admin
+     *
      * @param adminDto
      * @return
      */
     @Override
-    public Response addAdmin(AdminDto adminDto) {
+    @Transactional(rollbackFor = Exception.class)
+    public Response addAdmin(AdminDto adminDto) throws Exception {
+        // 校验管理员是否已经存在
+        QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Admin.USERNAME, adminDto.getUsername());
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        List<Admin> admins = baseMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(admins)) {
+            LOGGER.error("addAdmin failed, admin already exist in db, admin:{}", adminDto);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
+        Admin admin = this.toDb(adminDto, Admin.class);
+        // 给管理员设置默认密码，规则为用户名+yyyy
+        admin.setPassword(passwordEncoder.encode(admin.getUsername() + ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.YEAR)));
+        admin.setUpdateTime(new Date());
+        admin.setCreateTime(new Date());
+        if (baseMapper.updateByUserName(admin) < 1) {
+            if (baseMapper.insert(admin) < 1) {
+                LOGGER.error("addAdmin failed by unknown error, role:{}", admin);
+                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            }
+        }
 
+        // 给管理员绑定角色
+        QueryWrapper<Admin> wrapper = new QueryWrapper<>();
+        wrapper.eq(DbConstants.Admin.USERNAME, admin.getUsername());
+        Admin dbAdmin = baseMapper.selectOne(wrapper);
+        if (Objects.isNull(dbAdmin)) {
+            LOGGER.error("addAdmin failed cannot find admin by username:{}", admin.getUsername());
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
+        List<RoleDto> roleDtos = adminDto.getRoles();
+        if (!CollectionUtils.isEmpty(roleDtos)) {
+            for (RoleDto roleDto : roleDtos) {
+                RoleAdmin roleAdmin = new RoleAdmin();
+                roleAdmin.setAdminId(dbAdmin.getId());
+                roleAdmin.setRoleId(roleDto.getId());
+                if (roleAdminMapper.insert(roleAdmin) < 1) {
+                    Role role = roleMapper.selectById(roleDto.getId());
+                    LOGGER.error("addAdmin success, but add role failed by unknown error, username:{}, role:{}", dbAdmin.getUsername(), role);
+                }
+            }
+        }
         return Response.ok();
     }
 
     /**
      * 删除管理员
+     *
      * @param ids
      * @return
      * @throws Exception
      */
     @Override
-    public Response delAdmin(Set<String> ids) throws Exception{
+    @Transactional(rollbackFor = Exception.class)
+    public Response delAdmin(Set<String> ids) throws Exception {
         for (String id : ids) {
             Admin admin = baseMapper.selectById(id);
             // 清理缓存信息
@@ -156,11 +213,13 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
     /**
      * 从个人中心页面更改管理员信息
+     *
      * @param adminDto
      * @return
      */
     @Override
-    public Response editAdminFromCenter(AdminDto adminDto) throws InstantiationException, IllegalAccessException {
+    @Transactional(rollbackFor = Exception.class)
+    public Response editAdminFromCenter(AdminDto adminDto) throws Exception {
         Admin admin = baseMapper.selectById(adminDto.getId());
 
         QueryWrapper<Admin> phoneQueryWrapper = new QueryWrapper<>();
@@ -189,6 +248,81 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             LOGGER.error("editAdminFromCenter failed by unknown error, admin:{}", adminDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
+        return Response.ok();
+    }
+
+    /**
+     * 从个人中心页面修改邮箱
+     *
+     * @param passAndEmailDto
+     * @return
+     * @throws Exception
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response updateEmail(PassAndEmailDto passAndEmailDto) throws Exception {
+        // 获取当前登陆用户信息
+        QueryWrapper<Admin> wrapper = new QueryWrapper<>();
+        String currentUsername = SecurityUtils.getCurrentUsername();
+        wrapper.eq(DbConstants.Admin.USERNAME, currentUsername);
+        Admin admin = baseMapper.selectOne(wrapper);
+        if (Objects.isNull(admin)) {
+            LOGGER.error("updatePass failed, cannot find admin from db, username:{}", currentUsername);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+        // 对密码进行校验
+        String pass = RsaUtils.decryptByPrivateKey(mySecurityProperties.getRsaPrivateKey(), passAndEmailDto.getPass());
+        if (!passwordEncoder.matches(pass, admin.getPassword())) {
+            LOGGER.error("updateEmail failed, password is error");
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("修改失败，密码错误");
+        }
+        // 对验证码进行校验
+        String redisCode = redisUtil.get(RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + passAndEmailDto.getEmail());
+        if (StringUtils.isBlank(redisCode) || !Objects.equals(redisCode, passAndEmailDto.getCode())) {
+            LOGGER.error("updateEmail:{} failed, code is error, redisCode:[{}], code:[{}]", passAndEmailDto.getEmail(), redisCode, passAndEmailDto.getCode());
+            return Response.error().message("修改失败，验证码错误");
+        }
+        // 更新用户邮箱
+        admin.setEmail(passAndEmailDto.getEmail());
+        baseMapper.updateById(admin);
+        return Response.ok();
+    }
+
+    /**
+     * 从个人中心页面修改密码
+     * @param passAndEmailDto
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Response updatePass(PassAndEmailDto passAndEmailDto) throws Exception {
+        // 获取当前登陆用户信息
+        QueryWrapper<Admin> wrapper = new QueryWrapper<>();
+        String currentUsername = SecurityUtils.getCurrentUsername();
+        wrapper.eq(DbConstants.Admin.USERNAME, currentUsername);
+        Admin admin = baseMapper.selectOne(wrapper);
+        if (Objects.isNull(admin)) {
+            LOGGER.error("updatePass failed, cannot find admin from db, username:{}", currentUsername);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+        // 对密码进行校验
+        String oldPass = RsaUtils.decryptByPrivateKey(mySecurityProperties.getRsaPrivateKey(), passAndEmailDto.getOldPass());
+        String newPass = RsaUtils.decryptByPrivateKey(mySecurityProperties.getRsaPrivateKey(), passAndEmailDto.getNewPass());
+        if (!passwordEncoder.matches(oldPass, admin.getPassword())) {
+            LOGGER.error("updatePass failed, password is error");
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("修改失败，密码错误");
+        }
+        if (passwordEncoder.matches(newPass, admin.getPassword())) {
+            LOGGER.error("updatePass failed, newPass cannot equal oldPass");
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("修改失败，旧密码不能与新密码相同");
+        }
+        admin.setPassword(passwordEncoder.encode(newPass));
+        if (baseMapper.updateById(admin) < 1) {
+            LOGGER.error("updatePass failed by unknown error, admin:{}", admin);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+        // 从redis删除用户token
+        redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
         return Response.ok();
     }
 

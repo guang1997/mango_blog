@@ -35,4 +35,6 @@ public interface RoleService extends IService<Role>, ServiceConvertHandler<Role,
     Response getRoleById(Role role) throws Exception;
 
     void validRoleLevelByUserId(String userId);
+
+    void validRoleLevel(Integer level, String roleName);
 }
