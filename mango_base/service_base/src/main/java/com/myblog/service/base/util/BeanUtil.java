@@ -30,8 +30,8 @@ public class BeanUtil {
     // key:Class对象名-get或者set方法名 value:方法下标
     private static Map<String, Integer> methodIndexMap = new ConcurrentHashMap<>();
 
-    // key:Class对象 value:属性的get和set集合
-    private static Map<Class, List<String>> fieldMap = new ConcurrentHashMap<>();
+    // key:Class对象 value: key fieldName value:field
+    private static Map<Class, Map<String, Field>> fieldMap = new ConcurrentHashMap<>();
 
     /**
      * 复制属性
@@ -45,8 +45,18 @@ public class BeanUtil {
         }
         MethodAccess sourceMethodAccess = getFromCache(source);
         MethodAccess targetMethodAccess = getFromCache(target);
-        List<String> fieldList = fieldMap.get(source.getClass());
-        for (String fieldName : fieldList) {
+        Map<String, Field> sourceFieldMap = fieldMap.get(source.getClass());
+        Map<String, Field> targetFieldMap = fieldMap.get(target.getClass());
+        for (Map.Entry<String, Field> entry : sourceFieldMap.entrySet()) {
+            String fieldName = entry.getKey();
+            Field sourceField = entry.getValue();
+            Field targetField = targetFieldMap.get(fieldName);
+            if (Objects.isNull(targetField)) {
+                continue;
+            }
+            if (!Objects.equals(sourceField.getType(), targetField.getType())) {
+                continue;
+            }
             String getKey = String.join(Constants.Symbol.COMMA2, source.getClass().getName(), "get" + fieldName);
             String setKey = String.join(Constants.Symbol.COMMA2, target.getClass().getName(), "set" + fieldName);
 
@@ -74,7 +84,7 @@ public class BeanUtil {
                 }
                 // TODO 父类或者类型不同的无法复制,暂时手动复制
                 Field[] fields = objClazz.getDeclaredFields();
-                List<String> fieldNameList = new ArrayList<>();
+                Map<String, Field> stringFieldMap = new HashMap<>();
                 for (Field field : fields) {
                     // 非公共的私有变量
                     if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
@@ -86,11 +96,11 @@ public class BeanUtil {
                         int setIndex = methodAccess.getIndex("set" + fieldName);
                         methodIndexMap.putIfAbsent(String.join(Constants.Symbol.COMMA2, objClazz.getName(), getFieldName), getIndex);
                         methodIndexMap.putIfAbsent(String.join(Constants.Symbol.COMMA2, objClazz.getName(), setFieldName), setIndex);
-                        fieldNameList.add(fieldName);
+                        stringFieldMap.put(fieldName, field);
                     }
                 }
                 classMethodAccessMap.put(objClazz, methodAccess);
-                fieldMap.put(objClazz, fieldNameList);
+                fieldMap.put(objClazz, stringFieldMap);
             }
         }
         return methodAccess;

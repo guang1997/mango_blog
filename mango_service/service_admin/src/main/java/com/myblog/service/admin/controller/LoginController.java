@@ -105,6 +105,10 @@ public class LoginController {
                 return response.code(ResultCodeEnum.LOGIN_ERROR_LOCKED.getCode()).message(String.format(ResultCodeEnum.LOGIN_ERROR_LOCKED.getMessage(),
                         setLoginCommit(key)));
             }
+            // 如果账号已禁用，登陆失败
+            if (!admin.getEnabled()) {
+                return response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message("登陆失败，该账号已被禁用，请联系管理员处理");
+            }
             //查找角色
             List<Role> roles =  roleService.getRolesByUserId(admin.getId());
 

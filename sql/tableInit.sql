@@ -14,6 +14,7 @@
 
 
 -- 导出 mango_blog 的数据库结构
+DROP DATABASE IF EXISTS `mango_blog`;
 CREATE DATABASE IF NOT EXISTS `mango_blog` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `mango_blog`;
 
@@ -35,18 +36,17 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
   `nickname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '昵称',
   `qq_number` varchar(255) DEFAULT NULL COMMENT 'QQ号',
   `we_chat` varchar(255) DEFAULT NULL COMMENT '微信号',
-  `enabled` tinyint unsigned DEFAULT '0' COMMENT '账号状态1:禁用0:启用',
+  `enabled` tinyint unsigned DEFAULT '0' COMMENT '账号状态1:启用0:禁用',
   `is_deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='管理员表';
 
--- 正在导出表  mango_blog.t_admin 的数据：~2 rows (大约)
+-- 正在导出表  mango_blog.t_admin 的数据：~3 rows (大约)
 DELETE FROM `t_admin`;
 /*!40000 ALTER TABLE `t_admin` DISABLE KEYS */;
 INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `phone`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `enabled`, `is_deleted`) VALUES
-	('1295268474480156673', 'admin', '$2a$10$ZYi1kqMMQczWDw86u76uPu79CneIE1G0h4dw89a4tjZhrQCWa8QaW', 1, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', 'guang1997qqq@163.com', '18761616251', 5, '2022-04-07 21:59:02', '192.168.1.7', '2021-09-26 16:56:46', '2022-04-07 21:59:02', '李斯特', '872174823', '18761616251', 1, 0),
-	('1512085925777461250', 'test', '$2a$10$WPiDzgTn2WRDoVt0135vvu7d5gw1.89bUE22fJxsaWeHZJM9pnxUS', 1, NULL, '123@qq.com', '18761616251', 0, NULL, '127.0.0.1', '2022-04-07 23:12:33', '2022-04-07 23:12:33', 'test', NULL, NULL, 0, 1),
-	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', 1, 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 1, '2022-04-06 22:37:27', '192.168.1.7', '2021-12-02 22:01:22', '2022-04-06 22:37:27', '游客', '111111', '111111', 1, 0);
+	('1295268474480156673', 'admin', '$2a$10$ZYi1kqMMQczWDw86u76uPu79CneIE1G0h4dw89a4tjZhrQCWa8QaW', 1, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', 'guang1997qqq@163.com', '18761616251', 19, '2022-04-18 20:20:20', '192.168.1.7', '2021-09-26 16:56:46', '2022-04-18 20:20:20', '李斯特', '872174823', '18761616251', 1, 0),
+	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', 1, 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 1, '2022-04-06 22:37:27', '192.168.1.7', '2021-12-02 22:01:22', '2022-04-18 21:46:08', '游客', '111111', '111111', 0, 0);
 /*!40000 ALTER TABLE `t_admin` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_blog 结构
@@ -56,31 +56,29 @@ CREATE TABLE IF NOT EXISTS `t_blog` (
   `title` varchar(200) DEFAULT NULL COMMENT '博客标题',
   `summary` varchar(200) DEFAULT NULL COMMENT '博客简介',
   `content` longtext COMMENT '博客内容',
-  `tag_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '标签id',
   `click_count` int DEFAULT '0' COMMENT '博客点击数',
-  `collect_count` int DEFAULT '0' COMMENT '博客收藏数',
+  `like_count` int DEFAULT '0' COMMENT '博客点赞数',
   `file_id` varchar(255) DEFAULT NULL COMMENT '标题图片id',
-  `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '状态',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `admin_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '管理员id',
-  `is_original` varchar(1) DEFAULT '1' COMMENT '是否原创（0:不是 1：是）',
   `author` varchar(255) DEFAULT NULL COMMENT '作者',
-  `articles_part` varchar(255) DEFAULT NULL COMMENT '文章出处',
   `blog_sort_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '博客分类ID',
   `level` tinyint(1) DEFAULT '0' COMMENT '推荐等级(0:正常)',
-  `is_publish` varchar(1) DEFAULT '1' COMMENT '是否发布：0：否，1：是',
   `sort` int NOT NULL DEFAULT '0' COMMENT '排序字段，越大越靠前',
   `open_comment` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否开启评论(0:否 1:是)',
-  `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '类型【0 博客， 1：推广】',
-  `outside_link` varchar(1024) DEFAULT NULL COMMENT '外链【如果是推广，那么将跳转到外链】',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '逻辑删除 1（true）已删除， 0（false）未删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客表';
 
--- 正在导出表  mango_blog.t_blog 的数据：~0 rows (大约)
+-- 正在导出表  mango_blog.t_blog 的数据：~3 rows (大约)
 DELETE FROM `t_blog`;
 /*!40000 ALTER TABLE `t_blog` DISABLE KEYS */;
+INSERT INTO `t_blog` (`id`, `title`, `summary`, `content`, `click_count`, `like_count`, `file_id`, `create_time`, `update_time`, `admin_id`, `author`, `blog_sort_id`, `level`, `sort`, `open_comment`, `is_deleted`) VALUES
+	('1', '1', '1', '1', 0, 0, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '2022-04-17 09:42:18', '2022-04-17 09:42:19', '1', '1', '1505006369916694530', 1, 0, 0, 0),
+	('2', '2', '2', '2', 0, 0, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '2022-04-17 20:05:21', '2022-04-17 20:05:22', '2', '2', '1505006369916694530', 2, 0, 1, 0),
+	('3', '3', '3', '3', 0, 0, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '2022-04-17 20:05:39', '2022-04-17 20:05:40', '3', '3', '1506662963603652609', 3, 0, 1, 0),
+	('4', '1', '1', '2', 0, 0, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '2022-04-17 20:07:37', '2022-04-17 20:07:37', '1', '1', '1506662963603652609', 0, 0, 1, 0);
 /*!40000 ALTER TABLE `t_blog` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_blog_tag 结构
@@ -95,32 +93,43 @@ CREATE TABLE IF NOT EXISTS `t_blog_tag` (
   UNIQUE KEY `IDX_BLOGID_TAGID_UNIQUE` (`blog_id`,`tag_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- 正在导出表  mango_blog.t_blog_tag 的数据：~0 rows (大约)
+-- 正在导出表  mango_blog.t_blog_tag 的数据：~5 rows (大约)
 DELETE FROM `t_blog_tag`;
 /*!40000 ALTER TABLE `t_blog_tag` DISABLE KEYS */;
+INSERT INTO `t_blog_tag` (`id`, `blog_id`, `tag_id`, `create_time`, `update_time`) VALUES
+	('1', '1', '1506663317590327298', '2022-04-16 18:43:14', '2022-04-16 18:43:15'),
+	('2', '1', '1507906192298856450', '2022-04-16 18:43:50', '2022-04-16 18:43:51'),
+	('3', '2', '1506663317590327298', '2022-04-16 18:43:58', '2022-04-16 18:43:59'),
+	('4', '3', '1506663317590327298', '2022-04-16 18:45:14', '2022-04-16 18:45:14'),
+	('5', '4', '1506663317590327298', '2022-04-17 20:08:06', '2022-04-17 20:08:07');
 /*!40000 ALTER TABLE `t_blog_tag` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_comment 结构
 DROP TABLE IF EXISTS `t_comment`;
 CREATE TABLE IF NOT EXISTS `t_comment` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
+  `parent_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' COMMENT '父id',
   `user_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户id',
-  `to_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '回复某条评论的id',
-  `to_user_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '回复某个人的id',
+  `avatar` varchar(225) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户头像',
+  `nickname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户昵称',
   `content` varchar(2048) DEFAULT NULL COMMENT '评论内容',
-  `blog_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '博客id',
-  `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '状态',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `source` varchar(255) NOT NULL COMMENT '评论来源： MESSAGE_BOARD，ABOUT，BLOG_INFO 等',
   `type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '评论类型 1:点赞 0:评论',
-  `first_comment_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '一级评论ID',
+  `blog_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '博客id',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态: 0-待审核, 1-审核通过, 2-审核不通过',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='评论表';
 
--- 正在导出表  mango_blog.t_comment 的数据：~0 rows (大约)
+-- 正在导出表  mango_blog.t_comment 的数据：~4 rows (大约)
 DELETE FROM `t_comment`;
 /*!40000 ALTER TABLE `t_comment` DISABLE KEYS */;
+INSERT INTO `t_comment` (`id`, `parent_id`, `user_id`, `avatar`, `nickname`, `content`, `create_time`, `update_time`, `source`, `type`, `blog_id`, `status`) VALUES
+	('1295268474480156673', '0', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '李斯特', '测试', '2022-04-13 20:05:53', '2022-04-13 20:05:54', 'ABOUT', 0, NULL, 1),
+	('1295268474480156674', '1295268474480156673', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '李斯特', '回复测试', '2022-04-13 20:07:09', '2022-04-13 20:07:10', 'BLOG_INFO', 0, NULL, 1),
+	('1295268474480156675', '1295268474480156674', NULL, 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '游客', '回复李斯特', '2022-04-13 20:17:24', '2022-04-13 20:17:24', 'BLOG_INFO', 0, NULL, 1),
+	('1295268474480156676', '1295268474480156675', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '李斯特', '回复游客', '2022-04-13 20:18:42', '2022-04-13 20:18:42', 'MESSAGE_BOARD', 0, NULL, 1);
 /*!40000 ALTER TABLE `t_comment` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_dict 结构
@@ -136,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `t_dict` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典表';
 
--- 正在导出表  mango_blog.t_dict 的数据：~6 rows (大约)
+-- 正在导出表  mango_blog.t_dict 的数据：~8 rows (大约)
 DELETE FROM `t_dict`;
 /*!40000 ALTER TABLE `t_dict` DISABLE KEYS */;
 INSERT INTO `t_dict` (`id`, `dict_name`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
@@ -145,7 +154,10 @@ INSERT INTO `t_dict` (`id`, `dict_name`, `summary`, `is_deleted`, `create_time`,
 	('1506640128227151874', 'sys_status', '状态', 0, '2022-03-23 22:32:53', '2022-03-23 22:32:53', 0),
 	('1506648391412879362', 'sys_sort_type', '分类级别', 0, '2022-03-23 23:05:43', '2022-03-23 23:05:43', 0),
 	('1507909943558524929', 'sys_gender', '性别', 0, '2022-03-27 10:38:41', '2022-03-27 10:38:41', 0),
-	('1507913784651722753', 'sys_link_status', '友链状态', 0, '2022-03-27 10:53:57', '2022-03-27 10:53:57', 0);
+	('1507913784651722753', 'sys_link_status', '友链状态', 0, '2022-03-27 10:53:57', '2022-03-27 10:53:57', 0),
+	('1514209682880995330', 'sys_comment_type', '评论类型', 0, '2022-04-13 19:51:36', '2022-04-13 19:51:36', 0),
+	('1514209728137535490', 'sys_comment_source', '评论来源', 0, '2022-04-13 19:51:47', '2022-04-13 19:51:47', 0),
+	('1516045589821116417', 'sys_blog_level', '博客推荐级别', 0, '2022-04-18 21:26:50', '2022-04-18 21:26:50', 0);
 /*!40000 ALTER TABLE `t_dict` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_dict_detail 结构
@@ -165,7 +177,7 @@ CREATE TABLE IF NOT EXISTS `t_dict_detail` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典详细数据表';
 
--- 正在导出表  mango_blog.t_dict_detail 的数据：~13 rows (大约)
+-- 正在导出表  mango_blog.t_dict_detail 的数据：~18 rows (大约)
 DELETE FROM `t_dict_detail`;
 /*!40000 ALTER TABLE `t_dict_detail` DISABLE KEYS */;
 INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_class`, `list_class`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
@@ -174,8 +186,8 @@ INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_c
 	('1506196718315483137', '1506174838367870978', '目录', '0', NULL, 'default', '菜单类型 目录', 0, '2022-03-22 17:10:56', '2022-03-22 17:19:19', 3),
 	('1506198945411215362', '1506174838367870978', '菜单', '1', NULL, 'success', '菜单类型 菜单', 0, '2022-03-22 17:19:47', '2022-03-22 17:19:47', 2),
 	('1506199049916493825', '1506174838367870978', '按钮', '2', '', 'warning', '菜单类型 按钮', 0, '2022-03-22 17:20:12', '2022-03-22 17:20:23', 1),
-	('1506640400328429570', '1506640128227151874', '禁用', '1', NULL, 'danger', '系统状态 禁用', 0, '2022-03-23 22:33:58', '2022-03-23 22:34:27', 1),
-	('1506640493521670145', '1506640128227151874', '启用', '0', NULL, 'success', '系统状态 启用', 0, '2022-03-23 22:34:20', '2022-03-23 22:34:20', 2),
+	('1506640400328429570', '1506640128227151874', '禁用', '0', NULL, 'danger', '系统状态 禁用', 0, '2022-03-23 22:33:58', '2022-04-09 09:33:51', 1),
+	('1506640493521670145', '1506640128227151874', '启用', '1', NULL, 'success', '系统状态 启用', 0, '2022-03-23 22:34:20', '2022-04-09 09:33:47', 2),
 	('1506648554332229633', '1506648391412879362', '一级分类', '1', NULL, 'success', '分类级别 一级', 0, '2022-03-23 23:06:22', '2022-03-23 23:07:29', 3),
 	('1506648617326481409', '1506648391412879362', '二级分类', '2', NULL, 'primary', '分类级别 二级', 0, '2022-03-23 23:06:37', '2022-03-23 23:07:10', 2),
 	('1506648738428620801', '1506648391412879362', '三级分类', '3', NULL, 'info', '分类级别 三级', 0, '2022-03-23 23:07:06', '2022-03-23 23:07:06', 1),
@@ -183,7 +195,16 @@ INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_c
 	('1507910141563228162', '1507909943558524929', '女', '2', NULL, 'danger', '性别 女', 0, '2022-03-27 10:39:28', '2022-03-27 10:39:35', 1),
 	('1507913903639932929', '1507913784651722753', '申请中', '0', NULL, 'default', '友链状态 申请中', 0, '2022-03-27 10:54:25', '2022-03-27 10:54:58', 1),
 	('1507914027598393346', '1507913784651722753', '已上线', '1', NULL, 'success', '友链状态 已上线', 0, '2022-03-27 10:54:55', '2022-03-27 10:54:55', 2),
-	('1507914160700436482', '1507913784651722753', '已下架', '2', NULL, 'danger', '友链状态 已下架', 0, '2022-03-27 10:55:26', '2022-03-27 10:55:26', 3);
+	('1507914160700436482', '1507913784651722753', '已下架', '2', NULL, 'danger', '友链状态 已下架', 0, '2022-03-27 10:55:26', '2022-03-27 10:55:26', 3),
+	('1514210064461996034', '1514209682880995330', '点赞', '1', NULL, 'success', '评论类型 点赞', 0, '2022-04-13 19:53:07', '2022-04-13 19:53:07', 999),
+	('1514210160368951298', '1514209682880995330', '评论', '0', NULL, 'warning', '评论类型 评论', 0, '2022-04-13 19:53:30', '2022-04-13 19:53:34', 999),
+	('1514210349318152193', '1514209728137535490', '留言板', 'MESSAGE_BOARD', NULL, 'success', '评论来源 留言板', 0, '2022-04-13 19:54:15', '2022-04-13 19:54:15', 999),
+	('1514210482151759873', '1514209728137535490', '关于我', 'ABOUT', NULL, 'warning', '评论来源 关于我', 0, '2022-04-13 19:54:46', '2022-04-13 19:54:46', 999),
+	('1514210661902852098', '1514209728137535490', '博客详情', 'BLOG_INFO', NULL, 'primary', '评论来源 博客详情', 0, '2022-04-13 19:55:29', '2022-04-13 19:55:29', 999),
+	('1516045760239882241', '1516045589821116417', '正常', '0', NULL, 'default', '博客推荐级别 正常', 0, '2022-04-18 21:27:31', '2022-04-18 21:27:31', 999),
+	('1516045852984332289', '1516045589821116417', '一级推荐', '1', NULL, 'success', '博客推荐级别 一级推荐', 0, '2022-04-18 21:27:53', '2022-04-18 21:27:58', 999),
+	('1516045939999363073', '1516045589821116417', '二级推荐', '2', NULL, 'warning', '博客推荐级别 二级推荐', 0, '2022-04-18 21:28:14', '2022-04-18 21:29:20', 999),
+	('1516045995942989826', '1516045589821116417', '三级推荐', '3', NULL, 'danger', '博客推荐级别 三级推荐', 0, '2022-04-18 21:28:27', '2022-04-18 21:29:23', 999);
 /*!40000 ALTER TABLE `t_dict_detail` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_email_config 结构
@@ -278,23 +299,25 @@ DELETE FROM `t_menu`;
 /*!40000 ALTER TABLE `t_menu` DISABLE KEYS */;
 INSERT INTO `t_menu` (`id`, `name`, `title`, `pid`, `icon`, `sort`, `is_deleted`, `create_time`, `update_time`, `hidden`, `component`, `path`, `redirect`, `permission`, `menu_type`, `sub_count`) VALUES
 	('1195268474480156673', '权限管理', '权限管理', '0', 'authority', 998, 0, '2021-10-07 21:49:36', '2022-03-27 23:04:19', 0, 'Layout', '/authority', NULL, '', 0, 4),
-	('1195268474480156674', '管理员管理', '管理员管理', '1195268474480156673', 'user', 1, 0, '2021-10-07 22:38:13', '2022-03-09 17:27:43', 0, 'authority/admin', 'admin', NULL, 'admin:list', 1, 2),
+	('1195268474480156674', '管理员管理', '管理员管理', '1195268474480156673', 'peoples', 1, 0, '2021-10-07 22:38:13', '2022-04-10 12:45:12', 0, 'authority/admin', 'admin', NULL, 'admin:list', 1, 2),
 	('1195268474480156675', '菜单管理', '菜单管理', '1195268474480156673', 'authority', 2, 0, '2021-10-07 22:50:12', '2022-03-09 17:27:53', 0, 'authority/menu', 'menu', NULL, 'menu:list', 1, 4),
 	('1195268474480156676', '添加菜单', '添加菜单', '1195268474480156675', NULL, 1, 0, '2021-12-04 22:16:29', '2022-03-09 17:00:45', 0, NULL, NULL, NULL, 'menu:add', 2, 0),
 	('1195268474480156677', '博客管理', '博客管理', '0', 'blog', 999, 0, '2022-03-07 14:11:22', '2022-03-27 23:04:05', 0, 'Layout', '/blog', NULL, '', 0, 4),
 	('1195268474480156678', '博客管理', '博客管理', '1195268474480156677', 'blog', 1, 0, '2022-03-07 14:20:01', '2022-03-18 09:59:30', 0, 'blog/blog', 'blog', NULL, 'blog:list', 1, 0),
 	('1195268474480156679', '分类管理', '分类管理', '1195268474480156677', 'sort', 2, 0, '2022-03-07 14:55:30', '2022-03-18 10:05:00', 0, 'blog/sort', 'sort', NULL, 'sort:list', 1, 0),
-	('1501368407743528962', '系统管理', '系统管理', '0', 'system', 997, 0, '2022-03-09 09:24:57', '2022-03-27 23:04:25', 0, 'Layout', '/system', NULL, NULL, 0, 3),
+	('1501368407743528962', '系统管理', '系统管理', '0', 'system', 997, 0, '2022-03-09 09:24:57', '2022-03-27 23:04:25', 0, 'Layout', '/system', NULL, NULL, 0, 5),
 	('1501369279194071042', '字典管理', '字典管理', '1501368407743528962', 'authority', 999, 0, '2022-03-09 09:28:25', '2022-03-22 13:40:06', 0, 'system/dict', 'dict', NULL, 'dict:list', 1, 0),
 	('1501369997368082434', '删除菜单', '删除菜单', '1195268474480156675', NULL, 3, 0, '2022-03-09 09:31:16', '2022-03-09 17:26:48', 0, NULL, NULL, NULL, 'menu:del', 2, 0),
 	('1501483509264281601', '修改菜单', '修改菜单', '1195268474480156675', NULL, 2, 0, '2022-03-09 17:02:19', '2022-03-09 17:02:19', 0, NULL, NULL, NULL, 'menu:edit', 2, 0),
-	('1501490155294052354', '角色管理', '角色管理', '1195268474480156673', 'peoples', 3, 0, '2022-03-09 17:28:44', '2022-03-09 17:29:09', 0, 'authority/role', 'role', NULL, 'role:list', 1, 0),
+	('1501490155294052354', '角色管理', '角色管理', '1195268474480156673', 'adminRole', 3, 0, '2022-03-09 17:28:44', '2022-04-10 12:43:48', 0, 'authority/role', 'role', NULL, 'role:list', 1, 0),
 	('1503383805083586562', '添加管理员', '添加管理员', '1195268474480156674', NULL, 999, 0, '2022-03-14 22:53:25', '2022-03-14 22:53:25', 0, NULL, NULL, NULL, 'admin:add', 2, 0),
 	('1504633021835083777', '标签管理', '标签管理', '1195268474480156677', 'tag', 3, 0, '2022-03-18 09:37:22', '2022-03-18 10:05:36', 0, 'blog/tag', 'tag', NULL, 'blog:list', 1, 0),
 	('1506144477000859650', '友情链接', '友情链接', '1501368407743528962', 'link', 999, 0, '2022-03-22 13:43:21', '2022-03-22 13:43:21', 0, 'system/link', 'link', NULL, 'link:list', 1, 0),
 	('1508097474904268802', '系统监控', '系统监控', '0', 'monitor', 996, 0, '2022-03-27 23:08:23', '2022-03-27 23:08:23', 0, 'Layout', '/monitor', NULL, NULL, 0, 3),
 	('1508097940568481794', '服务监控', '服务监控', '1508097474904268802', 'dashboard', 999, 0, '2022-03-27 23:10:30', '2022-03-27 23:10:30', 0, 'monitor/server', 'server', NULL, 'server:list', 1, 0),
-	('1508812944326385665', 'druid监控', 'druid监控', '1508097474904268802', 'druid', 999, 0, '2022-03-29 22:26:53', '2022-03-29 22:26:53', 0, 'monitor/druid', 'druid', NULL, 'druid:list', 1, 0);
+	('1508812944326385665', 'druid监控', 'druid监控', '1508097474904268802', 'druid', 999, 0, '2022-03-29 22:26:53', '2022-03-29 22:26:53', 0, 'monitor/druid', 'druid', NULL, 'druid:list', 1, 0),
+	('1513015571486470146', '评论管理', '评论管理', '1501368407743528962', 'message', 999, 0, '2022-04-10 12:46:37', '2022-04-16 08:19:58', 0, 'system/comment', 'comment', NULL, 'comment:list', 1, 0),
+	('1515127581015547905', '门户访问记录管理', '门户访问记录管理', '1501368407743528962', 'web', 999, 0, '2022-04-16 08:39:00', '2022-04-16 17:29:20', 0, 'system/webVisit', 'webVisit', NULL, 'webVisit:list', 1, 0);
 /*!40000 ALTER TABLE `t_menu` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_picture 结构
@@ -348,15 +371,12 @@ CREATE TABLE IF NOT EXISTS `t_role_admin` (
   UNIQUE KEY `ROLE_ADMIN_UK` (`role_id`,`admin_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='角色管理员中间表';
 
--- 正在导出表  mango_blog.t_role_admin 的数据：~3 rows (大约)
+-- 正在导出表  mango_blog.t_role_admin 的数据：~2 rows (大约)
 DELETE FROM `t_role_admin`;
 /*!40000 ALTER TABLE `t_role_admin` DISABLE KEYS */;
 INSERT INTO `t_role_admin` (`id`, `role_id`, `admin_id`, `create_time`, `update_time`) VALUES
-	('1495268474480156673', '1395268474480156673', '1295268474480156673', '2021-10-02 22:52:34', '2021-10-02 22:52:35'),
-	('1495268474480156674', '1395268474480156673', '1595268474480156674', '2021-12-02 22:09:43', '2021-12-02 22:09:43'),
-	('1502546893753643010', '1502546893753643010', '1595268474480156674', '2022-03-12 16:18:38', '2022-03-12 16:18:38'),
-	('1512085943783608322', '1395268474480156673', '1512085925777461250', '2022-04-07 23:12:37', '2022-04-07 23:12:37'),
-	('1512085943959769089', '1395268474480156674', '1512085925777461250', '2022-04-07 23:12:37', '2022-04-07 23:12:37');
+	('1512987650810048514', '1395268474480156673', '1295268474480156673', '2022-04-10 10:55:41', '2022-04-10 10:55:41'),
+	('1516050445092786177', '1395268474480156674', '1595268474480156674', '2022-04-18 21:46:08', '2022-04-18 21:46:08');
 /*!40000 ALTER TABLE `t_role_admin` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role_menu 结构
@@ -371,7 +391,7 @@ CREATE TABLE IF NOT EXISTS `t_role_menu` (
   UNIQUE KEY `ROLE_MENU_UK` (`role_id`,`menu_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- 正在导出表  mango_blog.t_role_menu 的数据：~20 rows (大约)
+-- 正在导出表  mango_blog.t_role_menu 的数据：~22 rows (大约)
 DELETE FROM `t_role_menu`;
 /*!40000 ALTER TABLE `t_role_menu` DISABLE KEYS */;
 INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_time`) VALUES
@@ -381,20 +401,22 @@ INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_ti
 	('1507906766557794306', '1502546893753643010', '1501368407743528962', '2022-03-27 10:26:03', '2022-03-27 10:26:03'),
 	('1507906766822035458', '1502546893753643010', '1501369279194071042', '2022-03-27 10:26:03', '2022-03-27 10:26:03'),
 	('1507906767212105729', '1502546893753643010', '1506144477000859650', '2022-03-27 10:26:04', '2022-03-27 10:26:04'),
-	('1508813011242311682', '1395268474480156673', '1195268474480156673', '2022-03-29 22:27:09', '2022-03-29 22:27:09'),
-	('1508813012542545922', '1395268474480156673', '1195268474480156674', '2022-03-29 22:27:09', '2022-03-29 22:27:09'),
-	('1508813013381406721', '1395268474480156673', '1195268474480156675', '2022-03-29 22:27:09', '2022-03-29 22:27:09'),
-	('1508813015231094785', '1395268474480156673', '1195268474480156677', '2022-03-29 22:27:10', '2022-03-29 22:27:10'),
-	('1508813016250310658', '1395268474480156673', '1195268474480156678', '2022-03-29 22:27:10', '2022-03-29 22:27:10'),
-	('1508813018339074049', '1395268474480156673', '1195268474480156679', '2022-03-29 22:27:11', '2022-03-29 22:27:11'),
-	('1508813018930470914', '1395268474480156673', '1501368407743528962', '2022-03-29 22:27:11', '2022-03-29 22:27:11'),
-	('1508813019534450690', '1395268474480156673', '1501369279194071042', '2022-03-29 22:27:11', '2022-03-29 22:27:11'),
-	('1508813019983241217', '1395268474480156673', '1501490155294052354', '2022-03-29 22:27:11', '2022-03-29 22:27:11'),
-	('1508813020834684929', '1395268474480156673', '1504633021835083777', '2022-03-29 22:27:11', '2022-03-29 22:27:11'),
-	('1508813021228949505', '1395268474480156673', '1506144477000859650', '2022-03-29 22:27:11', '2022-03-29 22:27:11'),
-	('1508813021732265985', '1395268474480156673', '1508097474904268802', '2022-03-29 22:27:11', '2022-03-29 22:27:11'),
-	('1508813022420131842', '1395268474480156673', '1508097940568481794', '2022-03-29 22:27:12', '2022-03-29 22:27:12'),
-	('1508813022847950849', '1395268474480156673', '1508812944326385665', '2022-03-29 22:27:12', '2022-03-29 22:27:12');
+	('1515127626116898817', '1395268474480156673', '1195268474480156673', '2022-04-16 08:39:10', '2022-04-16 08:39:10'),
+	('1515127626699907073', '1395268474480156673', '1195268474480156674', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627354218497', '1395268474480156673', '1195268474480156675', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627354218498', '1395268474480156673', '1195268474480156677', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627354218499', '1395268474480156673', '1195268474480156678', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627354218500', '1395268474480156673', '1195268474480156679', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627354218501', '1395268474480156673', '1501368407743528962', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627354218502', '1395268474480156673', '1501369279194071042', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627421327362', '1395268474480156673', '1501490155294052354', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627421327363', '1395268474480156673', '1504633021835083777', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627421327364', '1395268474480156673', '1506144477000859650', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627421327365', '1395268474480156673', '1508097474904268802', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627421327366', '1395268474480156673', '1508097940568481794', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627421327367', '1395268474480156673', '1508812944326385665', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627421327368', '1395268474480156673', '1513015571486470146', '2022-04-16 08:39:11', '2022-04-16 08:39:11'),
+	('1515127627488436225', '1395268474480156673', '1515127581015547905', '2022-04-16 08:39:11', '2022-04-16 08:39:11');
 /*!40000 ALTER TABLE `t_role_menu` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_sort 结构
@@ -529,18 +551,33 @@ CREATE TABLE IF NOT EXISTS `t_web_visit` (
   `id` varchar(19) NOT NULL COMMENT '主键',
   `user_id` varchar(255) DEFAULT NULL COMMENT '用户id',
   `ip` varchar(255) DEFAULT NULL COMMENT '访问ip地址',
-  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `os` varchar(255) DEFAULT NULL COMMENT '操作系统',
   `browser` varchar(255) DEFAULT NULL COMMENT '浏览器',
   `ip_source` varchar(255) DEFAULT NULL COMMENT 'ip来源',
+  `behavior` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户行为',
+  `content` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '行为内容',
+  `request_time` timestamp NULL DEFAULT NULL COMMENT '请求时间',
+  `is_menu` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '是否是菜单1:是0:否',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='Web访问记录表';
 
--- 正在导出表  mango_blog.t_web_visit 的数据：~0 rows (大约)
+-- 正在导出表  mango_blog.t_web_visit 的数据：~11 rows (大约)
 DELETE FROM `t_web_visit`;
 /*!40000 ALTER TABLE `t_web_visit` DISABLE KEYS */;
+INSERT INTO `t_web_visit` (`id`, `user_id`, `ip`, `create_time`, `update_time`, `os`, `browser`, `ip_source`, `behavior`, `content`, `request_time`, `is_menu`) VALUES
+	('1', '1', '1', '2022-04-17 10:19:36', '2022-04-17 10:19:36', NULL, NULL, NULL, '点击博客', NULL, '2022-04-17 10:19:39', 1),
+	('10', NULL, NULL, '2022-04-17 17:31:07', '2022-04-17 17:31:08', NULL, NULL, NULL, '点击作者', NULL, '2022-04-17 17:31:08', 1),
+	('11', NULL, NULL, '2022-04-17 17:31:17', '2022-04-17 17:31:18', NULL, NULL, NULL, '点击博客标签页面', NULL, '2022-04-17 17:31:19', 1),
+	('2', '2', '1', '2022-04-17 10:19:46', '2022-04-17 10:19:46', NULL, NULL, NULL, '点击博客分类页面', NULL, '2022-04-17 10:19:48', 1),
+	('3', NULL, NULL, '2022-04-17 10:45:45', '2022-04-17 10:45:45', NULL, NULL, NULL, '点击博客', NULL, '2022-04-17 10:45:48', 1),
+	('4', NULL, NULL, '2022-04-16 10:46:05', '2022-04-17 10:46:06', NULL, NULL, NULL, '点击博客', NULL, '2022-04-16 10:46:11', 1),
+	('5', NULL, NULL, '2022-04-17 17:29:18', '2022-04-17 17:29:18', NULL, NULL, NULL, '点击首页', NULL, '2022-04-17 17:29:24', 1),
+	('6', NULL, NULL, '2022-04-17 17:29:45', '2022-04-17 17:29:45', NULL, NULL, NULL, '点击友情链接', NULL, '2022-04-17 17:29:46', 1),
+	('7', NULL, NULL, '2022-04-17 17:30:20', '2022-04-17 17:30:20', NULL, NULL, NULL, '点击归档', NULL, '2022-04-17 17:30:21', 1),
+	('8', NULL, NULL, '2022-04-17 17:30:34', '2022-04-17 17:30:34', NULL, NULL, NULL, '点击归档', NULL, '2022-04-17 17:30:39', 1),
+	('9', NULL, NULL, '2022-04-17 17:30:47', '2022-04-17 17:30:47', NULL, NULL, NULL, '点击归档', NULL, '2022-04-17 17:30:52', 1);
 /*!40000 ALTER TABLE `t_web_visit` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

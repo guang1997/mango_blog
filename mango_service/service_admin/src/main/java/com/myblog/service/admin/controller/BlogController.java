@@ -1,10 +1,14 @@
 package com.myblog.service.admin.controller;
 
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import com.myblog.service.admin.entity.dto.BlogDto;
+import com.myblog.service.admin.service.BlogService;
+import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.base.common.Response;
+import com.myblog.service.security.entity.dto.AdminDto;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -16,8 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/blog")
+@RequestMapping("/admin/blog")
 public class BlogController {
 
+    @Autowired
+    private BlogService blogService;
+
+    @LogByMethod("/admin/blog/getBlogByPage")
+    @ApiOperation(value = "分页查询博客信息", notes = "分页查询博客信息", response = Response.class)
+    @PostMapping("/getBlogByPage")
+    public Response getBlogByPage(@RequestBody BlogDto blogDto) throws Exception {
+        return blogService.getBlogByPage(blogDto);
+    }
 }
 

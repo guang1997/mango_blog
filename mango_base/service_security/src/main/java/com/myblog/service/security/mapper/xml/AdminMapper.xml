@@ -52,6 +52,6 @@
                 update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
         </set>
-        where title=#{title,jdbcType=VARBINARY} and pid=#{pid,jdbcType=INTEGER}
+        where username=#{username,jdbcType=VARBINARY}
     </update>
 </mapper>

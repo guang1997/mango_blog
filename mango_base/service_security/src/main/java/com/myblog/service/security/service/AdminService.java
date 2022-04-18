@@ -34,4 +34,6 @@ public interface AdminService extends IService<Admin>, ServiceConvertHandler<Adm
     Response updateEmail(PassAndEmailDto passAndEmailDto) throws Exception;
 
     Response updatePass(PassAndEmailDto passAndEmailDto) throws Exception;
+
+    Response editAdmin(AdminDto adminDto) throws Exception;
 }

@@ -50,6 +50,7 @@ public interface DbConstants {
 
     interface BlogTag {
         String TAG_ID = "tag_id";
+        String BLOG_ID = "blog_id";
     }
 
     interface Sort {
@@ -59,6 +60,9 @@ public interface DbConstants {
 
     interface Blog {
         String BLOG_SORT_ID = "blog_sort_id";
+        String TITLE = "title";
+        String LEVEL = "level";
+        String OPEN_COMMENT = "open_comment";
     }
 
 	interface Dict {
@@ -74,5 +78,18 @@ public interface DbConstants {
         String TITLE = "title";
         String URL = "url";
         String LINK_STATUS = "link_status";
+    }
+
+    interface Comment {
+        String CONTENT = "content";
+        String SOURCE = "source";
+        String TYPE = "type";
+        String STATUS = "status";
+        String PARENT_ID = "parent_id";
+    }
+
+    interface WebVisit {
+        String BEHAVIOR = "behavior";
+        String REQUEST_TIME = "request_time";
     }
 }

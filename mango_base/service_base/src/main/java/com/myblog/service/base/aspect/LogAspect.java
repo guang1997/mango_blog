@@ -2,6 +2,7 @@ package com.myblog.service.base.aspect;
 
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.JsonUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletRequest;
+import java.util.Objects;
 
 /**
  * 日志切面类
@@ -55,7 +57,10 @@ public class LogAspect {
             classLogger.info("method:{} invoke success, cost:{}, response:{}", methodName, (System.currentTimeMillis() - start), response);
         } catch (Exception e) {
             classLogger.error("method:" + methodName + " invoke failed, exception:", e);
-            return Response.error().message(e.getMessage());
+            if (Objects.nonNull(response)) {
+                return response;
+            }
+            return Response.error();
         }
         return response;
     }

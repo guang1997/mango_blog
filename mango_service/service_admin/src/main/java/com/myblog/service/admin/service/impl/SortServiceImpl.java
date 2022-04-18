@@ -45,6 +45,11 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
     @Override
     public Response getSortByPage(SortDto sortDto) throws Exception {
         Response response = Response.ok();
+        if (Objects.nonNull(sortDto.getQueryAll()) && sortDto.getQueryAll()) {
+            List<SortDto> sortDtos = this.toDtoList(baseMapper.selectList(null), SortDto.class);
+            response.data(Constants.ReplyField.DATA, sortDtos);
+            return response;
+        }
         QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
 
         int page = 1;

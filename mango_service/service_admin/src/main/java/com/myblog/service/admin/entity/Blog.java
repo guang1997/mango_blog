@@ -37,53 +37,32 @@ public class Blog extends BaseEntity {
     @ApiModelProperty(value = "博客内容")
     private String content;
 
-    @ApiModelProperty(value = "标签id")
-    private String tagId;
-
     @ApiModelProperty(value = "博客点击数")
     private Integer clickCount;
 
-    @ApiModelProperty(value = "博客收藏数")
-    private Integer collectCount;
+    @ApiModelProperty(value = "博客点赞数")
+    private Integer likeCount;
 
     @ApiModelProperty(value = "标题图片id")
     private String fileId;
 
-    @ApiModelProperty(value = "状态")
-    private Integer status;
-
     @ApiModelProperty(value = "管理员id")
     private String adminId;
 
-    @ApiModelProperty(value = "是否原创（0:不是 1：是）")
-    private String isOriginal;
-
     @ApiModelProperty(value = "作者")
     private String author;
-
-    @ApiModelProperty(value = "文章出处")
-    private String articlesPart;
 
     @ApiModelProperty(value = "博客分类ID")
     private String blogSortId;
 
     @ApiModelProperty(value = "推荐等级(0:正常)")
-    private Boolean level;
-
-    @ApiModelProperty(value = "是否发布：0：否，1：是")
-    private String isPublish;
+    private Integer level;
 
     @ApiModelProperty(value = "排序字段")
     private Integer sort;
 
     @ApiModelProperty(value = "是否开启评论(0:否 1:是)")
-    private Boolean openComment;
-
-    @ApiModelProperty(value = "类型【0 博客， 1：推广】")
-    private Boolean type;
-
-    @ApiModelProperty(value = "外链【如果是推广，那么将跳转到外链】")
-    private String outsideLink;
+    private Integer openComment;
 
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic

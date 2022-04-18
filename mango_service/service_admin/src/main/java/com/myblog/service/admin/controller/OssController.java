@@ -1,10 +1,12 @@
 package com.myblog.service.admin.controller;
 
+import com.myblog.service.admin.config.FileUploadProperties;
 import com.myblog.service.admin.service.OssService;
 import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.util.FileUtil;
 import com.myblog.service.security.entity.Admin;
 import com.myblog.service.security.service.AdminService;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -31,6 +34,9 @@ public class OssController {
     @Autowired
     private AdminService adminService;
 
+    @Autowired
+    private FileUploadProperties fileUploadProperties;
+
     /**
      * 该方法用于上传文件
      * @return
@@ -41,6 +47,13 @@ public class OssController {
     public Response uploadAvatar(MultipartFile avatar,
                                  @RequestParam("moduleName") String moduleName,
                                  @RequestParam("id") String id) throws IOException {
+        // 文件大小验证
+        FileUtil.checkSize(fileUploadProperties.getAvatarMaxSize(), avatar.getSize());
+        // 验证文件上传的格式
+        String fileType = FileUtil.getExtensionName(avatar.getOriginalFilename());
+        if(fileType != null && !fileUploadProperties.getAvatarImgType().contains(fileType)){
+            throw new RuntimeException("文件格式错误！, 仅支持 " + fileUploadProperties.getAvatarImgType() +" 格式");
+        }
         if (StringUtils.isBlank(id)) {
             LOGGER.error("uploadAvatar failed, id cannot be null");
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);

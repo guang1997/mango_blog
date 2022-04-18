@@ -47,4 +47,6 @@ public class AdminDto extends BaseDto {
     private String blurry;
 
     private List<String> lastLoginTimes;
+
+    private Boolean changeEnabled;
 }

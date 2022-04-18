@@ -17,4 +17,6 @@ public class SortDto extends BaseDto {
     private Integer sortLevel;
 
     private List<String> createTimes;
+
+    private Boolean queryAll;
 }

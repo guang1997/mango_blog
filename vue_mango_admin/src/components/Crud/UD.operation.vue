@@ -1,13 +1,13 @@
 <template>
   <div>
-    <el-button v-permission="permission.edit" :loading="crud.status.cu === 2" :disabled="disabledEdit" size="mini" type="primary" icon="el-icon-edit" @click="crud.toEdit(data)" />
+    <el-button v-permission="permission.edit" :loading="crud.status.cu === 2" :disabled="disabledEdit" v-if="showEdit" size="mini" type="primary" icon="el-icon-edit" @click="crud.toEdit(data)" />
     <el-popover v-model="pop" v-permission="permission.del" placement="top" width="180" trigger="manual" @show="onPopoverShow" @hide="onPopoverHide">
       <p>{{ msg }}</p>
       <div style="text-align: right; margin: 0">
         <el-button size="mini" type="text" @click="doCancel">取消</el-button>
         <el-button :loading="crud.dataStatus[crud.getDataId(data)].delete === 2" type="primary" size="mini" @click="crud.doDelete(data)">确定</el-button>
       </div>
-      <el-button slot="reference" :disabled="disabledDle" type="danger" icon="el-icon-delete" size="mini" @click="toDelete" />
+      <el-button slot="reference" :disabled="disabledDel" type="danger" icon="el-icon-delete" size="mini" @click="toDelete" />
     </el-popover>
   </div>
 </template>
@@ -28,13 +28,17 @@ export default {
       type: Boolean,
       default: false
     },
-    disabledDle: {
+    disabledDel: {
       type: Boolean,
       default: false
     },
     msg: {
       type: String,
       default: '确定删除本条数据吗？'
+    },
+    showEdit: {
+      type: Boolean,
+      default: true
     }
   },
   data() {

@@ -47,6 +47,11 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     @Override
     public Response getTagByPage(TagDto tagDto) throws Exception {
         Response response = Response.ok();
+        if (Objects.nonNull(tagDto.getQueryAll()) && tagDto.getQueryAll()) {
+            List<TagDto> tagDtos = this.toDtoList(baseMapper.selectList(null), TagDto.class);
+            response.data(Constants.ReplyField.DATA, tagDtos);
+            return response;
+        }
         QueryWrapper<Tag> queryWrapper = new QueryWrapper<>();
 
         int page = 1;

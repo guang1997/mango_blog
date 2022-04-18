@@ -2,4 +2,72 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.myblog.service.admin.mapper.BlogMapper">
 
+    <select id="getBlogCountByBlogSort" resultType="java.util.Map">
+        SELECT blog_sort_id as sortId, COUNT(id) AS value FROM t_blog GROUP BY blog_sort_id
+    </select>
+    <select id="getBlogContributeCount" resultType="java.util.Map">
+        SELECT DISTINCT DATE_FORMAT(create_time, '%Y-%m-%d') date, COUNT(id) count FROM t_blog WHERE is_deleted = 0 AND create_time BETWEEN #{startTime} AND #{endTime} GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+    </select>
+    <select id="selectBlogByRequest" resultType="com.myblog.service.admin.entity.Blog">
+        SELECT t1.id, t1.title, t1.summary, t1.content, t1.click_count,
+        t1.like_count, t1.file_id, t1.create_time, t1.update_time, t1.admin_id, t1.author, t1.blog_sort_id, t1.`level`, t1.sort, t1.open_comment, t1.is_deleted
+        FROM t_blog t1
+        <choose>
+            <when test="tagId!=null">
+                LEFT JOIN t_blog_tag t2
+                ON t1.id = t2.blog_id
+                WHERE t2.tag_id = #{tagId,jdbcType=VARCHAR}
+            </when>
+            <otherwise>
+                WHERE 1=1
+            </otherwise>
+        </choose>
+
+        AND t1.is_deleted = 0
+        <if test="title != null">
+            AND t1.title = #{title,jdbcType=VARCHAR}
+        </if>
+        <if test="author != null">
+            AND t1.author = #{author,jdbcType=TINYINT}
+        </if>
+        <if test="level != null">
+            AND t1.level = #{level,jdbcType=TINYINT}
+        </if>
+        <if test="openComment != null">
+            AND t1.open_comment = #{openComment,jdbcType=TINYINT}
+        </if>
+        <if test="blogSortId != null">
+            AND t1.blog_sort_id = #{blogSortId,jdbcType=TINYINT}
+        </if>
+         ORDER BY t1.sort DESC
+         LIMIT #{page,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}
+    </select>
+    <select id="selectBlogCountByRequest" resultType="java.lang.Integer">
+        SELECT COUNT(t1.id)
+        FROM t_blog t1
+        <choose>
+            <when test="tagId!=null">
+                LEFT JOIN t_blog_tag t2
+                ON t1.id = t2.blog_id
+                WHERE t2.tag_id = #{tagId,jdbcType=VARCHAR}
+            </when>
+            <otherwise>
+                WHERE 1=1
+            </otherwise>
+        </choose>
+
+        AND t1.is_deleted = 0
+        <if test="title != null">
+            AND t1.title = #{title,jdbcType=VARCHAR}
+        </if>
+        <if test="level != null">
+            AND t1.level = #{level,jdbcType=TINYINT}
+        </if>
+        <if test="openComment != null">
+            AND t1.open_comment = #{openComment,jdbcType=TINYINT}
+        </if>
+        <if test="blogSortId != null">
+            AND t1.blog_sort_id = #{blogSortId,jdbcType=TINYINT}
+        </if>
+    </select>
 </mapper>

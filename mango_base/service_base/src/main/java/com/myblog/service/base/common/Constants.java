@@ -40,9 +40,31 @@ public interface Constants {
         String DISK = "disk";
         String TIME = "time";
         String CODE = "code";
+        String COMMENT_COUNT = "commentCount";
+        String BLOG_COUNT = "blogCount";
+        String USER_COUNT = "userCount";
+        String VISIT_COUNT = "visitCount";
+        String NAME = "name";
+        String CONTRIBUTE_DATE = "contributeDate";
+        String BLOG_CONTRIBUTE_COUNT = "blogContributeCount";
+        String RADAR_INDICATOR = "radarIndicator";
+        String RADAR_CHART_DATA = "radarChartData";
+        String DATE = "date";
+        String VISIT_LIST = "visitList";
+        String BLOG_TAGS = "blogTags";
+        String BLOG_SORTS = "blogSorts";
     }
 
     interface SystemConstant {
         String WIN = "win";
+    }
+
+    /**
+     * 评论状态: 0-待审核, 1-审核通过, 2-审核不通过
+     */
+    interface CommentStatus {
+        int PENDING_REVIEW = 0;
+        int REVIEWED = 1;
+        int REJECT = 2;
     }
 }

@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +68,10 @@ public class AdminController {
         if (!CollectionUtils.isEmpty(roles)) {
             for (RoleDto roleDto : roles) {
                 Role role = roleService.getById(roleDto.getId());
-                roleService.validRoleLevel(role.getLevel(), role.getRoleName());
+                Response response = roleService.validRoleLevel(role.getLevel(), role.getRoleName());
+                if (!response.getSuccess()) {
+                    return response;
+                }
             }
         }
         return adminService.addAdmin(adminDto);
@@ -76,16 +80,12 @@ public class AdminController {
     @LogByMethod("/admin/manager/editAdmin")
     @ApiOperation(value = "修改管理员", notes = "修改管理员", response = Response.class)
     @PutMapping("/editAdmin")
-    public Response editAdmin(@RequestBody AdminDto adminDto) {
-        roleService.validRoleLevelByUserId(adminDto.getId());
-        Response response = Response.ok();
-        try {
-//            response = roleService.editRole(roleDto);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.UPDATE_FAILED.getCode()).message(ResultCodeEnum.UPDATE_FAILED.getMessage());
-            throw e;
+    public Response editAdmin(@RequestBody AdminDto adminDto) throws Exception {
+        Response response = roleService.validRoleLevelByUserId(adminDto.getId());
+        if (!response.getSuccess()) {
+            return response;
         }
-        return response;
+        return adminService.editAdmin(adminDto);
     }
 
     @LogByMethod("/admin/manager/editAdminFromCenter")
@@ -133,10 +133,13 @@ public class AdminController {
     @DeleteMapping("/delAdmin")
     public Response delAdmin(@RequestBody Set<String> ids) throws Exception {
         for (String id : ids) {
-
+            Response response = roleService.validRoleLevelByUserId(id);
+            if (!response.getSuccess()) {
+                return response;
+            }
         }
         return adminService.delAdmin(ids);
-    }
 
+    }
 }
 

@@ -1,6 +1,7 @@
 package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.*;
 import com.myblog.service.base.util.*;
@@ -117,7 +118,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
                     .or()
                     .like(DbConstants.Admin.NICKNAME, adminDto.getBlurry());
         }
-        if (StringUtils.isNotBlank(adminDto.getGender())) {
+        if (Objects.nonNull(adminDto.getGender())) {
             queryWrapper.eq(DbConstants.Admin.GENDER, adminDto.getGender());
         }
         if (Objects.nonNull(adminDto.getEnabled())) {
@@ -155,13 +156,16 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         List<Admin> admins = baseMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(admins)) {
             LOGGER.error("addAdmin failed, admin already exist in db, admin:{}", adminDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED).message("保存失败，用户名已存在");
         }
         Admin admin = this.toDb(adminDto, Admin.class);
         // 给管理员设置默认密码，规则为用户名+yyyy
         admin.setPassword(passwordEncoder.encode(admin.getUsername() + ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.YEAR)));
         admin.setUpdateTime(new Date());
         admin.setCreateTime(new Date());
+        admin.setLoginCount(0);
+        admin.setLastLoginIp(null);
+        admin.setLastLoginTime(null);
         if (baseMapper.updateByUserName(admin) < 1) {
             if (baseMapper.insert(admin) < 1) {
                 LOGGER.error("addAdmin failed by unknown error, role:{}", admin);
@@ -207,6 +211,10 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             // 清理缓存信息
             redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
             baseMapper.deleteById(id);
+            // 删除角色信息
+            UpdateWrapper<RoleAdmin> roleAdminUpdateWrapper = new UpdateWrapper<>();
+            roleAdminUpdateWrapper.eq(DbConstants.RoleAdmin.ADMIN_ID, id);
+            roleAdminMapper.delete(roleAdminUpdateWrapper);
         }
         return Response.ok();
     }
@@ -295,6 +303,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      * @throws Exception
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Response updatePass(PassAndEmailDto passAndEmailDto) throws Exception {
         // 获取当前登陆用户信息
         QueryWrapper<Admin> wrapper = new QueryWrapper<>();
@@ -326,16 +335,83 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         return Response.ok();
     }
 
+    /**
+     * 修改管理员
+     * @param adminDto
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response editAdmin(AdminDto adminDto) throws Exception{
+        QueryWrapper<Admin> usernameQueryWrapper = new QueryWrapper<>();
+        usernameQueryWrapper.eq(DbConstants.Admin.USERNAME, adminDto.getUsername())
+                .or()
+                .eq(DbConstants.Admin.PHONE, adminDto.getPhone())
+                .or()
+                .eq(DbConstants.Admin.EMAIL, adminDto.getEmail());
+        usernameQueryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        Admin dbAdmin = baseMapper.selectOne(usernameQueryWrapper);
+        if (Objects.nonNull(dbAdmin) && !Objects.equals(dbAdmin.getId(), adminDto.getId())) {
+            LOGGER.error("editAdmin failed, username or phone or email already exist, admin:{}", adminDto);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("保存失败，用户名、手机和邮箱不能重复");
+        }
+        Admin oldAdmin = baseMapper.selectById(adminDto.getId());
+        Admin admin = toDb(adminDto, Admin.class);
+        UpdateWrapper<Admin> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq(DbConstants.Base.ID, admin.getId());
+        if (baseMapper.update(admin, updateWrapper) < 1) {
+            LOGGER.error("editAdmin failed by unknown error, admin:{}", admin);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+        // 更改角色信息
+        UpdateWrapper<RoleAdmin> roleAdminUpdateWrapper = new UpdateWrapper<>();
+        roleAdminUpdateWrapper.eq(DbConstants.RoleAdmin.ADMIN_ID, adminDto.getId());
+        roleAdminMapper.delete(roleAdminUpdateWrapper);
+        List<RoleDto> roleDtos = adminDto.getRoles();
+        if (!CollectionUtils.isEmpty(roleDtos)) {
+            for (RoleDto roleDto : roleDtos) {
+                RoleAdmin roleAdmin = new RoleAdmin();
+                roleAdmin.setAdminId(dbAdmin.getId());
+                roleAdmin.setRoleId(roleDto.getId());
+                if (roleAdminMapper.insert(roleAdmin) < 1) {
+                    Role role = roleMapper.selectById(roleDto.getId());
+                    LOGGER.error("addAdmin success, but add role failed by unknown error, username:{}, role:{}", dbAdmin.getUsername(), role);
+                }
+            }
+        }
+        redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + oldAdmin.getUsername());
+        return Response.ok();
+    }
+
     @Override
     public void setDtoExtraProperties(Admin admin, AdminDto adminDto) {
         adminDto.setId(admin.getId());
         adminDto.setCreateTime(admin.getCreateTime());
         adminDto.setUpdateTime(admin.getUpdateTime());
+        adminDto.setPassword(null);
+        if (admin.getEnabled()) {
+            adminDto.setEnabled(1);
+        } else {
+            adminDto.setEnabled(0);
+        }
         // 查询角色信息
         List<RoleDto> roleDtos = toRoleDto(roleMapper.getRolesByUserId(admin.getId()));
         adminDto.setRoles(roleDtos);
     }
 
+    @Override
+    public void setDbExtraProperties(Admin admin, AdminDto adminDto) {
+        if (StringUtils.isNotBlank(adminDto.getId())) {
+            admin.setId(adminDto.getId());
+        }
+        if (Objects.nonNull(adminDto.getEnabled())) {
+            if (Objects.equals(adminDto.getEnabled(), 1)) {
+                admin.setEnabled(true);
+            } else {
+                admin.setEnabled(false);
+            }
+        }
+    }
     private List<RoleDto> toRoleDto(List<Role> roleList) {
         List<RoleDto> roleDtos = new ArrayList<>();
         for (Role role : roleList) {
