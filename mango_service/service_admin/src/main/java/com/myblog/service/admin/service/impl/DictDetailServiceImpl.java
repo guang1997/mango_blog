@@ -69,9 +69,9 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
 
     @Override
     public Response editDictDetail(DictDetailDto dictDetailDto) throws Exception{
-        DictDetail tag = this.toDb(dictDetailDto, DictDetail.class);
-        if (baseMapper.updateById(tag) < 1) {
-            LOGGER.error("editDictDetail failed by unknown error, dictDetail:{}", dictDetailDto);
+        DictDetail dictDetail = this.toDb(dictDetailDto, DictDetail.class);
+        if (baseMapper.updateById(dictDetail) < 1) {
+            LOGGER.error("editDictDetail failed by unknown error, dictDetail:{}", dictDetail);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();
@@ -102,7 +102,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
         dictDetail.setUpdateTime(new Date());
         if (baseMapper.updateByDictLabel(dictDetail) < 1) {
             if (baseMapper.insert(dictDetail) < 1) {
-                LOGGER.error("addDictDetail failed by unknown error, dictDetail:{}", dictDetailDto);
+                LOGGER.error("addDictDetail failed by unknown error, dictDetail:{}", dictDetail);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
         }

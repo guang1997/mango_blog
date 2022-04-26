@@ -178,7 +178,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         }
         Role role = this.toDb(roleDto, Role.class);
         if (baseMapper.updateById(role) < 1) {
-            LOGGER.error("editRole failed by unknown error, role:{}", roleDto);
+            LOGGER.error("editRole failed by unknown error, role:{}", role);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();

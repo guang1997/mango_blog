@@ -168,7 +168,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         admin.setLastLoginTime(null);
         if (baseMapper.updateByUserName(admin) < 1) {
             if (baseMapper.insert(admin) < 1) {
-                LOGGER.error("addAdmin failed by unknown error, role:{}", admin);
+                LOGGER.error("addAdmin failed by unknown error, admin:{}", admin);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
         }
@@ -252,8 +252,9 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             LOGGER.error("editAdminFromCenter failed, weChat is already exist, admin:{}", adminDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED_BY_WE_CHAT_EXIST);
         }
-        if (baseMapper.updateById(this.toDb(adminDto, Admin.class)) < 1) {
-            LOGGER.error("editAdminFromCenter failed by unknown error, admin:{}", adminDto);
+        Admin newAdmin = this.toDb(adminDto, Admin.class);
+        if (baseMapper.updateById(newAdmin) < 1) {
+            LOGGER.error("editAdminFromCenter failed by unknown error, admin:{}", newAdmin);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();

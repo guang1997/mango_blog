@@ -7,7 +7,7 @@ const api = {
     monitorWebsocketApi: baseWebSocketUrl + '/admin/websocket',
     // 图片上传
     imagesUploadApi: baseUrl + '/admin/oss/upload',
-    // 上传头像
+    // 个人中心页面上传头像
     uploadAvatarApi: baseUrl + '/admin/oss/uploadAvatar',
     // druid
     druidApi: baseUrl + '/druid',

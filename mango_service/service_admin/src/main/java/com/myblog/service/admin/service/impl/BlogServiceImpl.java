@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -190,6 +191,36 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         List<Sort> sorts = sortMapper.selectList(null);
         response.data(Constants.ReplyField.BLOG_SORTS, sorts);
         return response;
+    }
+
+    /**
+     * 添加博客
+     * @param blogDto
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response addBlog(BlogDto blogDto) throws Exception{
+        QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Blog.TITLE, blogDto.getTitle());
+        if (baseMapper.selectList(queryWrapper).size() > 0) {
+            return Response.error().message("保存失败, 已存在相同名称的博客");
+        }
+        // 保存博客
+        Blog blog = toDb(blogDto, Blog.class);
+        if (baseMapper.insert(blog) < 1) {
+            LOGGER.error("addBlog failed by unknown error, blog:{}", blog);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
+        // 查询已经保存的博客
+        Blog dbBlog = baseMapper.selectOne(queryWrapper);
+        // 保存标签
+        List<String> tagIds = blogDto.getTags().stream().map(Tag::getId).distinct().collect(Collectors.toList());
+        if (blogTagMapper.insertBatch(tagIds, dbBlog.getId()) < 1) {
+            LOGGER.error("addBlog failed by add tags failed, tagIds:{}, blog:{}", tagIds, dbBlog);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        }
+        return Response.ok();
     }
 
     @Override

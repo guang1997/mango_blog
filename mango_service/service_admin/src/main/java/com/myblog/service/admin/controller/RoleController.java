@@ -57,7 +57,7 @@ public class RoleController {
     public Response addRole(@RequestBody RoleDto roleDto) throws Exception {
         if (StringUtils.isBlank(roleDto.getRoleName())) {
             LOGGER.error("addRole failed, roleName cannot be null, role:{}", roleDto);
-            Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return roleService.addRole(roleDto);
     }

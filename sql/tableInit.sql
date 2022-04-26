@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
 DELETE FROM `t_admin`;
 /*!40000 ALTER TABLE `t_admin` DISABLE KEYS */;
 INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `phone`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `enabled`, `is_deleted`) VALUES
-	('1295268474480156673', 'admin', '$2a$10$ZYi1kqMMQczWDw86u76uPu79CneIE1G0h4dw89a4tjZhrQCWa8QaW', 1, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', 'guang1997qqq@163.com', '18761616251', 19, '2022-04-18 20:20:20', '192.168.1.7', '2021-09-26 16:56:46', '2022-04-18 20:20:20', '李斯特', '872174823', '18761616251', 1, 0),
+	('1295268474480156673', 'admin', '$2a$10$ZYi1kqMMQczWDw86u76uPu79CneIE1G0h4dw89a4tjZhrQCWa8QaW', 1, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', 'guang1997qqq@163.com', '18761616251', 22, '2022-04-26 20:18:46', '192.168.1.7', '2021-09-26 16:56:46', '2022-04-26 20:18:46', '李斯特', '872174823', '18761616251', 1, 0),
 	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', 1, 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 1, '2022-04-06 22:37:27', '192.168.1.7', '2021-12-02 22:01:22', '2022-04-18 21:46:08', '游客', '111111', '111111', 0, 0);
 /*!40000 ALTER TABLE `t_admin` ENABLE KEYS */;
 
@@ -177,7 +177,7 @@ CREATE TABLE IF NOT EXISTS `t_dict_detail` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典详细数据表';
 
--- 正在导出表  mango_blog.t_dict_detail 的数据：~18 rows (大约)
+-- 正在导出表  mango_blog.t_dict_detail 的数据：~24 rows (大约)
 DELETE FROM `t_dict_detail`;
 /*!40000 ALTER TABLE `t_dict_detail` DISABLE KEYS */;
 INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_class`, `list_class`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES

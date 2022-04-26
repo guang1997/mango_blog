@@ -90,7 +90,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         dict.setUpdateTime(new Date());
         if (baseMapper.updateByDictName(dict) < 1) {
             if (baseMapper.insert(dict) < 1) {
-                LOGGER.error("addDict failed by unknown error, dict:{}", dictDto);
+                LOGGER.error("addDict failed by unknown error, dict:{}", dict);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
         }
@@ -107,7 +107,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     public Response editDict(DictDto dictDto) throws Exception{
         Dict dict = this.toDb(dictDto, Dict.class);
         if (baseMapper.updateById(dict) < 1) {
-            LOGGER.error("editDict failed by unknown error, dict:{}", dictDto);
+            LOGGER.error("editDict failed by unknown error, dict:{}", dict);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();

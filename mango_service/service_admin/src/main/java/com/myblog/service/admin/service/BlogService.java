@@ -25,4 +25,6 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
     Response getBlogContributeCount() throws Exception;
 
     Response getBlogByPage(BlogDto blogDto) throws Exception;
+
+    Response addBlog(BlogDto blogDto) throws Exception;
 }

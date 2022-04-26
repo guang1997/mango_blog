@@ -81,7 +81,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
         // 添加时设置为申请中状态
         link.setLinkStatus(LinkStatusEnum.APPLY.getCode());
         if (baseMapper.insert(link) < 1) {
-            LOGGER.error("addLink failed by unknown error, link:{}", linkDto);
+            LOGGER.error("addLink failed by unknown error, link:{}", link);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return Response.ok();
@@ -89,9 +89,9 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
 
     @Override
     public Response editLink(LinkDto linkDto) throws Exception{
-        Link sort = this.toDb(linkDto, Link.class);
-        if (baseMapper.updateById(sort) < 1) {
-            LOGGER.error("editLink failed by unknown error, link:{}", linkDto);
+        Link link = this.toDb(linkDto, Link.class);
+        if (baseMapper.updateById(link) < 1) {
+            LOGGER.error("editLink failed by unknown error, link:{}", link);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();

@@ -92,9 +92,9 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
             LOGGER.error("addSort failed, sortName is already exist, tag:{}", sortDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        Sort tag = this.toDb(sortDto, Sort.class);
-        if (baseMapper.insert(tag) < 1) {
-            LOGGER.error("addSort failed by unknown error, sort:{}", sortDto);
+        Sort sort = this.toDb(sortDto, Sort.class);
+        if (baseMapper.insert(sort) < 1) {
+            LOGGER.error("addSort failed by unknown error, sort:{}", sort);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return Response.ok();
@@ -109,7 +109,7 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
     public Response editSort(SortDto sortDto) throws Exception{
         Sort sort = this.toDb(sortDto, Sort.class);
         if (baseMapper.updateById(sort) < 1) {
-            LOGGER.error("editSort failed by unknown error, sort:{}", sortDto);
+            LOGGER.error("editSort failed by unknown error, sort:{}", sort);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();

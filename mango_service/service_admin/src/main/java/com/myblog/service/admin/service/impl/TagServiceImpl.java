@@ -95,7 +95,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         }
         Tag tag = this.toDb(tagDto, Tag.class);
         if (baseMapper.insert(tag) < 1) {
-            LOGGER.error("addTag failed by unknown error, tag:{}", tagDto);
+            LOGGER.error("addTag failed by unknown error, tag:{}", tag);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return Response.ok();
@@ -110,7 +110,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     public Response editTag(TagDto tagDto) throws Exception{
         Tag tag = this.toDb(tagDto, Tag.class);
         if (baseMapper.updateById(tag) < 1) {
-            LOGGER.error("editTag failed by unknown error, tag:{}", tagDto);
+            LOGGER.error("editTag failed by unknown error, tag:{}", tag);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();

@@ -364,10 +364,6 @@ export default {
     };
   },
   methods: {
-    // 新增前将多选的值设置为空
-    [CRUD.HOOK.beforeToAdd]() {
-      this.roleDatas = [];
-    },
     // 添加取消之后
     [CRUD.HOOK.afterAddCancel]() {
       this.userAvatar = null;
