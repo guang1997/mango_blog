@@ -86,19 +86,7 @@
       fullscreen
     >
       <el-form :model="form" :rules="rules" ref="form">
-        <el-form-item label="标题图" :label-width="formLabelWidth">
-          <el-upload
-            class="avatar-uploader"
-            :action="imagesUploadApi + '?moduleName=blog'"
-            :show-file-list="false"
-            :on-success="handleFileSuccess"
-            :headers="headers"
-            :before-upload="beforeFileUpload">
-            <img v-if="fileId" :src="fileId" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-        </el-form-item>
-
+          <el-col :span="16">
         <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
           <el-input
             v-model="form.title"
@@ -114,7 +102,22 @@
             @input="contentChange"
           ></el-input>
         </el-form-item>
-
+</el-col>
+        <el-col :span="8">
+        <el-form-item label="标题图" :label-width="formLabelWidth">
+          <el-upload
+            class="avatar-uploader"
+            :action="imagesUploadApi + '?moduleName=blog'"
+            :show-file-list="false"
+            :on-success="handleFileSuccess"
+            :headers="headers"
+            :before-upload="beforeFileUpload">
+            <img v-if="fileId" :src="fileId" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+        </el-col>
+      
         <el-row>
           <el-col :span="4">
             <el-form-item
