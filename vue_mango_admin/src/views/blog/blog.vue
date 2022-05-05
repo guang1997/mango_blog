@@ -86,6 +86,7 @@
       fullscreen
     >
       <el-form :model="form" :rules="rules" ref="form">
+        <el-row>
           <el-col :span="16">
         <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
           <el-input
@@ -95,7 +96,7 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="简介" :label-width="formLabelWidth">
+        <el-form-item label="简介" :label-width="formLabelWidth" prop="summary">
           <el-input
             v-model="form.summary"
             auto-complete="off"
@@ -104,7 +105,7 @@
         </el-form-item>
 </el-col>
         <el-col :span="8">
-        <el-form-item label="标题图" :label-width="formLabelWidth">
+        <el-form-item label="标题图" :label-width="formLabelWidth" prop="fileId">
           <el-upload
             class="avatar-uploader"
             :action="imagesUploadApi + '?moduleName=blog'"
@@ -117,13 +118,13 @@
           </el-upload>
         </el-form-item>
         </el-col>
-      
+     </el-row> 
         <el-row>
           <el-col :span="4">
             <el-form-item
               label="分类"
               :label-width="formLabelWidth"
-              prop="blogSortUid"
+              prop="blogSortId"
             >
               <el-select
                 v-model="form.blogSortId"
@@ -142,7 +143,7 @@
           </el-col>
 
           <el-col :span="4">
-            <el-form-item label="标签" label-width="80px">
+            <el-form-item label="标签" label-width="80px" prop="tags">
               <el-select
                 v-model="tagDatas"
                 multiple
@@ -190,26 +191,9 @@
           </el-col>
         </el-row>
 
-        <el-form-item
-          label="作者"
-          :label-width="formLabelWidth"
-          v-if="form.isOriginal == 0"
-          prop="author"
-        >
-          <el-input v-model="form.author" auto-complete="off"></el-input>
+        <el-form-item label="内容" :label-width="formLabelWidth" prop="content">
+          <wangEditor ref="wangEditor" :content="form.content" @contentChange="contentChange" :height="320"></wangEditor>
         </el-form-item>
-
-        <el-form-item
-          label="文章出处"
-          :label-width="formLabelWidth"
-          v-if="form.isOriginal == 0"
-        >
-          <el-input v-model="form.articlesPart" auto-complete="off"></el-input>
-        </el-form-item>
-
-        <!-- <el-form-item label="内容" :label-width="formLabelWidth" prop="content">
-          <CKEditor ref="ckeditor" :content="form.content" @contentChange="contentChange" :height="320"></CKEditor>
-        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="text" @click="crud.cancelCU">取消</el-button>
@@ -334,6 +318,7 @@ import crudOperation from "@/components/Crud/CRUD.operation";
 import udOperation from "@/components/Crud/UD.operation";
 import pagination from "@/components/Crud/Pagination";
 import DateRangePicker from "@/components/DateRangePicker";
+import wangEditor from "@/components/WangEditor";
 import { mapGetters } from "vuex";
 import { getToken } from '@/utils/auth';
 let blogTags = [];
@@ -360,6 +345,7 @@ export default {
     rrOperation,
     udOperation,
     DateRangePicker,
+    wangEditor
   },
   cruds() {
     return CRUD({
@@ -414,6 +400,8 @@ export default {
           { pattern: /^[0-9]\d*$/, message: "网站评论只能为自然数" },
         ],
         content: [{ required: true, message: "内容不能为空", trigger: "blur" }],
+         summary: [{ required: true, message: "简介不能为空", trigger: "blur" }],
+         tags: [{ required: true, message: "标签不能为空", trigger: "blur" }],
       },
       show: false,
       size: 2,
@@ -517,8 +505,9 @@ export default {
       this.fileId = jsonData.data.url;
     },
     // 内容改变，触发监听
-    contentChange: function () {
+    contentChange: function (html) {
       this.isChange = true;
+      this.form.content = html
     },
     changeTag(value) {
       blogTags = [];
