@@ -192,7 +192,7 @@
         </el-row>
 
         <el-form-item label="内容" :label-width="formLabelWidth" prop="content">
-          <wangEditor ref="wangEditor" :content="form.content" @contentChange="contentChange" :height="320"></wangEditor>
+          <CKEditor ref="editor" :content="form.content" @contentChange="contentChange" :height="320"></CKEditor>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -318,7 +318,7 @@ import crudOperation from "@/components/Crud/CRUD.operation";
 import udOperation from "@/components/Crud/UD.operation";
 import pagination from "@/components/Crud/Pagination";
 import DateRangePicker from "@/components/DateRangePicker";
-import wangEditor from "@/components/WangEditor";
+import CKEditor from "@/components/CKEditor";
 import { mapGetters } from "vuex";
 import { getToken } from '@/utils/auth';
 let blogTags = [];
@@ -345,7 +345,7 @@ export default {
     rrOperation,
     udOperation,
     DateRangePicker,
-    wangEditor
+    CKEditor
   },
   cruds() {
     return CRUD({

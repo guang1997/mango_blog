@@ -26,6 +26,8 @@ import dict from '@/components/Dict'
 // 全局工具类
 import prototype from '@/utils/prototype'
 
+// ckEditor
+import CKEditor from 'ckeditor4-vue'
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -42,6 +44,7 @@ Vue.use(checkPer)
 Vue.use(VueParticles)
 Vue.use(prototype)
 Vue.use(dict)
+Vue.use(CKEditor)
 // set ElementUI lang to EN
 // Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
