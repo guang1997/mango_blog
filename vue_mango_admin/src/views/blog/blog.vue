@@ -92,7 +92,6 @@
           <el-input
             v-model="form.title"
             auto-complete="off"
-            @input="contentChange"
           ></el-input>
         </el-form-item>
 
@@ -100,7 +99,6 @@
           <el-input
             v-model="form.summary"
             auto-complete="off"
-            @input="contentChange"
           ></el-input>
         </el-form-item>
 </el-col>
@@ -192,7 +190,7 @@
         </el-row>
 
         <el-form-item label="内容" :label-width="formLabelWidth" prop="content">
-          <CKEditor ref="editor" :content="form.content" @contentChange="contentChange" :height="320"></CKEditor>
+          <WangEditor ref="editor" :content="form.content" @contentChange="contentChange"></WangEditor>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -318,7 +316,7 @@ import crudOperation from "@/components/Crud/CRUD.operation";
 import udOperation from "@/components/Crud/UD.operation";
 import pagination from "@/components/Crud/Pagination";
 import DateRangePicker from "@/components/DateRangePicker";
-import CKEditor from "@/components/CKEditor";
+import WangEditor from "@/components/WangEditor";
 import { mapGetters } from "vuex";
 import { getToken } from '@/utils/auth';
 let blogTags = [];
@@ -345,7 +343,7 @@ export default {
     rrOperation,
     udOperation,
     DateRangePicker,
-    CKEditor
+    WangEditor
   },
   cruds() {
     return CRUD({
@@ -405,7 +403,6 @@ export default {
       },
       show: false,
       size: 2,
-      isChange: false,
       formLabelWidth: "120px",
       tagDatas: [],
       fileId:null,
@@ -420,40 +417,13 @@ export default {
     // 添加取消之后
     [CRUD.HOOK.afterAddCancel]() {
       this.fileId = null;
+       this.$refs.editor.textData = null;
     },
     // 编辑取消之后
     [CRUD.HOOK.afterEditCancel]() {
       this.fileId = null;
+     this.$refs.editor.textData = null;
     },
-    // 添加取消之前
-    [CRUD.HOOK.beforeAddCancel]() {
-      if (this.isChange) {
-        this.$confirm("是否关闭博客编辑窗口", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        })
-          .then(() => {
-            // 清空触发器
-            clearInterval(this.interval);
-            this.isChange = false;
-            this.changeCount = 0;
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消关闭",
-            });
-          });
-      } else {
-        // 清空触发器
-        clearInterval(this.interval);
-        this.isChange = false;
-        this.changeCount = 0;
-      }
-    },
-    // 编辑取消之前
-    [CRUD.HOOK.beforeEditCancel]() {},
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
       if (this.tagValue.length === 0) {
@@ -474,6 +444,7 @@ export default {
       if (form.fileId) {
         this.fileId = form.fileId;
       }
+      // this.$refs.editor. editor.onCreated();
     },
     // 新增前将多选的值设置为空
     [CRUD.HOOK.beforeToAdd]() {
@@ -506,8 +477,7 @@ export default {
     },
     // 内容改变，触发监听
     contentChange: function (html) {
-      this.isChange = true;
-      this.form.content = html
+      this.form.content = html;
     },
     changeTag(value) {
       blogTags = [];

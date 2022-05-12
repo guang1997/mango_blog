@@ -33,3 +33,9 @@ if (process.env.npm_config_preview || rawArgv.includes('--preview')) {
 } else {
   run(`vue-cli-service build ${args}`)
 }
+
+module.exports = {
+  externals: {
+    "CKEDITOR": "window.CKEDITOR"
+  }
+}

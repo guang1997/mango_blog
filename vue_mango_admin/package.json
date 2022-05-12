@@ -1,8 +1,8 @@
 {
-  "name": "vue-admin-template",
-  "version": "4.4.0",
-  "description": "A vue admin template with Element UI & axios & iconfont & permission control & lint",
-  "author": "Pan <panfree23@gmail.com>",
+  "name": "vue-mango-admin",
+  "version": "1.0.0",
+  "description": "mango博客后台管理程序",
+  "author": "872174823@qq.com",
   "scripts": {
     "dev": "vue-cli-service serve",
     "build:prod": "vue-cli-service build",
@@ -15,8 +15,9 @@
   },
   "dependencies": {
     "@riophae/vue-treeselect": "^0.4.0",
+    "@wangeditor/editor": "^5.0.1",
+    "@wangeditor/editor-for-vue": "^1.0.1",
     "axios": "0.18.1",
-    "ckeditor4-vue": "^2.0.0",
     "core-js": "3.6.5",
     "echarts": "^4.2.1",
     "echarts-gl": "^1.1.1",
