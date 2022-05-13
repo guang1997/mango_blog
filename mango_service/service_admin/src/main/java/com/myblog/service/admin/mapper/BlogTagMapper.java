@@ -20,6 +20,4 @@ public interface BlogTagMapper extends BaseMapper<BlogTag> {
 
     @MapKey("tag_id")
     List<Map<String, Object>> getBlogCountByTag();
-
-    int insertBatch(@Param("tagIds") List<String> tagIds, @Param("blogId") String blogId);
 }

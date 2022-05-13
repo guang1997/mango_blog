@@ -74,7 +74,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             return response;
         }
         Set<String> tagIds = blogTagList.stream()
-                .map(map -> map.get("tagId").toString())
+                .map( map -> map.get("tagId").toString())
                 .collect(Collectors.toSet());
         List<Tag> tags = tagMapper.selectBatchIds(tagIds);
         for (Map<String, Object> blogTagMap : blogTagList) {
@@ -215,10 +215,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         // 查询已经保存的博客
         Blog dbBlog = baseMapper.selectOne(queryWrapper);
         // 保存标签
-        List<String> tagIds = blogDto.getTags().stream().map(Tag::getId).distinct().collect(Collectors.toList());
-        if (blogTagMapper.insertBatch(tagIds, dbBlog.getId()) < 1) {
-            LOGGER.error("addBlog failed by add tags failed, tagIds:{}, blog:{}", tagIds, dbBlog);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+        List<String> tagIds = blogDto.getBlogTags().stream().map(Tag::getId).distinct().collect(Collectors.toList());
+        for (String tagId : tagIds) {
+            BlogTag blogTag = new BlogTag();
+            blogTag.setBlogId(dbBlog.getId());
+            blogTag.setTagId(tagId);
+            if (blogTagMapper.insert(blogTag) < 1) {
+                LOGGER.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, dbBlog);
+                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            }
         }
         return Response.ok();
     }
@@ -239,7 +244,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             Set<String> tagIds = blogTags.stream().map(BlogTag::getTagId).collect(Collectors.toSet());
             List<Tag> tags = tagMapper.selectBatchIds(tagIds);
             if (!CollectionUtils.isEmpty(tags)) {
-                dto.setTags(tags);
+                dto.setBlogTags(tags);
             }
         }
     }

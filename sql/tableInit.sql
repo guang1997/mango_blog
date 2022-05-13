@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- 主机:                           127.0.0.1
--- 服务器版本:                        8.0.26 - MySQL Community Server - GPL
+-- 服务器版本:                        8.0.27 - MySQL Community Server - GPL
 -- 服务器操作系统:                      Win64
--- HeidiSQL 版本:                  11.3.0.6295
+-- HeidiSQL 版本:                  10.2.0.5704
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -10,7 +10,6 @@
 /*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
 -- 导出 mango_blog 的数据库结构
@@ -41,11 +40,11 @@ CREATE TABLE IF NOT EXISTS `t_admin` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='管理员表';
 
--- 正在导出表  mango_blog.t_admin 的数据：~3 rows (大约)
+-- 正在导出表  mango_blog.t_admin 的数据：~2 rows (大约)
 DELETE FROM `t_admin`;
 /*!40000 ALTER TABLE `t_admin` DISABLE KEYS */;
 INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`, `phone`, `login_count`, `last_login_time`, `last_login_ip`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `enabled`, `is_deleted`) VALUES
-	('1295268474480156673', 'admin', '$2a$10$ZYi1kqMMQczWDw86u76uPu79CneIE1G0h4dw89a4tjZhrQCWa8QaW', 1, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', 'guang1997qqq@163.com', '18761616251', 22, '2022-04-26 20:18:46', '192.168.1.7', '2021-09-26 16:56:46', '2022-04-26 20:18:46', '李斯特', '872174823', '18761616251', 1, 0),
+	('1295268474480156673', 'admin', '$2a$10$ZYi1kqMMQczWDw86u76uPu79CneIE1G0h4dw89a4tjZhrQCWa8QaW', 1, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', 'guang1997qqq@163.com', '18761616251', 25, '2022-05-13 14:28:12', '192.168.14.49', '2021-09-26 16:56:46', '2022-05-13 14:28:12', '李斯特', '872174823', '18761616251', 1, 0),
 	('1595268474480156674', 'visitor', '$2a$10$Ak12ZqHxdWV4ooYfoWdNMuPGeN3NZzvgzsrtOj5WViECxU4FGrnBy', 1, 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg', '872174823@qq.com', '18888888888', 1, '2022-04-06 22:37:27', '192.168.1.7', '2021-12-02 22:01:22', '2022-04-18 21:46:08', '游客', '111111', '111111', 0, 0);
 /*!40000 ALTER TABLE `t_admin` ENABLE KEYS */;
 
@@ -53,12 +52,12 @@ INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`
 DROP TABLE IF EXISTS `t_blog`;
 CREATE TABLE IF NOT EXISTS `t_blog` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
-  `title` varchar(200) DEFAULT NULL COMMENT '博客标题',
-  `summary` varchar(200) DEFAULT NULL COMMENT '博客简介',
-  `content` longtext COMMENT '博客内容',
+  `title` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '博客标题',
+  `summary` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '博客简介',
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '博客内容',
   `click_count` int DEFAULT '0' COMMENT '博客点击数',
   `like_count` int DEFAULT '0' COMMENT '博客点赞数',
-  `file_id` varchar(255) DEFAULT NULL COMMENT '标题图片id',
+  `file_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '标题图片id',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `admin_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '管理员id',
@@ -71,14 +70,16 @@ CREATE TABLE IF NOT EXISTS `t_blog` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客表';
 
--- 正在导出表  mango_blog.t_blog 的数据：~3 rows (大约)
+-- 正在导出表  mango_blog.t_blog 的数据：~5 rows (大约)
 DELETE FROM `t_blog`;
 /*!40000 ALTER TABLE `t_blog` DISABLE KEYS */;
 INSERT INTO `t_blog` (`id`, `title`, `summary`, `content`, `click_count`, `like_count`, `file_id`, `create_time`, `update_time`, `admin_id`, `author`, `blog_sort_id`, `level`, `sort`, `open_comment`, `is_deleted`) VALUES
-	('1', '1', '1', '1', 0, 0, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '2022-04-17 09:42:18', '2022-04-17 09:42:19', '1', '1', '1505006369916694530', 1, 0, 0, 0),
-	('2', '2', '2', '2', 0, 0, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '2022-04-17 20:05:21', '2022-04-17 20:05:22', '2', '2', '1505006369916694530', 2, 0, 1, 0),
-	('3', '3', '3', '3', 0, 0, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '2022-04-17 20:05:39', '2022-04-17 20:05:40', '3', '3', '1506662963603652609', 3, 0, 1, 0),
-	('4', '1', '1', '2', 0, 0, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/avatar/2022/04/04/d3b5c4c0-6734-4532-84c3-79a199997298-avatar.png', '2022-04-17 20:07:37', '2022-04-17 20:07:37', '1', '1', '1506662963603652609', 0, 0, 1, 0);
+	('1525038141301727233', '测试博客', '测试博客', '<p>测试😅😀</p><pre><code class="language-java">   /**\r\n     * 添加博客\r\n     * @param blogDto\r\n     * @return\r\n     */\r\n    @Override\r\n    @Transactional(rollbackFor = Exception.class)\r\n    public Response addBlog(BlogDto blogDto) throws Exception{\r\n        QueryWrapper&lt;Blog&gt; queryWrapper = new QueryWrapper&lt;&gt;();\r\n        queryWrapper.eq(DbConstants.Blog.TITLE, blogDto.getTitle());\r\n        if (baseMapper.selectList(queryWrapper).size() &gt; 0) {\r\n            return Response.error().message("保存失败, 已存在相同名称的博客");\r\n        }\r\n        // 保存博客\r\n        Blog blog = toDb(blogDto, Blog.class);\r\n        if (baseMapper.insert(blog) &lt; 1) {\r\n            LOGGER.error("addBlog failed by unknown error, blog:{}", blog);\r\n            return Response.setResult(ResultCodeEnum.SAVE_FAILED);\r\n        }\r\n        // 查询已经保存的博客\r\n        Blog dbBlog = baseMapper.selectOne(queryWrapper);\r\n        // 保存标签\r\n        List&lt;String&gt; tagIds = blogDto.getTags().stream().map(Tag::getId).distinct().collect(Collectors.toList());\r\n        for (String tagId : tagIds) {\r\n            BlogTag blogTag = new BlogTag();\r\n            blogTag.setBlogId(dbBlog.getId());\r\n            blogTag.setTagId(tagId);\r\n            if (blogTagMapper.insert(blogTag) &lt; 1) {\r\n                LOGGER.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, dbBlog);\r\n                return Response.setResult(ResultCodeEnum.SAVE_FAILED);\r\n            }\r\n        }\r\n        return Response.ok();\r\n    }</code></pre><p><br></p>', 0, 0, 'blob:http://localhost:9528/230b5848-10e3-4628-bdd3-93664b668e49', '2022-05-13 17:00:01', '2022-05-13 17:00:01', NULL, NULL, '1505006369916694530', 0, 999, 1, 0),
+	('1525038377248104450', '测试2', '测试2', '<p>测试😅😀</p><pre><code class="language-java">   /**\r\n     * 添加博客\r\n     * @param blogDto\r\n     * @return\r\n     */\r\n    @Override\r\n    @Transactional(rollbackFor = Exception.class)\r\n    public Response addBlog(BlogDto blogDto) throws Exception{\r\n        QueryWrapper&lt;Blog&gt; queryWrapper = new QueryWrapper&lt;&gt;();\r\n        queryWrapper.eq(DbConstants.Blog.TITLE, blogDto.getTitle());\r\n        if (baseMapper.selectList(queryWrapper).size() &gt; 0) {\r\n            return Response.error().message("保存失败, 已存在相同名称的博客");\r\n        }\r\n        // 保存博客\r\n        Blog blog = toDb(blogDto, Blog.class);\r\n        if (baseMapper.insert(blog) &lt; 1) {\r\n            LOGGER.error("addBlog failed by unknown error, blog:{}", blog);\r\n            return Response.setResult(ResultCodeEnum.SAVE_FAILED);\r\n        }\r\n        // 查询已经保存的博客\r\n        Blog dbBlog = baseMapper.selectOne(queryWrapper);\r\n        // 保存标签\r\n        List&lt;String&gt; tagIds = blogDto.getTags().stream().map(Tag::getId).distinct().collect(Collectors.toList());\r\n        for (String tagId : tagIds) {\r\n            BlogTag blogTag = new BlogTag();\r\n            blogTag.setBlogId(dbBlog.getId());\r\n            blogTag.setTagId(tagId);\r\n            if (blogTagMapper.insert(blogTag) &lt; 1) {\r\n                LOGGER.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, dbBlog);\r\n                return Response.setResult(ResultCodeEnum.SAVE_FAILED);\r\n            }\r\n        }\r\n        return Response.ok();\r\n    }</code></pre><p><br></p>', 0, 0, 'blob:http://localhost:9528/29e8eb78-467b-42a2-8a47-e9a2831796ad', '2022-05-13 17:00:58', '2022-05-13 17:00:58', NULL, NULL, '1505006369916694530', 0, 999, 1, 0),
+	('1525039156038082561', '测试3', '测试3', '<p>test实践技能</p>', 0, 0, 'blob:http://localhost:9528/931b1f09-d953-4731-a9e4-cfba52f73f47', '2022-05-13 17:04:03', '2022-05-13 17:04:03', NULL, NULL, '1505006369916694530', 0, 999, 1, 0),
+	('1525041625224957953', '测的', '测', '<p>123</p>', 0, 0, 'blob:http://localhost:9528/a134014b-68f9-4e5d-b9e3-f6e94623d040', '2022-05-13 17:13:52', '2022-05-13 17:13:52', NULL, NULL, '1505006369916694530', 1, 999, 1, 0),
+	('1525042572332355586', '123', '123', '<p>fewfewf</p>', 0, 0, 'blob:http://localhost:9528/9344d6e4-e804-4b9e-94ce-151fc6608c14', '2022-05-13 17:17:38', '2022-05-13 17:17:38', NULL, NULL, '1505006369916694530', 2, 999, 1, 0),
+	('1525043116346167298', '1234', '1234', '<p>1234</p>', 0, 0, 'blob:http://localhost:9528/167535b4-dd41-4471-8abf-dbf495949370', '2022-05-13 17:19:48', '2022-05-13 17:19:48', NULL, NULL, '1505006369916694530', 0, 999, 1, 0);
 /*!40000 ALTER TABLE `t_blog` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_blog_tag 结构
@@ -97,11 +98,17 @@ CREATE TABLE IF NOT EXISTS `t_blog_tag` (
 DELETE FROM `t_blog_tag`;
 /*!40000 ALTER TABLE `t_blog_tag` DISABLE KEYS */;
 INSERT INTO `t_blog_tag` (`id`, `blog_id`, `tag_id`, `create_time`, `update_time`) VALUES
-	('1', '1', '1506663317590327298', '2022-04-16 18:43:14', '2022-04-16 18:43:15'),
-	('2', '1', '1507906192298856450', '2022-04-16 18:43:50', '2022-04-16 18:43:51'),
-	('3', '2', '1506663317590327298', '2022-04-16 18:43:58', '2022-04-16 18:43:59'),
-	('4', '3', '1506663317590327298', '2022-04-16 18:45:14', '2022-04-16 18:45:14'),
-	('5', '4', '1506663317590327298', '2022-04-17 20:08:06', '2022-04-17 20:08:07');
+	('1525038141394001921', '1525038141301727233', '1506663317590327298', '2022-05-13 17:00:01', '2022-05-13 17:00:01'),
+	('1525038141410779138', '1525038141301727233', '1507906192298856450', '2022-05-13 17:00:01', '2022-05-13 17:00:01'),
+	('1525038377290047490', '1525038377248104450', '1506663317590327298', '2022-05-13 17:00:58', '2022-05-13 17:00:58'),
+	('1525038377298436098', '1525038377248104450', '1507906192298856450', '2022-05-13 17:00:58', '2022-05-13 17:00:58'),
+	('1525039156084219906', '1525039156038082561', '1506663317590327298', '2022-05-13 17:04:03', '2022-05-13 17:04:03'),
+	('1525039156092608513', '1525039156038082561', '1507906192298856450', '2022-05-13 17:04:03', '2022-05-13 17:04:03'),
+	('1525041625300455426', '1525041625224957953', '1506663317590327298', '2022-05-13 17:13:52', '2022-05-13 17:13:52'),
+	('1525042572395270146', '1525042572332355586', '1507906192298856450', '2022-05-13 17:17:38', '2022-05-13 17:17:38'),
+	('1525042572403658754', '1525042572332355586', '1506663317590327298', '2022-05-13 17:17:38', '2022-05-13 17:17:38'),
+	('1525043116388110338', '1525043116346167298', '1507906192298856450', '2022-05-13 17:19:48', '2022-05-13 17:19:48'),
+	('1525043116396498946', '1525043116346167298', '1506663317590327298', '2022-05-13 17:19:48', '2022-05-13 17:19:48');
 /*!40000 ALTER TABLE `t_blog_tag` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_comment 结构
@@ -145,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `t_dict` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典表';
 
--- 正在导出表  mango_blog.t_dict 的数据：~8 rows (大约)
+-- 正在导出表  mango_blog.t_dict 的数据：~9 rows (大约)
 DELETE FROM `t_dict`;
 /*!40000 ALTER TABLE `t_dict` DISABLE KEYS */;
 INSERT INTO `t_dict` (`id`, `dict_name`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
@@ -265,7 +272,7 @@ CREATE TABLE IF NOT EXISTS `t_link` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='友情链接表';
 
--- 正在导出表  mango_blog.t_link 的数据：~2 rows (大约)
+-- 正在导出表  mango_blog.t_link 的数据：~0 rows (大约)
 DELETE FROM `t_link`;
 /*!40000 ALTER TABLE `t_link` DISABLE KEYS */;
 INSERT INTO `t_link` (`id`, `title`, `summary`, `url`, `create_time`, `update_time`, `link_status`, `file_id`) VALUES
@@ -294,7 +301,7 @@ CREATE TABLE IF NOT EXISTS `t_menu` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='菜单表';
 
--- 正在导出表  mango_blog.t_menu 的数据：~17 rows (大约)
+-- 正在导出表  mango_blog.t_menu 的数据：~20 rows (大约)
 DELETE FROM `t_menu`;
 /*!40000 ALTER TABLE `t_menu` DISABLE KEYS */;
 INSERT INTO `t_menu` (`id`, `name`, `title`, `pid`, `icon`, `sort`, `is_deleted`, `create_time`, `update_time`, `hidden`, `component`, `path`, `redirect`, `permission`, `menu_type`, `sub_count`) VALUES
@@ -432,7 +439,7 @@ CREATE TABLE IF NOT EXISTS `t_sort` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客分类表';
 
--- 正在导出表  mango_blog.t_sort 的数据：~3 rows (大约)
+-- 正在导出表  mango_blog.t_sort 的数据：~4 rows (大约)
 DELETE FROM `t_sort`;
 /*!40000 ALTER TABLE `t_sort` DISABLE KEYS */;
 INSERT INTO `t_sort` (`id`, `sort_name`, `summary`, `create_time`, `update_time`, `click_count`, `sort_level`) VALUES
@@ -455,7 +462,7 @@ CREATE TABLE IF NOT EXISTS `t_tag` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='标签表';
 
--- 正在导出表  mango_blog.t_tag 的数据：~0 rows (大约)
+-- 正在导出表  mango_blog.t_tag 的数据：~2 rows (大约)
 DELETE FROM `t_tag`;
 /*!40000 ALTER TABLE `t_tag` DISABLE KEYS */;
 INSERT INTO `t_tag` (`id`, `summary`, `click_count`, `create_time`, `update_time`, `sort`, `tag_name`) VALUES
@@ -581,6 +588,5 @@ INSERT INTO `t_web_visit` (`id`, `user_id`, `ip`, `create_time`, `update_time`, 
 /*!40000 ALTER TABLE `t_web_visit` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;

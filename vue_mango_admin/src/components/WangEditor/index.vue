@@ -34,7 +34,6 @@ export default Vue.extend({
     },
     methods: {
         onCreated(editor) {
-            console.log("editor", editor)
             if(!this.editor) {
                 this.editor = Object.seal(editor) // 一定要用 Object.seal() ，否则会报错
             }

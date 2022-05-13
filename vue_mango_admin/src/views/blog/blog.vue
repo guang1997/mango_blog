@@ -141,9 +141,9 @@
           </el-col>
 
           <el-col :span="4">
-            <el-form-item label="标签" label-width="80px" prop="tags">
+            <el-form-item label="标签" label-width="80px" prop="blogTags">
               <el-select
-                v-model="tagDatas"
+                v-model="form.blogTags"
                 multiple
                 size="small"
                 placeholder="请选择"
@@ -241,9 +241,9 @@
             prop="sortName"
             label="分类"
           />
-          <el-table-column label="标签" width="100" prop="role">
+          <el-table-column label="标签" width="100" prop="blogTags">
             <template slot-scope="scope">
-              <div v-for="item in scope.row.tags" :key="item.id" :value="item">
+              <div v-for="item in scope.row.blogTags" :key="item.id" :value="item">
                 <el-tag style="margin-bottom: 10px">{{ item.tagName }}</el-tag>
               </div>
             </template>
@@ -332,8 +332,7 @@ const defaultForm = {
   blogSortId: null,
   level: null,
   sort: 999,
-  openComment: 1,
-  fileId: null,
+  openComment: 1
 };
 export default {
   name: "Blog",
@@ -397,14 +396,13 @@ export default {
           { required: true, message: "网站评论不能为空", trigger: "blur" },
           { pattern: /^[0-9]\d*$/, message: "网站评论只能为自然数" },
         ],
-        content: [{ required: true, message: "内容不能为空", trigger: "blur" }],
          summary: [{ required: true, message: "简介不能为空", trigger: "blur" }],
-         tags: [{ required: true, message: "标签不能为空", trigger: "blur" }],
+         blogTags: [{ required: true, message: "标签不能为空", trigger: "blur" }],
+        //  fileId: [{ required: true, message: "标题图不能为空", trigger: "blur" }],
       },
       show: false,
       size: 2,
       formLabelWidth: "120px",
-      tagDatas: [],
       fileId:null,
       sorts:[],
       tags:[],
@@ -416,24 +414,26 @@ export default {
   methods: {
     // 添加取消之后
     [CRUD.HOOK.afterAddCancel]() {
-      this.fileId = null;
+       this.fileId = null;
        this.$refs.editor.textData = null;
+       this.form.blogTags = null;
     },
     // 编辑取消之后
     [CRUD.HOOK.afterEditCancel]() {
       this.fileId = null;
-     this.$refs.editor.textData = null;
+      this.$refs.editor.textData = null;
+      this.form.blogTags = null;
     },
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
-      if (this.tagValue.length === 0) {
+      if (!this.fileId) {
         this.$message({
-          message: "标签不能为空",
+          message: "标题图不能为空",
           type: "warning",
         });
         return false;
       }
-      crud.form.tags = blogTags;
+      crud.form.blogTags = blogTags;
       crud.form.fileId = this.fileId
       return true;
     },
@@ -444,23 +444,29 @@ export default {
       if (form.fileId) {
         this.fileId = form.fileId;
       }
-      // this.$refs.editor. editor.onCreated();
     },
     // 新增前将多选的值设置为空
     [CRUD.HOOK.beforeToAdd]() {
-      this.tagDatas = [];
       this.fileId = null;
+     
+      if (this.$refs.editor) {
+        this.$refs.editor.textData = null;
+      }
+       
+       blogTags = []
     },
     // 初始化编辑时的标签
     [CRUD.HOOK.beforeToEdit](crud, form) {
-      this.tagDatas = [];
       blogTags = [];
       const _this = this;
       form.tags.forEach(function (tag, index) {
-        _this.tagDatas.push(tag.id);
-        const temp_tag = { id: tag.id };
+        // _this.tagDatas.push(tag.id);
+        // const temp_tag = { id: tag.id };
         blogTags.push(temp_tag);
       });
+    },
+    [CRUD.HOOK.afterSubmit](crud, form) {
+      this.form.blogTags = null;
     },
     // 禁止输入空格
     keydown(e) {

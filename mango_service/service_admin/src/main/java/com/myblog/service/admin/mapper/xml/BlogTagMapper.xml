@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.myblog.service.admin.mapper.BlogTagMapper">
-    <insert id="insertBatch">
-        INSERT INTO t_blog_tag (tag_id, blog_id) VALUES
-        <foreach collection="tagIds" item="tagId" separator="," open="(" close=")">
-            #{tagId, blogId}
-        </foreach>
-    </insert>
-
     <select id="getBlogCountByTag" resultType="java.util.Map">
         SELECT tag_id as tagId, COUNT(blog_id) AS value FROM t_blog_tag GROUP BY tag_id;
     </select>
