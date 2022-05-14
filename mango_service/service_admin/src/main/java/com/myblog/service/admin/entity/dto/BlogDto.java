@@ -38,5 +38,5 @@ public class BlogDto extends BaseDto {
 
     private String tagId;
 
-    private List<Tag> blogTags;
+    private List<Tag> tags;
 }

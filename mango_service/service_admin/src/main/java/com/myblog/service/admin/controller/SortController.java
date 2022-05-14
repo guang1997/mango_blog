@@ -52,7 +52,7 @@ public class SortController {
     }
 
     @LogByMethod("/admin/sort/editSort")
-    @ApiOperation(value = "修改分类", notes = "修改标分类", response = Response.class)
+    @ApiOperation(value = "修改分类", notes = "修改分类", response = Response.class)
     @PutMapping("/editSort")
     public Response editSort(@RequestBody SortDto sortDto) throws Exception {
         return sortService.editSort(sortDto);

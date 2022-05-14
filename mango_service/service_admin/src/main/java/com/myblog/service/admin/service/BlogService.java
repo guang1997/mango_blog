@@ -6,6 +6,8 @@ import com.myblog.service.admin.entity.dto.BlogDto;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 
+import java.util.Set;
+
 /**
  * <p>
  * 博客表 服务类
@@ -27,4 +29,8 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
     Response getBlogByPage(BlogDto blogDto) throws Exception;
 
     Response addBlog(BlogDto blogDto) throws Exception;
+
+    Response editBlog(BlogDto blogDto);
+
+    Response delBlog(Set<String> ids);
 }

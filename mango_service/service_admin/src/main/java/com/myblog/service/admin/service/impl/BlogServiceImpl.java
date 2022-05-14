@@ -16,7 +16,9 @@ import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.BaseUtil;
+import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
+import com.myblog.service.security.config.util.SecurityUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -215,7 +217,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         // 查询已经保存的博客
         Blog dbBlog = baseMapper.selectOne(queryWrapper);
         // 保存标签
-        List<String> tagIds = blogDto.getBlogTags().stream().map(Tag::getId).distinct().collect(Collectors.toList());
+        List<String> tagIds = blogDto.getTags().stream().map(Tag::getId).distinct().collect(Collectors.toList());
         for (String tagId : tagIds) {
             BlogTag blogTag = new BlogTag();
             blogTag.setBlogId(dbBlog.getId());
@@ -226,6 +228,29 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             }
         }
         return Response.ok();
+    }
+
+    /**
+     * 编辑博客
+     * @param blogDto
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response editBlog(BlogDto blogDto) {
+        return null;
+    }
+
+    /**
+     * 删除博客
+     * @param ids
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Response delBlog(Set<String> ids) {
+
+        return null;
     }
 
     @Override
@@ -244,8 +269,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             Set<String> tagIds = blogTags.stream().map(BlogTag::getTagId).collect(Collectors.toSet());
             List<Tag> tags = tagMapper.selectBatchIds(tagIds);
             if (!CollectionUtils.isEmpty(tags)) {
-                dto.setBlogTags(tags);
+                dto.setTags(tags);
             }
         }
+    }
+
+    @Override
+    public Blog toDb(BlogDto dto, Class<Blog> dbClazz) {
+        Blog blog = new Blog();
+        BeanUtil.copyProperties(dto, blog);
+        setDbExtraProperties(blog, dto);
+        // 设置用户信息
+        blog.setAdminId(SecurityUtils.getCurrentUserId());
+        blog.setAuthor(SecurityUtils.getCurrentUsername());
+        return blog;
     }
 }

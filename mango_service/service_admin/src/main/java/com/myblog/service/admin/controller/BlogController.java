@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 /**
  * <p>
  * 博客表 前端控制器
@@ -51,6 +53,20 @@ public class BlogController {
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return blogService.addBlog(blogDto);
+    }
+
+    @LogByMethod("/admin/blog/editBlog")
+    @ApiOperation(value = "修改博客", notes = "修改博客", response = Response.class)
+    @PutMapping("/editBlog")
+    public Response editBlog(@RequestBody BlogDto blogDto) throws Exception {
+        return blogService.editBlog(blogDto);
+    }
+
+    @LogByMethod("/admin/blog/delBlog")
+    @ApiOperation(value = "删除博客", notes = "删除博客", response = Response.class)
+    @DeleteMapping("/delBlog")
+    public Response delBlog(@RequestBody Set<String> ids) throws Exception {
+        return blogService.delBlog(ids);
     }
 }
 

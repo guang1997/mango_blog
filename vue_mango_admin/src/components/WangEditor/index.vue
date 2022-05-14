@@ -12,7 +12,6 @@
             :defaultConfig="editorConfig"
             :mode="mode"
             @onCreated="onCreated"
-            @onChange="onChange"
         />
     </div>
 </template>
@@ -38,10 +37,11 @@ export default Vue.extend({
                 this.editor = Object.seal(editor) // 一定要用 Object.seal() ，否则会报错
             }
         },
-        onChange() {
-            // 动态设置数据到form表单中
-             this.$emit("contentChange", this.editor.getHtml());
-        }
+        //获取data
+        getData: function() {
+            return this.editor.getHtml();
+        },
+
     },
     beforeDestroy() {
          const editor = this.editor

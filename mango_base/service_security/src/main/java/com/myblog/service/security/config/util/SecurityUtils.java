@@ -61,7 +61,7 @@ public class SecurityUtils {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             return userDetails.getUsername();
         }
-        throw new RuntimeException("找不到当前登录的信息");
+        return null;
     }
 
     /**

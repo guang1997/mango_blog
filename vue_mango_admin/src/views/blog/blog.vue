@@ -141,9 +141,9 @@
           </el-col>
 
           <el-col :span="4">
-            <el-form-item label="标签" label-width="80px" prop="blogTags">
+            <el-form-item label="标签" label-width="80px" prop="tags">
               <el-select
-                v-model="form.blogTags"
+                v-model="tagDatas"
                 multiple
                 size="small"
                 placeholder="请选择"
@@ -173,7 +173,7 @@
                   v-for="item in dict.sys_blog_level"
                   :key="item.id"
                   :label="item.dictLabel"
-                  :value="item.dictValue"
+                  :value="parseInt(item.dictValue)"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -190,7 +190,7 @@
         </el-row>
 
         <el-form-item label="内容" :label-width="formLabelWidth" prop="content">
-          <WangEditor ref="editor" :content="form.content" @contentChange="contentChange"></WangEditor>
+          <WangEditor ref="editor" :content="form.content" ></WangEditor>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -241,9 +241,9 @@
             prop="sortName"
             label="分类"
           />
-          <el-table-column label="标签" width="100" prop="blogTags">
+          <el-table-column label="标签" width="100" prop="tags">
             <template slot-scope="scope">
-              <div v-for="item in scope.row.blogTags" :key="item.id" :value="item">
+              <div v-for="item in scope.row.tags" :key="item.id" :value="item">
                 <el-tag style="margin-bottom: 10px">{{ item.tagName }}</el-tag>
               </div>
             </template>
@@ -397,8 +397,6 @@ export default {
           { pattern: /^[0-9]\d*$/, message: "网站评论只能为自然数" },
         ],
          summary: [{ required: true, message: "简介不能为空", trigger: "blur" }],
-         blogTags: [{ required: true, message: "标签不能为空", trigger: "blur" }],
-        //  fileId: [{ required: true, message: "标题图不能为空", trigger: "blur" }],
       },
       show: false,
       size: 2,
@@ -409,20 +407,26 @@ export default {
       headers: {
         'Authorization': getToken()
       },
+      tagDatas: []
     };
   },
   methods: {
     // 添加取消之后
     [CRUD.HOOK.afterAddCancel]() {
        this.fileId = null;
-       this.$refs.editor.textData = null;
-       this.form.blogTags = null;
+      //  this.$refs.editor.textData = null;
+       this.form.tags = null;
+       // 因为组件中关闭模态框时暂时没想到好方法去关闭WangEditor，
+       // 导致数据显示有问题，因此暂时使用刷新页面的方法来将其关闭
+      window.location.reload()
     },
     // 编辑取消之后
     [CRUD.HOOK.afterEditCancel]() {
       this.fileId = null;
-      this.$refs.editor.textData = null;
-      this.form.blogTags = null;
+      // this.$refs.editor.textData = null;
+      this.form.tags = null;
+      // this.form.content = null;
+      window.location.reload()
     },
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
@@ -433,7 +437,14 @@ export default {
         });
         return false;
       }
-      crud.form.blogTags = blogTags;
+       if (this.tagDatas.length === 0) {
+        this.$message({
+          message: "标签不能为空",
+          type: "warning",
+        });
+        return false;
+      }
+      crud.form.tags = blogTags;
       crud.form.fileId = this.fileId
       return true;
     },
@@ -452,22 +463,27 @@ export default {
       if (this.$refs.editor) {
         this.$refs.editor.textData = null;
       }
-       
-       blogTags = []
+       this.tagDatas = []
     },
     // 初始化编辑时的标签
     [CRUD.HOOK.beforeToEdit](crud, form) {
       blogTags = [];
+      this.tagDatas = [];
       const _this = this;
       form.tags.forEach(function (tag, index) {
-        // _this.tagDatas.push(tag.id);
-        // const temp_tag = { id: tag.id };
+        _this.tagDatas.push(tag.id);
+        const temp_tag = { id: tag.id };
         blogTags.push(temp_tag);
       });
     },
     [CRUD.HOOK.afterSubmit](crud, form) {
-      this.form.blogTags = null;
+      this.form.tags = null;
+      window.location.reload()
     },
+     [CRUD.HOOK.beforeSubmit](crud, form) {
+      this.form.content = this.$refs.editor.getData()
+    },
+    
     // 禁止输入空格
     keydown(e) {
       if (e.keyCode === 32) {
@@ -481,10 +497,7 @@ export default {
      cropUploadSuccess(jsonData, field) {
       this.fileId = jsonData.data.url;
     },
-    // 内容改变，触发监听
-    contentChange: function (html) {
-      this.form.content = html;
-    },
+
     changeTag(value) {
       blogTags = [];
       value.forEach(function (data, index) {
@@ -514,7 +527,7 @@ export default {
     });
     },
      handleFileSuccess(res, file) {
-        this.fileId = URL.createObjectURL(file.raw);
+      this.fileId = file.response.data.url;
       },
     beforeFileUpload(file) {
         const isJPG = file.type === 'image/jpeg';
