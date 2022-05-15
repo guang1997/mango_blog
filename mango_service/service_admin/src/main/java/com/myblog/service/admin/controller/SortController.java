@@ -11,8 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
@@ -40,18 +42,14 @@ public class SortController {
         return sortService.getSortByPage(sortDto);
     }
 
-    @LogByMethod("/admin/sort/addSort")
+    @LogByMethod(value = "/admin/sort/addSort", validate = true)
     @ApiOperation(value = "新增分类", notes = "新增分类", response = Response.class)
     @PostMapping("/addSort")
     public Response addSort(@RequestBody SortDto sortDto) throws Exception {
-        if (StringUtils.isBlank(sortDto.getSortName())) {
-            LOGGER.error("addSort failed, sortName cannot be null, role:{}", sortDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
-        }
         return sortService.addSort(sortDto);
     }
 
-    @LogByMethod("/admin/sort/editSort")
+    @LogByMethod(value = "/admin/sort/editSort", validate = true)
     @ApiOperation(value = "修改分类", notes = "修改分类", response = Response.class)
     @PutMapping("/editSort")
     public Response editSort(@RequestBody SortDto sortDto) throws Exception {

@@ -1,17 +1,22 @@
 package com.myblog.service.base.aspect;
 
+import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.JsonUtils;
+import com.myblog.service.base.util.ValidateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletRequest;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -46,7 +51,18 @@ public class LogAspect {
         String methodName = joinPoint.getSignature().getName();
         // 获取入参
         String params = getParams(joinPoint.getArgs());
-        // TODO 对入参进行校验
+        // 对入参进行校验
+        if (joinPoint.getSignature() instanceof MethodSignature) {
+            MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+            // 配置了注解并且标识为校验入参的方法才进行入参校验
+            LogByMethod logByMethod = methodSignature.getMethod().getAnnotation(LogByMethod.class);
+            if (Objects.nonNull(logByMethod) && logByMethod.validate()) {
+                Response validateResponse = ValidateUtil.validate(joinPoint.getArgs()[0]);
+                if (!validateResponse.getSuccess()) {
+                    return validateResponse;
+                }
+            }
+        }
         if (classLogger.isDebugEnabled()) {
             classLogger.debug("recieve request:{}, params:{}", methodName, params);
         }

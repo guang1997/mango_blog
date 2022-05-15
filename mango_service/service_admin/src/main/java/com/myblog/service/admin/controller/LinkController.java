@@ -40,7 +40,7 @@ public class LinkController {
         return linkService.getLinkByPage(linkDto);
     }
 
-    @LogByMethod("/admin/link/addLink")
+    @LogByMethod(value = "/admin/link/addLink", validate = true)
     @ApiOperation(value = "新增友情链接", notes = "新增友情链接", response = Response.class)
     @PostMapping("/addLink")
     public Response addLink(@RequestBody LinkDto linkDto) throws Exception {
@@ -51,7 +51,7 @@ public class LinkController {
         return linkService.addLink(linkDto);
     }
 
-    @LogByMethod("/admin/link/editLink")
+    @LogByMethod(value = "/admin/link/editLink", validate = true)
     @ApiOperation(value = "修改友情链接", notes = "修改友情链接", response = Response.class)
     @PutMapping("/editLink")
     public Response editLink(@RequestBody LinkDto linkDto) throws Exception {

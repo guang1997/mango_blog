@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Objects;
@@ -70,7 +71,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     }
 
     @Override
-    public Response addLink(LinkDto linkDto) throws Exception{
+    public Response addLink(@Validated LinkDto linkDto) throws Exception{
         QueryWrapper<Link> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Link.URL, linkDto.getUrl());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
@@ -89,6 +90,16 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
 
     @Override
     public Response editLink(LinkDto linkDto) throws Exception{
+        QueryWrapper<Link> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Link.URL, linkDto.getUrl());
+        List<Link> links = baseMapper.selectList(queryWrapper);
+        if (links.size() > 0) {
+            for (Link link : links) {
+                if (!Objects.equals(link.getId(), linkDto.getId())) {
+                    return Response.error().message("更新失败, 已存在相同路径的友链");
+                }
+            }
+        }
         Link link = this.toDb(linkDto, Link.class);
         if (baseMapper.updateById(link) < 1) {
             LOGGER.error("editLink failed by unknown error, link:{}", link);

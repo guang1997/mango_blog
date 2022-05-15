@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -40,18 +41,14 @@ public class TagController {
         return tagService.getTagByPage(tagDto);
     }
 
-    @LogByMethod("/admin/tag/addTag")
+    @LogByMethod(value = "/admin/tag/addTag", validate = true)
     @ApiOperation(value = "新增标签", notes = "新增标签", response = Response.class)
     @PostMapping("/addTag")
     public Response addTag(@RequestBody TagDto tagDto) throws Exception {
-        if (StringUtils.isBlank(tagDto.getTagName())) {
-            LOGGER.error("addTag failed, tagName cannot be null, role:{}", tagDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
-        }
         return tagService.addTag(tagDto);
     }
 
-    @LogByMethod("/admin/tag/editTag")
+    @LogByMethod(value = "/admin/tag/editTag", validate = true)
     @ApiOperation(value = "修改标签", notes = "修改标签", response = Response.class)
     @PutMapping("/editTag")
     public Response editTag(@RequestBody TagDto tagDto) throws Exception {

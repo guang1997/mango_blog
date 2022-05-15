@@ -3,6 +3,8 @@ package com.myblog.service.security.entity.dto;
 import com.myblog.service.base.entity.dto.BaseDto;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,6 +23,7 @@ public class MenuDto extends BaseDto {
 
     private String path;
 
+    @NotNull(message = "菜单名不能为空")
     private String title;
 
     private String icon;

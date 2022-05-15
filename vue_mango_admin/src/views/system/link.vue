@@ -31,7 +31,7 @@
       <crudOperation :permission="permission" />
     </div>
           <!--表单渲染-->
-        <el-dialog append-to-body :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="crud.status.title" width="580px">
+        <el-dialog append-to-body :close-on-click-modal="false" :before-close="crud.cancelCU" :visible="crud.status.cu > 0" :title="crud.status.title" width="580px">
           <el-form ref="form" :inline="true" :model="form" size="small" label-width="80px" :rules="rules">
             <el-form-item
               label="网站标题"
@@ -103,14 +103,18 @@
             <el-table-column :show-overflow-tooltip="true" prop="title" label="友链标题" width="150"/>
              <el-table-column :show-overflow-tooltip="true" prop="url" label="友链url" width="200"/>
             <el-table-column :show-overflow-tooltip="true" prop="summary" label="友链描述" width="250"/>
-            <el-table-column label="友链状态" width="200">
-              <template slot-scope="scope">
-                <template>
-                  <el-tag v-for="item in filterSysLinkStatus(scope.row.linkStatus)" 
-                  :type="item.listClass" :key="item.id">{{item.dictLabel}}</el-tag>
-                </template>
-              </template>
-            </el-table-column>
+            <el-table-column label="友链状态" align="center" prop="linkStatus">
+            <template slot-scope="scope">
+              <el-switch
+                :value="scope.row.linkStatus"
+                :active-value="1"
+                :inactive-value="0"
+                active-color="#409EFF"
+                inactive-color="#F56C6C"
+                @change="changeLinkStatus(scope.row, scope.row.linkStatus)"
+              />
+            </template>
+          </el-table-column>
 
             <el-table-column label="创建时间"  prop="createTime" />
             <el-table-column
@@ -173,13 +177,6 @@ export default {
       },
     };
   },
-  computed: {
-    filterSysLinkStatus() {
-      return function(linkStatus) {
-        return this.dict.sys_link_status.filter(item => item.dictValue == linkStatus)
-      }
-    }
-  },
   methods: {
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
@@ -197,6 +194,44 @@ export default {
       if (e.keyCode === 32) {
         e.returnValue = false
       }
+    },
+    // 改变状态
+    changeLinkStatus(data, val) {
+      let oldStatus = data.linkStatus;
+      if (oldStatus === 0) {
+        data.linkStatus = 1;
+      } else {
+        data.linkStatus = 0;
+      }
+      this.$confirm(
+        '此操作将 "' +
+          (val === 0 ? "激活" : "禁用") +
+          '" ' +
+          "该友链, 是否继续？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          crudLink
+            .edit(data)
+            .then((res) => {
+              if (res.code === this.$ECode.SUCCESS) {
+                this.crud.notify("" + "成功", CRUD.NOTIFICATION_TYPE.SUCCESS);
+              } else {
+                data.linkStatus = oldStatus;
+              }
+            })
+            .catch(() => {
+              data.linkStatus = oldStatus;
+            });
+        })
+        .catch(() => {
+          data.linkStatus = oldStatus;
+        });
     },
   },
 };

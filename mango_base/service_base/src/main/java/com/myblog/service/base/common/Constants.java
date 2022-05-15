@@ -53,6 +53,7 @@ public interface Constants {
         String VISIT_LIST = "visitList";
         String BLOG_TAGS = "blogTags";
         String BLOG_SORTS = "blogSorts";
+        String MENU_BUTTONS = "menuButtons";
     }
 
     interface SystemConstant {

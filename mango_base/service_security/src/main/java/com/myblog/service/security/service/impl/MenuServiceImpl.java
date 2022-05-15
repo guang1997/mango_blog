@@ -179,6 +179,16 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      */
     @Override
     public Response editMenu(MenuDto menuDto) throws Exception {
+        QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Base.PID, menuDto.getPid());
+        List<Menu> menus = baseMapper.selectList(queryWrapper);
+        if (menus.size() > 0) {
+            for (Menu menu : menus) {
+                if (Objects.equals(menu.getTitle(), menuDto.getTitle()) && !Objects.equals(menu.getId(), menuDto.getId())) {
+                    return Response.error().message("更新失败, 该父菜单下已存在相同名称的菜单");
+                }
+            }
+        }
         // 获取旧的菜单信息，用于更新父菜单的subCount
         MenuDto oldMenu = this.getMenuById(menuDto.getId());
         Menu menu = this.toDb(menuDto, Menu.class);

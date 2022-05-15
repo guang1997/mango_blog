@@ -236,7 +236,7 @@
               <udOperation
                 :data="scope.row"
                 :permission="permission"
-                :disabled-dle="scope.row.id === user.id"
+                :disabledDel="scope.row.id === user.id"
               />
             </template>
           </el-table-column>

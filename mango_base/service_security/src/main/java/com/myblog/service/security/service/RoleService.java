@@ -4,9 +4,9 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.security.entity.Role;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.entity.dto.RoleDto;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.Set;
 
@@ -37,4 +37,6 @@ public interface RoleService extends IService<Role>, ServiceConvertHandler<Role,
     Response validRoleLevelByUserId(String userId);
 
     Response validRoleLevel(Integer level, String roleName);
+
+    List<String> getMenusByRoleId(List<String> roleIds);
 }

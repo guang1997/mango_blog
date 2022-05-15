@@ -3,14 +3,20 @@ package com.myblog.service.admin.entity.dto;
 import com.myblog.service.base.entity.dto.BaseDto;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Data
 public class DictDetailDto extends BaseDto {
+    @NotNull(message = "字典id不能为空")
     private String dictId;
 
     private String dictName;
 
+    @NotNull(message = "字典标签不能为空")
     private String dictLabel;
 
+    @NotNull(message = "字典值不能为空")
     private String dictValue;
 
     private String cssClass;

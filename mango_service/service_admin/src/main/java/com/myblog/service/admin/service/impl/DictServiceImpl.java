@@ -105,6 +105,16 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public Response editDict(DictDto dictDto) throws Exception{
+        QueryWrapper<Dict> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Dict.DICT_NAME, dictDto.getDictName());
+        List<Dict> dicts = baseMapper.selectList(queryWrapper);
+        if (dicts.size() > 0) {
+            for (Dict dict : dicts) {
+                if (!Objects.equals(dictDto.getId(), dict.getId())) {
+                    return Response.error().message("更新失败, 已存在相同名称的字典");
+                }
+            }
+        }
         Dict dict = this.toDb(dictDto, Dict.class);
         if (baseMapper.updateById(dict) < 1) {
             LOGGER.error("editDict failed by unknown error, dict:{}", dict);

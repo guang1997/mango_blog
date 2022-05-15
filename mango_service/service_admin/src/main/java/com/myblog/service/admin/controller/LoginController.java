@@ -7,6 +7,7 @@ import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.RedisUtil;
 import com.myblog.service.security.config.entity.MySecurityProperties;
+import com.myblog.service.security.entity.RoleMenu;
 import com.myblog.service.security.entity.dto.LoginDto;
 import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.entity.dto.Meta;
@@ -30,10 +31,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -79,16 +80,12 @@ public class LoginController {
      *
      * @return
      */
-    @LogByMethod("/admin/auth/login")
+    @LogByMethod(value = "/admin/auth/login", validate = true)
     @ApiOperation(value = "登录", notes = "登录", response = Response.class)
     @AnonymousPostMapping(value = "/login")
     public Response login(@RequestBody LoginDto loginDto, HttpServletRequest request) throws Exception {
         Response response = Response.ok();
         String token = "";
-        if (loginDto == null || StringUtils.isEmpty(loginDto.getUsername()) || StringUtils.isEmpty(loginDto.getPassword())) {
-            LOGGER.error("admin:{} login error", loginDto);
-            return response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message(ResultCodeEnum.LOGIN_ERROR.getMessage());
-        }
         try {
             // 校验用户是否失败次数过多
             String key = String.join(RedisConstants.DIVISION, RedisConstants.LOGIN_LIMIT, loginDto.getUsername(), IpUtils.getIpAddr(request));
@@ -160,13 +157,16 @@ public class LoginController {
                 LOGGER.error("getAdminInfo Error, admin is null, authUser:{}", authUser);
                 return response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
             }
-            Collection<? extends GrantedAuthority> authorities = authUser.getAuthorities();
-            List<String> roles = new ArrayList<>();
-            for (GrantedAuthority authority : authorities) {
-                roles.add(authority.getAuthority());
+            // 获取角色信息
+            List<Role> roles = roleService.getRolesByUserId(admin.getId());
+            // 获取角色对应的按钮信息
+            List<String> roleIds = roles.stream().map(Role::getId).collect(Collectors.toList());
+            List<String> menuButtons = roleService.getMenusByRoleId(roleIds);
+            if (!CollectionUtils.isEmpty(menuButtons)) {
+                menuButtons = menuButtons.stream().distinct().collect(Collectors.toList());
             }
-
-            response.data(Constants.ReplyField.ROLES, roles)
+            Set<String> roleNameSets = roles.stream().map(Role::getRoleName).collect(Collectors.toSet());
+            response.data(Constants.ReplyField.ROLES, roleNameSets)
                     .data(Constants.ReplyField.TOKEN, token)
                     .data(Constants.ReplyField.USERNAME, admin.getUsername())
                     .data(Constants.ReplyField.NICKNAME, admin.getNickname())
@@ -176,7 +176,8 @@ public class LoginController {
                     .data(Constants.ReplyField.QQ_NUMBER, admin.getQqNumber())
                     .data(Constants.ReplyField.WE_CHAT, admin.getWeChat())
                     .data(Constants.ReplyField.ID, authUser.getId())
-                    .data(Constants.ReplyField.AVATAR, admin.getAvatar());
+                    .data(Constants.ReplyField.AVATAR, admin.getAvatar())
+                    .data(Constants.ReplyField.MENU_BUTTONS, menuButtons);
         } catch (Exception e) {
             response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
             throw e;

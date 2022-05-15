@@ -39,6 +39,9 @@ const user = {
     },
     SET_USER: (state, user) => {
       state.user = user
+    },
+    SET_MENU_BUTTONS: (state, menuButtons) => {
+      state.menuButtons = menuButtons
     }
   },
   actions: {
@@ -82,6 +85,7 @@ const user = {
 
         commit('SET_NAME', data.username)
         commit('SET_AVATAR', data.avatar)
+        commit('SET_MENU_BUTTONS', data.menuButtons)
         commit('SET_USER', data)
         resolve(response)
         }).catch(error => {
@@ -93,6 +97,7 @@ const user = {
      UpdateInfo({ commit, data }) {
       commit('SET_NAME', data.username)
       commit('SET_AVATAR', data.avatar)
+      commit('SET_MENU_BUTTONS', data.menuButtons)
       commit('SET_USER', data)
     },
     // 登出
@@ -103,6 +108,7 @@ const user = {
           resetRouter()
           commit('SET_ROLES', [])
           commit('SET_USER', {})
+          commit('SET_MENU_BUTTONS', [])
           resolve()
         }).catch(error => {
           reject(error)

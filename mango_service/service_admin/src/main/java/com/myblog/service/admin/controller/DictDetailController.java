@@ -40,6 +40,7 @@ public class DictDetailController {
         return dictDetailService.getDictDetailByPage(dictDetailDto);
     }
 
+    @LogByMethod("/admin/dictDetail/getDetailsByDictName")
     @ApiOperation(value = "根据字典类型获取字典数据", notes = "根据字典类型获取字典数据", response = Response.class)
     @PostMapping("/getDetailsByDictName")
     public Response getDetailsByDictName(@RequestBody DictDetailDto dictDetailDto) {
@@ -51,18 +52,14 @@ public class DictDetailController {
         return dictDetailService.getDetailsByDictName(dictDetailDto.getDictName());
     }
 
-    @LogByMethod("/admin/dictDetail/addDictDetail")
+    @LogByMethod(value = "/admin/dictDetail/addDictDetail", validate = true)
     @ApiOperation(value = "新增字典详情", notes = "新增字典详情", response = Response.class)
     @PostMapping("/addDictDetail")
     public Response addDictDetail(@RequestBody DictDetailDto dictDetailDto) throws Exception {
-        if (StringUtils.isBlank(dictDetailDto.getDictLabel())) {
-            LOGGER.error("addDictDetail failed, dictLabel cannot be null, dictDetail:{}", dictDetailDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
-        }
         return dictDetailService.addDictDetail(dictDetailDto);
     }
 
-    @LogByMethod("/admin/dictDetail/editDictDetail")
+    @LogByMethod(value = "/admin/dictDetail/editDictDetail", validate = true)
     @ApiOperation(value = "修改字典详情", notes = "修改字典详情", response = Response.class)
     @PutMapping("/editDictDetail")
     public Response editDictDetail(@RequestBody DictDetailDto dictDetailDto) throws Exception {

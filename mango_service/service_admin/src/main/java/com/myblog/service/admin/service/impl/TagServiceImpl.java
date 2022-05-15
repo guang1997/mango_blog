@@ -108,6 +108,16 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      */
     @Override
     public Response editTag(TagDto tagDto) throws Exception{
+        QueryWrapper<Tag> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Tag.TAG_NAME, tagDto.getTagName());
+        List<Tag> tags = baseMapper.selectList(queryWrapper);
+        if (tags.size() > 0) {
+            for (Tag tag : tags) {
+                if (!Objects.equals(tag.getId(), tagDto.getId())) {
+                    return Response.error().message("更新失败, 已存在相同名称的标签");
+                }
+            }
+        }
         Tag tag = this.toDb(tagDto, Tag.class);
         if (baseMapper.updateById(tag) < 1) {
             LOGGER.error("editTag failed by unknown error, tag:{}", tag);

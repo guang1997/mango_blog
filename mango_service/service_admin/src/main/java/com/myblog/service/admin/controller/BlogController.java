@@ -5,11 +5,7 @@ import com.myblog.service.admin.entity.dto.BlogDto;
 import com.myblog.service.admin.service.BlogService;
 import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Response;
-import com.myblog.service.base.common.ResultCodeEnum;
-import com.myblog.service.security.entity.dto.AdminDto;
-import com.myblog.service.security.entity.dto.RoleDto;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,20 +38,14 @@ public class BlogController {
         return blogService.getBlogByPage(blogDto);
     }
 
-    @LogByMethod("/admin/role/addBlog")
+    @LogByMethod(value = "/admin/role/addBlog", validate = true)
     @ApiOperation(value = "新增博客", notes = "新增博客", response = Response.class)
     @PostMapping("/addBlog")
     public Response addBlog(@RequestBody BlogDto blogDto) throws Exception {
-        if (StringUtils.isBlank(blogDto.getTitle())
-                || StringUtils.isBlank(blogDto.getContent())
-                || StringUtils.isBlank(blogDto.getFileId())) {
-            LOGGER.error("addBlog failed, title or content or fileId cannot be null, blog:{}", blogDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
-        }
         return blogService.addBlog(blogDto);
     }
 
-    @LogByMethod("/admin/blog/editBlog")
+    @LogByMethod(value = "/admin/blog/editBlog", validate = true)
     @ApiOperation(value = "修改博客", notes = "修改博客", response = Response.class)
     @PutMapping("/editBlog")
     public Response editBlog(@RequestBody BlogDto blogDto) throws Exception {

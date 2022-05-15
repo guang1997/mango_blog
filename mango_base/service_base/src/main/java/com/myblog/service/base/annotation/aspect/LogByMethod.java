@@ -13,4 +13,10 @@ public @interface LogByMethod {
      * @return
      */
     String value() default "";
+
+    /**
+     * 是否检查入参
+     * @return
+     */
+    boolean validate() default false;
 }

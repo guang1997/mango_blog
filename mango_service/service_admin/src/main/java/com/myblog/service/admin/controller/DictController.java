@@ -45,7 +45,7 @@ public class DictController {
         return dictService.getDictByPage(dictDto);
     }
 
-    @LogByMethod("/admin/dict/addDict")
+    @LogByMethod(value = "/admin/dict/addDict", validate = true)
     @ApiOperation(value = "新增字典", notes = "新增字典", response = Response.class)
     @PostMapping("/addDict")
     public Response addDict(@RequestBody DictDto dictDto) throws Exception {
@@ -56,7 +56,7 @@ public class DictController {
         return dictService.addDict(dictDto);
     }
 
-    @LogByMethod("/admin/dict/editDict")
+    @LogByMethod(value = "/admin/dict/editDict", validate = true)
     @ApiOperation(value = "修改字典", notes = "修改字典", response = Response.class)
     @PutMapping("/editDict")
     public Response editDict(@RequestBody DictDto dictDto) throws Exception {

@@ -1,6 +1,7 @@
 package com.myblog.service.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.admin.controller.DashboardController;
 import com.myblog.service.admin.entity.*;
@@ -54,6 +55,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 获取博客总数量，用于首页展示
+     *
      * @return
      */
     @Override
@@ -65,6 +67,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 根据获取标签和博客数量，用于首页展示
+     *
      * @return
      */
     @Override
@@ -76,7 +79,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             return response;
         }
         Set<String> tagIds = blogTagList.stream()
-                .map( map -> map.get("tagId").toString())
+                .map(map -> map.get("tagId").toString())
                 .collect(Collectors.toSet());
         List<Tag> tags = tagMapper.selectBatchIds(tagIds);
         for (Map<String, Object> blogTagMap : blogTagList) {
@@ -97,6 +100,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 根据获取分类和博客数量，用于首页展示
+     *
      * @return
      */
     @Override
@@ -129,10 +133,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 获取一年内文章贡献度
+     *
      * @return
      */
     @Override
-    public Response getBlogContributeCount() throws Exception{
+    public Response getBlogContributeCount() throws Exception {
         Response response = Response.ok();
         // 获取当天结束时间
         String endTime = ThreadSafeDateFormat.getTodayEndTime();
@@ -166,11 +171,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 分页查询博客信息
+     *
      * @param blogDto
      * @return
      */
     @Override
-    public Response getBlogByPage(BlogDto blogDto) throws Exception{
+    public Response getBlogByPage(BlogDto blogDto) throws Exception {
         Response response = Response.ok();
         int page = 1;
         int size = 10;
@@ -197,12 +203,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 添加博客
+     *
      * @param blogDto
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response addBlog(BlogDto blogDto) throws Exception{
+    public Response addBlog(BlogDto blogDto) throws Exception {
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Blog.TITLE, blogDto.getTitle());
         if (baseMapper.selectList(queryWrapper).size() > 0) {
@@ -232,25 +239,77 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 编辑博客
+     *
      * @param blogDto
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Response editBlog(BlogDto blogDto) {
-        return null;
+        QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Blog.TITLE, blogDto.getTitle());
+        List<Blog> dbBlogList = baseMapper.selectList(queryWrapper);
+        if (dbBlogList.size() > 0) {
+            for (Blog blog : dbBlogList) {
+                if (!Objects.equals(blog.getId(), blogDto.getId())) {
+                    return Response.error().message("更新失败, 已存在相同名称的博客");
+                }
+            }
+        }
+        // 保存博客
+        Blog blog = toDb(blogDto, Blog.class);
+        if (baseMapper.updateById(blog) < 1) {
+            LOGGER.error("editBlog failed by unknown error, blog:{}", blog);
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+        // 保存标签
+        List<String> tagIds = blogDto.getTags().stream().map(Tag::getId).distinct().collect(Collectors.toList());
+        UpdateWrapper<BlogTag> blogTagUpdateWrapper = new UpdateWrapper<>();
+        blogTagUpdateWrapper.eq(DbConstants.BlogTag.BLOG_ID, blog.getId());
+        blogTagMapper.delete(blogTagUpdateWrapper);
+        for (String tagId : tagIds) {
+            BlogTag blogTag = new BlogTag();
+            blogTag.setBlogId(blog.getId());
+            blogTag.setTagId(tagId);
+            if (blogTagMapper.insert(blogTag) < 1) {
+                LOGGER.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, blog);
+                return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            }
+        }
+        return Response.ok();
     }
 
     /**
      * 删除博客
+     *
      * @param ids
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Response delBlog(Set<String> ids) {
-
-        return null;
+        for (String blogId : ids) {
+            // 如果博客中的作者与当前登陆用户不一致不删除
+            Blog dbBlog = baseMapper.selectById(blogId);
+            if (Objects.isNull(dbBlog)) {
+                LOGGER.error("delBlog failed, cannot find blog from db, blogId:{}", blogId);
+                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+            }
+            String currentUserId = SecurityUtils.getCurrentUserId();
+            if (!Objects.equals(currentUserId, dbBlog.getAdminId())) {
+                LOGGER.error("delBlog failed, current adminId:{} not equals db adminId:{}, blogId:{}", currentUserId, dbBlog.getAdminId(), blogId);
+                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+            }
+            // 删除绑定的菜单
+            UpdateWrapper<BlogTag> blogTagUpdateWrapper = new UpdateWrapper<>();
+            blogTagUpdateWrapper.eq(DbConstants.BlogTag.BLOG_ID, blogId);
+            blogTagMapper.delete(blogTagUpdateWrapper);
+            if (baseMapper.deleteById(blogId) < 1) {
+                LOGGER.error("delBlog failed by unknown error, blogId:{}", blogId);
+                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+            }
+        }
+        return Response.ok();
     }
 
     @Override

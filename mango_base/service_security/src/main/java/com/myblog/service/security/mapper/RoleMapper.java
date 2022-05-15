@@ -29,4 +29,6 @@ public interface RoleMapper extends BaseMapper<Role> {
     List<MenuDto> selectRoleMenu(@Param("roleId") String roleId);
 
     int insertRoleMenu(@Param("roleMenu") RoleMenu roleMenu);
+
+    List<String> selectRoleMenus(@Param("roleIds") List<String> roleIds);
 }

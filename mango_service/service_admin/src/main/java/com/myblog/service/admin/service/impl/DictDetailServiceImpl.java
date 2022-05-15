@@ -69,6 +69,16 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
 
     @Override
     public Response editDictDetail(DictDetailDto dictDetailDto) throws Exception{
+        QueryWrapper<DictDetail> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.DictDetail.DICT_ID, dictDetailDto.getDictId());
+        List<DictDetail> dictDetails = baseMapper.selectList(queryWrapper);
+        if (dictDetails.size() > 0) {
+            for (DictDetail dictDetail : dictDetails) {
+                if (Objects.equals(dictDetailDto.getDictLabel(), dictDetail.getDictLabel())) {
+                    return Response.error().message("更新失败, 已存在相同名称的字典");
+                }
+            }
+        }
         DictDetail dictDetail = this.toDb(dictDetailDto, DictDetail.class);
         if (baseMapper.updateById(dictDetail) < 1) {
             LOGGER.error("editDictDetail failed by unknown error, dictDetail:{}", dictDetail);
@@ -92,7 +102,8 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
     public Response addDictDetail(DictDetailDto dictDetailDto) throws Exception{
         QueryWrapper<DictDetail> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.DictDetail.DICT_LABEL, dictDetailDto.getDictLabel());
-        if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
+        DictDetail dbDictDetail = baseMapper.selectOne(queryWrapper);
+        if (Objects.nonNull(dbDictDetail) && Objects.equals(dictDetailDto.getDictId(), dbDictDetail.getDictId())) {
             LOGGER.error("addDictDetail failed, dictLabel is already exist, dictDetailDto:{}", dictDetailDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }

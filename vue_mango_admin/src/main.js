@@ -19,12 +19,14 @@ import VueParticles from 'vue-particles'
 
 // 权限指令
 import checkPer from '@/utils/permission'
+import permission from '@/directive/Permission'
 
 // 数据字典
 import dict from '@/components/Dict'
 
 // 全局工具类
 import prototype from '@/utils/prototype'
+
 
 // ckEditor
 // import CKEditor from 'ckeditor4-vue'
@@ -44,7 +46,7 @@ Vue.use(checkPer)
 Vue.use(VueParticles)
 Vue.use(prototype)
 Vue.use(dict)
-// Vue.use(CKEditor)
+Vue.use(permission)
 // set ElementUI lang to EN
 // Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明

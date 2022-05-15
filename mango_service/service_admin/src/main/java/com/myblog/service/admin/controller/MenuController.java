@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -73,7 +74,7 @@ public class MenuController {
         return Response.ok().data(Constants.ReplyField.DATA, menuDtos);
     }
 
-    @LogByMethod("/admin/menu/addMenu")
+    @LogByMethod(value = "/admin/menu/addMenu", validate = true)
     @ApiOperation(value = "新增菜单", notes = "新增菜单", response = Response.class)
     @PostMapping("/addMenu")
     public Response addMenu(@RequestBody MenuDto menuDto) throws Exception {
@@ -94,7 +95,7 @@ public class MenuController {
         return menuService.addMenu(menuDto);
     }
 
-    @LogByMethod("/admin/menu/editMenu")
+    @LogByMethod(value = "/admin/menu/editMenu", validate = true)
     @ApiOperation(value = "修改菜单", notes = "修改菜单", response = Response.class)
     @PutMapping("/editMenu")
     public Response editMenu(@RequestBody MenuDto menuDto) throws Exception {

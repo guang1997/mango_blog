@@ -294,7 +294,7 @@
               <udOperation
                 :data="scope.row"
                 :permission="permission"
-                :disabled-dle="scope.row.id === user.id"
+                :disabledDel="scope.row.adminId !== user.id"
               />
             </template>
           </el-table-column>
@@ -379,9 +379,18 @@ export default {
       defaultProps: { children: "children", label: "label", isLeaf: "leaf" },
       currentId: 0,
       permission: {
-        add: ["admin", "blog:add"],
-        edit: ["admin", "blog:edit"],
-        del: ["admin", "blog:del"],
+        add: {
+          roles:["admin"],
+          menuButtons:["blog:add"]
+        },
+        edit: {
+          roles:["admin"],
+          menuButtons:["blog:edit"]
+        }, 
+        del: {
+          roles:["admin"],
+          menuButtons:["blog:del"]
+        },
       },
       rules: {
         title: [{ required: true, message: "标题不能为空", trigger: "blur" }],

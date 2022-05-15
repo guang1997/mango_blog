@@ -10,7 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>
@@ -31,13 +34,13 @@ public class VerificationCodeController {
     @Autowired
     private VerificationCodeService verificationCodeService;
 
-    @LogByMethod("/admin/code/sendCode")
+    @LogByMethod(value = "/admin/code/sendCode")
     @ApiOperation(value = "发送验证码", notes = "发送验证码", response = Response.class)
     @GetMapping("/sendCode")
     public Response sendCode(String email) {
         if (StringUtils.isBlank(email)) {
-            LOGGER.error("sendCode failed, email cannot be null");
-            return Response.setResult(ResultCodeEnum.SEND_CODE_FAILED);
+            LOGGER.error("sendCode failed, email:[{}] cannot be null", email);
+            return Response.error().message("邮箱不能为空");
         }
         return verificationCodeService.sendCode(email);
     }

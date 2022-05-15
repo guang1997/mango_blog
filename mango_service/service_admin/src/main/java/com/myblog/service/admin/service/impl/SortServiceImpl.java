@@ -107,6 +107,16 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
      */
     @Override
     public Response editSort(SortDto sortDto) throws Exception{
+        QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Sort.SORT_NAME, sortDto.getSortName());
+        List<Sort> sorts = baseMapper.selectList(queryWrapper);
+        if (sorts.size() > 0) {
+            for (Sort sort : sorts) {
+                if (!Objects.equals(sort.getId(), sortDto.getId())) {
+                    return Response.error().message("更新失败, 已存在相同名称的分类");
+                }
+            }
+        }
         Sort sort = this.toDb(sortDto, Sort.class);
         if (baseMapper.updateById(sort) < 1) {
             LOGGER.error("editSort failed by unknown error, sort:{}", sort);

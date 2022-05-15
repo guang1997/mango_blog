@@ -176,6 +176,16 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         if (!response.getSuccess()) {
             return response;
         }
+        QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Role.ROLE_NAME, roleDto.getRoleName());
+        List<Role> roles = baseMapper.selectList(queryWrapper);
+        if (roles.size() > 0) {
+            for (Role role : roles) {
+                if (!Objects.equals(role.getId(), roleDto.getId())) {
+                    return Response.error().message("更新失败, 已存在相同名称的角色");
+                }
+            }
+        }
         Role role = this.toDb(roleDto, Role.class);
         if (baseMapper.updateById(role) < 1) {
             LOGGER.error("editRole failed by unknown error, role:{}", role);
@@ -257,6 +267,16 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             return Response.error().message("权限不足，你的角色级别：" + currentLevel + "，低于操作的角色级别：" + level);
         }
         return Response.ok();
+    }
+
+    /**
+     * 获取角色绑定的菜单信息
+     * @param roleIds
+     * @return
+     */
+    @Override
+    public List<String> getMenusByRoleId(List<String> roleIds) {
+        return baseMapper.selectRoleMenus(roleIds);
     }
 
     public Response validRoleLevelByUserId(String userId) {

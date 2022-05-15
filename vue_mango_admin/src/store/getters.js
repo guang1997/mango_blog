@@ -14,6 +14,7 @@ const getters = {
   monitorWebsocketApi: state => state.api.monitorWebsocketApi,
   druidApi: state => state.api.druidApi,
   baseApi: state => state.api.baseApi,
-  uploadAvatarApi: state => state.api.uploadAvatarApi
+  uploadAvatarApi: state => state.api.uploadAvatarApi,
+  menuButtons: state => state.user.menuButtons
 }
 export default getters

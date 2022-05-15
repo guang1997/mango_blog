@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -51,18 +52,14 @@ public class RoleController {
         return roleService.getRoleById(role);
     }
 
-    @LogByMethod("/admin/role/addRole")
+    @LogByMethod(value = "/admin/role/addRole", validate = true)
     @ApiOperation(value = "新增角色", notes = "新增角色", response = Response.class)
     @PostMapping("/addRole")
     public Response addRole(@RequestBody RoleDto roleDto) throws Exception {
-        if (StringUtils.isBlank(roleDto.getRoleName())) {
-            LOGGER.error("addRole failed, roleName cannot be null, role:{}", roleDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
-        }
         return roleService.addRole(roleDto);
     }
 
-    @LogByMethod("/admin/role/editRole")
+    @LogByMethod(value = "/admin/role/editRole", validate = true)
     @ApiOperation(value = "修改角色", notes = "修改角色", response = Response.class)
     @PutMapping("/editRole")
     public Response editRole(@RequestBody RoleDto roleDto) throws Exception {

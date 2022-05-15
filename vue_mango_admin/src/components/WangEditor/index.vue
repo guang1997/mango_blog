@@ -27,15 +27,23 @@ export default Vue.extend({
             editor: null,
             textData: this.content,
             toolbarConfig: { },
-            editorConfig: {},
+            editorConfig: {
+                MENU_CONF: {
+                    // 暂时使用base64方式插入图片
+                    uploadImage: {
+                        base64LimitSize: 2 * 1024 * 1024,
+
+                    }
+                }
+            },
             mode: 'default', // or 'simple'
         }
     },
     methods: {
         onCreated(editor) {
-            if(!this.editor) {
-                this.editor = Object.seal(editor) // 一定要用 Object.seal() ，否则会报错
-            }
+            
+            this.editor = Object.seal(editor) // 一定要用 Object.seal() ，否则会报错
+            console.log(editor.getAllMenuKeys())
         },
         //获取data
         getData: function() {
