@@ -181,7 +181,10 @@ export default {
     return {
       currentId: 0,
       permission: {
-        del: ["admin", "comment:del"],
+        del: {
+          roles:["admin"],
+          menuButtons:["comment:del"]
+        }
       },
       Avatar:Avatar
     };

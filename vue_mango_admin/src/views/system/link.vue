@@ -103,7 +103,7 @@
             <el-table-column :show-overflow-tooltip="true" prop="title" label="友链标题" width="150"/>
              <el-table-column :show-overflow-tooltip="true" prop="url" label="友链url" width="200"/>
             <el-table-column :show-overflow-tooltip="true" prop="summary" label="友链描述" width="250"/>
-            <el-table-column label="友链状态" align="center" prop="linkStatus">
+            <el-table-column label="友链状态" align="center" prop="linkStatus" v-permission="permission.edit">
             <template slot-scope="scope">
               <el-switch
                 :value="scope.row.linkStatus"
@@ -168,9 +168,18 @@ export default {
     return {
       currentId: 0,
       permission: {
-        add: ["admin", "link:add"],
-        edit: ["admin", "link:edit"],
-        del: ["admin", "link:del"],
+        add: {
+          roles:["admin"],
+          menuButtons:["link:add"]
+        },
+        edit: {
+          roles:["admin"],
+          menuButtons:["link:edit"]
+        }, 
+        del: {
+          roles:["admin"],
+          menuButtons:["link:del"]
+        }
       },
       rules: {
         url: [{ required: true, message: "请输入网站地址", trigger: "blur" }],

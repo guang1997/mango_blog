@@ -181,7 +181,7 @@
             prop="nickname"
             label="昵称"
           />
-          <el-table-column label="状态" align="center" prop="enabled">
+          <el-table-column label="状态" align="center" prop="enabled" v-permission="permission.edit">
             <template slot-scope="scope">
               <el-switch
                 :disabled="scope.row.id === user.id"
@@ -325,9 +325,18 @@ export default {
       roleDatas: [],
       roles: [],
       permission: {
-        add: ["admin", "admin:add"],
-        edit: ["admin", "admin:edit"],
-        del: ["admin", "admin:del"],
+        add: {
+          roles:["admin"],
+          menuButtons:["admin:add"]
+        },
+        edit: {
+          roles:["admin"],
+          menuButtons:["admin:edit"]
+        }, 
+        del: {
+          roles:["admin"],
+          menuButtons:["admin:del"]
+        }
       },
       rules: {
         username: [

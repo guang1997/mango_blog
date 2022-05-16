@@ -276,7 +276,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public List<String> getMenusByRoleId(List<String> roleIds) {
-        return baseMapper.selectRoleMenus(roleIds);
+        return baseMapper.selectRoleMenuButtons(roleIds);
     }
 
     public Response validRoleLevelByUserId(String userId) {

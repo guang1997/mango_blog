@@ -132,9 +132,18 @@ export default {
     return {
       currentId: 0,
       permission: {
-        add: ["admin", "tag:add"],
-        edit: ["admin", "tag:edit"],
-        del: ["admin", "tag:del"],
+         add: {
+          roles:["admin"],
+          menuButtons:["tag:add"]
+        },
+        edit: {
+          roles:["admin"],
+          menuButtons:["tag:edit"]
+        }, 
+        del: {
+          roles:["admin"],
+          menuButtons:["tag:del"]
+        }
       },
       rules: {
         tagName: [{ required: true, message: "请输入名称", trigger: "blur" }],

@@ -140,9 +140,18 @@ export default {
     return {
       currentId: 0,
       permission: {
-        add: ["admin", "sort:add"],
-        edit: ["admin", "sort:edit"],
-        del: ["admin", "sort:del"],
+         add: {
+          roles:["admin"],
+          menuButtons:["sort:add"]
+        },
+        edit: {
+          roles:["admin"],
+          menuButtons:["sort:edit"]
+        }, 
+        del: {
+          roles:["admin"],
+          menuButtons:["sort:del"]
+        }
       },
       rules: {
         sortName: [{ required: true, message: "请输入名称", trigger: "blur" }],

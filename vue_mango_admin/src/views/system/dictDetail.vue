@@ -126,9 +126,18 @@ export default {
         ]
       },
       permission: {
-        add: ['admin', 'dict:add'],
-        edit: ['admin', 'dict:edit'],
-        del: ['admin', 'dict:del']
+        add: {
+          roles:["admin"],
+          menuButtons:["dict:add"]
+        },
+        edit: {
+          roles:["admin"],
+          menuButtons:["dict:edit"]
+        }, 
+        del: {
+          roles:["admin"],
+          menuButtons:["dict:del"]
+        }
       },
       listClassType: [
           {key: 1, label: "default", value: 'default'},

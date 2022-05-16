@@ -131,7 +131,7 @@
               <span class="role-span">菜单分配</span>
             </el-tooltip>
             <el-button
-              v-permission="['admin', 'roles:edit']"
+              v-permission="permission.edit"
               :disabled="!showButton"
               :loading="menuLoading"
               icon="el-icon-check"
@@ -202,9 +202,18 @@ export default {
       menus: [],
       menuIds: [],
       permission: {
-        add: ["admin", "roles:add"],
-        edit: ["admin", "roles:edit"],
-        del: ["admin", "roles:del"],
+        add: {
+          roles:["admin"],
+          menuButtons:["role:add"]
+        },
+        edit: {
+          roles:["admin"],
+          menuButtons:["role:edit"]
+        }, 
+        del: {
+          roles:["admin"],
+          menuButtons:["role:del"]
+        }
       },
       rules: {
         roleName: [{ required: true, message: "请输入名称", trigger: "blur" }],

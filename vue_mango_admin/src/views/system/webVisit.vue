@@ -133,7 +133,10 @@ export default {
     return {
       currentId: 0,
       permission: {
-        del: ["admin", "comment:del"],
+        del: {
+          roles:["admin"],
+          menuButtons:["webVisit:del"]
+        }
       },
     };
   },

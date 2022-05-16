@@ -287,9 +287,18 @@ export default {
     return {
       menus: [],
       permission: {
-        add: ["admin", "menu:add"],
-        edit: ["admin", "menu:edit"],
-        del: ["admin", "menu:del"],
+        add: {
+          roles:["admin"],
+          menuButtons:["menu:add"]
+        },
+        edit: {
+          roles:["admin"],
+          menuButtons:["menu:edit"]
+        }, 
+        del: {
+          roles:["admin"],
+          menuButtons:["menu:del"]
+        }
       },
       rules: {
         title: [{ required: true, message: "请输入标题", trigger: "blur" }],
