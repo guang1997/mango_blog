@@ -5,7 +5,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>mango_base</module>
-        <module>mango_service</module>
+        <module>mango_admin</module>
+        <module>mango_web</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

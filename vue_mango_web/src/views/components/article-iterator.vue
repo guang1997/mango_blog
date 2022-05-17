@@ -4,11 +4,11 @@
       <el-card class="article-iterator__item" v-for="(article, index) in articles" :key="index">
         <div class="item-content">
           <div class="item-content__pic">
-            <img :src="article.headerPic" alt="" />
+            <img :src="article.summary" alt="" />
           </div>
           <div class="item-content__info">
             <div class="item-content__link">
-              <router-link :to="'/app/article/' + article.articleId">{{ article.title }}</router-link>
+              <router-link :to="'/app/article/' + article.id">{{ article.title }}</router-link>
             </div>
             <div class="item-content__detail">
               <span>
@@ -18,15 +18,15 @@
               <span>&nbsp;|&nbsp;</span>
               <span>
                 <i class="el-icon-chat-dot-round"></i>
-                评论数 {{ article.commentNum }}
+                评论数 {{ article.clickCount }}
               </span>
               <span>&nbsp;|&nbsp;</span>
               <span>
                 <i class="el-icon-star-off"></i>
-                点赞 {{ article.likeNum }}
+                点赞 {{ article.likeCount }}
               </span>
             </div>
-            <div class="item-content__abstract">{{ article.abstract }}</div>
+            <div class="item-content__abstract">{{ article.author }}</div>
           </div>
         </div>
       </el-card>
@@ -37,6 +37,7 @@
   </div>
 </template>
 <script>
+
 export default {
   name: 'articleIterator',
   props: {

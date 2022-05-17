@@ -10,9 +10,15 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.17.1",
+    "element-ui": "^2.15.6",
+    "emojilib": "^3.0.4",
+    "resize-observer-polyfill": "^1.5.1",
     "vue": "^2.5.2",
     "vue-meta": "^2.4.0",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vuex": "^3.6.2",
+    "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

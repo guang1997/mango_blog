@@ -1,9 +1,9 @@
 <template>
   <div class="home-article">
-    <layout cover="/img/cover/home.jpg">
+    <layout cover="/static/img/cover/home.jpg">
       <div id="home-article-header" class="home-article__header" slot="header">
         <div class="home-article__dictum">
-          <div class="home-article__site-name">Marco's Blog</div>
+          <div class="home-article__site-name">Lisite's Blog</div>
           <div class="home-article__dictum-info">
             <span>{{ dictumInfo }}</span>
             <span class="home-article__typed-cursor" :class="{ 'is-typed-cursor-anmation': watingTyped }">|</span>
@@ -33,22 +33,22 @@
 <script>
 // 导入工具/组件
 import scrollTo from '@/utils/scrollTo'
-import home from '@/api/home'
+import blogApi from '@/api/blog'
 import articleIterator from '@/views/components/article-iterator'
 export default {
   // 组件名称
   name: 'home',
   metaInfo() {
     return {
-      title: `首页  - Marco's Blog`,
+      title: `首页  - Lisite's Blog`,
       meta: [
         {
           name: 'description',
-          content: `这是一个用vue ssr 开发的个人博客，记录学习与生活 - Marco's Blog`
+          content: `这是一个用vue开发的个人博客，记录学习与生活 - Lisite's Blog`
         },
         {
           name: 'keywords',
-          content: 'vue ssr,vue博客,技术博客'
+          content: 'vue博客,技术博客'
         }
       ]
     }
@@ -81,24 +81,24 @@ export default {
     this.startPlay()
   },
   async asyncData() {
-    const articleRes = await home.getArticles({
+    const res = await blogApi.getBlogs({
       publish: 1,
       page: 1,
-      content: 0
+      size: 0
     })
-    if (articleRes.status === 200) return { articles: articleRes.data, total: articleRes.total }
+    if (res.code === this.$ECode.SUCCESS) return { articles: res.data.data, total: res.data.total }
   },
   methods: {
     async currentChange(val) {
-      const articleRes = await home.getArticles({
+      const res = await blogApi.getBlogs({
         publish: 1,
         limit: 1,
         page: val,
-        content: 0
+        size: 0
       })
-      if (articleRes.status === 200) {
-        this.total = articleRes.total
-        this.articles = articleRes.data
+      if (res.code === this.$ECode.SUCCESS) {
+        this.total = res.data.total
+        this.articles = res.data.data
       }
     },
 
