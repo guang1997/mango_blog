@@ -30,7 +30,7 @@
       <slot name="footer">
         <div class="layout__footer-content" :style="{ backgroundImage: 'url(' + cover + ')' }">
           <div class="layout__footer-item">
-            <span>©2018 - 2022&nbsp;&nbsp;&nbsp;</span>
+            <span>©2022 - 2024&nbsp;&nbsp;&nbsp;</span>
             <a href="https://github.com/justJokee" target="_blank">justJokee</a>
           </div>
           <div class="layout__footer-item">Powerd by Vue2.x ssr</div>
@@ -58,7 +58,7 @@ export default {
     },
     cover: {
       type: String,
-      default: '/img/article/cover.jpg'
+      default: '/static/img/cover/home.jpg'
     }
   },
   components: {

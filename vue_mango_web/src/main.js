@@ -19,7 +19,6 @@ Vue.component('layout', layout)
 Vue.config.productionTip = false
 
 export function createApp() {
-  debugger
   const router = createRouter()
   const store = createStore()
   sync(store, router)

@@ -14,6 +14,11 @@ const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
 const devWebpackConfig = merge(baseWebpackConfig, {
+  entry: {
+    app: './src/entry-client.js',
+    vendors: ['axios', '@/assets/js/prism.js'],
+    vues: ['vue', 'vuex', 'vue-router']
+  },
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
   },

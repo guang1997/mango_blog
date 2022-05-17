@@ -1,4 +1,4 @@
-import { createApp } from './app'
+import { createApp } from './main'
 import { storage } from '@/utils/storage'
 import R_O_P from 'resize-observer-polyfill'
 import Vue from 'vue'
@@ -32,12 +32,12 @@ Vue.mixin({
 })
 
 const { app, router, store } = createApp()
-Prism.plugins.toolbar.registerButton('macostyle', function () {
-  const content = document.createElement('div')
-  content.setAttribute('class', 'toolbar-item__content')
-  content.innerHTML = '<span class="toolbar-item__icon"></span>'
-  return content
-})
+// Prism.plugins.toolbar.registerButton('macostyle', function () {
+//   const content = document.createElement('div')
+//   content.setAttribute('class', 'toolbar-item__content')
+//   content.innerHTML = '<span class="toolbar-item__icon"></span>'
+//   return content
+// })
 // 将服务端渲染时的状态写入vuex中
 if (window.__INITIAL_STATE__) {
   store.replaceState(window.__INITIAL_STATE__.state)
