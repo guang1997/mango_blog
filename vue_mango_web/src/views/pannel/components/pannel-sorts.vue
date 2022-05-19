@@ -1,7 +1,3 @@
-<doc>
-  @desc:   看板 - 文章分类
-  @author: justJokee 
-</doc>
 <template>
   <div class="pannel-category">
     <el-card>
@@ -11,7 +7,7 @@
       </div>
       <div class="pannel__item-body">
         <ul>
-          <li v-for="(item, index) in category" :key="index" @click="filterArticles(item.name, item._id)">
+          <li v-for="(item, index) in sort" :key="index" @click="filterBlogs(item.name, item._id)">
             <span>{{ item.name }}</span>
             <span>{{ item.total }}</span>
           </li>
@@ -24,20 +20,20 @@
 import { mapState } from 'vuex'
 
 export default {
-  name: 'pannelCategory',
+  name: 'pannelSorts',
   props: {},
   data() {
     return {}
   },
   computed: {
-    ...mapState(['category'])
+    ...mapState(['sort'])
   },
   methods: {
-    filterArticles(name, _id) {
+    filterBlogs(name, _id) {
       this.$router.push({
-        name: 'articleFilter',
+        name: 'blogFilter',
         params: {
-          type: 'category',
+          type: 'sort',
           param: _id
         },
         query: {

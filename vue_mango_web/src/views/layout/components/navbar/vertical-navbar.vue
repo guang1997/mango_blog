@@ -27,7 +27,7 @@
           <span>分类</span>
         </el-menu-item>
       </el-submenu>
-      <el-submenu index="2">
+      <!-- <el-submenu index="2">
         <template slot="title">
           <i class="el-icon-camera"></i>
           <span>娱乐</span>
@@ -36,7 +36,7 @@
           <i class="el-icon-video-camera-solid"></i>
           <span>电影</span>
         </el-menu-item>
-      </el-submenu>
+      </el-submenu> -->
       <el-menu-item index="messageBoard">
         <i class="el-icon-chat-dot-round"></i>
         <span>留言板</span>

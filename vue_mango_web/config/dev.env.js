@@ -6,5 +6,5 @@ module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
 
   //开发环境
-  VUE_APP_BASE_API: '"http://localhost:10002/web"',
+  VUE_APP_BASE_API: '"http://localhost:10002"',
 })

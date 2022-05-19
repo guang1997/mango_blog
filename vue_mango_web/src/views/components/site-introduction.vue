@@ -1,10 +1,10 @@
 <template>
   <div class="site-introduction">
     <div class="site-introduction__avatar" @click="goTo('home')">
-      <img src="https://avatars.githubusercontent.com/u/35912907?v=4" alt="" />
+      <img src="https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/15/09fb67b0-f1d2-4d63-afda-a72219d55c65-avatar.jpeg" alt="" />
     </div>
     <div class="site-introduction__info" @click="goTo('home')">
-      <p class="site-introduction__sitename">Marco</p>
+      <p class="site-introduction__sitename">Lisite</p>
       <p>
         Hi，欢迎来到 Lisite's Blog，这是一个使用 vue 开发的，记录学习与生活的个人博客，你可以在
         <a href="https://mapblog.cn/app/article/8">这里</a>

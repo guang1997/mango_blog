@@ -1,32 +1,32 @@
 <template>
   <div class="article-iterator">
-    <template v-if="articles.length">
-      <el-card class="article-iterator__item" v-for="(article, index) in articles" :key="index">
+    <template v-if="blogs.length">
+      <el-card class="article-iterator__item" v-for="(blog, index) in blogs" :key="index">
         <div class="item-content">
           <div class="item-content__pic">
-            <img :src="article.summary" alt="" />
+            <img :src="blog.fileId" alt="" />
           </div>
           <div class="item-content__info">
             <div class="item-content__link">
-              <router-link :to="'/app/article/' + article.id">{{ article.title }}</router-link>
+              <router-link :to="'/app/article/' + blog.id">{{ blog.title }}</router-link>
             </div>
             <div class="item-content__detail">
               <span>
                 <i class="el-icon-date"></i>
-                发表时间 {{ article.createTime | formatDate }}
+                发表时间 {{ blog.createTime }}
               </span>
               <span>&nbsp;|&nbsp;</span>
               <span>
                 <i class="el-icon-chat-dot-round"></i>
-                评论数 {{ article.clickCount }}
+                评论数 {{ blog.clickCount }}
               </span>
               <span>&nbsp;|&nbsp;</span>
               <span>
                 <i class="el-icon-star-off"></i>
-                点赞 {{ article.likeCount }}
+                点赞 {{ blog.likeCount }}
               </span>
             </div>
-            <div class="item-content__abstract">{{ article.author }}</div>
+            <div class="item-content__abstract">{{ blog.summary }}</div>
           </div>
         </div>
       </el-card>
@@ -41,7 +41,7 @@
 export default {
   name: 'articleIterator',
   props: {
-    articles: {
+    blogs: {
       type: Array,
       default() {
         return []

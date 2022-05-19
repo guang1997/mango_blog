@@ -1,7 +1,3 @@
-<doc>
-  @desc:   看板 - 最新文章
-  @author: justJokee 
-</doc>
 <template>
   <div class="pannel-articles">
     <el-card>
@@ -11,20 +7,20 @@
           <span>最新文章</span>
         </div>
         <div class="pannel__item-body">
-          <template v-if="newArticles.length">
-            <div class="body-item" v-for="(article, index) in newArticles" :key="index">
+          <template v-if="newBlogs.length">
+            <div class="body-item" v-for="(blog, index) in newBlogs" :key="index">
               <div class="body-pic">
-                <router-link :to="'/app/article/' + article.articleId">
-                  <img v-lazy="article.headerPic" alt="" />
+                <router-link :to="'/app/article/' + blog.id">
+                  <img v-lazy="blog.fileId" alt="" />
                 </router-link>
               </div>
               <div class="body-info">
                 <div class="body-info__title">
-                  <router-link :to="'/app/article/' + article.articleId">
-                    {{ article.title }}
+                  <router-link :to="'/app/article/' + blog.id">
+                    {{ blog.title }}
                   </router-link>
                 </div>
-                <div class="body-info__date">{{ article.createTime | formatDate }}</div>
+                <div class="body-info__date">{{ blog.createTime }}</div>
               </div>
             </div>
           </template>
@@ -38,13 +34,13 @@
 import { mapState } from 'vuex'
 
 export default {
-  name: 'pannelArticles',
+  name: 'pannelBlogs',
   props: {},
   data() {
     return {}
   },
   computed: {
-    ...mapState(['newArticles'])
+    ...mapState(['newBlogs'])
   },
   methods: {}
 }

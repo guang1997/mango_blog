@@ -1,6 +1,6 @@
 <template>
   <div class="home-article">
-    <layout cover="/static/img/cover/home.jpg">
+    <layout cover="https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/15/09fb67b0-f1d2-4d63-afda-a72219d55c65-avatar.jpeg">
       <div id="home-article-header" class="home-article__header" slot="header">
         <div class="home-article__dictum">
           <div class="home-article__site-name">Lisite's Blog</div>
@@ -14,11 +14,11 @@
         </div>
       </div>
       <div class="home-article__body" slot="custom-body">
-        <article-iterator :articles="articles"></article-iterator>
+        <article-iterator :blogs="blogs"></article-iterator>
 
         <div class="home-article__page">
           <el-pagination
-            v-if="articles.length"
+            v-if="blogs.length"
             :total="total"
             layout="prev, pager, next"
             :page-size="pageSize"
@@ -61,17 +61,16 @@ export default {
   data() {
     return {
       total: 0, //
-      pageSize: 8,
+      pageSize: 6,
       dictumInfo: '',
       timer: null,
       backTimer: null,
       watingTyped: false,
       hidePage: false,
-      articles: [],
+      blogs: [],
       dictums: [
-        ['你瞧这些白云聚了又散，散了又聚，人生离合，亦复如斯。', '出自：金庸'],
-        ['人在江湖，身不由己。', '出自：古龙'],
-        ['天涯思君不可忘。', '出自：《倚天屠龙记》']
+        ['小鱼干是换不来幸福的，因为它本身就是幸福'],
+        ['有些事本来很遥远，你争取，它就会离你愈来愈近'],
       ]
     }
   },
@@ -81,24 +80,21 @@ export default {
     this.startPlay()
   },
   async asyncData() {
-    const res = await blogApi.getBlogs({
-      publish: 1,
+    const res = await blogApi.getBlogByPage({
       page: 1,
-      size: 0
+      size: this.pageSize
     })
-    if (res.code === this.$ECode.SUCCESS) return { articles: res.data.data, total: res.data.total }
+    if (res.code === 20000) return { blogs: res.data.data, total: res.data.total }
   },
   methods: {
     async currentChange(val) {
-      const res = await blogApi.getBlogs({
-        publish: 1,
-        limit: 1,
+      const res = await blogApi.getBlogByPage({
         page: val,
-        size: 0
+        size: this.pageSize
       })
       if (res.code === this.$ECode.SUCCESS) {
         this.total = res.data.total
-        this.articles = res.data.data
+        this.blogs = res.data.data
       }
     },
 

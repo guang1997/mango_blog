@@ -18,9 +18,9 @@
 import { mapState } from 'vuex'
 import pannelIntroduction from './components/pannel-introduction'
 import pannelCatalog from './components/pannel-catalog'
-import pannelArticles from './components/pannel-articles'
+import pannelBlogs from './components/pannel-blogs'
 import pannelComments from './components/pannel-comments'
-import pannelCategory from './components/pannel-category'
+import pannelSorts from './components/pannel-sorts'
 import PannelTags from './components/pannel-tags.vue'
 import pannelArchives from './components/pannel-archives'
 import { getScrollTop } from '@/utils/getScrollTop'
@@ -31,9 +31,9 @@ export default {
   components: {
     pannelIntroduction,
     pannelCatalog,
-    pannelArticles,
+    pannelBlogs,
     pannelComments,
-    pannelCategory,
+    pannelSorts,
     PannelTags,
     pannelArchives
   },
@@ -76,10 +76,10 @@ export default {
       // 路由进行自定义看板、顺序
       const def = [
         'pannel-catalog',
-        'pannel-articles',
+        'pannel-blogs',
         'pannel-comments',
         'pannel-tags',
-        'pannel-category',
+        'pannel-sorts',
         'pannel-archives'
       ]
       if (this.pannels) {

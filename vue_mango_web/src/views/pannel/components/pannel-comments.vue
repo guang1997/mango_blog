@@ -1,7 +1,3 @@
-<doc>
-  @desc:   看板 - 最新文章评论
-  @author: justJokee 
-</doc>
 <template>
   <div class="pannel-comments">
     <el-card>

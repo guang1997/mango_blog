@@ -5,8 +5,8 @@ export default {
   setArchives(state, archives) {
     state.archives = archives
   },
-  setCategory(state, category) {
-    state.category = category
+  setSort(state, sort) {
+    state.sort = sort
   },
   setTags(state, tags) {
     state.tags = tags
@@ -14,8 +14,8 @@ export default {
   setNewComments(state, newComments) {
     state.newComments = newComments
   },
-  setNewArticles(state, newArticles) {
-    state.newArticles = newArticles
+  setNewBlogs(state, newblogs) {
+    state.newblogs = newblogs
   },
   setActiveCatalog(state, id) {
     state.activeCatalog = id

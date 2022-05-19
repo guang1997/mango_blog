@@ -1,7 +1,3 @@
-<doc>
-  @desc:   看板 - 本站简介
-  @author: justJokee 
-</doc>
 <template>
   <div class="pannel-introduction">
     <el-card>

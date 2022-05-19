@@ -30,7 +30,7 @@
       </el-dropdown-menu>
     </el-dropdown>
 
-    <el-dropdown class="horizontal-navbar__menu">
+    <!-- <el-dropdown class="horizontal-navbar__menu">
       <span class="navbar-menu-title">
         <i class="el-icon-camera"></i>
         娱乐
@@ -42,7 +42,7 @@
           电影
         </el-dropdown-item>
       </el-dropdown-menu>
-    </el-dropdown>
+    </el-dropdown> -->
     <div class="horizontal-navbar__menu" @click="goTo('messageBoard')">
       <i class="el-icon-chat-dot-round"></i>
       <span>留言板</span>

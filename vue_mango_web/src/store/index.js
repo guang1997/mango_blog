@@ -4,32 +4,33 @@ import actions from './actions'
 import mutations from './mutations'
 
 Vue.use(Vuex)
-export function createStore() {
-  return new Vuex.Store({
-    state: {
-      activeCatalog: '',
-      rollBack: false,
-      // 访客信息
-      visitorInfo: {},
-      // 文章目录树
-      catalogs: [],
-      // 文章归档 按月统计
-      archives: [],
-      // 文章分类
-      category: [],
-      // 文章标签
-      tags: [],
-      // 最新评论
-      newComments: [],
-      // 最新文章
-      newArticles: [],
-      totals: {
-        article: 0,
-        tag: 0,
-        category: 0
-      }
-    },
-    mutations,
-    actions
-  })
-}
+
+const store = new Vuex.Store({
+  state: {
+    activeCatalog: '',
+    rollBack: false,
+    // 访客信息
+    visitorInfo: {},
+    // 文章目录树
+    catalogs: [],
+    // 文章归档 按月统计
+    archives: [],
+    // 文章分类
+    sort: [],
+    // 文章标签
+    tags: [],
+    // 最新评论
+    newComments: [],
+    // 最新文章
+    newBlogs: [],
+    totals: {
+      blog: 0,
+      tag: 0,
+      sort: 0
+    }
+  },
+  mutations,
+  actions
+})
+
+export default store

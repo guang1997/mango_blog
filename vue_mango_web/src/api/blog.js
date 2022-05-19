@@ -1,11 +1,11 @@
 import request from '@/utils/request'
 
-export function getBlogs(data) {
+export function getBlogByPage(data) {
     return request({
-      url: '/web/blog/getBlogs',
+      url: '/web/blog/getBlogByPage',
       method: 'post',
       data
     })
   }
 
-  export default { getBlogs }
+  export default { getBlogByPage }

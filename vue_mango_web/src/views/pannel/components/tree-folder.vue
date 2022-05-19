@@ -1,7 +1,3 @@
-<doc>
-  @desc:   布局组件
-  @author: justJokee 
-</doc>
 <template>
   <ol class="tree-folder">
     <li v-for="(catalog, index) in catalogs" :key="catalog.level + '_' + index">

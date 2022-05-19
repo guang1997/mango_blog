@@ -1,7 +1,3 @@
-<doc>
-  @desc:   看板 - 文章标签
-  @author: justJokee 
-</doc>
 <template>
   <div class="pannel-tags">
     <el-card>

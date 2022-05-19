@@ -70,6 +70,9 @@ export default {
   data() {
     return {}
   },
+  mounted() {
+      console.log("this.cover", this.cover)
+  },
   methods: {}
 }
 </script>

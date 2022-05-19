@@ -1,41 +1,34 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
 import empty from '@/components/empty'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import layout from '@/views/layout/'
-import { createRouter } from './router'
-import { createStore } from './store'
-import { sync } from 'vuex-router-sync'
+import router from './router'
+import store  from './store'
 import mergeAsyncData from '@/mixins/mergeAsyncData'
+import R_O_P from 'resize-observer-polyfill'
+import VueLazyload from '@/utils/lazyLoad'
+const loading = require('@/assets/img/loading.gif')
+if (!window.ResizeObserver) {
+  window.ResizeObserver = R_O_P
+}
 
 Vue.mixin(mergeAsyncData)
 Vue.use(ElementUI)
+// eslint-disable-next-line no-undef
+Vue.use(VueLazyload, {
+  loading: loading
+})
+
 Vue.component('empty', empty)
 Vue.component('layout', layout)
 
 Vue.config.productionTip = false
 
-export function createApp() {
-  const router = createRouter()
-  const store = createStore()
-  sync(store, router)
-  const app = new Vue({
-    router,
-    store,
-    render: (h) => h(App)
-  })
-
-  return { app, router, store }
-}
-
-/* eslint-disable no-new */
-// new Vue({
-//   el: '#app',
-//   router,
-//   store,
-//   components: { App },
-//   template: '<App/>'
-// })
+new Vue({
+  el: '#app',
+  router,
+  store,
+  render: h => h(App)
+})

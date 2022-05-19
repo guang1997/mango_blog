@@ -11,24 +11,22 @@ const originalPush = Router.prototype.push
 Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch((err) => err)
 }
-
-export function createRouter() {
-  return new Router({
-    mode: 'history',
-    routes: [
-      {
-        path: '/',
-        name: 'home',
-        component: home
-      }
-    ],
-    scrollBehavior(to, from, savedPosition) {
-      if (to.hash || to.query.anchor) return false
-      if (savedPosition) {
-        return savedPosition
-      } else {
-        return { x: 0, y: 0 }
-      }
+const router = new Router({
+  mode: 'history',
+  routes: [
+    {
+      path: '/',
+      name: 'home',
+      component: home
     }
-  })
-}
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash || to.query.anchor) return false
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
+    }
+  }
+})
+export default router

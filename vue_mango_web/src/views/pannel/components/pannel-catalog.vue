@@ -1,7 +1,3 @@
-<doc>
-  @desc:   看板 - 文章目录树
-  @author: justJokee 
-</doc>
 <template>
   <div class="pannel-catalog">
     <el-card>
