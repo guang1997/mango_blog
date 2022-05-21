@@ -23,7 +23,7 @@ export default {
     this.initPannel()
   },
   methods: {
-    ...mapMutations(['setArchives', 'setSort', 'setTags', 'setNewComments', 'setNewBlogs', 'setTotals']),
+    ...mapMutations(['setArchives', 'setSorts', 'setTags', 'setNewComments', 'setNewBlogs', 'setTotals']),
     initPannel() {
       // this.$api.getArchives({ countType: 'month', page: 1, limit: 1000 }).then((res) => {
       //   if (res.status === 20000) this.setArchives(res.data)
@@ -32,18 +32,18 @@ export default {
         page: 1,
         size: 5
       }).then((res) => {
-        if (res.status === 20000) {
-          this.setTotals({ key: 'sort', value: res.total })
-          this.setSort(res.data)
+        if (res.code === 20000) {
+          this.setTotals({ key: 'sort', value: res.data.total })
+          this.setSorts(res.data.data)
         }
       })
       tagApi.getTagByPage({
         page: 1,
         size: 1000
       }).then((res) => {
-        if (res.status === 20000) {
-          this.setTotals({ key: 'tag', value: res.total })
-          this.setTags(res.data)
+        if (res.code === 20000) {
+          this.setTotals({ key: 'tag', value: res.data.total })
+          this.setTags(res.data.data)
         }
       })
       commentApi
@@ -52,7 +52,7 @@ export default {
           size: 5
         })
         .then((res) => {
-          if (res.status === 20000) this.setNewComments(res.data)
+          if (res.code === 20000) this.setNewComments(res.data.data)
         })
       blogApi
         .getBlogByPage({
@@ -60,9 +60,9 @@ export default {
           size: 5
         })
         .then((res) => {
-          if (res.status === 20000) {
-            this.setTotals({ key: 'blog', value: res.total })
-            this.setNewBlogs(res.data)
+          if (res.code === 20000) {
+            this.setTotals({ key: 'blog', value: res.data.total })
+            this.setNewBlogs(res.data.data)
           }
         })
     }

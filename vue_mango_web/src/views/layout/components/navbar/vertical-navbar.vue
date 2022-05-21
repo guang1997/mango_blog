@@ -14,15 +14,15 @@
           <i class="el-icon-discover"></i>
           <span>导航</span>
         </template>
-        <el-menu-item index="archives">
+        <el-menu-item index="archive">
           <i class="el-icon-files"></i>
           <span>归档</span>
         </el-menu-item>
-        <el-menu-item index="tags">
+        <el-menu-item index="tag">
           <i class="el-icon-collection-tag"></i>
           <span>标签</span>
         </el-menu-item>
-        <el-menu-item index="category">
+        <el-menu-item index="sort">
           <i class="el-icon-folder-opened"></i>
           <span>分类</span>
         </el-menu-item>

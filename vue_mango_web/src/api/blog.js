@@ -7,5 +7,19 @@ export function getBlogByPage(data) {
       data
     })
   }
-
-  export default { getBlogByPage }
+  export function getBlogById(data) {
+    return request({
+      url: '/web/blog/getBlogById',
+      method: 'post',
+      data
+    })
+  }
+  export function getBlogBySortId(data) {
+    return request({
+      url: '/web/blog/getBlogBySortId',
+      method: 'post',
+      data
+    })
+  }
+  
+  export default { getBlogByPage, getBlogById, getBlogBySortId }

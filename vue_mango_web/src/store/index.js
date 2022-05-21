@@ -16,7 +16,7 @@ const store = new Vuex.Store({
     // 文章归档 按月统计
     archives: [],
     // 文章分类
-    sort: [],
+    sorts: [],
     // 文章标签
     tags: [],
     // 最新评论

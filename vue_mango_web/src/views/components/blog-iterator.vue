@@ -39,7 +39,7 @@
 <script>
 
 export default {
-  name: 'articleIterator',
+  name: 'blogIterator',
   props: {
     blogs: {
       type: Array,

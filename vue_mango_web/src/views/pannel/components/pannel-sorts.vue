@@ -7,9 +7,9 @@
       </div>
       <div class="pannel__item-body">
         <ul>
-          <li v-for="(item, index) in sort" :key="index" @click="filterBlogs(item.name, item._id)">
-            <span>{{ item.name }}</span>
-            <span>{{ item.total }}</span>
+          <li v-for="(item, index) in sorts" :key="index" @click="filterBlogs(item.name, item._id)">
+            <span>{{ item.sortName }}</span>
+            <span>{{ item.blogNum }}</span>
           </li>
         </ul>
       </div>
@@ -26,14 +26,14 @@ export default {
     return {}
   },
   computed: {
-    ...mapState(['sort'])
+    ...mapState(['sorts'])
   },
   methods: {
     filterBlogs(name, _id) {
       this.$router.push({
         name: 'blogFilter',
         params: {
-          type: 'sort',
+          type: 'sorts',
           param: _id
         },
         query: {

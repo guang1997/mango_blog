@@ -3,6 +3,8 @@ package com.myblog.service.web.entity.dto;
 import com.myblog.service.base.entity.dto.BaseDto;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Data
 public class BlogDto extends BaseDto {
@@ -28,5 +30,7 @@ public class BlogDto extends BaseDto {
 
     private Integer sort;
 
-    private String tagId;
+    private List<TagDto> tags;
+
+    private String blogSortId;
 }

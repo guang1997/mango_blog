@@ -15,15 +15,15 @@
         <i class="el-icon-arrow-down"></i>
       </span>
       <el-dropdown-menu slot="dropdown" class="menu-list">
-        <el-dropdown-item @click.native="goTo('archives')">
+        <el-dropdown-item @click.native="goTo('archive')">
           <i class="el-icon-files"></i>
           归档
         </el-dropdown-item>
-        <el-dropdown-item @click.native="goTo('tags')">
+        <el-dropdown-item @click.native="goTo('tag')">
           <i class="el-icon-collection-tag"></i>
           标签
         </el-dropdown-item>
-        <el-dropdown-item @click.native="goTo('category')">
+        <el-dropdown-item @click.native="goTo('sort')">
           <i class="el-icon-folder-opened"></i>
           分类
         </el-dropdown-item>

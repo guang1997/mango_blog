@@ -6,9 +6,9 @@
         v-for="(tag, index) in tags"
         :key="index"
         :style="{ color: color(), fontSize: fontSize(), padding: tagPadding }"
-        @click="filterArticles(tag.tag)"
+        @click="filterArticles(tag.tagName)"
       >
-        {{ tag.tag }}
+        {{ tag.tagName }}
       </span>
     </div>
     <empty v-else></empty>

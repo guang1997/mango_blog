@@ -1,6 +1,6 @@
 <template>
   <div class="home-article">
-    <layout cover="https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/15/09fb67b0-f1d2-4d63-afda-a72219d55c65-avatar.jpeg">
+    <layout cover="/static/img/cover/home.jpg">
       <div id="home-article-header" class="home-article__header" slot="header">
         <div class="home-article__dictum">
           <div class="home-article__site-name">Lisite's Blog</div>
@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="home-article__body" slot="custom-body">
-        <article-iterator :blogs="blogs"></article-iterator>
+        <blog-iterator :blogs="blogs"></blog-iterator>
 
         <div class="home-article__page">
           <el-pagination
@@ -34,7 +34,7 @@
 // 导入工具/组件
 import scrollTo from '@/utils/scrollTo'
 import blogApi from '@/api/blog'
-import articleIterator from '@/views/components/article-iterator'
+import blogIterator from '@/views/components/blog-iterator'
 export default {
   // 组件名称
   name: 'home',
@@ -55,7 +55,7 @@ export default {
   },
   // 子组件
   components: {
-    articleIterator
+    blogIterator
   },
   props: {},
   data() {
@@ -160,7 +160,7 @@ export default {
   &__header {
     width: 100vw;
     height: 100vh;
-    background-image: url('/img/cover/home.jpg');
+    background-image: url('/static/img/cover/home.jpg');
     background-position: center;
     background-size: cover;
     position: relative;

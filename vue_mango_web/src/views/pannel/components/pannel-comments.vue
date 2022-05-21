@@ -10,18 +10,18 @@
           <template v-if="newComments.length">
             <div class="body-item" v-for="(comment, index) in newComments" :key="index">
               <div class="body-pic">
-                <router-link :to="'/app/article/' + comment.articleId + '?anchor=a_cm'">
-                  <img v-lazy="comment.imgUrl" alt="" />
+                <router-link :to="'/app/article/' + comment.blogId + '?anchor=a_cm'">
+                  <img v-lazy="comment.avatar" alt="" />
                 </router-link>
               </div>
               <div class="body-info">
                 <div class="body-info__title">
-                  <router-link :to="'/app/article/' + comment.articleId + '?anchor=a_cm'">
+                  <router-link :to="'/app/article/' + comment.blogId + '?anchor=a_cm'">
                     {{ comment.content }}
                   </router-link>
                 </div>
                 <div class="body-info__name">{{ comment.name }}</div>
-                <div class="body-info__date">发表于：{{ comment.date | formatDate }}</div>
+                <div class="body-info__date">发表于：{{ comment.createTime }}</div>
               </div>
             </div>
           </template>

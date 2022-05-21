@@ -31,7 +31,7 @@
         <div class="layout__footer-content" :style="{ backgroundImage: 'url(' + cover + ')' }">
           <div class="layout__footer-item">
             <span>©2022 - 2024&nbsp;&nbsp;&nbsp;</span>
-            <a href="https://github.com/justJokee" target="_blank">justJokee</a>
+            <a href="https://github.com/justJokee" target="_blank">lisite</a>
           </div>
           <div class="layout__footer-item">Powerd by Vue2.x ssr</div>
           <div class="layout__footer-item item-icp">
@@ -45,8 +45,8 @@
   </div>
 </template>
 <script>
-import navbar from '@/views/layout/components/navbar/'
-import layoutHeader from '@/views/layout/components/header/'
+import navbar from '@/views/layout/components/navbar'
+import layoutHeader from '@/views/layout/components/header'
 
 import pannel from '@/views/pannel/'
 
@@ -69,9 +69,6 @@ export default {
 
   data() {
     return {}
-  },
-  mounted() {
-      console.log("this.cover", this.cover)
   },
   methods: {}
 }

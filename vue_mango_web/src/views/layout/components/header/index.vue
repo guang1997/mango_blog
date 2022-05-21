@@ -22,9 +22,6 @@ export default {
       default: '标题'
     }
   },
-  mounted() {
-      console.log("this.layoutHeader.cover", this.cover)
-  },
   data() {
     return {}
   }

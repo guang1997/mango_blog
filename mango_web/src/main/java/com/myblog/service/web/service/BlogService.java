@@ -17,4 +17,6 @@ import com.myblog.service.web.entity.dto.BlogDto;
 public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog, BlogDto> {
 
     Response getBlogByPage(BlogDto blogDto) throws Exception;
+
+    Response getBlogBySortId(BlogDto blogDto) throws Exception;
 }
