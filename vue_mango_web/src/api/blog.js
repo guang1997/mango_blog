@@ -21,5 +21,12 @@ export function getBlogByPage(data) {
       data
     })
   }
+  export function getBlogByTagId(data) {
+    return request({
+      url: '/web/blog/getBlogByTagId',
+      method: 'post',
+      data
+    })
+  }
   
-  export default { getBlogByPage, getBlogById, getBlogBySortId }
+  export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId }

@@ -25,5 +25,5 @@ public interface BlogMapper extends BaseMapper<Blog> {
 
     List<Tag> selectTagByBlogId(@Param("blogs") List<Blog> blogs);
 
-    List<BlogDto> selectListByBlogId(@Param("blogSortId") String blogSortId);
+    Integer changeLike(@Param("blogId") String blogId, @Param("likeCount") int likeCount);
 }

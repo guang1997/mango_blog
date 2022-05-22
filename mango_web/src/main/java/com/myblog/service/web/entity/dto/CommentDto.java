@@ -34,4 +34,8 @@ public class CommentDto extends BaseDto {
     private List<CommentDto> children;
 
     private List<String> createTimes;
+
+    private Boolean isLiked;
+
+    private Integer likeCount;
 }

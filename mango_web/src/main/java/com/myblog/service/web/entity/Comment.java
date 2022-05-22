@@ -46,13 +46,13 @@ public class Comment extends BaseEntity {
     private String source;
 
     @ApiModelProperty(value = "评论类型 1:点赞 0:评论")
-    private Boolean type;
+    private Integer type;
 
     @ApiModelProperty(value = "博客id")
     private String blogId;
 
     @ApiModelProperty(value = "状态: 0-待审核, 1-审核通过, 2-审核不通过")
-    private Boolean status;
+    private Integer status;
 
 
 }

@@ -1,13 +1,14 @@
 <template>
   <div class="tags">
     <layout _title="标签" cover="/static/img/cover/tags.jpg">
-      <tags-iterator :tags="tags"></tags-iterator>
+      <timeline-iterator :activities="tags" :itemByDate="itemByDate" @getBlogList="getBlogList" :selectBlogId="selectBlogId" :displayName="displayName"></timeline-iterator>
     </layout>
   </div>
 </template>
 <script>
+import blogApi from '@/api/blog'
 import tagApi from '@/api/tag'
-import tagsIterator from '@/views/components/tags-iterator'
+import timelineIterator from '@/views/components/timeline-iterator'
 export default {
   name: 'tags',
   metaInfo() {
@@ -15,15 +16,57 @@ export default {
       title: `标签  - Lisite's Blog`
     }
   },
-  components: { tagsIterator },
+  components: { timelineIterator },
   data() {
     return {
-      tags: []
+      itemByDate:[],
+      tags: [],
+      selectBlogId:"",
+      displayName:"标签"
     }
   },
-  async asyncData() {
-    const res = await tagApi.getTagByPage({})
-    if (res.code === 20000) return { tags: res.data.data, total: res.total }
+   created() {
+    tagApi.getTagByPage({ queryAll: true }).then(response => {
+      if (response.code == 20000) {
+        var result = []
+
+        for (var a = 0; a < response.data.data.length; a++) {
+          var dataForDate = {
+            name: response.data.data[a].tagName,
+            id: response.data.data[a].id
+          };
+          result.push(dataForDate);
+        }
+        
+        this.tags = result;
+
+        // 默认选择第一个
+        this.getBlogList(this.tags[0].id);
+      }
+    });
+
+  },
+  methods: {
+     getBlogList(tagId) {
+      this.selectBlogId = tagId;
+      blogApi.getBlogByTagId({tagId}).then(response => {
+        if (response.code == 20000) {
+          var result = []
+
+          for (var a = 0; a < response.data.data.length; a++) {
+            var dataForDate = {
+              id: response.data.data[a].id,
+              title: response.data.data[a].title,
+              createTime: response.data.data[a].createTime,
+              author: response.data.data[a].author,
+              sort: response.data.data[a].sort
+            };
+            result.push(dataForDate);
+          }
+          this.itemByDate = result;
+        }
+      });
+    },
   }
 }
 </script>

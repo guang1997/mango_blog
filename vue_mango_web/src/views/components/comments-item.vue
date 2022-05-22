@@ -1,7 +1,3 @@
-<doc>
-  @desc:   留言、文章评论展示列表
-  @author: justJokee
-</doc>
 <template>
   <div class="comments-item">
     <div class="comments-item__avatar" :class="{ 'comments-item__avatar--small': subType }">

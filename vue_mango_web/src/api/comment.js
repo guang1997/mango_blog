@@ -7,5 +7,12 @@ export function getCommentByPage(data) {
       data
     })
   }
-
-  export default { getCommentByPage }
+  export function likeBlog(data) {
+    return request({
+      url: '/web/comment/likeBlog',
+      method: 'post',
+      data
+    })
+  }
+  
+  export default { getCommentByPage, likeBlog }

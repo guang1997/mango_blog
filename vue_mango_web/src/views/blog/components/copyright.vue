@@ -1,20 +1,18 @@
-<doc>
-  @desc:   文章版权信息提示
-  @author: justJokee
-</doc>
 <template>
   <div class="copyright">
     <ul>
       <li>
         <span class="copyright__label">文章作者：</span>
         <span>
-          <a href="mailto:undefined">{{ author }}</a>
+          <a href="mailto:872174823@qq.com">{{ author }}</a>
         </span>
       </li>
       <li>
         <span class="copyright__label">文章链接：</span>
         <span>
-          <a :href="url">{{ url }}</a>
+           <router-link :to="'/app/blog/' + blogId" @click.native="onClick()">
+                    {{ url }}
+                  </router-link>
         </span>
       </li>
       <li class="copyright__licence">
@@ -34,9 +32,13 @@ export default {
   props: {
     author: {
       type: String,
-      default: 'Marco'
+      default: 'Lisite'
     },
     url: {
+      type: String,
+      default: ''
+    },
+    blogId: {
       type: String,
       default: ''
     },
@@ -46,7 +48,11 @@ export default {
     return {}
   },
   components: {},
-  methods: {}
+  methods: {
+    onClick() {
+      location.reload();
+    }
+  }
 }
 </script>
 <style lang="scss">

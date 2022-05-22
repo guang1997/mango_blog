@@ -38,6 +38,13 @@ public class BlogController {
         return blogService.getBlogByPage(blogDto);
     }
 
+    @LogByMethod("/web/blog/getBlogById")
+    @ApiOperation(value = "根据博客id查询博客信息", notes = "根据博客id查询博客信息", response = Response.class)
+    @PostMapping("/getBlogById")
+    public Response getBlogById(@RequestBody BlogDto blogDto) throws Exception {
+        return blogService.getBlogById(blogDto);
+    }
+
     @LogByMethod("/web/blog/getBlogBySortId")
     @ApiOperation(value = "根据分类id查询博客信息", notes = "根据分类id查询博客信息", response = Response.class)
     @PostMapping("/getBlogBySortId")
@@ -47,6 +54,17 @@ public class BlogController {
             return Response.ok();
         }
         return blogService.getBlogBySortId(blogDto);
+    }
+
+    @LogByMethod("/web/blog/getBlogByTagId")
+    @ApiOperation(value = "根据标签id查询博客信息", notes = "根据分类id查询博客信息", response = Response.class)
+    @PostMapping("/getBlogByTagId")
+    public Response getBlogByTagId(@RequestBody BlogDto blogDto) throws Exception {
+        if (StringUtils.isBlank(blogDto.getTagId())) {
+            LOGGER.warn("getBlogByTagId return empty, tagId is null, blogDto:{}", blogDto);
+            return Response.ok();
+        }
+        return blogService.getBlogByTagId(blogDto);
     }
 }
 

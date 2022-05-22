@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.myblog.service.web.mapper.BlogMapper">
-    <resultMap type="com.myblog.service.web.entity.dto.BlogDto" id="BlogSortMap">
-        <id property="id" column="id"/>
-        <result property="title" jdbcType="VARCHAR" column="title"/>
-        <result property="author" jdbcType="VARCHAR" column="author"/>
-        <result property="createTime" jdbcType="TIMESTAMP" column="create_time"/>
-        <!-- collection描述一对多的关系，ofType是集合所包含的类型，可以写完整Java类名或别名  -->
-        <collection property="tags" ofType="com.myblog.service.web.entity.dto.TagDto">
-            <id property="id" column="id"/>
-            <result property="tagName" jdbcType="VARCHAR" column="tag_name"/>
-        </collection>
-    </resultMap>
+    <update id="changeLike">
+        UPDATE t_blog SET like_count = #{likeCount} WHERE id=#{blogId};
+    </update>
     <select id="selectCountGroupByBlogSort" resultType="java.util.Map">
         SELECT t.blog_sort_id, COUNT(t.id) AS blogNum FROM t_blog t WHERE t.is_deleted= 0 GROUP BY t.blog_sort_id;
     </select>
@@ -22,12 +14,5 @@
         <foreach collection="blogs" open="(" close=")" separator="," item="blog">
             #{blog.id}
         </foreach>
-    </select>
-    <select id="selectListByBlogId" resultMap="BlogSortMap">
-        SELECT t1.id, t1.author, t1.title, t3.id, t3.tag_name FROM t_blog t1
-        LEFT JOIN t_blog_tag t2 ON t1.id=t2.blog_id
-        LEFT JOIN t_tag t3 ON t2.tag_id=t3.id
-        WHERE t1.is_deleted=0 AND t1.blog_sort_id=#{blogSortId}
-        ORDER BY t1.create_time DESC
     </select>
 </mapper>

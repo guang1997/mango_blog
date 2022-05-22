@@ -1,7 +1,3 @@
-<doc>
-  @desc:   文章上/下一篇
-  @author: justJokee
-</doc>
 <template>
   <div class="prev-next">
     <div class="prev-next__content">

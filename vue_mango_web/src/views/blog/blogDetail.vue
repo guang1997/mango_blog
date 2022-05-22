@@ -1,55 +1,57 @@
 <template>
   <div class="article-detail">
-    <layout :cover="article.headerPic">
+    <layout :cover="blog.fileId">
       <div class="article-detail__header" slot="custom-header">
-        <h1 class="article-detail__title">{{ article.title }}</h1>
+        <h1 class="article-detail__title">{{ blog.title }}</h1>
         <div class="article-detail__info info-1">
           <span>
             <i class="el-icon-date"></i>
-            发表时间 {{ article.createTime | formatDate }}
+            发表时间 {{ blog.createTime }}
           </span>
           <span>&nbsp;|&nbsp;</span>
           <span>
             <i class="el-icon-price-tag"></i>
-            标签 {{ tags }}
+            标签 {{ tagNames }}
           </span>
         </div>
         <div class="article-detail__info info-2">
           <span>
             <i class="el-icon-chat-dot-round"></i>
-            阅读量 {{ article.pv }}
+            阅读量 {{ blog.clickCount }}
           </span>
           <span>&nbsp;|&nbsp;</span>
           <span>
             <i class="el-icon-chat-dot-round"></i>
-            评论数 {{ article.commentNum }}
+            评论数 {{ blog.comments ? blog.comments.length : 0 }}
           </span>
           <span>&nbsp;|&nbsp;</span>
           <span>
             <i class="el-icon-star-off"></i>
-            点赞 {{ article.likeNum }}
+            点赞 {{ blog.likeCount }}
           </span>
         </div>
       </div>
       <note>
-        <p>{{ article.abstract }}</p>
+        <p>{{ blog.summary }}</p>
       </note>
-      <div v-html="article.content" class="article-detail__body ql-editor"></div>
+      <div v-html="blog.content" class="article-detail__body ql-editor"></div>
       <div class="article-detail__update">
-        <span>最后编辑于：{{ article.updateTime | formatDate }}</span>
+        <span>最后编辑于：{{ blog.updateTime }}</span>
       </div>
       <div class="article-detail__like">
-        <el-button type="primary" :plain="article.liked === 0" @click="likeArticle">👍🏻 {{ likeText }}</el-button>
+        <el-button type="primary" :plain="blog.liked" @click="likeBlog"
+          >👍🏻 {{ likeText }}</el-button
+        >
       </div>
       <div class="article-detail__copyright">
-        <copyright :url="url"></copyright>
+        <copyright :url="url" :blogId="blog.id"></copyright>
       </div>
-      <div class="article-detail__share">
-        <share :tags="article.tag" :abstract="article.abstract" :title="article.title"></share>
-      </div>
-      <div class="article-detail__prevnext">
-        <prevnext :article="article"></prevnext>
-      </div>
+      <!-- <div class="article-detail__share">
+        <share :tags="blog.tags" :abstract="blog.summary" :title="blog.title"></share>
+      </div> -->
+      <!-- <div class="article-detail__prevnext">
+        <prevnext :article="blog"></prevnext>
+      </div> -->
       <div class="article-detail__comment">
         <a id="a_cm"></a>
         <div class="comment__title">
@@ -57,14 +59,14 @@
           <span>文章评论</span>
         </div>
         <div class="comment__submit">
-          <submit @submitContent="submitContent"></submit>
+          <!-- <submit @submitContent="submitContent"></submit> -->
         </div>
         <div class="comment__total">
           <span>{{ total }}条评论</span>
         </div>
-        <div class="comment__list">
-          <comments :messages="messages" @submitReply="submitReply" @addLike="addLike"></comments>
-        </div>
+        <!-- <div class="comment__list">
+          <comments :comments="comments" @submitReply="submitReply" @addLike="addLike"></comments>
+        </div> -->
         <div class="comment__page" v-if="total">
           <el-pagination
             :current-page.sync="currentPage"
@@ -79,42 +81,44 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from 'vuex'
-import blogApi from '@/api/blog'
-import note from '@/components/note/'
-import { generateTree } from '@/utils/generateTree'
-import { getRandomCharacter } from '@/utils/getRandomCharacter'
-import comments from '@/views/components/comments'
-import submit from '@/views/components/submit'
-import copyright from './components/copyright'
-import share from './components/share'
-import prevnext from './components/prevnext'
-import '@/assets/css/quill.snow.css'
+import { mapState, mapMutations } from "vuex";
+import blogApi from "@/api/blog";
+import commentApi from "@/api/comment";
+import note from "@/components/note/";
+import { generateTree } from "@/utils/generateTree";
+import { getRandomCharacter } from "@/utils/getRandomCharacter";
+import comments from "@/views/components/comments";
+import submit from "@/views/components/submit";
+import copyright from "./components/copyright";
+import share from "./components/share";
+import prevnext from "./components/prevnext";
+import Fingerprint2 from "fingerprintjs2";
+import "@/assets/css/quill.snow.css";
 function jumpAnchor(route) {
-  if (route.query.anchor === 'a_cm') {
-    const el = document.querySelector('#a_cm')
-    el.scrollIntoView()
+  if (route.query.anchor === "a_cm") {
+    const el = document.querySelector("#a_cm");
+    el.scrollIntoView();
   }
 }
 
 export default {
-  name: 'blogDetail',
+  name: "blogDetail",
   components: { note, comments, submit, copyright, share, prevnext },
   props: {},
   metaInfo() {
     return {
-      title: `${this.article.title}  - Lisite's Blog`,
-      meta: [
-        {
-          name: 'description',
-          content: this.article.abstract + ` - Marco's Blog mapblog`
-        },
-        {
-          name: 'keywords',
-          content: this.article.tag.join(',')
-        }
-      ]
-    }
+      title: `Lisite's Blog - ${this.blog.title}`,
+      // meta: [
+      //   {
+      //     name: 'description',
+      //     content: this.blog.summary + ` - Lisite's Blog mapblog`
+      //   },
+      //   {
+      //     name: 'keywords',
+      //     content: this.blog.tags.join(',')
+      //   }
+      // ]
+    };
   },
   // 动态属性
   data() {
@@ -122,125 +126,155 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 0,
-      article: {},
-      messages: [],
-      flatTree: null
-    }
+      blog: {},
+      comments: [],
+      flatTree: null,
+      components: [],
+      userId: ''
+    };
   },
   computed: {
-    ...mapState(['visitorInfo']),
-    tags() {
-      if (this.article.tag) return this.article.tag.join(' ')
-      return ''
+    ...mapState(["visitorInfo"]),
+    tagNames() {
+      if (this.blog.tags) {
+        var tagNames = [];
+        for (var a = 0; a < this.blog.tags.length; a++) {
+          tagNames.push(this.blog.tags[a].tagName);
+        }
+        return tagNames.join(" ");
+      }
+      return "";
     },
     url() {
-      return `${process.env.BASE_URL}/app/article/${this.article.articleId}`
+      return `${process.env.VUE_APP_BASE_API}/app/blog/${this.blog.id}`;
     },
     likeText() {
-      if (this.article.liked) return '已赞'
-      return '赞'
-    }
+      if (this.blog.liked) return "已赞";
+      return "赞";
+    },
   },
   watch: {
     $route(to, from) {
       if (to.params.id !== from.params.id) {
         this.$nextTick(() => {
-          this.collectTitles()
-        })
+          this.collectTitles();
+        });
       }
-    }
+    },
   },
   filters: {},
   mounted() {
     this.$nextTick(function () {
-      Prism.highlightAll()
-    })
-    this.collectTitles()
-    window.addEventListener('scroll', this.handleScroll, false)
+      Prism.highlightAll();
+    });
+    this.collectTitles();
+    window.addEventListener("scroll", this.handleScroll, false);
+  },
+  created() {
+    setTimeout(() => {
+      this.createFingerprint();
+    }, 1000);
   },
   updated() {},
   async asyncData({ route, isServer, _ip }) {
-    const articleRes = await blogApi.getBlogById({
-      publish: 1,
-      articleId: route.params.id,
-      _ip
-    })
+    const res = await blogApi.getBlogById({
+      id: route.params.id,
+    });
     // const commentRes = await commentApi.getBlogComments({
     //   page: 1,
     //   limit: 10,
     //   articleId: route.params.id,
     //   _ip
     // })
-    if (articleRes.status === 200) {
-      if (!isServer) setTimeout(() => jumpAnchor(route), 0)
-      return { article: articleRes.data, messages: commentRes.data, total: commentRes.total }
+    if (res.code === 20000) {
+      if (!isServer) setTimeout(() => jumpAnchor(route), 0);
+      return {
+        blog: res.data.data,
+        comments: res.data.data.comments,
+        total: res.total,
+      };
     }
   },
   methods: {
-    ...mapMutations(['setCatalogs', 'setActiveCatalog']),
-    async likeArticle() {
-      const inc = this.article.liked ? -1 : 1
-
-      const likeRes = await this.$blogApi.likeArticle({
-        _id: this.article._id,
-        inc
-      })
-      if (likeRes.status === 200) {
+    ...mapMutations(["setCatalogs", "setActiveCatalog"]),
+    async likeBlog() {
+      const isLiked = this.blog.liked ? true : false;
+      const res = await commentApi.likeBlog({
+        blogId: this.blog.id,
+        isLiked,
+        likeCount: this.blog.likeCount,
+        userId: this.userId
+      });
+      if (res.code === 20000) {
         this.$message({
-          type: 'success',
-          message: likeRes.info
-        })
-        this.article.likeNum = likeRes.data.like
-        this.article.liked = likeRes.data.liked
+          type: "success",
+          message: res.message,
+        });
+
+        if (isLiked === false) {
+          // 一开始没点过赞，后来点了赞
+          this.blog.likeCount = this.blog.likeCount + 1;
+          this.blog.liked = true;
+        } else if (isLiked === true) {
+          // 一开始点了赞，后来取消了赞
+          this.blog.likeCount = this.blog.likeCount - 1;
+          this.blog.liked = false;
+        }
+      } else {
+        this.$message({
+          type: "error",
+          message: res.message,
+        });
       }
     },
     async addLike(message) {
-      const inc = message.liked ? -1 : 1
-      const likeRes = await blogApi.likeArticleComment({
-        _id: message._id,
-        inc
-      })
+      const inc = message.liked ? -1 : 1;
+      const likeRes = await commentApi.likeBlogComment({
+        id: message._id,
+        inc,
+      });
       if (likeRes.status === 200) {
-        let finder
-        this.messages.some((msg) => {
+        let finder;
+        this.comments.some((msg) => {
           if (msg._id === likeRes.data._id) {
-            finder = msg
-            return true
+            finder = msg;
+            return true;
           }
           if (msg.reply && msg.reply.length) {
-            let done = false
+            let done = false;
             msg.reply.some((er) => {
               if (er._id === likeRes.data._id) {
-                finder = er
-                done = true
+                finder = er;
+                done = true;
               }
-            })
-            return done
+            });
+            return done;
           }
-        })
+        });
         if (finder) {
-          finder.like = likeRes.data.like
-          finder.liked = likeRes.data.liked
+          finder.like = likeRes.data.like;
+          finder.liked = likeRes.data.liked;
         }
         this.$message({
-          type: 'success',
-          message: likeRes.info
-        })
+          type: "success",
+          message: likeRes.info,
+        });
       }
     },
     submitContent(content, cb) {
-      this.submit(content, null, cb)
+      this.submit(content, null, cb);
     },
     submitReply(content, currentReplyComment, cb) {
-      this.submit(content, currentReplyComment, cb)
+      this.submit(content, currentReplyComment, cb);
     },
     async submit(content, currentReplyComment, cb) {
-      let parentId
-      let aite
+      let parentId;
+      let aite;
       if (currentReplyComment) {
-        if (currentReplyComment.parentId) parentId = currentReplyComment.parentId
-        else parentId = currentReplyComment._id
-        aite = currentReplyComment.name
+        if (currentReplyComment.parentId)
+          parentId = currentReplyComment.parentId;
+        else parentId = currentReplyComment._id;
+        aite = currentReplyComment.name;
       }
       const res = await blogApi.saveArticleComment({
         articleId: this.$route.params.id,
@@ -250,90 +284,107 @@ export default {
         link: this.visitorInfo.link,
         content: content,
         parentId,
-        aite
-      })
+        aite,
+      });
       if (res.status === 200) {
-        if (cb) cb()
+        if (cb) cb();
         this.$message({
-          type: 'success',
-          message: '评论成功'
-        })
-        this.getArticleComments()
+          type: "success",
+          message: "评论成功",
+        });
+        // this.getArticleComments()
       }
     },
     async currentChange(val) {
-      this.currentPage = val
-      this.getArticleComments()
+      this.currentPage = val;
+      this.getArticleComments();
     },
-    async getArticleComments() {
-      const commentRes = await blogApi.getArticleComments({
-        page: this.currentPage,
-        limit: this.limit,
-        articleId: this.$route.params.id
-      })
-      if (commentRes.status === 200) {
-        this.total = commentRes.total
-        this.messages = commentRes.data
-      }
-    },
+    // async getArticleComments() {
+    //   const commentRes = await blogApi.getArticleComments({
+    //     page: this.currentPage,
+    //     limit: this.limit,
+    //     articleId: this.$route.params.id
+    //   })
+    //   if (commentRes.status === 200) {
+    //     this.total = commentRes.total
+    //     this.comments = commentRes.data
+    //   }
+    // },
     collectTitles() {
-      const selectors = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].map((et) => '.article-detail__body ' + et).join(',')
-      const nodeList = document.querySelectorAll(selectors)
-      if (!nodeList) return
+      const selectors = ["h1", "h2", "h3", "h4", "h5", "h6"]
+        .map((et) => ".article-detail__body " + et)
+        .join(",");
+      const nodeList = document.querySelectorAll(selectors);
+      if (!nodeList) return;
 
       const flatTree = Array.from(nodeList).map((node) => {
-        const a = document.createElement('a')
-        const tempId = getRandomCharacter(4)
-        const firstChild = node.firstChild
-        a.setAttribute('name', node.innerText)
-        a.setAttribute('id', tempId)
+        const a = document.createElement("a");
+        const tempId = getRandomCharacter(4);
+        const firstChild = node.firstChild;
+        a.setAttribute("name", node.innerText);
+        a.setAttribute("id", tempId);
         // node.appendChild(a)
-        node.insertBefore(a, firstChild)
+        node.insertBefore(a, firstChild);
         return {
           level: parseInt(node.nodeName.substr(1)),
           name: node.innerText,
-          tempId
-        }
-      })
-      this.flatTree = [...flatTree]
-      this.flatTree.reverse()
-      const catalogs = generateTree(flatTree)
-      this.addTreeLevel(catalogs)
-      this.setCatalogs(catalogs)
+          tempId,
+        };
+      });
+      this.flatTree = [...flatTree];
+      this.flatTree.reverse();
+      const catalogs = generateTree(flatTree);
+      this.addTreeLevel(catalogs);
+      this.setCatalogs(catalogs);
     },
     addTreeLevel(catalogs, level, order) {
       catalogs.forEach((catalog, index) => {
-        if (!level) level = 0
-        catalog.level_tree = level
-        catalog.order = order ? order + '.' + (index + 1) : index + 1
-        const dom = document.getElementById(catalog.tempId)
-        dom.removeAttribute('name')
-        dom.setAttribute('name', catalog.order)
+        if (!level) level = 0;
+        catalog.level_tree = level;
+        catalog.order = order ? order + "." + (index + 1) : index + 1;
+        const dom = document.getElementById(catalog.tempId);
+        dom.removeAttribute("name");
+        dom.setAttribute("name", catalog.order);
         if (catalog.children && catalog.children.length) {
-          this.addTreeLevel(catalog.children, level + 1, catalog.order)
+          this.addTreeLevel(catalog.children, level + 1, catalog.order);
         }
-      })
+      });
     },
 
     handleScroll() {
-      if (!this.flatTree) return
+      if (!this.flatTree) return;
       this.flatTree.some((item) => {
-        const node = document.getElementById(item.tempId)
+        const node = document.getElementById(item.tempId);
         if (node.getBoundingClientRect().y < 5) {
-          this.setActiveCatalog(item.tempId)
-          return true
+          this.setActiveCatalog(item.tempId);
+          return true;
         }
-      })
-    }
+      });
+    },
+    createFingerprint() {
+      Fingerprint2.get((components) => {
+        // 参数只有回调函数时，默认浏览器指纹依据全部配置信息进行生成
+        const values = components.map(function (component, index) {
+          if (index === 0) {
+            //把微信浏览器⾥UA的wifi或4G等⽹络替换成空,不然切换⽹络会ID不⼀样
+            return component.value.replace(/\bNetType\/\w+\b/, "");
+          }
+          return component.value;
+        });
+        this.userId = Fingerprint2.x64hash128(values.join(""), 31); // 生成浏览器指纹
+        console.log("userId", this.userId)
+        // localStorage.setItem('browserId', murmur); // 存储浏览器指纹，在项目中用于校验用户身份和埋点
+      });
+    },
   },
   destroyed() {
-    window.removeEventListener('scroll', this.handleScroll, false)
-  }
-}
+    window.removeEventListener("scroll", this.handleScroll, false);
+  },
+};
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-@import '~@/style/index.scss';
+@import "~@/style/index.scss";
 .article-detail {
   &__header {
     width: 100%;
@@ -342,8 +393,9 @@ export default {
     flex-direction: column;
   }
   &__body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Lato, Roboto, 'PingFang SC',
-      'Microsoft JhengHei', 'Microsoft YaHei', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+      Lato, Roboto, "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei",
+      sans-serif;
     line-height: 2;
     color: #4c4948;
     img {
@@ -356,7 +408,7 @@ export default {
     padding: 0 12px;
     text-align: center;
     @include themeify() {
-      color: themed('color-title');
+      color: themed("color-title");
     }
     @include respond-to(xs) {
       font-size: 18px;
@@ -366,7 +418,7 @@ export default {
   &__info {
     padding: 0 12px;
     @include themeify() {
-      color: themed('color-navbar');
+      color: themed("color-navbar");
     }
   }
   .info-2 {
@@ -377,7 +429,7 @@ export default {
     padding: 14px;
     text-align: right;
     @include themeify() {
-      color: themed('color-ele-holder');
+      color: themed("color-ele-holder");
     }
   }
   &__like {
@@ -400,7 +452,7 @@ export default {
       padding: 16px 0;
       font-size: 20px;
       font-weight: 700;
-      > [class^='el-icon-'] {
+      > [class^="el-icon-"] {
         font-weight: 700;
       }
       span {
@@ -444,7 +496,7 @@ export default {
     pre > code {
       background: 0 0 !important;
     }
-    code:not([class*='language-']) {
+    code:not([class*="language-"]) {
       background-color: #f0f0f0;
       border-radius: 3px;
       font-size: 90%;

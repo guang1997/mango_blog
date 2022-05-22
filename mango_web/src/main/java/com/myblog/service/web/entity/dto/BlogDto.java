@@ -1,6 +1,9 @@
 package com.myblog.service.web.entity.dto;
 
 import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.web.entity.Comment;
+import com.myblog.service.web.entity.Sort;
+import com.myblog.service.web.entity.Tag;
 import lombok.Data;
 
 import java.util.List;
@@ -25,12 +28,15 @@ public class BlogDto extends BaseDto {
 
     private String author;
 
+    private Sort sort;
 
-    private String sortName;
-
-    private Integer sort;
-
-    private List<TagDto> tags;
+    private List<Tag> tags;
 
     private String blogSortId;
+
+    private String tagId;
+
+    private List<Comment> comments;
+
+    private Boolean liked;
 }

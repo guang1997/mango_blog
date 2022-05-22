@@ -10,13 +10,13 @@
           <template v-if="newBlogs.length">
             <div class="body-item" v-for="(blog, index) in newBlogs" :key="index">
               <div class="body-pic">
-                <router-link :to="'/app/article/' + blog.id">
+                <router-link :to="'/app/blog/' + blog.id">
                   <img v-lazy="blog.fileId" alt="" />
                 </router-link>
               </div>
               <div class="body-info">
                 <div class="body-info__title">
-                  <router-link :to="'/app/article/' + blog.id">
+                  <router-link :to="'/app/blog/' + blog.id">
                     {{ blog.title }}
                   </router-link>
                 </div>

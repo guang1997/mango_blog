@@ -8,7 +8,7 @@
           </div>
           <div class="item-content__info">
             <div class="item-content__link">
-              <router-link :to="'/app/article/' + blog.id">{{ blog.title }}</router-link>
+              <router-link :to="'/app/blog/' + blog.id">{{ blog.title }}</router-link>
             </div>
             <div class="item-content__detail">
               <span>
@@ -18,7 +18,7 @@
               <span>&nbsp;|&nbsp;</span>
               <span>
                 <i class="el-icon-chat-dot-round"></i>
-                评论数 {{ blog.clickCount }}
+                评论数 {{ blog.comments ? blog.comments.length : 0 }}
               </span>
               <span>&nbsp;|&nbsp;</span>
               <span>

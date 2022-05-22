@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * <p>
  * 评论表 前端控制器
@@ -33,5 +35,12 @@ public class CommentController {
     public Response getCommentByPage(@RequestBody CommentDto commentDto) throws Exception {
         return commentService.getCommentByPage(commentDto);
     }
+    @LogByMethod("/web/comment/likeBlog")
+    @ApiOperation(value = "给博客点赞", notes = "给博客点赞", response = Response.class)
+    @PostMapping("/likeBlog")
+    public Response likeBlog(@RequestBody CommentDto commentDto, HttpServletRequest request) throws Exception {
+        return commentService.likeBlog(commentDto, request);
+    }
+
 }
 
