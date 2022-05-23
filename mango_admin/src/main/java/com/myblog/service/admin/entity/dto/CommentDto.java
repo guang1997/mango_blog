@@ -12,6 +12,8 @@ public class CommentDto extends BaseDto {
 
     private String userId;
 
+    private String ip;
+
     private String avatar;
 
     private String nickname;

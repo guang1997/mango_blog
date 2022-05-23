@@ -9,7 +9,7 @@ import lombok.ToString;
 public enum ResultCodeEnum {
 
     SUCCESS(true, 20000,"成功"),
-    UNKNOWN_REASON(false, 20001, "错误"),
+    UNKNOWN_REASON(false, 20001, "失败"),
     QUERY_FAILED(false, 20003, "查询失败"),
     UPDATE_FAILED(false, 20005, "更新失败"),
     SAVE_FAILED(false, 20007, "保存失败"),

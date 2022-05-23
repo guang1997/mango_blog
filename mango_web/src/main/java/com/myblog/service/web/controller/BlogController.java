@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * <p>
  * 博客表 前端控制器
@@ -41,8 +43,8 @@ public class BlogController {
     @LogByMethod("/web/blog/getBlogById")
     @ApiOperation(value = "根据博客id查询博客信息", notes = "根据博客id查询博客信息", response = Response.class)
     @PostMapping("/getBlogById")
-    public Response getBlogById(@RequestBody BlogDto blogDto) throws Exception {
-        return blogService.getBlogById(blogDto);
+    public Response getBlogById(@RequestBody BlogDto blogDto, HttpServletRequest request) throws Exception {
+        return blogService.getBlogById(blogDto, request);
     }
 
     @LogByMethod("/web/blog/getBlogBySortId")

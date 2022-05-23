@@ -1,6 +1,7 @@
 package com.myblog.service.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
@@ -68,25 +69,43 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Response likeBlog(CommentDto commentDto, HttpServletRequest request) throws Exception {
+        int likeCount = 0;
+        String successMsg = "点赞成功";
+        String failedMsg = "点赞失败";
         Response response = Response.ok();
-        String ipAddr = IpUtils.getIpAddr(request);
+        // 注意：userId可能是浏览器生成的指纹，也可能是用户登陆后生成的用户id
+        Comment comment = this.toDb(commentDto, Comment.class);
+        comment.setStatus(Constants.CommentStatus.REVIEWED);
+        comment.setBlogId(commentDto.getBlogId());
+        comment.setIp(IpUtils.getIpAddr(request));
+        comment.setType(Constants.CommentType.LIKES);
+        comment.setParentId("0");
         // 已经点过赞，要取消点赞
         if (commentDto.getIsLiked()) {
-            if (blogMapper.changeLike(commentDto.getBlogId(), commentDto.getLikeCount() - 1) < 1) {
-                LOGGER.error("likeBlog failed by change blog likeCount, commentDto:{}", commentDto);
-                return Response.error().message("点赞失败");
-            }
-            // 注意：userId可能是浏览器生成的指纹，也可能是用户登陆后生成的用户id
-            Comment comment = this.toDb(commentDto, Comment.class);
-            comment.setStatus(1);
-            comment.setType(1);
-            comment.setBlogId(commentDto.getBlogId());
+            likeCount = commentDto.getLikeCount() - 1;
             comment.setContent("false");
+            successMsg = "取消的是赞，受伤的是心 ಥ﹏ಥ";
+            failedMsg = "点赞取消失败";
+        } else {
+            comment.setContent("true");
+            likeCount = commentDto.getLikeCount() + 1;
         }
-        Comment comment = this.toDb(commentDto, Comment.class);
-        comment.setParentId("0");
-        comment.setStatus(1);
 
+        if (blogMapper.changeLike(commentDto.getBlogId(), likeCount) < 1) {
+            LOGGER.error("likeBlog failed by change blog likeCount, commentDto:{}", commentDto);
+            return Response.error().message(failedMsg);
+        }
+        UpdateWrapper<Comment> commentUpdateWrapper = new UpdateWrapper<>();
+        commentUpdateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
+        commentUpdateWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.IP, comment.getIp()).or().eq(DbConstants.Comment.USER_ID, comment.getUserId()));
+
+        if (baseMapper.update(comment, commentUpdateWrapper) < 1) {
+            if (baseMapper.insert(comment) < 1) {
+                LOGGER.error("likeBlog failed by unknowen error, comment:{}", comment);
+                return Response.error().message(failedMsg);
+            }
+        }
+        response.setMessage(successMsg);
         return response;
     }
 }

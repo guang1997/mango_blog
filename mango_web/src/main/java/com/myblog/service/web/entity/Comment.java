@@ -33,6 +33,9 @@ public class Comment extends BaseEntity {
     @ApiModelProperty(value = "用户id")
     private String userId;
 
+    @ApiModelProperty(value = "评论来源ip")
+    private String ip;
+
     @ApiModelProperty(value = "用户头像")
     private String avatar;
 

@@ -38,8 +38,13 @@
       <div class="article-detail__update">
         <span>最后编辑于：{{ blog.updateTime }}</span>
       </div>
-      <div class="article-detail__like">
-        <el-button type="primary" :plain="blog.liked" @click="likeBlog"
+      <div class="article-detail__like" v-if="blog.liked === true">
+        <el-button type="success" @click.prevent="likeBlog($event)"
+          >👍🏻 {{ likeText }}</el-button
+        >
+      </div>
+      <div class="article-detail__like" v-else-if="blog.liked === false">
+        <el-button type="success" plain @click.prevent="likeBlog($event)"
           >👍🏻 {{ likeText }}</el-button
         >
       </div>
@@ -130,7 +135,7 @@ export default {
       comments: [],
       flatTree: null,
       components: [],
-      userId: ''
+      userId: "",
     };
   },
   computed: {
@@ -179,6 +184,7 @@ export default {
   async asyncData({ route, isServer, _ip }) {
     const res = await blogApi.getBlogById({
       id: route.params.id,
+      userId: this.userId,
     });
     // const commentRes = await commentApi.getBlogComments({
     //   page: 1,
@@ -197,13 +203,14 @@ export default {
   },
   methods: {
     ...mapMutations(["setCatalogs", "setActiveCatalog"]),
-    async likeBlog() {
+    async likeBlog(event) {
       const isLiked = this.blog.liked ? true : false;
       const res = await commentApi.likeBlog({
         blogId: this.blog.id,
         isLiked,
         likeCount: this.blog.likeCount,
-        userId: this.userId
+        userId: this.userId,
+        source: "BLOG_INFO_LIKES",
       });
       if (res.code === 20000) {
         this.$message({
@@ -225,6 +232,11 @@ export default {
           type: "error",
           message: res.message,
         });
+      }
+      // 取消标签焦点，加上button的plain样式，否则会一直显示非朴素按钮
+      event.target.blur();
+      if (event.target.nodeName == "SPAN") {
+        event.target.parentNode.blur();
       }
     },
     async addLike(message) {
@@ -372,8 +384,6 @@ export default {
           return component.value;
         });
         this.userId = Fingerprint2.x64hash128(values.join(""), 31); // 生成浏览器指纹
-        console.log("userId", this.userId)
-        // localStorage.setItem('browserId', murmur); // 存储浏览器指纹，在项目中用于校验用户身份和埋点
       });
     },
   },

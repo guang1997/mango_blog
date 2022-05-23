@@ -87,6 +87,8 @@ public interface DbConstants {
         String STATUS = "status";
         String PARENT_ID = "parent_id";
         String BLOG_ID = "blog_id";
+        String IP = "ip";
+        String USER_ID = "user_id";
     }
 
     interface WebVisit {

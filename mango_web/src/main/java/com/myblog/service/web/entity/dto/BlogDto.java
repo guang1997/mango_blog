@@ -39,4 +39,6 @@ public class BlogDto extends BaseDto {
     private List<Comment> comments;
 
     private Boolean liked;
+
+    private String userId;
 }

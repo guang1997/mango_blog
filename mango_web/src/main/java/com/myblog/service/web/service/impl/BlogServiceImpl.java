@@ -2,11 +2,9 @@ package com.myblog.service.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.myblog.service.base.common.Constants;
-import com.myblog.service.base.common.DbConstants;
-import com.myblog.service.base.common.Response;
-import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.common.*;
 import com.myblog.service.base.util.BeanUtil;
+import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.web.controller.BlogController;
 import com.myblog.service.web.entity.*;
 import com.myblog.service.web.entity.dto.BlogDto;
@@ -19,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -135,7 +134,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return
      */
     @Override
-    public Response getBlogById(BlogDto blogDto) throws Exception{
+    public Response getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception{
         Response response = Response.ok();
         Blog blog = baseMapper.selectById(blogDto.getId());
         if (Objects.isNull(blog)) {
@@ -143,8 +142,25 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             return Response.setResult(ResultCodeEnum.QUERY_FAILED);
         }
         BlogDto responseDto = this.toDto(blog, BlogDto.class);
+        // 查询该ip是否已经给博客点过赞
+        responseDto.setLiked(getBlogLiked(responseDto.getId(), IpUtils.getIpAddr(request), blogDto.getUserId()));
         response.data(Constants.ReplyField.DATA, responseDto);
         return response;
+    }
+
+    private Boolean getBlogLiked(String id, String ipAddr, String userId) {
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommentStatus.REVIEWED);
+        queryWrapper.eq(DbConstants.Comment.BLOG_ID, id);
+        queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
+        queryWrapper.eq(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_LIKES.getSource());
+        queryWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.USER_ID, userId).or().eq(DbConstants.Comment.IP, ipAddr));
+
+        Comment comment = commentMapper.selectOne(queryWrapper);
+        if (Objects.isNull(comment)) {
+            return false;
+        }
+        return !Objects.equals("false", comment.getContent());
     }
 
     @Override

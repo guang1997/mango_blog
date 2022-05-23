@@ -6,6 +6,8 @@ import com.myblog.service.web.entity.Blog;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.web.entity.dto.BlogDto;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * <p>
  * 博客表 服务类
@@ -22,5 +24,5 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
 
     Response getBlogByTagId(BlogDto blogDto) throws Exception;
 
-    Response getBlogById(BlogDto blogDto) throws Exception;
+    Response getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception;
 }

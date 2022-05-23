@@ -68,4 +68,12 @@ public interface Constants {
         int REVIEWED = 1;
         int REJECT = 2;
     }
+
+    /**
+     * 评论类型: 0-评论，1-点赞
+     */
+    interface CommentType {
+        int MESSAGE = 0;
+        int LIKES = 1;
+    }
 }
