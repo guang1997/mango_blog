@@ -148,13 +148,44 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         return response;
     }
 
+    /**
+     * 获取上一篇和下一篇博客
+     * @param blogDto
+     * @return
+     */
+    @Override
+    public Response getPrevNextBlog(BlogDto blogDto) throws Exception{
+        Response response = Response.ok();
+        // 获取上一篇博客
+        QueryWrapper<Blog> prevQueryWrapper = new QueryWrapper<>();
+        prevQueryWrapper.lt(DbConstants.Base.CREATE_TIME, blogDto.getCreateTime());
+        prevQueryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        prevQueryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
+        List<Blog> prevBlogList = baseMapper.selectList(prevQueryWrapper);
+        if (!CollectionUtils.isEmpty(prevBlogList)) {
+            response.data(Constants.ReplyField.PREV_BLOG, this.toDto(prevBlogList.get(0), BlogDto.class));
+        }
+        // 获取下一篇博客
+        QueryWrapper<Blog> nextQueryWrapper = new QueryWrapper<>();
+        nextQueryWrapper.gt(DbConstants.Base.CREATE_TIME, blogDto.getCreateTime());
+        prevQueryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        prevQueryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
+        List<Blog> nextBlogList = baseMapper.selectList(nextQueryWrapper);
+        if (!CollectionUtils.isEmpty(nextBlogList)) {
+            response.data(Constants.ReplyField.NEXT_BLOG, this.toDto(nextBlogList.get(0), BlogDto.class));
+        }
+        return response;
+    }
+
     private Boolean getBlogLiked(String id, String ipAddr, String userId) {
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommentStatus.REVIEWED);
         queryWrapper.eq(DbConstants.Comment.BLOG_ID, id);
         queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
         queryWrapper.eq(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_LIKES.getSource());
-        queryWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.USER_ID, userId).or().eq(DbConstants.Comment.IP, ipAddr));
+        queryWrapper.eq(DbConstants.Comment.USER_ID, userId);
+        // TODO (IP+操作系统类型+浏览器类型+浏览器版本号) 生成IP唯一标识
+//        queryWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.USER_ID, userId).or().eq(DbConstants.Comment.IP, ipAddr));
 
         Comment comment = commentMapper.selectOne(queryWrapper);
         if (Objects.isNull(comment)) {

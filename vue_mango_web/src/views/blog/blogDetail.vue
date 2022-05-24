@@ -51,12 +51,12 @@
       <div class="article-detail__copyright">
         <copyright :url="url" :blogId="blog.id"></copyright>
       </div>
-      <!-- <div class="article-detail__share">
-        <share :tags="blog.tags" :abstract="blog.summary" :title="blog.title"></share>
-      </div> -->
-      <!-- <div class="article-detail__prevnext">
-        <prevnext :article="blog"></prevnext>
-      </div> -->
+      <div class="article-detail__share">
+        <share :tags="blog.tags" :summary="blog.summary" :title="blog.title"></share>
+      </div>
+      <div class="article-detail__prevnext">
+        <prevnext :createTime="blog.createTime"></prevnext>
+      </div>
       <div class="article-detail__comment">
         <a id="a_cm"></a>
         <div class="comment__title">
@@ -64,14 +64,14 @@
           <span>文章评论</span>
         </div>
         <div class="comment__submit">
-          <!-- <submit @submitContent="submitContent"></submit> -->
+          <submit @submitContent="submitContent"></submit>
         </div>
         <div class="comment__total">
           <span>{{ total }}条评论</span>
         </div>
-        <!-- <div class="comment__list">
+        <div class="comment__list">
           <comments :comments="comments" @submitReply="submitReply" @addLike="addLike"></comments>
-        </div> -->
+        </div>
         <div class="comment__page" v-if="total">
           <el-pagination
             :current-page.sync="currentPage"
@@ -113,16 +113,6 @@ export default {
   metaInfo() {
     return {
       title: `Lisite's Blog - ${this.blog.title}`,
-      // meta: [
-      //   {
-      //     name: 'description',
-      //     content: this.blog.summary + ` - Lisite's Blog mapblog`
-      //   },
-      //   {
-      //     name: 'keywords',
-      //     content: this.blog.tags.join(',')
-      //   }
-      // ]
     };
   },
   // 动态属性
@@ -135,7 +125,7 @@ export default {
       comments: [],
       flatTree: null,
       components: [],
-      userId: "",
+      userId: ""
     };
   },
   computed: {
@@ -197,7 +187,7 @@ export default {
       return {
         blog: res.data.data,
         comments: res.data.data.comments,
-        total: res.total,
+        total: res.total
       };
     }
   },
@@ -232,6 +222,13 @@ export default {
           type: "error",
           message: res.message,
         });
+         if (isLiked === false) {
+          // 一开始没点过赞，后来点了赞，失败时将博客赞的数量减掉
+          this.blog.likeCount = this.blog.likeCount - 1;
+        } else if (isLiked === true) {
+          // 一开始点了赞，后来取消了赞，失败时将博客赞的数量加回去
+          this.blog.likeCount = this.blog.likeCount + 1;
+        }
       }
       // 取消标签焦点，加上button的plain样式，否则会一直显示非朴素按钮
       event.target.blur();

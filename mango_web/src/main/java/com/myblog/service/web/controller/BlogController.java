@@ -68,5 +68,12 @@ public class BlogController {
         }
         return blogService.getBlogByTagId(blogDto);
     }
+
+    @LogByMethod("/web/blog/getPrevNextBlog")
+    @ApiOperation(value = "查询博客上一篇博客和下一篇博客", notes = "查询博客上一篇博客和下一篇博客", response = Response.class)
+    @PostMapping("/getPrevNextBlog")
+    public Response getPrevNextBlog(@RequestBody BlogDto blogDto) throws Exception {
+        return blogService.getPrevNextBlog(blogDto);
+    }
 }
 

@@ -1,21 +1,21 @@
 <template>
   <div class="prev-next">
     <div class="prev-next__content">
-      <div class="content__prev" v-if="prevnext.prev">
+      <div class="content__prev" v-if="prevBlog">
         <a :href="getHref('prev')">
-          <img :src="prevnext.prev.headerPic" alt="" />
+          <img :src="prevBlog.fileId" alt="" />
           <div class="content__info">
             <div>上一篇</div>
-            <div class="info-title">{{ this.prevnext.prev.title }}</div>
+            <div class="info-title">{{ this.prevBlog.title }}</div>
           </div>
         </a>
       </div>
-      <div class="content__next" v-if="prevnext.next">
+      <div class="content__next" v-if="nextBlog">
         <a :href="getHref('next')">
-          <img :src="prevnext.next.headerPic" alt="" />
+          <img :src="nextBlog.fileId" alt="" />
           <div class="content__info">
             <div>下一篇</div>
-            <div class="info-title">{{ this.prevnext.next.title }}</div>
+            <div class="info-title">{{ this.nextBlog.title }}</div>
           </div>
         </a>
       </div>
@@ -23,39 +23,49 @@
   </div>
 </template>
 <script>
+import blogApi from "@/api/blog";
 export default {
   name: 'prevnext',
   props: {
-    article: {
-      type: Object,
-      default() {
-        return {}
-      }
+    createTime: {
+      type: String
     }
   },
   data() {
     return {
-      prevnext: {}
+      prevBlog: null,
+      nextBlog: null
     }
   },
-  mounted() {
-    this.getPrevnextArticle()
+  created() {
+    // console.log(this.nextBlog)
+    
   },
   components: {},
   methods: {
-    async getPrevnextArticle() {
-      const prevnextRes = await this.$api.getPrevnextArticle({
-        createTime: this.article.createTime
+    async getPrevNextBlog() {
+      const prevnextRes = await blogApi.getPrevNextBlog({
+        createTime: this.createTime
       })
-      if (prevnextRes.status === 200) {
-        this.prevnext = prevnextRes.data
+      if (prevnextRes.code === 20000) {
+        this.prevBlog = prevnextRes.data.prevBlog
+        this.nextBlog = prevnextRes.data.nextBlog
       }
     },
     getHref(type) {
-      if (type === 'prev') return `/app/article/${this.prevnext.prev.articleId}`
-      else return `/app/article/${this.prevnext.next.articleId}`
+      if (type === 'prev') return `/app/blog/${this.prevBlog.id}`
+      else return `/app/blog/${this.nextBlog.id}`
     }
-  }
+  },
+  watch: {
+     createTime: {
+       handler (newValue, oldValue) {
+         // 监听最新值，获取到值后再去查询数据
+         this.getPrevNextBlog()  
+       }
+     }
+    },
+
 }
 </script>
 <style lang="scss">

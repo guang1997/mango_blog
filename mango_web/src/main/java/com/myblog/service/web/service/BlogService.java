@@ -25,4 +25,6 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
     Response getBlogByTagId(BlogDto blogDto) throws Exception;
 
     Response getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception;
+
+    Response getPrevNextBlog(BlogDto blogDto) throws Exception;
 }

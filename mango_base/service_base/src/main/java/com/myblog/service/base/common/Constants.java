@@ -54,6 +54,8 @@ public interface Constants {
         String BLOG_TAGS = "blogTags";
         String BLOG_SORTS = "blogSorts";
         String MENU_BUTTONS = "menuButtons";
+        String PREV_BLOG = "prevBlog";
+        String NEXT_BLOG = "nextBlog";
     }
 
     interface SystemConstant {

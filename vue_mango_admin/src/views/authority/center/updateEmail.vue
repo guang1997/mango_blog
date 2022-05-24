@@ -3,8 +3,8 @@
     <el-dialog :visible.sync="dialog" :close-on-click-modal="false" :before-close="cancel" :title="title" append-to-body width="475px" @close="cancel">
       <el-form ref="form" :model="form" :rules="rules" size="small" label-width="88px">
         <el-form-item label="新邮箱" prop="email">
-          <el-input v-model="form.email" auto-complete="on" style="width: 200px;" />
-          <el-button style="margin-left: 10px" :loading="codeLoading" :disabled="isDisabled" size="small" @click="sendCode">{{ buttonName }}</el-button>
+          <el-input v-model="form.email" auto-complete="on" style="width: 218px;vertical-align: middle;box-sizing: content-box;" />
+          <el-button style="margin-left: 10px;vertical-align: middle;box-sizing: content-box;" :loading="codeLoading" :disabled="isDisabled" size="small" @click="sendCode">{{ buttonName }}</el-button>
         </el-form-item>
         <el-form-item label="验证码" prop="code">
           <el-input v-model="form.code" style="width: 320px;" />

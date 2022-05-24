@@ -1,12 +1,8 @@
-<doc>
-  @desc:   文章分享
-  @author: justJokee
-</doc>
 <template>
   <div class="share">
     <div class="share__tags">
       <el-tag size="small" class="tag" v-for="(tag, index) in tags" :key="index" effect="plain" type="">
-        {{ tag }}
+        {{ tag.tagName }}
       </el-tag>
     </div>
     <div class="share__apps">
@@ -20,11 +16,11 @@
         @click="share('qzone', 'http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey')"
         class="design-bg-qzone"
       ></a>
-      <a
+      <!-- <a
         href="javascript: void(0)"
         @click="share('sina', 'http://v.t.sina.com.cn/share/share.php')"
         class="design-bg-sina"
-      ></a>
+      ></a> -->
       <el-popover placement="top" width="200" trigger="hover" @show="gQrcode" @hide="hideQrcode">
         <div class="wx-qrcode">
           <div class="wx-qrcode__title">微信扫一扫：分享</div>
@@ -32,11 +28,11 @@
         </div>
         <a href="javascript: void(0)" slot="reference" class="design-bg-weixin"></a>
       </el-popover>
-      <a
+      <!-- <a
         href="javascript: void(0)"
         @click="share('douban', 'http://shuo.douban.com/!service/share')"
         class="design-bg-douban"
-      ></a>
+      ></a> -->
     </div>
   </div>
 </template>
@@ -51,18 +47,18 @@ export default {
         return []
       }
     },
-    // 文章标题
+    // 文章链接
     url: {
       type: String,
       default: ''
     },
-    // 文章链接
+    // 文章标题
     title: {
       type: String,
       default: ''
     },
     // 分享内容摘要
-    abstract: {
+    summary: {
       type: String,
       default: ''
     }
@@ -81,19 +77,19 @@ export default {
 
       switch (type) {
         case 'QQ':
-          href = `${appUrl}?title=${title}&url=${url}&desc=${this.abstract}&site=Marco's Blog`
+          href = `${appUrl}?title=${title}&url=${url}&desc=${this.summary}&site=Lisite's Blog`
           break
         case 'qzone':
-          href = `${appUrl}?title=${title}&url=${url}&desc=${this.abstract}&site=Marco's Blog&summary=${this.abstract}`
+          href = `${appUrl}?title=${title}&url=${url}&desc=${this.summary}&site=Lisite's Blog&summary=${this.summary}`
           break
-        case 'sina':
-          href = `${appUrl}?title=${title}&url=${url}`
-          break
+        // case 'sina':
+        //   href = `${appUrl}?title=${title}&url=${url}`
+        //   break
         case 'weixin':
           href = `${appUrl}&url=${url}`
           break
-        case 'douban':
-          href = `${appUrl}?name=${title}&href=${url}`
+        // case 'douban':
+        //   href = `${appUrl}?name=${title}&href=${url}`
       }
       el.target = '_blank'
       el.href = href

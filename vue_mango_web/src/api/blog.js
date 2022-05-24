@@ -28,5 +28,13 @@ export function getBlogByPage(data) {
       data
     })
   }
+  export function getPrevNextBlog(data) {
+    return request({
+      url: '/web/blog/getPrevNextBlog',
+      method: 'post',
+      data
+    })
+  }
   
-  export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId }
+  
+  export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId, getPrevNextBlog }

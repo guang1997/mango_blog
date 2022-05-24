@@ -38,16 +38,26 @@
     </div>
     <el-dialog title="登录" :visible.sync="customVisible" width="30%" custom-class="visitor-submit-box">
       <div class="submit__login">
-        <el-form label-width="60px" :model="customInfo" :rules="submitRules" ref="customForm">
+        <el-form label-width="60px" :model="formInfo" :rules="submitRules" ref="customForm">
           <el-form-item label="昵称" prop="name">
-            <el-input v-model="customInfo.name" placeholder="请输入昵称"></el-input>
+            <el-input v-model="formInfo.name" placeholder="请输入昵称"></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
-            <el-input v-model="customInfo.email" placeholder="请输入邮箱"></el-input>
+            <el-input v-model="formInfo.email" placeholder="请输入邮箱"></el-input>
           </el-form-item>
-          <el-form-item label="网址" prop="link">
-            <el-input v-model="customInfo.link" placeholder="请输入你的主页 例如：https://awesome.me"></el-input>
-          </el-form-item>
+          <el-form-item label="验证码" prop="code">
+            <el-row>
+              <el-col :span="14">
+                <el-input style="vertical-align: middle;box-sizing: content-box;" v-model="formInfo.code" placeholder="请输入验证码" />
+              </el-col>
+               <el-col :span="10">
+               <el-button style="height:20px;vertical-align: middle;box-sizing: content-box" :loading="codeLoading" :disabled="isDisabled" size="small" @click="sendCode">{{ buttonName }}</el-button>
+              </el-col>
+            </el-row>
+          
+           
+        </el-form-item>
+
         </el-form>
         <div class="submit__register">
           <el-button size="small" type="primary" @click="register">注册</el-button>
@@ -65,39 +75,13 @@
         </div>
       </div>
     </el-dialog>
-    <el-dialog
-      title="信息完善"
-      width="30%"
-      :visible.sync="perfectVisible"
-      :show-close="false"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      custom-class="visitor-submit-box"
-    >
-      <div class="submit__perfect">
-        <el-form label-width="80px" :model="perfect" :rules="submitRules" ref="perfectForm">
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="perfect.email" placeholder="请输入邮箱"></el-input>
-          </el-form-item>
-          <el-form-item label="网址" prop="link">
-            <el-input
-              v-model="perfect.link"
-              placeholder="请输入你的主页 例如：https://awesome.me"
-              prop="link"
-            ></el-input>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="submit__perfect-footer">
-          <el-button type="primary" size="small" @click="submitPerfect">确 定</el-button>
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
 import { mapState, mapMutations } from 'vuex'
 import { storage } from '@/utils/storage'
 import emoji from '@/components/emoji'
+import userApi from "@/api/user";
 
 export default {
   name: 'submit',
@@ -127,10 +111,10 @@ export default {
       comment: '',
       customVisible: false,
       perfectVisible: false,
-      customInfo: {
+      formInfo: {
         name: '',
         email: '',
-        link: ''
+        code: ''
       },
       perfect: {
         email: '',
@@ -140,8 +124,12 @@ export default {
       submitRules: {
         name: [{ required: true, validator: nameValidator, trigger: 'blur' }],
         email: [{ type: 'email', required: true, message: '请填写邮箱', trigger: 'blur' }],
-        link: [{ type: 'url', required: false, message: '请输入合法地址' }]
-      }
+        code: [{ type: 'code', required: false, message: '请输入验证码' }]
+      },
+       buttonName: '获取验证码',
+       codeLoading: false,
+       isDisabled: false, 
+       time: 60,
     }
   },
   mounted() {
@@ -155,8 +143,8 @@ export default {
     ...mapMutations(['setVisitor']),
     openGithub() {
       // TODO: 环境变量 BASE_URL
-      const BASE_URL = process.env.BASE_URL
-      window.open(`${BASE_URL}/login/git`, '_blank', 'height=600,width=800,toolbar=no, menubar=no, scrollbars=no')
+      const VUE_APP_BASE_API = process.env.VUE_APP_BASE_API
+      window.open(`${VUE_APP_BASE_API}/login/git`, '_blank', 'height=600,width=800,toolbar=no, menubar=no, scrollbars=no')
     },
     openQQ() {
       // return
@@ -167,7 +155,7 @@ export default {
       // )
       QC.Login.showPopup({
         appId: '101999089',
-        redirectURI: 'https://mapblog.cn/qc_back.html'
+        redirectURI: 'http://mapblog.cn/qc_back.html'
       })
     },
     register() {
@@ -215,19 +203,6 @@ export default {
       window.addEventListener('message', this.handleGithubCb, false)
     },
     handleQQCb() {
-      /**
-       *  oInfo：{
-            "ret":0,
-            "msg":"",
-            "nickname":"遲來の垨堠",
-            "figureurl":"http://qzapp.qlogo.cn/qzapp/100229030/ECCC463F76A2E3C1D9217BBC30418164/30",
-            "figureurl_1":"http://qzapp.qlogo.cn/qzapp/100229030/ECCC463F76A2E3C1D9217BBC30418164/50",
-            "figureurl_2":"http://qzapp.qlogo.cn/qzapp/100229030/ECCC463F76A2E3C1D9217BBC30418164/100",
-            "gender":"男",
-            "vip":"1",
-            "level":"7"
-          }
-       */
 
       QC.Login({}, (info) => {
         // 获取opeId accessToken
@@ -310,7 +285,38 @@ export default {
     getEmoji(emoji) {
       this.$refs.comment.focus()
       this.comment += emoji
-    }
+    },
+    sendCode() {
+      if (this.formInfo.email) {
+        this.codeLoading = true
+        this.buttonName = '验证码发送中'
+        const _this = this
+        userApi.sendCode(this.formInfo).then(res => {
+          this.$message({
+            showClose: true,
+            message: '发送成功，验证码有效期5分钟',
+            type: 'success'
+          })
+          this.codeLoading = false
+          this.isDisabled = true
+          this.buttonName = this.time-- + '秒后重新发送'
+          this.timer = window.setInterval(function() {
+            _this.buttonName = _this.time + '秒后重新发送'
+            --_this.time
+            if (_this.time < 0) {
+              _this.buttonName = '重新发送'
+              _this.time = 60
+              _this.isDisabled = false
+              window.clearInterval(_this.timer)
+            }
+          }, 1000)
+        }).catch(err => {
+          this.resetForm()
+          this.codeLoading = false
+          console.log(err)
+        })
+      }
+    },
   },
   destroyed() {
     window.removeEventListener('message', this.handleGithubCb)

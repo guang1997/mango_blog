@@ -3,6 +3,7 @@ package com.myblog.service.web.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.myblog.service.base.common.CommentSourceEnum;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
@@ -79,6 +80,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         comment.setBlogId(commentDto.getBlogId());
         comment.setIp(IpUtils.getIpAddr(request));
         comment.setType(Constants.CommentType.LIKES);
+        comment.setSource(CommentSourceEnum.BLOG_INFO_LIKES.getSource());
         comment.setParentId("0");
         // 已经点过赞，要取消点赞
         if (commentDto.getIsLiked()) {
@@ -97,7 +99,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         }
         UpdateWrapper<Comment> commentUpdateWrapper = new UpdateWrapper<>();
         commentUpdateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
-        commentUpdateWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.IP, comment.getIp()).or().eq(DbConstants.Comment.USER_ID, comment.getUserId()));
+        commentUpdateWrapper.eq(DbConstants.Comment.USER_ID, comment.getUserId());
+        // TODO (IP+操作系统类型+浏览器类型+浏览器版本号) 生成IP唯一标识
+//        commentUpdateWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.IP, comment.getIp()).or().eq(DbConstants.Comment.USER_ID, comment.getUserId()));
 
         if (baseMapper.update(comment, commentUpdateWrapper) < 1) {
             if (baseMapper.insert(comment) < 1) {
