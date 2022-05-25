@@ -38,4 +38,6 @@ public class CommentDto extends BaseDto {
     private Boolean isLiked;
 
     private Integer likeCount;
+
+    private UniqueKeyDto uniqueKey;
 }

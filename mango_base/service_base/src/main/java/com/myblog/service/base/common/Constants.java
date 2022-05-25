@@ -7,6 +7,7 @@ public interface Constants {
         String COMMA2 = "-";
         String COMMA3 = ".";
         String COMMA4 = "/";
+        String COMMA5 = ";";
     }
 
     interface ReplyField {
@@ -56,6 +57,8 @@ public interface Constants {
         String MENU_BUTTONS = "menuButtons";
         String PREV_BLOG = "prevBlog";
         String NEXT_BLOG = "nextBlog";
+        String OS = "os";
+        String BROWSER = "browser";
     }
 
     interface SystemConstant {

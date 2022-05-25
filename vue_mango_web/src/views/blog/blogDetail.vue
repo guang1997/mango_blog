@@ -52,7 +52,11 @@
         <copyright :url="url" :blogId="blog.id"></copyright>
       </div>
       <div class="article-detail__share">
-        <share :tags="blog.tags" :summary="blog.summary" :title="blog.title"></share>
+        <share
+          :tags="blog.tags"
+          :summary="blog.summary"
+          :title="blog.title"
+        ></share>
       </div>
       <div class="article-detail__prevnext">
         <prevnext :createTime="blog.createTime"></prevnext>
@@ -70,7 +74,11 @@
           <span>{{ total }}条评论</span>
         </div>
         <div class="comment__list">
-          <comments :comments="comments" @submitReply="submitReply" @addLike="addLike"></comments>
+          <comments
+            :comments="comments"
+            @submitReply="submitReply"
+            @addLike="addLike"
+          ></comments>
         </div>
         <div class="comment__page" v-if="total">
           <el-pagination
@@ -125,7 +133,9 @@ export default {
       comments: [],
       flatTree: null,
       components: [],
-      userId: ""
+      userId: "",
+      uniqueKey:{}
+
     };
   },
   computed: {
@@ -175,6 +185,7 @@ export default {
     const res = await blogApi.getBlogById({
       id: route.params.id,
       userId: this.userId,
+      uniqueKey: this.uniqueKey
     });
     // const commentRes = await commentApi.getBlogComments({
     //   page: 1,
@@ -187,13 +198,14 @@ export default {
       return {
         blog: res.data.data,
         comments: res.data.data.comments,
-        total: res.total
+        total: res.total,
       };
     }
   },
   methods: {
     ...mapMutations(["setCatalogs", "setActiveCatalog"]),
     async likeBlog(event) {
+
       const isLiked = this.blog.liked ? true : false;
       const res = await commentApi.likeBlog({
         blogId: this.blog.id,
@@ -201,6 +213,7 @@ export default {
         likeCount: this.blog.likeCount,
         userId: this.userId,
         source: "BLOG_INFO_LIKES",
+        uniqueKey: this.uniqueKey
       });
       if (res.code === 20000) {
         this.$message({
@@ -222,7 +235,7 @@ export default {
           type: "error",
           message: res.message,
         });
-         if (isLiked === false) {
+        if (isLiked === false) {
           // 一开始没点过赞，后来点了赞，失败时将博客赞的数量减掉
           this.blog.likeCount = this.blog.likeCount - 1;
         } else if (isLiked === true) {
@@ -381,7 +394,23 @@ export default {
           return component.value;
         });
         this.userId = Fingerprint2.x64hash128(values.join(""), 31); // 生成浏览器指纹
+        this.uniqueKey = {
+          height: window.screen.height,
+          width: window.screen.width,
+          dpi: this.getDPI(),
+          pixelDepth: window.screen.pixelDepth
+        }
       });
+    },
+    // 获取dpi
+    getDPI() {
+      const div = document.createElement("div");
+      div.style.cssText =
+        "height: 1in; left: -100%; position: absolute; top: -100%; width: 1in;";
+      document.body.appendChild(div);
+      const devicePixelRatio = window.devicePixelRatio || 1,
+        dpi = div.offsetWidth * devicePixelRatio;
+      return dpi;
     },
   },
   destroyed() {

@@ -184,7 +184,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
         queryWrapper.eq(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_LIKES.getSource());
         queryWrapper.eq(DbConstants.Comment.USER_ID, userId);
-        // TODO (IP+操作系统类型+浏览器类型+浏览器版本号) 生成IP唯一标识
+        // TODO 暂时先只通过浏览器指纹来设置点赞,更换浏览器时点赞会重置
 //        queryWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.USER_ID, userId).or().eq(DbConstants.Comment.IP, ipAddr));
 
         Comment comment = commentMapper.selectOne(queryWrapper);

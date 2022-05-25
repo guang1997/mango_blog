@@ -1,10 +1,15 @@
 package com.myblog.service.base.util;
 
+import com.myblog.service.base.common.Constants;
+import com.myblog.service.base.entity.dto.UniqueKeyDto;
+
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * IP相关工具类
@@ -33,6 +38,7 @@ public class IpUtils {
         if ((ipAddress == null) || (ipAddress.length() == 0) || ("unknown".equalsIgnoreCase(ipAddress))) {
             ipAddress = request.getRemoteAddr();//获取未配置代理的情况
         }
+
         // 获取本机真实地址
         if ("127.0.0.1".equals(ipAddress) || "0:0:0:0:0:0:0:1".equals(ipAddress)) {
             InetAddress addr = InetAddress.getLocalHost();
@@ -43,15 +49,6 @@ public class IpUtils {
             ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
         }
         return ipAddress;
-    }
-
-    private static String getIp(String ip) {
-        if ((ip != null) && (ip.indexOf(44) > 0)) {
-            String[] ipArray = ip.split(",");
-
-            ip = ipArray[(ipArray.length - 1)].trim();
-        }
-        return ip;
     }
 
     /**
@@ -92,5 +89,71 @@ public class IpUtils {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    /**
+     * 获取操作系统,浏览器及浏览器版本信息
+     *
+     * @param request
+     * @return
+     */
+    public static Map<String, String> getOsAndBrowserInfo(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        String user = userAgent.toLowerCase();
+
+        String os = "";
+        String browser = "";
+
+        //=================OS Info=======================
+        if (userAgent.toLowerCase().contains("windows")) {
+            os = "Windows";
+        } else if (userAgent.toLowerCase().contains("mac")) {
+            os = "Mac";
+        } else if (userAgent.toLowerCase().contains("x11")) {
+            os = "Unix";
+        } else if (userAgent.toLowerCase().contains("android")) {
+            os = "Android";
+        } else if (userAgent.toLowerCase().contains("iphone")) {
+            os = "IPhone";
+        } else {
+            os = "UnKnown, More-Info: " + userAgent;
+        }
+        //===============Browser===========================
+        if (user.contains("edge")) {
+            browser = (userAgent.substring(userAgent.indexOf("Edge")).split(" ")[0]).replace("/", "-");
+        } else if (user.contains("msie")) {
+            String substring = userAgent.substring(userAgent.indexOf("MSIE")).split(";")[0];
+            browser = substring.split(" ")[0].replace("MSIE", "IE") + "-" + substring.split(" ")[1];
+        } else if (user.contains("safari") && user.contains("version")) {
+            browser = (userAgent.substring(userAgent.indexOf("Safari")).split(" ")[0]).split("/")[0]
+                    + "-" + (userAgent.substring(userAgent.indexOf("Version")).split(" ")[0]).split("/")[1];
+        } else if (user.contains("opr") || user.contains("opera")) {
+            if (user.contains("opera")) {
+                browser = (userAgent.substring(userAgent.indexOf("Opera")).split(" ")[0]).split("/")[0]
+                        + "-" + (userAgent.substring(userAgent.indexOf("Version")).split(" ")[0]).split("/")[1];
+            } else if (user.contains("opr")) {
+                browser = ((userAgent.substring(userAgent.indexOf("OPR")).split(" ")[0]).replace("/", "-"))
+                        .replace("OPR", "Opera");
+            }
+
+        } else if (user.contains("chrome")) {
+            browser = (userAgent.substring(userAgent.indexOf("Chrome")).split(" ")[0]).replace("/", "-");
+        } else if ((user.contains("mozilla/7.0")) || (user.contains("netscape6")) ||
+                (user.contains("mozilla/4.7")) || (user.contains("mozilla/4.78")) ||
+                (user.contains("mozilla/4.08")) || (user.contains("mozilla/3"))) {
+            browser = "Netscape-?";
+
+        } else if (user.contains("firefox")) {
+            browser = (userAgent.substring(userAgent.indexOf("Firefox")).split(" ")[0]).replace("/", "-");
+        } else if (user.contains("rv")) {
+            String IEVersion = (userAgent.substring(userAgent.indexOf("rv")).split(" ")[0]).replace("rv:", "-");
+            browser = "IE" + IEVersion.substring(0, IEVersion.length() - 1);
+        } else {
+            browser = "UnKnown, More-Info: " + userAgent;
+        }
+        Map<String, String> result = new HashMap<>(2);
+        result.put(Constants.ReplyField.OS, os);
+        result.put(Constants.ReplyField.BROWSER, browser);
+        return result;
     }
 }

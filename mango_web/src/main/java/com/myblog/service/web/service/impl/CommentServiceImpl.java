@@ -8,12 +8,16 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.IpUtils;
+import com.myblog.service.base.util.MD5Utils;
 import com.myblog.service.web.entity.Comment;
 import com.myblog.service.web.entity.dto.CommentDto;
 import com.myblog.service.web.mapper.BlogMapper;
 import com.myblog.service.web.mapper.CommentMapper;
 import com.myblog.service.web.service.CommentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myblog.service.web.util.UniqueKeyUtil;
+import eu.bitwalker.useragentutils.OperatingSystem;
+import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -78,7 +86,12 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         Comment comment = this.toDb(commentDto, Comment.class);
         comment.setStatus(Constants.CommentStatus.REVIEWED);
         comment.setBlogId(commentDto.getBlogId());
-        comment.setIp(IpUtils.getIpAddr(request));
+        String ipAddr = IpUtils.getIpAddr(request);
+        comment.setIp(ipAddr);
+        String uniqueKey = UniqueKeyUtil.getUniqueKey(request, ipAddr, commentDto.getUniqueKey());
+        LOGGER.debug("likeBlog getUniqueKey:{} success", uniqueKey);
+        comment.setUniqueKey(MD5Utils.string2MD5(uniqueKey));
+
         comment.setType(Constants.CommentType.LIKES);
         comment.setSource(CommentSourceEnum.BLOG_INFO_LIKES.getSource());
         comment.setParentId("0");
@@ -99,9 +112,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         }
         UpdateWrapper<Comment> commentUpdateWrapper = new UpdateWrapper<>();
         commentUpdateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
-        commentUpdateWrapper.eq(DbConstants.Comment.USER_ID, comment.getUserId());
-        // TODO (IP+操作系统类型+浏览器类型+浏览器版本号) 生成IP唯一标识
-//        commentUpdateWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.IP, comment.getIp()).or().eq(DbConstants.Comment.USER_ID, comment.getUserId()));
+        // TODO 暂时先只通过浏览器指纹或者用户id以及ip和设备型号生成的数据来设置点赞,尽量保证唯一性
+//        commentUpdateWrapper.eq(DbConstants.Comment.USER_ID, comment.getUserId());
+        commentUpdateWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.IP, comment.getIp()).or().eq(DbConstants.Comment.USER_ID, comment.getUserId()));
 
         if (baseMapper.update(comment, commentUpdateWrapper) < 1) {
             if (baseMapper.insert(comment) < 1) {

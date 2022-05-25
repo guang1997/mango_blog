@@ -52,6 +52,7 @@
         <hutool.version>5.3.4</hutool.version>
         <log4j.version>1.2.17</log4j.version>
         <mail.version>1.4.7</mail.version>
+        <userAgentUtils.version>1.21</userAgentUtils.version>
     </properties>
 
     <dependencyManagement>
@@ -275,6 +276,11 @@
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>${mail.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.bitwalker</groupId>
+                <artifactId>UserAgentUtils</artifactId>
+                <version>${userAgentUtils.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
