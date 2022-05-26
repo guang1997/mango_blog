@@ -88,7 +88,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         comment.setBlogId(commentDto.getBlogId());
         String ipAddr = IpUtils.getIpAddr(request);
         comment.setIp(ipAddr);
-        String uniqueKey = UniqueKeyUtil.getUniqueKey(request, ipAddr, commentDto.getUniqueKey());
+        String uniqueKey = UniqueKeyUtil.getUniqueKey(request, commentDto.getScreenInformation());
         LOGGER.debug("likeBlog getUniqueKey:{} success", uniqueKey);
         comment.setUniqueKey(MD5Utils.string2MD5(uniqueKey));
 
@@ -112,9 +112,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         }
         UpdateWrapper<Comment> commentUpdateWrapper = new UpdateWrapper<>();
         commentUpdateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
+        commentUpdateWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
         // TODO 暂时先只通过浏览器指纹或者用户id以及ip和设备型号生成的数据来设置点赞,尽量保证唯一性
-//        commentUpdateWrapper.eq(DbConstants.Comment.USER_ID, comment.getUserId());
-        commentUpdateWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.IP, comment.getIp()).or().eq(DbConstants.Comment.USER_ID, comment.getUserId()));
+        commentUpdateWrapper.and(wrapper -> wrapper
+                .and(wrapper2 -> wrapper2.eq(DbConstants.Comment.IP, comment.getIp()).eq(DbConstants.Comment.UNIQUE_KEY, comment.getUniqueKey()))
+                .or().eq(DbConstants.Comment.USER_ID, comment.getUserId()));
 
         if (baseMapper.update(comment, commentUpdateWrapper) < 1) {
             if (baseMapper.insert(comment) < 1) {

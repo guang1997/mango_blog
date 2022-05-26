@@ -1,7 +1,6 @@
 package com.myblog.service.base.util;
 
 import com.myblog.service.base.common.Constants;
-import com.myblog.service.base.entity.dto.UniqueKeyDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;

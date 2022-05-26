@@ -105,7 +105,6 @@ import submit from "@/views/components/submit";
 import copyright from "./components/copyright";
 import share from "./components/share";
 import prevnext from "./components/prevnext";
-import Fingerprint2 from "fingerprintjs2";
 import "@/assets/css/quill.snow.css";
 function jumpAnchor(route) {
   if (route.query.anchor === "a_cm") {
@@ -113,7 +112,6 @@ function jumpAnchor(route) {
     el.scrollIntoView();
   }
 }
-
 export default {
   name: "blogDetail",
   components: { note, comments, submit, copyright, share, prevnext },
@@ -134,8 +132,8 @@ export default {
       flatTree: null,
       components: [],
       userId: "",
-      uniqueKey:{}
-
+      mangoBlogBrowserFinger: localStorage.getItem("mangoBlogBrowserFinger"),
+      mangoBlogScreenInformation: localStorage.getItem("mangoBlogScreenInformation")
     };
   },
   computed: {
@@ -176,17 +174,16 @@ export default {
     window.addEventListener("scroll", this.handleScroll, false);
   },
   created() {
-    setTimeout(() => {
-      this.createFingerprint();
-    }, 1000);
   },
   updated() {},
+
   async asyncData({ route, isServer, _ip }) {
     const res = await blogApi.getBlogById({
       id: route.params.id,
-      userId: this.userId,
-      uniqueKey: this.uniqueKey
+      userId: localStorage.getItem("mangoBlogBrowserFinger"),
+      screenInformation: JSON.parse(localStorage.getItem("mangoBlogScreenInformation")),
     });
+
     // const commentRes = await commentApi.getBlogComments({
     //   page: 1,
     //   limit: 10,
@@ -205,15 +202,14 @@ export default {
   methods: {
     ...mapMutations(["setCatalogs", "setActiveCatalog"]),
     async likeBlog(event) {
-
       const isLiked = this.blog.liked ? true : false;
       const res = await commentApi.likeBlog({
         blogId: this.blog.id,
         isLiked,
         likeCount: this.blog.likeCount,
-        userId: this.userId,
+        userId: this.userId === "" ? localStorage.getItem("mangoBlogBrowserFinger") : this.userId,
         source: "BLOG_INFO_LIKES",
-        uniqueKey: this.uniqueKey
+        screenInformation: JSON.parse(localStorage.getItem("mangoBlogScreenInformation")),
       });
       if (res.code === 20000) {
         this.$message({
@@ -383,35 +379,7 @@ export default {
         }
       });
     },
-    createFingerprint() {
-      Fingerprint2.get((components) => {
-        // 参数只有回调函数时，默认浏览器指纹依据全部配置信息进行生成
-        const values = components.map(function (component, index) {
-          if (index === 0) {
-            //把微信浏览器⾥UA的wifi或4G等⽹络替换成空,不然切换⽹络会ID不⼀样
-            return component.value.replace(/\bNetType\/\w+\b/, "");
-          }
-          return component.value;
-        });
-        this.userId = Fingerprint2.x64hash128(values.join(""), 31); // 生成浏览器指纹
-        this.uniqueKey = {
-          height: window.screen.height,
-          width: window.screen.width,
-          dpi: this.getDPI(),
-          pixelDepth: window.screen.pixelDepth
-        }
-      });
-    },
-    // 获取dpi
-    getDPI() {
-      const div = document.createElement("div");
-      div.style.cssText =
-        "height: 1in; left: -100%; position: absolute; top: -100%; width: 1in;";
-      document.body.appendChild(div);
-      const devicePixelRatio = window.devicePixelRatio || 1,
-        dpi = div.offsetWidth * devicePixelRatio;
-      return dpi;
-    },
+    
   },
   destroyed() {
     window.removeEventListener("scroll", this.handleScroll, false);

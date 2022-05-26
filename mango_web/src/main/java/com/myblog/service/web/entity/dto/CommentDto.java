@@ -39,5 +39,5 @@ public class CommentDto extends BaseDto {
 
     private Integer likeCount;
 
-    private UniqueKeyDto uniqueKey;
+    private UniqueKeyDto screenInformation;
 }

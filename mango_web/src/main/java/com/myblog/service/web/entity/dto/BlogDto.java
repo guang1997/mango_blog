@@ -41,4 +41,6 @@ public class BlogDto extends BaseDto {
     private Boolean liked;
 
     private String userId;
+
+    private UniqueKeyDto screenInformation;
 }

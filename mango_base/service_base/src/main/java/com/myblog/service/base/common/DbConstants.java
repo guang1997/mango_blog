@@ -89,6 +89,7 @@ public interface DbConstants {
         String BLOG_ID = "blog_id";
         String IP = "ip";
         String USER_ID = "user_id";
+        String UNIQUE_KEY = "unique_key";
     }
 
     interface WebVisit {

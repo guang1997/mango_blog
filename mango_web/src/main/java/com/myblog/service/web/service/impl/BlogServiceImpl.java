@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.*;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.IpUtils;
+import com.myblog.service.base.util.MD5Utils;
 import com.myblog.service.web.controller.BlogController;
 import com.myblog.service.web.entity.*;
 import com.myblog.service.web.entity.dto.BlogDto;
 import com.myblog.service.web.mapper.*;
 import com.myblog.service.web.service.BlogService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myblog.service.web.util.UniqueKeyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 分页查询博客信息
+     *
      * @param blogDto
      * @return
      * @throws Exception
@@ -78,6 +81,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 根据博客分类查询博客信息
+     *
      * @param blogDto
      * @return
      */
@@ -102,11 +106,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 根据博客标签查询博客信息
+     *
      * @param blogDto
      * @return
      */
     @Override
-    public Response getBlogByTagId(BlogDto blogDto) throws Exception{
+    public Response getBlogByTagId(BlogDto blogDto) throws Exception {
         Response response = Response.ok();
         QueryWrapper<BlogTag> blogTagQueryWrapper = new QueryWrapper<>();
         blogTagQueryWrapper.eq(DbConstants.BlogTag.TAG_ID, blogDto.getTagId());
@@ -130,11 +135,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     /**
      * 根据博客id获取博客信息
+     *
      * @param blogDto
      * @return
      */
     @Override
-    public Response getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception{
+    public Response getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception {
         Response response = Response.ok();
         Blog blog = baseMapper.selectById(blogDto.getId());
         if (Objects.isNull(blog)) {
@@ -143,18 +149,22 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         }
         BlogDto responseDto = this.toDto(blog, BlogDto.class);
         // 查询该ip是否已经给博客点过赞
-        responseDto.setLiked(getBlogLiked(responseDto.getId(), IpUtils.getIpAddr(request), blogDto.getUserId()));
+        responseDto.setLiked(getBlogLiked(responseDto.getId(),
+                IpUtils.getIpAddr(request),
+                blogDto.getUserId(),
+                MD5Utils.string2MD5(UniqueKeyUtil.getUniqueKey(request, blogDto.getScreenInformation()))));
         response.data(Constants.ReplyField.DATA, responseDto);
         return response;
     }
 
     /**
      * 获取上一篇和下一篇博客
+     *
      * @param blogDto
      * @return
      */
     @Override
-    public Response getPrevNextBlog(BlogDto blogDto) throws Exception{
+    public Response getPrevNextBlog(BlogDto blogDto) throws Exception {
         Response response = Response.ok();
         // 获取上一篇博客
         QueryWrapper<Blog> prevQueryWrapper = new QueryWrapper<>();
@@ -177,15 +187,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         return response;
     }
 
-    private Boolean getBlogLiked(String id, String ipAddr, String userId) {
+    private Boolean getBlogLiked(String id, String ipAddr, String userId, String uniqueKey) {
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommentStatus.REVIEWED);
         queryWrapper.eq(DbConstants.Comment.BLOG_ID, id);
         queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
         queryWrapper.eq(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_LIKES.getSource());
-        queryWrapper.eq(DbConstants.Comment.USER_ID, userId);
-        // TODO 暂时先只通过浏览器指纹来设置点赞,更换浏览器时点赞会重置
-//        queryWrapper.and(wrapper -> wrapper.eq(DbConstants.Comment.USER_ID, userId).or().eq(DbConstants.Comment.IP, ipAddr));
+        queryWrapper.and(wrapper -> wrapper
+                .and(wrapper2 -> wrapper2.eq(DbConstants.Comment.IP, ipAddr).eq(DbConstants.Comment.UNIQUE_KEY, uniqueKey))
+                .or().eq(DbConstants.Comment.USER_ID, userId));
+
 
         Comment comment = commentMapper.selectOne(queryWrapper);
         if (Objects.isNull(comment)) {

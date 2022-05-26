@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class UniqueKeyUtil {
 
-    public static String getUniqueKey(HttpServletRequest request, String ipAddr, UniqueKeyDto uniqueKey) {
+    public static String getUniqueKey(HttpServletRequest request, UniqueKeyDto uniqueKey) {
         String agent = request.getHeader("User-Agent");
         if (StringUtils.isNotBlank(agent)) {
             UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
@@ -19,7 +19,6 @@ public class UniqueKeyUtil {
             uniqueKey.setGroup(operatingSystem.getGroup().toString());
             uniqueKey.setManufacturer(operatingSystem.getManufacturer().toString());
         }
-        uniqueKey.setIp(ipAddr);
 
         return uniqueKey.toString();
     }

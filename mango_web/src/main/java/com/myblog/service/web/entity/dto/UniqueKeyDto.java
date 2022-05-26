@@ -7,8 +7,6 @@ import lombok.ToString;
 @ToString
 public class UniqueKeyDto {
 
-    private String ip;
-
     /**
      * 操作系统名
      */
