@@ -1,9 +1,9 @@
-package com.myblog.service.admin.service.impl;
+package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.myblog.service.admin.entity.EmailConfig;
-import com.myblog.service.admin.mapper.EmailConfigMapper;
-import com.myblog.service.admin.service.EmailConfigService;
+import com.myblog.service.security.entity.EmailConfig;
+import com.myblog.service.security.mapper.EmailConfigMapper;
+import com.myblog.service.security.service.EmailConfigService;
 import org.springframework.stereotype.Service;
 
 /**

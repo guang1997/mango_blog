@@ -1,7 +1,8 @@
-package com.myblog.service.admin.service;
+package com.myblog.service.security.service;
+
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.myblog.service.admin.entity.EmailConfig;
+import com.myblog.service.security.entity.EmailConfig;
 
 /**
  * <p>

@@ -60,6 +60,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         Page<Comment> commentPage = new Page<>(page, size);
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
+        queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.MESSAGE);
         baseMapper.selectPage(commentPage, queryWrapper);
 
         response.data(Constants.ReplyField.DATA, this.toDtoList(commentPage.getRecords(), CommentDto.class));

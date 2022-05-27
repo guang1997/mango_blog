@@ -1,4 +1,4 @@
-package com.myblog.service.admin.entity;
+package com.myblog.service.security.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.myblog.service.base.entity.BaseEntity;

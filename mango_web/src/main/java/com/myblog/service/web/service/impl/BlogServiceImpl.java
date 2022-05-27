@@ -227,6 +227,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Comment.STATUS, 1);
         queryWrapper.eq(DbConstants.Comment.BLOG_ID, id);
+        queryWrapper.ne(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_LIKES);
         return commentMapper.selectList(queryWrapper);
     }
 

@@ -1,7 +1,8 @@
-package com.myblog.service.admin.mapper;
+package com.myblog.service.security.mapper;
 
-import com.myblog.service.admin.entity.EmailConfig;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.myblog.service.security.entity.EmailConfig;
 
 /**
  * <p>

@@ -1,4 +1,4 @@
-package com.myblog.service.admin.service.impl;
+package com.myblog.service.security.service.impl;
 
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.RandomUtil;
@@ -9,14 +9,14 @@ import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
-import com.myblog.service.admin.entity.EmailConfig;
-import com.myblog.service.admin.service.EmailConfigService;
-import com.myblog.service.admin.service.VerificationCodeService;
 import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.Base64Util;
 import com.myblog.service.base.util.RedisUtil;
+import com.myblog.service.security.entity.EmailConfig;
+import com.myblog.service.security.service.EmailConfigService;
+import com.myblog.service.security.service.VerificationCodeService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +47,9 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
      * @return
      */
     @Override
-    public Response sendCode(String  email) {
+    public Response sendCode(String  email, String source) {
 
-        String key = RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + email;
+        String key = RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + email + RedisConstants.DIVISION + source;
         String content = "";
         TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
         Template template = engine.getTemplate("template/email/email.ftl");
@@ -107,8 +107,8 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
      * @return
      */
     @Override
-    public Response validateCode(String email, String code) {
-        String key = RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + email;
+    public Response validateCode(String email, String code, String source) {
+        String key = RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + email + RedisConstants.DIVISION + source;
         String redisCode = redisUtil.get(key);
         if (StringUtils.isBlank(redisCode) || !Objects.equals(redisCode, code)) {
             LOGGER.debug("validateCode, redisCode:[{}] is not equals code:[{}]", redisCode, code);

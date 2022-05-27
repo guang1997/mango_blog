@@ -81,4 +81,12 @@ public interface Constants {
         int MESSAGE = 0;
         int LIKES = 1;
     }
+
+    /**
+     * 邮箱来源
+     */
+    interface EmailSource {
+        String WEB = "WEB";
+        String ADMIN = "ADMIN";
+    }
 }

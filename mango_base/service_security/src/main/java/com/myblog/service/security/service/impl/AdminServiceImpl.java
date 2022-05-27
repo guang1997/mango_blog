@@ -20,6 +20,7 @@ import com.myblog.service.security.mapper.RoleAdminMapper;
 import com.myblog.service.security.mapper.RoleMapper;
 import com.myblog.service.security.service.AdminService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myblog.service.security.service.VerificationCodeService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,9 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
     @Autowired
     private RoleAdminMapper roleAdminMapper;
+
+    @Autowired
+    private VerificationCodeService verificationCodeService;
 
     @Override
     public Admin checkLogin(LoginDto loginDto) throws Exception {
@@ -286,10 +290,9 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("修改失败，密码错误");
         }
         // 对验证码进行校验
-        String redisCode = redisUtil.get(RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + passAndEmailDto.getEmail());
-        if (StringUtils.isBlank(redisCode) || !Objects.equals(redisCode, passAndEmailDto.getCode())) {
-            LOGGER.error("updateEmail:{} failed, code is error, redisCode:[{}], code:[{}]", passAndEmailDto.getEmail(), redisCode, passAndEmailDto.getCode());
-            return Response.error().message("修改失败，验证码错误");
+        Response verificationCodeResponse = verificationCodeService.validateCode(passAndEmailDto.getEmail(), passAndEmailDto.getCode(), Constants.EmailSource.ADMIN);
+        if (!verificationCodeResponse.getSuccess()) {
+            return verificationCodeResponse;
         }
         // 更新用户邮箱
         admin.setEmail(passAndEmailDto.getEmail());
