@@ -1,7 +1,10 @@
 package com.myblog.service.web.service;
 
+import com.myblog.service.base.common.Response;
+import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.web.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.myblog.service.web.entity.dto.UserDto;
 
 /**
  * <p>
@@ -11,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author 李斯特
  * @since 2022-05-27
  */
-public interface UserService extends IService<User> {
+public interface UserService extends IService<User>, ServiceConvertHandler<User, UserDto> {
 
+    Response login(UserDto userDto) throws Exception;
 }

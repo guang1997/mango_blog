@@ -89,4 +89,21 @@ public interface Constants {
         String WEB = "WEB";
         String ADMIN = "ADMIN";
     }
+
+    /**
+     * 用户标签
+     */
+    interface UserTag {
+        int ORDINARY_USERS = 0;
+        int ADMIN = 1;
+        int BLOG_USERS = 2;
+    }
+
+    /**
+     * 通用状态
+     */
+    interface CommonStatus {
+        int DISABLED = 0;
+        int ENABLED = 1;
+    }
 }

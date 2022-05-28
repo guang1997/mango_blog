@@ -8,5 +8,12 @@ export function sendCode(data) {
     })
   }
   
+export function saveVisitor(data) {
+  return request({
+    url: '/web/user/saveVisitor',
+    method: 'post',
+    data
+  })
+}
   
-  export default { sendCode }
+  export default { sendCode,saveVisitor }

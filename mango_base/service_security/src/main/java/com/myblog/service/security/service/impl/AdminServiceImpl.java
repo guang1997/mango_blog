@@ -62,9 +62,6 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Autowired
     private RoleAdminMapper roleAdminMapper;
 
-    @Autowired
-    private VerificationCodeService verificationCodeService;
-
     @Override
     public Admin checkLogin(LoginDto loginDto) throws Exception {
         String username = loginDto.getUsername();
@@ -288,11 +285,6 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         if (!passwordEncoder.matches(pass, admin.getPassword())) {
             LOGGER.error("updateEmail failed, password is error");
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("修改失败，密码错误");
-        }
-        // 对验证码进行校验
-        Response verificationCodeResponse = verificationCodeService.validateCode(passAndEmailDto.getEmail(), passAndEmailDto.getCode(), Constants.EmailSource.ADMIN);
-        if (!verificationCodeResponse.getSuccess()) {
-            return verificationCodeResponse;
         }
         // 更新用户邮箱
         admin.setEmail(passAndEmailDto.getEmail());

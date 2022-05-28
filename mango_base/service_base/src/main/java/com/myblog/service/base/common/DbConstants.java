@@ -96,4 +96,15 @@ public interface DbConstants {
         String BEHAVIOR = "behavior";
         String REQUEST_TIME = "request_time";
     }
+
+    interface EmailConfig {
+        String SOURCE = "source";
+    }
+
+    interface User {
+        String EMAIL = "email";
+        String USERNAME = "username";
+        String NICKNAME = "nickname";
+        String STATUS = "status";
+    }
 }

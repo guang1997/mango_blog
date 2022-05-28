@@ -29,10 +29,10 @@ public class User extends BaseEntity {
     private static final long serialVersionUID=1L;
 
     @ApiModelProperty(value = "用户名")
-    private String userName;
+    private String username;
 
     @ApiModelProperty(value = "密码")
-    private String passWord;
+    private String password;
 
     @ApiModelProperty(value = "性别(1:男2:女)")
     private Integer gender;
@@ -62,7 +62,7 @@ public class User extends BaseEntity {
     private Integer status;
 
     @ApiModelProperty(value = "昵称")
-    private String nickName;
+    private String nickname;
 
     @ApiModelProperty(value = "QQ号")
     private String qqNumber;
@@ -71,10 +71,10 @@ public class User extends BaseEntity {
     private String weChat;
 
     @ApiModelProperty(value = "评论状态 1:正常 0:禁言")
-    private Boolean commentStatus;
+    private Integer commentStatus;
 
     @ApiModelProperty(value = "用户标签：0：普通用户，1：管理员，2：博主 等")
-    private Boolean userTag;
+    private Integer userTag;
 
 
 }

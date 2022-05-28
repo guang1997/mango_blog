@@ -9,6 +9,8 @@ import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
@@ -66,6 +68,8 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         }
 
         // 发送验证码
+        QueryWrapper<EmailConfig> emailConfigQueryWrapper = new QueryWrapper<>();
+        emailConfigQueryWrapper.eq(DbConstants.EmailConfig.SOURCE, source);
         EmailConfig emailConfig = emailConfigService.getOne(null);
         if (Objects.isNull(emailConfig)) {
             return Response.error().message("发送邮件失败，请联系管理员配置邮箱");

@@ -2,6 +2,7 @@ package com.myblog.service.admin.controller;
 
 
 import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.security.entity.Role;
@@ -10,6 +11,7 @@ import com.myblog.service.security.entity.dto.PassAndEmailDto;
 import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.service.AdminService;
 import com.myblog.service.security.service.RoleService;
+import com.myblog.service.security.service.VerificationCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +47,10 @@ public class AdminController {
 
     @Autowired
     private RoleService roleService;
+
+
+    @Autowired
+    private VerificationCodeService verificationCodeService;
 
     @LogByMethod("/admin/manager/getAdminByPage")
     @ApiOperation(value = "分页查询管理员信息", notes = "分页查询管理员信息", response = Response.class)
@@ -123,6 +129,11 @@ public class AdminController {
                 || StringUtils.isBlank(passAndEmailDto.getEmail())) {
             LOGGER.error("updateEmail failed, pass or email cannot be null");
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+        // 对验证码进行校验
+        Response verificationCodeResponse = verificationCodeService.validateCode(passAndEmailDto.getEmail(), passAndEmailDto.getCode(), Constants.EmailSource.ADMIN);
+        if (!verificationCodeResponse.getSuccess()) {
+            return verificationCodeResponse;
         }
         return adminService.updateEmail(passAndEmailDto);
 

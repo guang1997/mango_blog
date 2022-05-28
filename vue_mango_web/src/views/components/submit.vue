@@ -2,14 +2,24 @@
   <div class="submit">
     <div class="submit__avatar">
       <div class="submit__avatar-default">
-        <img v-show="!!visitorInfo.imgUrl" :src="visitorInfo.imgUrl" :title="visitorInfo.name" />
-        <i v-show="!visitorInfo.imgUrl" class="el-icon-user" :title="visitorInfo.name"></i>
+        <img
+          v-show="!!visitorInfo.imgUrl"
+          :src="visitorInfo.imgUrl"
+          :title="visitorInfo.name"
+        />
+        <i
+          v-show="!visitorInfo.imgUrl"
+          class="el-icon-user"
+          :title="visitorInfo.name"
+        ></i>
       </div>
       <div class="submit__avatar-rel"></div>
     </div>
     <div class="submit__content">
       <div class="submit__input">
-        <span v-if="currentReplyMessage.name" class="reply-name">回复 {{ currentReplyMessage.name }} :</span>
+        <span v-if="currentReplyMessage.name" class="reply-name"
+          >回复 {{ currentReplyMessage.name }} :</span
+        >
         <el-input
           ref="comment"
           type="textarea"
@@ -17,6 +27,8 @@
           placeholder="说点什么"
           @focus="focus"
           v-model="comment"
+          maxlength="200"
+          show-word-limit
         ></el-input>
       </div>
       <div class="submit__handle">
@@ -31,36 +43,81 @@
         </div>
 
         <div class="submit__btn">
-          <el-button v-if="currentReplyMessage._id" size="medium" @click="cancelReply">取消</el-button>
-          <el-button size="medium" :disabled="!visitorInfo._id" @click="submitMessage">提交</el-button>
+          <el-button
+            v-if="currentReplyMessage._id"
+            size="medium"
+            @click="cancelReply"
+            >取消</el-button
+          >
+          <el-button
+            size="medium"
+            :disabled="!visitorInfo._id"
+            @click="submitMessage"
+            >提交</el-button
+          >
         </div>
       </div>
     </div>
-    <el-dialog title="登录" :visible.sync="customVisible" width="30%" custom-class="visitor-submit-box">
+    <el-dialog
+      title="登录"
+      :visible.sync="customVisible"
+      width="30%"
+      custom-class="visitor-submit-box"
+      @close='closeDialog'
+    >
       <div class="submit__login">
-        <el-form label-width="60px" :model="formInfo" :rules="submitRules" ref="customForm">
-          <el-form-item label="昵称" prop="name">
-            <el-input v-model="formInfo.name" placeholder="请输入昵称"></el-input>
+        <el-form
+          label-width="60px"
+          :model="formInfo"
+          :rules="submitRules"
+          ref="customForm"
+        >
+          <el-form-item label="昵称" prop="nickName">
+            <el-input
+              v-model="formInfo.nickName"
+              placeholder="请输入昵称"
+              clearable
+            ></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
-            <el-input v-model="formInfo.email" placeholder="请输入邮箱"></el-input>
+            <el-input
+              v-model="formInfo.email"
+              placeholder="请输入邮箱"
+              clearable
+            ></el-input>
           </el-form-item>
           <el-form-item label="验证码" prop="code">
             <el-row>
-              <el-col :span="14">
-                <el-input style="vertical-align: middle;box-sizing: content-box;" v-model="formInfo.code" placeholder="请输入验证码" />
+              <el-col :xs="14" :sm="14" :lg="15">
+                <el-input
+                  style="vertical-align: middle; box-sizing: content-box"
+                  v-model="formInfo.code"
+                  placeholder="请输入验证码"
+                  clearable
+                />
+                <span :class="computCodeClass">{{ codeSpanName }}</span>
               </el-col>
-               <el-col :span="10">
-               <el-button style="height:20px;vertical-align: middle;box-sizing: content-box" :loading="codeLoading" :disabled="isDisabled" size="small" @click="sendCode">{{ buttonName }}</el-button>
+              <el-col :xs="10" :sm="10" :lg="9">
+                <el-button
+                  style="
+                    height: 20px;
+                    vertical-align: middle;
+                    box-sizing: content-box;
+                  "
+                  :disabled="isDisabled"
+                  size="small"
+                  @click="openVcode"
+                >
+                  获取验证码
+                </el-button>
               </el-col>
             </el-row>
-          
-           
-        </el-form-item>
-
+          </el-form-item>
         </el-form>
         <div class="submit__register">
-          <el-button size="small" type="primary" @click="register">注册</el-button>
+          <el-button size="small" type="primary" @click="submit"
+            >登陆</el-button
+          >
         </div>
         <div class="submit__third-part">
           <div class="line">第三方登录</div>
@@ -68,83 +125,125 @@
             <a href="javascript: void(0)" @click="openQQ" class="login-qq">
               <img src="~@/assets/img/qq.png" alt="QQ登录" />
             </a>
-            <a href="javascript: void(0)" class="login-github" @click="openGithub">
+            <a
+              href="javascript: void(0)"
+              class="login-github"
+              @click="openGithub"
+            >
               <img src="~@/assets/img/github.png" alt="github登录" />
             </a>
           </div>
         </div>
       </div>
     </el-dialog>
+    <Vcode
+      :show="isShow"
+      @success="success"
+      @close="close"
+      style="z-index: 10000"
+    />
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from 'vuex'
-import { storage } from '@/utils/storage'
-import emoji from '@/components/emoji'
-import userApi from "@/api/user";
+import { mapState, mapMutations } from "vuex";
+import { storage } from "@/utils/storage";
+import emoji from "@/components/emoji";
+import loginApi from "@/api/login";
+import Vcode from "vue-puzzle-vcode";
 
 export default {
-  name: 'submit',
+  name: "submit",
   props: {
     currentReplyMessage: {
       type: Object,
       default() {
-        return {}
-      }
-    }
+        return {};
+      },
+    },
   },
   components: {
-    emoji
+    emoji,
+    Vcode,
   },
   data() {
     const nameValidator = (rule, value, callback) => {
-      const reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]{1,16}$/gi
-      if (value === '') {
-        callback(new Error('请输入昵称'))
+      const reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]{1,16}$/gi;
+      if (value === "") {
+        callback(new Error("请输入昵称"));
       } else if (!reg.test(value)) {
-        callback(new Error('昵称支持中英文、数字、下划线的组合，限16位'))
+        callback(new Error("昵称支持中英文、数字、下划线的组合，限16位"));
       } else {
-        callback()
+        callback();
       }
-    }
+    };
     return {
-      comment: '',
+      comment: "",
       customVisible: false,
       perfectVisible: false,
       formInfo: {
-        name: '',
-        email: '',
-        code: ''
+        nickName: "",
+        email: "",
+        code: "",
       },
       perfect: {
-        email: '',
-        link: ''
+        email: "",
+        link: "",
       },
       tempInfo: {},
       submitRules: {
-        name: [{ required: true, validator: nameValidator, trigger: 'blur' }],
-        email: [{ type: 'email', required: true, message: '请填写邮箱', trigger: 'blur' }],
-        code: [{ type: 'code', required: false, message: '请输入验证码' }]
+        nickName: [{ required: true, validator: nameValidator, trigger: "blur" }],
+        email: [
+          {
+            type: "email",
+            required: true,
+            message: "请填写邮箱",
+            trigger: "blur",
+          },
+        ],
+        code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
       },
-       buttonName: '获取验证码',
-       codeLoading: false,
-       isDisabled: false, 
-       time: 60,
-    }
+      codeSpanName: "",
+      isDisabled: false,
+      time: 60,
+      isShow: false,
+    };
   },
   mounted() {
-    this.handleQQCb()
-    this.addMessageListener()
+    this.handleQQCb();
+    this.addMessageListener();
   },
   computed: {
-    ...mapState(['visitorInfo'])
+    ...mapState(["visitorInfo"]),
+    computCodeClass() {
+      if (this.isDisabled) {
+        return "codeSpan";
+      } else {
+        return "el-form-item__error";
+      }
+    },
   },
   methods: {
-    ...mapMutations(['setVisitor']),
+    ...mapMutations(["setVisitor"]),
+    test() {
+      this.isShow = true;
+    },
+    // 用户通过了验证
+    success(msg) {
+      this.isShow = false; // 通过验证后，需要手动隐藏模态框
+      this.sendCode()
+    },
+    // 用户点击遮罩层，应该关闭模态框
+    close() {
+      this.isShow = false;
+    },
     openGithub() {
       // TODO: 环境变量 BASE_URL
-      const VUE_APP_BASE_API = process.env.VUE_APP_BASE_API
-      window.open(`${VUE_APP_BASE_API}/login/git`, '_blank', 'height=600,width=800,toolbar=no, menubar=no, scrollbars=no')
+      const VUE_APP_BASE_API = process.env.VUE_APP_BASE_API;
+      window.open(
+        `${VUE_APP_BASE_API}/login/git`,
+        "_blank",
+        "height=600,width=800,toolbar=no, menubar=no, scrollbars=no"
+      );
     },
     openQQ() {
       // return
@@ -154,30 +253,29 @@ export default {
       //   'height=525,width=585, toolbar=no, menubar=no, scrollbars=no, status=no, location=yes, resizable=yes'
       // )
       QC.Login.showPopup({
-        appId: '101999089',
-        redirectURI: 'http://mapblog.cn/qc_back.html'
-      })
+        appId: "101999089",
+        redirectURI: "http://mapblog.cn/qc_back.html",
+      });
     },
-    register() {
+    submit() {
       this.$refs.customForm.validate(async (valid) => {
         if (valid) {
-          const res = await this.$api.saveVisitor({
-            ...this.customInfo,
-            imgUrl: '/img/avatar/avatar.jpeg',
-            type: 0
-          })
+          const res = await this.loginApi.saveVisitor({
+            ...this.formInfo,
+            imgUrl: "/img/avatar/avatar.jpeg"
+          });
 
-          if (res.status === 200) {
-            this.setVisitorInfo(res.data)
-            this.customVisible = false
-            this.customInfo = {
-              name: '',
-              email: '',
-              link: ''
-            }
+          if (res.code === 20000) {
+            this.setVisitorInfo(res.data.data);
+            this.customVisible = false;
+            this.formInfo = {
+              nickName: "",
+              email: "",
+              code: "",
+            };
           }
         }
-      })
+      });
     },
     submitPerfect() {
       this.$refs.perfectForm.validate(async (valid) => {
@@ -185,25 +283,24 @@ export default {
           const res = await this.$api.saveVisitor({
             ...this.tempInfo,
             ...this.perfect,
-            date: new Date()
-          })
+            date: new Date(),
+          });
           if (res.status === 200) {
-            this.setVisitorInfo(res.data)
+            this.setVisitorInfo(res.data);
             this.perfect = {
-              email: '',
-              link: ''
-            }
-            this.tempInfo = {}
-            this.perfectVisible = false
+              email: "",
+              link: "",
+            };
+            this.tempInfo = {};
+            this.perfectVisible = false;
           }
         }
-      })
+      });
     },
     addMessageListener() {
-      window.addEventListener('message', this.handleGithubCb, false)
+      window.addEventListener("message", this.handleGithubCb, false);
     },
     handleQQCb() {
-
       QC.Login({}, (info) => {
         // 获取opeId accessToken
         QC.Login.getMe(async (openId) => {
@@ -212,119 +309,143 @@ export default {
             name: info.nickname,
             imgUrl: info.figureurl_qq_2 || info.figureurl_2,
             qqOpenId: openId,
-            type: 1
-          })
+            type: 1,
+          });
 
           if (res.status === 200) {
             if (res.data._saved) {
-              this.setVisitorInfo(res.data.info)
-              this.customVisible = false
+              this.setVisitorInfo(res.data.info);
+              this.customVisible = false;
             } else {
               // 存储
               this.tempInfo = {
                 name: info.nickname,
                 imgUrl: info.figureurl_qq_2 || info.figureurl_2,
                 type: 1,
-                qqOpenId: openId
-              }
-              this.customVisible = false
-              this.perfectVisible = true
+                qqOpenId: openId,
+              };
+              this.customVisible = false;
+              this.perfectVisible = true;
             }
           }
-        })
-      })
+        });
+      });
     },
     handleGithubCb(e) {
-      if (e.data.type === 'github') {
-        console.log('github登陆成功=====>>>>', e.data.data, 'isSaved::::', e.data.data._saved)
+      if (e.data.type === "github") {
+        console.log(
+          "github登陆成功=====>>>>",
+          e.data.data,
+          "isSaved::::",
+          e.data.data._saved
+        );
         // 此用户已登陆过
         if (e.data.data._saved) {
-          delete e.data.data._saved
+          delete e.data.data._saved;
           // 初始化访客信息
-          this.setVisitorInfo(e.data.data)
-          this.customVisible = false
+          this.setVisitorInfo(e.data.data);
+          this.customVisible = false;
         } else {
-          const info = e.data.data
+          const info = e.data.data;
           this.tempInfo = {
             name: info.login,
             imgUrl: info.avatar_url,
             type: 2,
-            githubId: info.id
-          }
-          this.customVisible = false
-          this.perfectVisible = true
+            githubId: info.id,
+          };
+          this.customVisible = false;
+          this.perfectVisible = true;
         }
       }
     },
     setVisitorInfo(info) {
-      this.setVisitor(info)
-      storage.setVisitor(info)
+      this.setVisitor(info);
+      storage.setVisitor(info);
     },
     submitMessage() {
-      if (this.comment.trim() === '') {
+      if (this.comment.trim() === "") {
         this.$message({
-          type: 'warning',
-          message: 'Oops 至少得说两句~'
-        })
-        return
+          type: "warning",
+          message: "Oops 至少得说两句~",
+        });
+        return;
       }
-      this.$emit('submitContent', this.comment.trim(), () => {
-        this.comment = ''
-      })
+      this.$emit("submitContent", this.comment.trim(), () => {
+        this.comment = "";
+      });
     },
     cancelReply() {
-      this.$emit('changeCurrentReplyMessage', {})
+      this.$emit("changeCurrentReplyMessage", {});
     },
     logout() {
-      this.setVisitor({})
-      storage.removeVisitor()
+      this.setVisitor({});
+      storage.removeVisitor();
     },
     focus() {
-      if (!storage.getVisitor()) this.customVisible = true
+      if (!storage.getVisitor()) this.customVisible = true;
     },
     getEmoji(emoji) {
-      this.$refs.comment.focus()
-      this.comment += emoji
+      this.$refs.comment.focus();
+      this.comment += emoji;
+    },
+    openVcode() {
+      this.isShow = true;
     },
     sendCode() {
       if (this.formInfo.email) {
-        this.codeLoading = true
-        this.buttonName = '验证码发送中'
-        const _this = this
-        userApi.sendCode(this.formInfo).then(res => {
-          this.$message({
-            showClose: true,
-            message: '发送成功，验证码有效期5分钟',
-            type: 'success'
+        // 发送验证码时清空校验，否则校验的字会和倒计时的字重复
+        this.$refs.customForm.clearValidate('code')
+        const _this = this;
+        const param = {
+          email: this.formInfo.email,
+        };
+        loginApi
+          .sendCode(param)
+          .then((res) => {
+            this.isDisabled = true;
+            this.$message({
+              showClose: true,
+              message: "发送成功，验证码有效期5分钟",
+              type: "success",
+            });
+
+            this.codeSpanName = this.time-- + "秒后重新发送";
+            this.timer = window.setInterval(function () {
+              _this.codeSpanName = _this.time + "秒后重新发送";
+              --_this.time;
+              if (_this.time < 0) {
+                _this.codeSpanName = "";
+                _this.time = 60;
+                _this.isDisabled = false;
+                window.clearInterval(_this.timer);
+              }
+            }, 1000);
           })
-          this.codeLoading = false
-          this.isDisabled = true
-          this.buttonName = this.time-- + '秒后重新发送'
-          this.timer = window.setInterval(function() {
-            _this.buttonName = _this.time + '秒后重新发送'
-            --_this.time
-            if (_this.time < 0) {
-              _this.buttonName = '重新发送'
-              _this.time = 60
-              _this.isDisabled = false
-              window.clearInterval(_this.timer)
-            }
-          }, 1000)
-        }).catch(err => {
-          this.resetForm()
-          this.codeLoading = false
-          console.log(err)
-        })
+          .catch((err) => {
+            this.isDisabled = false;
+            this.resetForm();
+            console.log(err);
+          });
       }
     },
+    closeDialog() {
+            this.$refs['customForm'].resetFields()
+    }
+    //  createTask(cb) {
+    //   return () =>
+    //     new Promise((resolve) => {
+    //       cb(resolve)
+    //     })
+    // },
   },
   destroyed() {
-    window.removeEventListener('message', this.handleGithubCb)
-  }
-}
+    window.removeEventListener("message", this.handleGithubCb);
+    if (this.timer) clearInterval(this.timer);
+  },
+};
 </script>
 <style lang="scss">
-@import '~@/style/index.scss';
+@import "~@/style/index.scss";
 
 .submit {
   display: flex;
@@ -334,8 +455,8 @@ export default {
     height: 50px;
     border-radius: 50%;
     @include themeify() {
-      color: themed('color-avatar-icon');
-      background: themed('color-avatar-bg');
+      color: themed("color-avatar-icon");
+      background: themed("color-avatar-bg");
     }
     &-default {
       @include flex-box-center;
@@ -432,5 +553,20 @@ export default {
 }
 .visitor-submit-box {
   min-width: 340px;
+}
+.codeSpan {
+  color: #67c23a;
+  font-size: 12px;
+  line-height: 1;
+  padding-top: 4px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+}
+.el-form-item__label {
+  padding: 0 8px 0 0;
+}
+.el-input--suffix .el-input__inner {
+  padding-right: 0px;
 }
 </style>
