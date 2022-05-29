@@ -16,5 +16,5 @@ import com.myblog.service.web.entity.dto.UserDto;
  */
 public interface UserService extends IService<User>, ServiceConvertHandler<User, UserDto> {
 
-    Response login(UserDto userDto) throws Exception;
+    Response doLogin(UserDto userDto) throws Exception;
 }

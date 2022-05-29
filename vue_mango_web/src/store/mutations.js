@@ -24,6 +24,7 @@ export default {
     state.rollBack = rollBack
   },
   setVisitor(state, info) {
+    console.log("state.info", info)
     state.visitorInfo = info
   },
   setTotals(state, kv) {

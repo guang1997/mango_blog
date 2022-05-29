@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import actions from './actions'
 import mutations from './mutations'
+import { storage } from "@/utils/storage";
 
 Vue.use(Vuex)
 
@@ -10,7 +11,7 @@ const store = new Vuex.Store({
     activeCatalog: '',
     rollBack: false,
     // 访客信息
-    visitorInfo: {},
+    visitorInfo: storage.getVisitor() ? storage.getVisitor() : {},
     // 文章目录树
     catalogs: [],
     // 文章归档 按月统计

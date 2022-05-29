@@ -34,7 +34,7 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
-    @LogByMethod(value = "/web/user/sendCode")
+    @LogByMethod(value = "/web/login/sendCode")
     @ApiOperation(value = "发送验证码", notes = "发送验证码", response = Response.class)
     @PostMapping("/sendCode")
     public Response sendCode(@RequestBody UserDto userDto) {
@@ -45,14 +45,14 @@ public class LoginController {
         return verificationCodeService.sendCode(userDto.getEmail(), Constants.EmailSource.WEB);
     }
 
-    @LogByMethod(value = "/web/user/login")
+    @LogByMethod(value = "/web/login/doLogin")
     @ApiOperation(value = "保存用户", notes = "保存用户", response = Response.class)
-    @PostMapping("/login")
-    public Response login(@RequestBody UserDto userDto) throws Exception {
+    @PostMapping("/doLogin")
+    public Response doLogin(@RequestBody UserDto userDto) throws Exception {
         // 校验验证码
         if (!verificationCodeService.validateCode(userDto.getEmail(), userDto.getCode(), Constants.EmailSource.WEB).getSuccess()) {
             return Response.error().message("验证码错误");
         }
-        return userService.login(userDto);
+        return userService.doLogin(userDto);
     }
 }

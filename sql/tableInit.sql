@@ -554,7 +554,7 @@ DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE IF NOT EXISTS `t_user` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名',
-  `password` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '密码',
+  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '密码',
   `gender` tinyint unsigned DEFAULT NULL COMMENT '性别(1:男2:女)',
   `avatar` varchar(225) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '个人头像',
   `birthday` date DEFAULT NULL COMMENT '出生年月日',
@@ -566,7 +566,7 @@ CREATE TABLE IF NOT EXISTS `t_user` (
   `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '状态：0-禁用; 1-激活',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
-  `nick_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '昵称',
+  `nickname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '昵称',
   `qq_number` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'QQ号',
   `we_chat` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '微信号',
   `comment_status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '评论状态 1:正常 0:禁言',
@@ -578,6 +578,8 @@ CREATE TABLE IF NOT EXISTS `t_user` (
 -- 正在导出表  mango_blog.t_user 的数据：~0 rows (大约)
 DELETE FROM `t_user`;
 /*!40000 ALTER TABLE `t_user` DISABLE KEYS */;
+INSERT INTO `t_user` (`id`, `username`, `password`, `gender`, `avatar`, `birthday`, `email`, `mobile`, `login_count`, `last_login_time`, `last_login_ip`, `status`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `comment_status`, `user_tag`) VALUES
+	('1530907221067931649', '李斯特123', '$2a$10$mRyGRbLPkiAblV11ATLGDu5sIG5w9.t2uUlSMI2hWvTEKgfHxI9Le', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', NULL, '872174823@qq.com', NULL, 6, NULL, '127.0.0.1', 1, '2022-05-29 21:41:39', '2022-05-29 22:42:58', '李斯特123', NULL, NULL, 1, 0);
 /*!40000 ALTER TABLE `t_user` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_web_config 结构

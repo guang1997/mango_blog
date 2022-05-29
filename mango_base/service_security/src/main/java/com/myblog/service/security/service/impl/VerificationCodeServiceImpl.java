@@ -70,7 +70,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         // 发送验证码
         QueryWrapper<EmailConfig> emailConfigQueryWrapper = new QueryWrapper<>();
         emailConfigQueryWrapper.eq(DbConstants.EmailConfig.SOURCE, source);
-        EmailConfig emailConfig = emailConfigService.getOne(null);
+        EmailConfig emailConfig = emailConfigService.getOne(emailConfigQueryWrapper);
         if (Objects.isNull(emailConfig)) {
             return Response.error().message("发送邮件失败，请联系管理员配置邮箱");
         }
@@ -118,7 +118,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
             LOGGER.debug("validateCode, redisCode:[{}] is not equals code:[{}]", redisCode, code);
             return Response.setResult(ResultCodeEnum.CODE_ERROR);
         }
-        redisUtil.delete(key);
+        // 校验完不删除验证码，5分钟后自动删除
         return Response.ok();
     }
 }

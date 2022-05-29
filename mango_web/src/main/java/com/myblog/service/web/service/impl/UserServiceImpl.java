@@ -45,18 +45,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return
      */
     @Override
-    public Response login(UserDto userDto) throws Exception {
+    public Response doLogin(UserDto userDto) throws Exception {
         Response response = Response.ok();
         userDto.setUsername(userDto.getNickname());
-        String username = userDto.getUsername();
         // 根据用户名查询是否存在该用户，暂时不校验密码
         QueryWrapper<User> userWrapper = new QueryWrapper<>();
-        userWrapper.eq(DbConstants.User.USERNAME, username);
+
         userWrapper.eq(DbConstants.User.EMAIL, userDto.getEmail());
         userWrapper.eq(DbConstants.User.STATUS, Constants.CommonStatus.ENABLED);
         User dbUser = baseMapper.selectOne(userWrapper);
         if (Objects.nonNull(dbUser)) {
             dbUser.setLoginCount(dbUser.getLoginCount() + 1);
+            dbUser.setUsername(userDto.getUsername());
+            dbUser.setNickname(userDto.getNickname());
             baseMapper.updateById(dbUser);
             response.data(Constants.ReplyField.DATA, dbUser);
             return response;
@@ -71,6 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             LOGGER.error("login failed by insert user:{} to db", user);
             return Response.error();
         }
+        dbUser = baseMapper.selectOne(userWrapper);
         response.data(Constants.ReplyField.DATA, dbUser);
         return response;
     }

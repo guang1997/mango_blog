@@ -3,14 +3,14 @@
     <div class="submit__avatar">
       <div class="submit__avatar-default">
         <img
-          v-show="!!visitorInfo.imgUrl"
-          :src="visitorInfo.imgUrl"
-          :title="visitorInfo.name"
+          v-show="!!visitorInfo.avatar"
+          :src="visitorInfo.avatar"
+          :title="visitorInfo.nickname"
         />
         <i
-          v-show="!visitorInfo.imgUrl"
+          v-show="!visitorInfo.avatar"
           class="el-icon-user"
-          :title="visitorInfo.name"
+          :title="visitorInfo.nickname"
         ></i>
       </div>
       <div class="submit__avatar-rel"></div>
@@ -36,8 +36,8 @@
           <div class="submit__emoji">
             <emoji @getEmoji="getEmoji"></emoji>
           </div>
-          <div class="submit__userTag" v-show="visitorInfo.name">
-            <span>欢迎，{{ visitorInfo.name }}</span>
+          <div class="submit__userTag" v-show="visitorInfo.nickname">
+            <span>欢迎，{{ visitorInfo.nickname }}</span>
             <i class="el-icon-circle-close" title="退出" @click="logout"></i>
           </div>
         </div>
@@ -51,7 +51,7 @@
           >
           <el-button
             size="medium"
-            :disabled="!visitorInfo._id"
+            :disabled="!visitorInfo.id"
             @click="submitMessage"
             >提交</el-button
           >
@@ -72,9 +72,9 @@
           :rules="submitRules"
           ref="customForm"
         >
-          <el-form-item label="昵称" prop="nickName">
+          <el-form-item label="昵称" prop="nickname">
             <el-input
-              v-model="formInfo.nickName"
+              v-model="formInfo.nickname"
               placeholder="请输入昵称"
               clearable
             ></el-input>
@@ -107,15 +107,16 @@
                   :disabled="isDisabled"
                   size="small"
                   @click="openVcode"
+                  :loading="codeLoading"
                 >
-                  获取验证码
+                  {{ codeButtonName }}
                 </el-button>
               </el-col>
             </el-row>
           </el-form-item>
         </el-form>
         <div class="submit__register">
-          <el-button size="small" type="primary" @click="submit"
+          <el-button size="small" type="primary" @click="submit" :loading="submitLoading"
             >登陆</el-button
           >
         </div>
@@ -181,7 +182,7 @@ export default {
       customVisible: false,
       perfectVisible: false,
       formInfo: {
-        nickName: "",
+        nickname: "",
         email: "",
         code: "",
       },
@@ -191,7 +192,7 @@ export default {
       },
       tempInfo: {},
       submitRules: {
-        nickName: [{ required: true, validator: nameValidator, trigger: "blur" }],
+        nickname: [{ required: true, validator: nameValidator, trigger: "blur" }],
         email: [
           {
             type: "email",
@@ -206,14 +207,26 @@ export default {
       isDisabled: false,
       time: 60,
       isShow: false,
+      codeLoading: false,
+      codeButtonName: '获取验证码',
+      submitLoading: false
     };
   },
   mounted() {
     this.handleQQCb();
     this.addMessageListener();
+    // console.log('this.visitorInfo', JSON.parse(JSON.stringify(this.visitorInfo)))
+    // console.log('this.$state.visitorInfo', this.$store.state.visitorInfo)
+  },
+  created() {
+      console.log(JSON.stringify(this.$store.state.visitorInfo))
+      console.log(this.$store.state)
   },
   computed: {
     ...mapState(["visitorInfo"]),
+    // visitorInfo () {
+    //   return this.$store.state.visitorInfo
+    // },
     computCodeClass() {
       if (this.isDisabled) {
         return "codeSpan";
@@ -230,6 +243,8 @@ export default {
     // 用户通过了验证
     success(msg) {
       this.isShow = false; // 通过验证后，需要手动隐藏模态框
+      this.codeLoading = true;
+      this.codeButtonName = ' 获取中';
       this.sendCode()
     },
     // 用户点击遮罩层，应该关闭模态框
@@ -259,21 +274,25 @@ export default {
     },
     submit() {
       this.$refs.customForm.validate(async (valid) => {
+        this.submitLoading = true;
         if (valid) {
-          const res = await this.loginApi.saveVisitor({
-            ...this.formInfo,
-            imgUrl: "/img/avatar/avatar.jpeg"
+          const res = await loginApi.doLogin({
+            email: this.formInfo.email,
+            nickname: this.formInfo.nickname,
+            code: this.formInfo.code,
+            avatar: "https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg"
           });
 
           if (res.code === 20000) {
             this.setVisitorInfo(res.data.data);
             this.customVisible = false;
             this.formInfo = {
-              nickName: "",
+              nickname: "",
               email: "",
               code: "",
             };
           }
+          this.submitLoading = false;
         }
       });
     },
@@ -378,8 +397,16 @@ export default {
       this.$emit("changeCurrentReplyMessage", {});
     },
     logout() {
-      this.setVisitor({});
-      storage.removeVisitor();
+       this.$confirm(`确定退出账号吗?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.setVisitor({});
+        storage.removeVisitor();
+      }).catch(() => {
+      })
+      
     },
     focus() {
       if (!storage.getVisitor()) this.customVisible = true;
@@ -408,7 +435,8 @@ export default {
               message: "发送成功，验证码有效期5分钟",
               type: "success",
             });
-
+            this.codeLoading = false;
+            this.codeButtonName = '获取验证码';
             this.codeSpanName = this.time-- + "秒后重新发送";
             this.timer = window.setInterval(function () {
               _this.codeSpanName = _this.time + "秒后重新发送";
@@ -423,20 +451,15 @@ export default {
           })
           .catch((err) => {
             this.isDisabled = false;
-            this.resetForm();
+            this.codeLoading = false;
+            this.codeButtonName = '获取验证码';
             console.log(err);
           });
       }
     },
     closeDialog() {
-            this.$refs['customForm'].resetFields()
+       this.$refs['customForm'].resetFields()
     }
-    //  createTask(cb) {
-    //   return () =>
-    //     new Promise((resolve) => {
-    //       cb(resolve)
-    //     })
-    // },
   },
   destroyed() {
     window.removeEventListener("message", this.handleGithubCb);

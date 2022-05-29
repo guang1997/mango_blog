@@ -4,7 +4,7 @@
  */
 
 // 访客信息key
-const visitorKey = 'v_k_i'
+const visitorKey = 'mango_blog_visitor_key'
 
 export const storage = {
   getVisitor() {
