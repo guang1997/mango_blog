@@ -1,7 +1,3 @@
-<doc>
-  @desc:   留言、文章评论展示
-  @author: justJokee
-</doc>
 <template>
   <div class="comments">
     <div class="comments__top" v-for="(msg, index) in messages" :key="index">

@@ -17,8 +17,8 @@
     </div>
     <div class="submit__content">
       <div class="submit__input">
-        <span v-if="currentReplyMessage.name" class="reply-name"
-          >回复 {{ currentReplyMessage.name }} :</span
+        <span v-if="currentReplyMessage.nickname" class="reply-name"
+          >回复 {{ currentReplyMessage.nickname }} :</span
         >
         <el-input
           ref="comment"
@@ -44,7 +44,7 @@
 
         <div class="submit__btn">
           <el-button
-            v-if="currentReplyMessage._id"
+            v-if="currentReplyMessage.id"
             size="medium"
             @click="cancelReply"
             >取消</el-button
@@ -215,18 +215,9 @@ export default {
   mounted() {
     this.handleQQCb();
     this.addMessageListener();
-    // console.log('this.visitorInfo', JSON.parse(JSON.stringify(this.visitorInfo)))
-    // console.log('this.$state.visitorInfo', this.$store.state.visitorInfo)
-  },
-  created() {
-      console.log(JSON.stringify(this.$store.state.visitorInfo))
-      console.log(this.$store.state)
   },
   computed: {
     ...mapState(["visitorInfo"]),
-    // visitorInfo () {
-    //   return this.$store.state.visitorInfo
-    // },
     computCodeClass() {
       if (this.isDisabled) {
         return "codeSpan";
@@ -293,26 +284,6 @@ export default {
             };
           }
           this.submitLoading = false;
-        }
-      });
-    },
-    submitPerfect() {
-      this.$refs.perfectForm.validate(async (valid) => {
-        if (valid) {
-          const res = await this.$api.saveVisitor({
-            ...this.tempInfo,
-            ...this.perfect,
-            date: new Date(),
-          });
-          if (res.status === 200) {
-            this.setVisitorInfo(res.data);
-            this.perfect = {
-              email: "",
-              link: "",
-            };
-            this.tempInfo = {};
-            this.perfectVisible = false;
-          }
         }
       });
     },

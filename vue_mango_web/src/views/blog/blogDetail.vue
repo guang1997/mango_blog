@@ -82,10 +82,10 @@
         </div>
         <div class="comment__page" v-if="total">
           <el-pagination
-            :current-page.sync="currentPage"
+            :current-page.sync="page"
             :total="total"
             layout="prev, pager, next"
-            :page-size="pageSize"
+            :page-size="size"
             @current-change="currentChange"
           ></el-pagination>
         </div>
@@ -124,8 +124,8 @@ export default {
   // 动态属性
   data() {
     return {
-      currentPage: 1,
-      pageSize: 10,
+      page: 1,
+      size: 10,
       total: 0,
       blog: {},
       comments: [],
@@ -183,19 +183,12 @@ export default {
       userId: localStorage.getItem("mangoBlogBrowserFinger"),
       screenInformation: JSON.parse(localStorage.getItem("mangoBlogScreenInformation")),
     });
-
-    // const commentRes = await commentApi.getBlogComments({
-    //   page: 1,
-    //   limit: 10,
-    //   articleId: route.params.id,
-    //   _ip
-    // })
     if (res.code === 20000) {
       if (!isServer) setTimeout(() => jumpAnchor(route), 0);
       return {
         blog: res.data.data,
         comments: res.data.data.comments,
-        total: res.total,
+        total: res.data.data.comments.length,
       };
     }
   },
@@ -295,39 +288,38 @@ export default {
         aite = currentReplyComment.name;
       }
       const res = await blogApi.saveArticleComment({
-        articleId: this.$route.params.id,
-        name: this.visitorInfo.name,
-        imgUrl: this.visitorInfo.imgUrl,
-        email: this.visitorInfo.email,
-        link: this.visitorInfo.link,
+        blogId: this.$route.params.id,
+        nickname: this.visitorInfo.nickname,
+        avatar: this.visitorInfo.avatar,
         content: content,
         parentId,
-        aite,
+        source: 'BLOG_INFO_MESSAGE',
+
       });
-      if (res.status === 200) {
+      if (res.code === 20000) {
         if (cb) cb();
         this.$message({
           type: "success",
           message: "评论成功",
         });
-        // this.getArticleComments()
+        this.getBlogComments()
       }
     },
     async currentChange(val) {
-      this.currentPage = val;
-      this.getArticleComments();
+      this.page = val;
+      this.getBlogComments();
     },
-    // async getArticleComments() {
-    //   const commentRes = await blogApi.getArticleComments({
-    //     page: this.currentPage,
-    //     limit: this.limit,
-    //     articleId: this.$route.params.id
-    //   })
-    //   if (commentRes.status === 200) {
-    //     this.total = commentRes.total
-    //     this.comments = commentRes.data
-    //   }
-    // },
+    async getBlogComments() {
+      const commentRes = await commentApi.getBlogComments({
+        page: this.page,
+        size: this.size,
+        blogId: this.$route.params.id
+      })
+      if (commentRes.code === 20000) {
+        this.total = commentRes.total
+        this.comments = commentRes.data.data
+      }
+    },
     collectTitles() {
       const selectors = ["h1", "h2", "h3", "h4", "h5", "h6"]
         .map((et) => ".article-detail__body " + et)
