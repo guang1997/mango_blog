@@ -88,7 +88,7 @@
           </el-form-item>
           <el-form-item label="验证码" prop="code">
             <el-row>
-              <el-col :xs="14" :sm="14" :lg="15">
+              <el-col :xs="14" :sm="14" :lg="18">
                 <el-input
                   style="vertical-align: middle; box-sizing: content-box"
                   v-model="formInfo.code"
@@ -97,7 +97,7 @@
                 />
                 <span :class="computCodeClass">{{ codeSpanName }}</span>
               </el-col>
-              <el-col :xs="10" :sm="10" :lg="9">
+              <el-col :xs="10" :sm="10" :lg="6">
                 <el-button
                   style="
                     height: 20px;
