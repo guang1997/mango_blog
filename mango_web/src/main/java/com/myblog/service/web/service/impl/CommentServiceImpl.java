@@ -3,10 +3,8 @@ package com.myblog.service.web.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.myblog.service.base.common.CommentSourceEnum;
-import com.myblog.service.base.common.Constants;
-import com.myblog.service.base.common.DbConstants;
-import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.*;
+import com.myblog.service.base.util.BaseUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.MD5Utils;
 import com.myblog.service.web.entity.Comment;
@@ -15,9 +13,8 @@ import com.myblog.service.web.mapper.BlogMapper;
 import com.myblog.service.web.mapper.CommentMapper;
 import com.myblog.service.web.service.CommentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myblog.service.web.util.CommentTreeUtil;
 import com.myblog.service.web.util.UniqueKeyUtil;
-import eu.bitwalker.useragentutils.OperatingSystem;
-import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -59,11 +52,33 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
         Page<Comment> commentPage = new Page<>(page, size);
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(commentDto.getBlogId())) {
+            queryWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+        }
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.MESSAGE);
+        queryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommonStatus.ENABLED);
         baseMapper.selectPage(commentPage, queryWrapper);
+        List<CommentDto> commentDtos = this.toDtoList(commentPage.getRecords(), CommentDto.class);
+        // 查询子评论
+        if (Objects.nonNull(commentDto.getQueryChildren()) && commentDto.getQueryChildren()) {
+            QueryWrapper<Comment> childrenQueryWrapper = new QueryWrapper<>();
+            childrenQueryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
+            childrenQueryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.MESSAGE);
+            childrenQueryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommonStatus.ENABLED);
+            if (StringUtils.isNotBlank(commentDto.getBlogId())) {
+                // 博客详情页面
+                childrenQueryWrapper.eq(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_MESSAGE);
+                childrenQueryWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+            } else {
+                // 留言板
+            }
+            commentDtos.addAll(this.toDtoList(baseMapper.selectList(childrenQueryWrapper), CommentDto.class));
+            commentDtos = commentDtos.stream().filter(BaseUtil.distinctByKey(CommentDto::getId)).collect(Collectors.toList());
+            commentDtos = CommentTreeUtil.toCommentTree(commentDtos, "0");
+        }
 
-        response.data(Constants.ReplyField.DATA, this.toDtoList(commentPage.getRecords(), CommentDto.class));
+        response.data(Constants.ReplyField.DATA, commentDtos);
         response.data(Constants.ReplyField.TOTAL, commentPage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);
         response.data(Constants.ReplyField.SIZE, size);
@@ -127,5 +142,22 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         }
         response.setMessage(successMsg);
         return response;
+    }
+
+    /**
+     * 保存评论
+     *
+     * @param commentDto
+     * @return
+     */
+    @Override
+    public Response saveComment(CommentDto commentDto, HttpServletRequest request) throws Exception {
+        Comment comment = this.toDb(commentDto, Comment.class);
+        comment.setIp(IpUtils.getIpAddr(request));
+        if (baseMapper.insert(comment) < 1) {
+            LOGGER.error("likeBlog failed by unknowen error, comment:{}", comment);
+            return Response.setResult(ResultCodeEnum.COMMENT_FAILED);
+        }
+        return Response.ok();
     }
 }

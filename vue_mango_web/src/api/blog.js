@@ -35,6 +35,6 @@ export function getBlogByPage(data) {
       data
     })
   }
-  
+
   
   export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId, getPrevNextBlog }

@@ -40,4 +40,11 @@ public class CommentDto extends BaseDto {
     private Integer likeCount;
 
     private UniqueKeyDto screenInformation;
+
+    /**
+     * 被评论人昵称
+     */
+    private String answerNickname;
+
+    private Boolean queryChildren;
 }

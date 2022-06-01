@@ -29,6 +29,7 @@ public enum ResultCodeEnum {
     UPDATE_FAILED_BY_WE_CHAT_EXIST(false, 23015, "更新失败，微信号已存在"),
     UPDATE_FAILED_BY_PHONE_EXIST(false, 23016, "更新失败，手机号已存在"),
     SEND_CODE_FAILED(false, 23017, "发送验证码失败"),
+    COMMENT_FAILED(false, 23018, "评论失败"),
 //    SAVE_TAG_FAILED(false, 200010, "保存失败，已经存在对应标签"),
 //    SAVE_TYPE_FAILED(false, 200011, "保存失败，已经存在对应类型"),
 //

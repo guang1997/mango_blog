@@ -63,7 +63,7 @@
       :visible.sync="customVisible"
       width="30%"
       custom-class="visitor-submit-box"
-      @close='closeDialog'
+      @close="closeDialog"
     >
       <div class="submit__login">
         <el-form
@@ -87,36 +87,39 @@
             ></el-input>
           </el-form-item>
           <el-form-item label="验证码" prop="code">
-            <el-row>
-              <el-col :xs="14" :sm="14" :lg="18">
-                <el-input
-                  style="vertical-align: middle; box-sizing: content-box"
-                  v-model="formInfo.code"
-                  placeholder="请输入验证码"
-                  clearable
-                />
-                <span :class="computCodeClass">{{ codeSpanName }}</span>
-              </el-col>
-              <el-col :xs="10" :sm="10" :lg="6">
-                <el-button
-                  style="
-                    height: 20px;
-                    vertical-align: middle;
-                    box-sizing: content-box;
-                  "
-                  :disabled="isDisabled"
-                  size="small"
-                  @click="openVcode"
-                  :loading="codeLoading"
-                >
-                  {{ codeButtonName }}
-                </el-button>
-              </el-col>
-            </el-row>
+            <div style="display: flex">
+              <el-input
+                style="
+                  vertical-align: middle;
+                  box-sizing: content-box;
+                  width: 100%;
+                "
+                v-model="formInfo.code"
+                placeholder="请输入验证码"
+                clearable
+              />
+              <el-button
+                style="
+                  height: 20px;
+                  vertical-align: middle;
+                  box-sizing: content-box;
+                "
+                :disabled="isDisabled"
+                size="small"
+                @click="openVcode"
+                :loading="codeLoading"
+              >
+                {{ codeButtonName }}
+              </el-button>
+            </div>
           </el-form-item>
         </el-form>
         <div class="submit__register">
-          <el-button size="small" type="primary" @click="submit" :loading="submitLoading"
+          <el-button
+            size="small"
+            type="primary"
+            @click="doLogin"
+            :loading="submitLoading"
             >登陆</el-button
           >
         </div>
@@ -192,7 +195,9 @@ export default {
       },
       tempInfo: {},
       submitRules: {
-        nickname: [{ required: true, validator: nameValidator, trigger: "blur" }],
+        nickname: [
+          { required: true, validator: nameValidator, trigger: "blur" },
+        ],
         email: [
           {
             type: "email",
@@ -203,13 +208,12 @@ export default {
         ],
         code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
       },
-      codeSpanName: "",
       isDisabled: false,
       time: 60,
       isShow: false,
       codeLoading: false,
-      codeButtonName: '获取验证码',
-      submitLoading: false
+      codeButtonName: "获取验证码",
+      submitLoading: false,
     };
   },
   mounted() {
@@ -218,13 +222,6 @@ export default {
   },
   computed: {
     ...mapState(["visitorInfo"]),
-    computCodeClass() {
-      if (this.isDisabled) {
-        return "codeSpan";
-      } else {
-        return "el-form-item__error";
-      }
-    },
   },
   methods: {
     ...mapMutations(["setVisitor"]),
@@ -234,9 +231,16 @@ export default {
     // 用户通过了验证
     success(msg) {
       this.isShow = false; // 通过验证后，需要手动隐藏模态框
-      this.codeLoading = true;
-      this.codeButtonName = ' 获取中';
-      this.sendCode()
+      if (this.formInfo.email) {
+        this.buttonName = "验证码发送中";
+        this.codeLoading = true;
+        this.sendCode();
+      } else {
+        this.$message({
+          type: "warning",
+          message: "请填写正确的邮箱~",
+        });
+      }
     },
     // 用户点击遮罩层，应该关闭模态框
     close() {
@@ -263,7 +267,7 @@ export default {
         redirectURI: "http://mapblog.cn/qc_back.html",
       });
     },
-    submit() {
+    doLogin() {
       this.$refs.customForm.validate(async (valid) => {
         this.submitLoading = true;
         if (valid) {
@@ -271,7 +275,8 @@ export default {
             email: this.formInfo.email,
             nickname: this.formInfo.nickname,
             code: this.formInfo.code,
-            avatar: "https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg"
+            avatar:
+              "https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg",
           });
 
           if (res.code === 20000) {
@@ -368,16 +373,16 @@ export default {
       this.$emit("changeCurrentReplyMessage", {});
     },
     logout() {
-       this.$confirm(`确定退出账号吗?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.setVisitor({});
-        storage.removeVisitor();
-      }).catch(() => {
+      this.$confirm(`确定退出账号吗?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
-      
+        .then(() => {
+          this.setVisitor({});
+          storage.removeVisitor();
+        })
+        .catch(() => {});
     },
     focus() {
       if (!storage.getVisitor()) this.customVisible = true;
@@ -390,47 +395,45 @@ export default {
       this.isShow = true;
     },
     sendCode() {
-      if (this.formInfo.email) {
-        // 发送验证码时清空校验，否则校验的字会和倒计时的字重复
-        this.$refs.customForm.clearValidate('code')
-        const _this = this;
-        const param = {
-          email: this.formInfo.email,
-        };
-        loginApi
-          .sendCode(param)
-          .then((res) => {
-            this.isDisabled = true;
-            this.$message({
-              showClose: true,
-              message: "发送成功，验证码有效期5分钟",
-              type: "success",
-            });
-            this.codeLoading = false;
-            this.codeButtonName = '获取验证码';
-            this.codeSpanName = this.time-- + "秒后重新发送";
-            this.timer = window.setInterval(function () {
-              _this.codeSpanName = _this.time + "秒后重新发送";
-              --_this.time;
-              if (_this.time < 0) {
-                _this.codeSpanName = "";
-                _this.time = 60;
-                _this.isDisabled = false;
-                window.clearInterval(_this.timer);
-              }
-            }, 1000);
-          })
-          .catch((err) => {
-            this.isDisabled = false;
-            this.codeLoading = false;
-            this.codeButtonName = '获取验证码';
-            console.log(err);
+      // if (this.formInfo.email) {
+      this.buttonName = "验证码发送中";
+      const _this = this;
+      const param = {
+        email: this.formInfo.email,
+      };
+      loginApi
+        .sendCode(param)
+        .then((res) => {
+          this.isDisabled = true;
+          this.$message({
+            showClose: true,
+            message: "发送成功，验证码有效期5分钟",
+            type: "success",
           });
-      }
+          this.codeLoading = false;
+          this.codeButtonName = "获取验证码";
+          this.codeButtonName = this.time-- + "秒后重新发送";
+          this.timer = window.setInterval(function () {
+            _this.codeButtonName = _this.time + "秒后重新发送";
+            --_this.time;
+            if (_this.time < 0) {
+              _this.codeButtonName = "重新发送";
+              _this.time = 60;
+              _this.isDisabled = false;
+              window.clearInterval(_this.timer);
+            }
+          }, 1000);
+        })
+        .catch((err) => {
+          this.isDisabled = false;
+          this.codeLoading = false;
+          console.log(err);
+        });
+      // }
     },
     closeDialog() {
-       this.$refs['customForm'].resetFields()
-    }
+      this.$refs["customForm"].resetFields();
+    },
   },
   destroyed() {
     window.removeEventListener("message", this.handleGithubCb);

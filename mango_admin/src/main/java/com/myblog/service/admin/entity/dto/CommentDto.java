@@ -21,7 +21,7 @@ public class CommentDto extends BaseDto {
     /**
      * 被评论人昵称
      */
-    private String toNickname;
+    private String answerNickname;
 
     private String content;
 

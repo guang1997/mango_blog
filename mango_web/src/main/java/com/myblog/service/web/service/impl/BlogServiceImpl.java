@@ -220,7 +220,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         dto.setId(db.getId());
         dto.setCreateTime(db.getCreateTime());
         dto.setUpdateTime(db.getUpdateTime());
-        dto.setComments(getBlogComments(db.getId()));
+//        dto.setComments(getBlogComments(db.getId()));
     }
 
     private List<Comment> getBlogComments(String id) {

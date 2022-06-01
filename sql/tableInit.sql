@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS `t_comment` (
   `unique_key` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '唯一标识，如果用户id不同，ip相同，则判断此字段',
   `avatar` varchar(225) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户头像',
   `nickname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户昵称',
+  `answer_nickname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '被评论用户昵称',
   `content` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '评论内容',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
@@ -128,9 +129,22 @@ CREATE TABLE IF NOT EXISTS `t_comment` (
 -- 正在导出表  mango_blog.t_comment 的数据：~2 rows (大约)
 DELETE FROM `t_comment`;
 /*!40000 ALTER TABLE `t_comment` DISABLE KEYS */;
-INSERT INTO `t_comment` (`id`, `parent_id`, `user_id`, `ip`, `unique_key`, `avatar`, `nickname`, `content`, `create_time`, `update_time`, `source`, `type`, `blog_id`, `status`) VALUES
-	('1529827769391112193', '0', 'b1bd7743106c5abba2c10a5b5c53e2e8', '192.168.1.7', '15a9a9470ed27a119ee83da5b79d90ab', NULL, NULL, 'true', '2022-05-26 22:12:18', '2022-05-28 17:47:48', 'BLOG_INFO_LIKES', 1, '1528008410976800770', 1),
-	('1530014642556301313', '0', '1f64137dd82160a8de6284e3958c1543', '192.168.14.49', '4267f9cf6169ea4df54c99b1b4fa6708', NULL, NULL, 'false', '2022-05-27 10:34:52', '2022-05-27 10:35:09', 'BLOG_INFO_LIKES', 1, '1528008410976800770', 1);
+INSERT INTO `t_comment` (`id`, `parent_id`, `user_id`, `ip`, `unique_key`, `avatar`, `nickname`, `answer_nickname`, `content`, `create_time`, `update_time`, `source`, `type`, `blog_id`, `status`) VALUES
+	('1529827769391112193', '0', '1530907221067931649', '192.168.1.7', '15a9a9470ed27a119ee83da5b79d90ab', 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'true', '2022-05-26 22:12:18', '2022-06-01 22:33:02', 'BLOG_INFO_LIKES', 1, '1528008410976800770', 1),
+	('1530014642556301313', '0', '1f64137dd82160a8de6284e3958c1543', '192.168.14.49', '4267f9cf6169ea4df54c99b1b4fa6708', NULL, NULL, NULL, 'false', '2022-05-27 10:34:52', '2022-05-27 10:35:09', 'BLOG_INFO_LIKES', 1, '1528008410976800770', 1),
+	('1531973248526622722', '0', '1530907221067931649', NULL, NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '测试评论', '2022-06-01 20:17:40', '2022-06-01 20:17:40', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1531973770071547906', '0', '1530907221067931649', NULL, NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '测试评论2', '2022-06-01 20:19:44', '2022-06-01 20:19:44', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1531975753427861505', '0', '1530907221067931649', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '测试3', '2022-06-01 20:27:37', '2022-06-01 20:27:37', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1531995466149236737', '1531975753427861505', '1530907221067931649', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', '李斯特123', '回复一级评论', '2022-06-01 21:45:57', '2022-06-01 21:45:57', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1531995993096425474', '1531975753427861505', '1530907221067931649', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', '李斯特123', '再次回复一级评论', '2022-06-01 21:48:03', '2022-06-01 21:48:03', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1531996056149397506', '1531975753427861505', '1530907221067931649', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', '李斯特123', '回复二级评论', '2022-06-01 21:48:18', '2022-06-01 21:48:18', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1531998598052810754', '1531975753427861505', '1531998551454093313', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '测试123', '李斯特123', '回复李斯特', '2022-06-01 21:58:24', '2022-06-01 21:58:24', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1532000804827140097', '1531975753427861505', '1531998551454093313', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '测试123', '李斯特123', '回复', '2022-06-01 22:07:10', '2022-06-01 22:07:10', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1532001695563091969', '0', '1531998551454093313', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '测试123', NULL, '测试回复功能', '2022-06-01 22:10:42', '2022-06-01 22:10:42', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1532002447207534594', '1532001695563091969', '1531998551454093313', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '测试123', '测试123', '测试一级回复', '2022-06-01 22:13:41', '2022-06-01 22:13:41', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1532002484977242113', '1532001695563091969', '1531998551454093313', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '测试123', '测试123', '测试二级回复', '2022-06-01 22:13:50', '2022-06-01 22:13:50', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1532002522977636354', '1532001695563091969', '1531998551454093313', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '测试123', '测试123', '测试三级回复', '2022-06-01 22:13:59', '2022-06-01 22:13:59', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1),
+	('1532002579110006785', '1532001695563091969', '1531998551454093313', '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '测试123', '测试123', '测试二级回复的回复', '2022-06-01 22:14:13', '2022-06-01 22:14:13', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1);
 /*!40000 ALTER TABLE `t_comment` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_dict 结构
@@ -579,7 +593,8 @@ CREATE TABLE IF NOT EXISTS `t_user` (
 DELETE FROM `t_user`;
 /*!40000 ALTER TABLE `t_user` DISABLE KEYS */;
 INSERT INTO `t_user` (`id`, `username`, `password`, `gender`, `avatar`, `birthday`, `email`, `mobile`, `login_count`, `last_login_time`, `last_login_ip`, `status`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `comment_status`, `user_tag`) VALUES
-	('1530907221067931649', '李斯特123', '$2a$10$mRyGRbLPkiAblV11ATLGDu5sIG5w9.t2uUlSMI2hWvTEKgfHxI9Le', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', NULL, '872174823@qq.com', NULL, 6, NULL, '127.0.0.1', 1, '2022-05-29 21:41:39', '2022-05-29 22:42:58', '李斯特123', NULL, NULL, 1, 0);
+	('1530907221067931649', '李斯特123', '$2a$10$mRyGRbLPkiAblV11ATLGDu5sIG5w9.t2uUlSMI2hWvTEKgfHxI9Le', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', NULL, '872174823@qq.com', NULL, 11, NULL, '127.0.0.1', 1, '2022-05-29 21:41:39', '2022-06-01 22:32:30', '李斯特123', NULL, NULL, 1, 0),
+	('1531998551454093313', '测试123', '$2a$10$2NllPZWFJv5Gmk.57YhdpOT3Bs0OyIwV0Rl/.QWotW87WTC1v/2s.', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', NULL, 'guang1997qqq@163.com', NULL, 1, NULL, '127.0.0.1', 1, '2022-06-01 21:58:12', '2022-06-01 21:58:12', '测试123', NULL, NULL, 1, 0);
 /*!40000 ALTER TABLE `t_user` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_web_config 结构

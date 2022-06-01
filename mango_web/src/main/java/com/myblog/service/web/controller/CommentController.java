@@ -35,6 +35,7 @@ public class CommentController {
     public Response getCommentByPage(@RequestBody CommentDto commentDto) throws Exception {
         return commentService.getCommentByPage(commentDto);
     }
+
     @LogByMethod("/web/comment/likeBlog")
     @ApiOperation(value = "给博客点赞", notes = "给博客点赞", response = Response.class)
     @PostMapping("/likeBlog")
@@ -42,5 +43,11 @@ public class CommentController {
         return commentService.likeBlog(commentDto, request);
     }
 
+    @LogByMethod("/web/comment/saveComment")
+    @ApiOperation(value = "保存评论", notes = "保存评论", response = Response.class)
+    @PostMapping("/saveComment")
+    public Response saveComment(@RequestBody CommentDto commentDto, HttpServletRequest request) throws Exception {
+        return commentService.saveComment(commentDto, request);
+    }
 }
 

@@ -74,26 +74,26 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
         List<CommentDto> commentDtos = this.toDtoList(commentPage.getRecords(), CommentDto.class);
         // 设置被评论人
-        for (CommentDto dbCommentDto : commentDtos) {
-            if (Objects.equals(dbCommentDto.getParentId(), "0")) {
-                continue;
-            }
-            CommentDto parentDto = commentDtos.stream()
-                    .filter(dto -> Objects.equals(dto.getId(), dbCommentDto.getParentId()))
-                    .findAny().orElse(null);
-            // 如果分页查回来的数据中没有被评论人，那么再去数据库查
-            if (Objects.nonNull(parentDto)) {
-                dbCommentDto.setToNickname(parentDto.getNickname());
-            } else {
-                QueryWrapper<Comment> parentQueryWrapper = new QueryWrapper<>();
-                parentQueryWrapper.eq(DbConstants.Comment.PARENT_ID, dbCommentDto.getParentId());
-                parentQueryWrapper.eq(DbConstants.Comment.STATUS, 1);
-                List<Comment> comments = baseMapper.selectList(parentQueryWrapper);
-                if (!CollectionUtils.isEmpty(comments)) {
-                    dbCommentDto.setToNickname(comments.get(0).getNickname());
-                }
-            }
-        }
+//        for (CommentDto dbCommentDto : commentDtos) {
+//            if (Objects.equals(dbCommentDto.getParentId(), "0")) {
+//                continue;
+//            }
+//            CommentDto parentDto = commentDtos.stream()
+//                    .filter(dto -> Objects.equals(dto.getId(), dbCommentDto.getParentId()))
+//                    .findAny().orElse(null);
+//            // 如果分页查回来的数据中没有被评论人，那么再去数据库查
+//            if (Objects.nonNull(parentDto)) {
+//                dbCommentDto.setToNickname(parentDto.getNickname());
+//            } else {
+//                QueryWrapper<Comment> parentQueryWrapper = new QueryWrapper<>();
+//                parentQueryWrapper.eq(DbConstants.Comment.PARENT_ID, dbCommentDto.getParentId());
+//                parentQueryWrapper.eq(DbConstants.Comment.STATUS, 1);
+//                List<Comment> comments = baseMapper.selectList(parentQueryWrapper);
+//                if (!CollectionUtils.isEmpty(comments)) {
+//                    dbCommentDto.setToNickname(comments.get(0).getNickname());
+//                }
+//            }
+//        }
         response.data(Constants.ReplyField.DATA, commentDtos);
         response.data(Constants.ReplyField.TOTAL, commentPage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);

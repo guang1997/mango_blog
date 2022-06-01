@@ -1,28 +1,28 @@
 <template>
   <div class="comments">
-    <div class="comments__top" v-for="(msg, index) in messages" :key="index">
+    <div class="comments__top" v-for="(msg, index) in comments" :key="index">
       <comments-item
-        :message="msg"
+        :comment="msg"
         @changeCurrentReplyMessage="changeCurrentReplyMessage"
         @addLike="addLike"
       ></comments-item>
       <submit
-        v-if="msg._id === currentReplyMessage._id"
+        v-if="msg.id === currentReplyMessage.id"
         :currentReplyMessage="currentReplyMessage"
         @changeCurrentReplyMessage="changeCurrentReplyMessage"
         @submitContent="submitContent"
       ></submit>
-      <div class="comments__sub" v-if="msg.reply && msg.reply.length">
-        <template v-for="(reply, _index) in msg.reply">
+      <div class="comments__sub" v-if="msg.children && msg.children.length">
+        <template v-for="(reply, _index) in msg.children">
           <comments-item
             :key="'reply_' + _index"
-            :message="reply"
+            :comment="reply"
             :subType="true"
             @addLike="addLike"
             @changeCurrentReplyMessage="changeCurrentReplyMessage"
           ></comments-item>
           <submit
-            v-if="reply._id === currentReplyMessage._id"
+            v-if="reply.id === currentReplyMessage.id"
             :key="_index"
             :currentReplyMessage="currentReplyMessage"
             @submitContent="submitContent"
@@ -31,7 +31,7 @@
         </template>
       </div>
     </div>
-    <div class="comments__empty" v-if="!messages.length">emm...没人理我</div>
+    <div class="comments__empty" v-if="!comments.length">emm...没人理我</div>
   </div>
 </template>
 <script>
@@ -40,7 +40,7 @@ import submit from './submit'
 export default {
   name: 'comments',
   props: {
-    messages: {
+    comments: {
       type: Array,
       default() {
         return []

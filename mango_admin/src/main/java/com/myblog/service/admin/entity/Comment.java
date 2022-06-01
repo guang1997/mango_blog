@@ -58,5 +58,6 @@ public class Comment extends BaseEntity {
     @ApiModelProperty(value = "状态: 0-待审核, 1-审核通过, 2-审核不通过")
     private Integer status;
 
-
+    @ApiModelProperty(value = "被评论用户昵称")
+    private String answerNickname;
 }

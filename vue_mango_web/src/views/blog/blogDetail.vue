@@ -105,6 +105,7 @@ import submit from "@/views/components/submit";
 import copyright from "./components/copyright";
 import share from "./components/share";
 import prevnext from "./components/prevnext";
+import { storage } from "@/utils/storage";
 import "@/assets/css/quill.snow.css";
 function jumpAnchor(route) {
   if (route.query.anchor === "a_cm") {
@@ -130,10 +131,7 @@ export default {
       blog: {},
       comments: [],
       flatTree: null,
-      components: [],
-      userId: "",
-      mangoBlogBrowserFinger: localStorage.getItem("mangoBlogBrowserFinger"),
-      mangoBlogScreenInformation: localStorage.getItem("mangoBlogScreenInformation")
+      components: []
     };
   },
   computed: {
@@ -173,22 +171,23 @@ export default {
     this.collectTitles();
     window.addEventListener("scroll", this.handleScroll, false);
   },
-  created() {
-  },
+  created() {},
   updated() {},
 
   async asyncData({ route, isServer, _ip }) {
     const res = await blogApi.getBlogById({
       id: route.params.id,
-      userId: localStorage.getItem("mangoBlogBrowserFinger"),
-      screenInformation: JSON.parse(localStorage.getItem("mangoBlogScreenInformation")),
+      userId: storage.getVisitor() ? storage.getVisitor() : storage.getMangoBlogBrowserFinger(),
+      screenInformation: JSON.parse(
+        storage.getMangoBlogScreenInformation()
+      ),
     });
     if (res.code === 20000) {
       if (!isServer) setTimeout(() => jumpAnchor(route), 0);
       return {
         blog: res.data.data,
-        comments: res.data.data.comments,
-        total: res.data.data.comments.length,
+        comments: res.data.comment,
+        total: res.data.commentCount,
       };
     }
   },
@@ -200,9 +199,19 @@ export default {
         blogId: this.blog.id,
         isLiked,
         likeCount: this.blog.likeCount,
-        userId: this.userId === "" ? localStorage.getItem("mangoBlogBrowserFinger") : this.userId,
+         userId: this.visitorInfo ? this.visitorInfo.id : storage.getMangoBlogBrowserFinger(),
         source: "BLOG_INFO_LIKES",
-        screenInformation: JSON.parse(localStorage.getItem("mangoBlogScreenInformation")),
+        screenInformation: JSON.parse(
+          localStorage.getItem("mangoBlogScreenInformation")
+        ),
+        avatar:
+          this.visitorInfo && this.visitorInfo.avatar
+            ? this.visitorInfo.avatar
+            : "",
+        nickname:
+          this.visitorInfo && this.visitorInfo.nickname
+            ? this.visitorInfo.nickname
+            : "",
       });
       if (res.code === 20000) {
         this.$message({
@@ -239,12 +248,15 @@ export default {
       }
     },
     async addLike(message) {
-      const inc = message.liked ? -1 : 1;
+      const isLiked = message.liked ? true : false;
       const likeRes = await commentApi.likeBlogComment({
-        id: message._id,
-        inc,
+         blogId: this.blog.id,
+        id: message.id,
+        isLiked,
+        userId: this.visitorInfo ? this.visitorInfo.id : storage.getMangoBlogBrowserFinger(),
+        source: "BLOG_INFO_COMMENT_LIKES",
       });
-      if (likeRes.status === 200) {
+      if (likeRes.code === 20000) {
         let finder;
         this.comments.some((msg) => {
           if (msg._id === likeRes.data._id) {
@@ -279,22 +291,25 @@ export default {
       this.submit(content, currentReplyComment, cb);
     },
     async submit(content, currentReplyComment, cb) {
-      let parentId;
-      let aite;
+      let parentId = "0";
+      let answerNickname;
       if (currentReplyComment) {
-        if (currentReplyComment.parentId)
+        if (currentReplyComment.parentId === "0") {
+          parentId = currentReplyComment.id;
+        } else {
           parentId = currentReplyComment.parentId;
-        else parentId = currentReplyComment._id;
-        aite = currentReplyComment.name;
+        }
+        answerNickname = currentReplyComment.nickname;
       }
-      const res = await blogApi.saveArticleComment({
+      const res = await commentApi.saveComment({
         blogId: this.$route.params.id,
         nickname: this.visitorInfo.nickname,
         avatar: this.visitorInfo.avatar,
+        userId: this.visitorInfo.id,
         content: content,
         parentId,
-        source: 'BLOG_INFO_MESSAGE',
-
+        source: "BLOG_INFO_MESSAGE",
+        answerNickname,
       });
       if (res.code === 20000) {
         if (cb) cb();
@@ -302,22 +317,24 @@ export default {
           type: "success",
           message: "评论成功",
         });
-        this.getBlogComments()
+        this.getCommentByPage();
       }
     },
     async currentChange(val) {
       this.page = val;
-      this.getBlogComments();
+      debugger;
+      this.getCommentByPage();
     },
-    async getBlogComments() {
-      const commentRes = await commentApi.getBlogComments({
+    async getCommentByPage() {
+      const commentRes = await commentApi.getCommentByPage({
         page: this.page,
         size: this.size,
-        blogId: this.$route.params.id
-      })
+        blogId: this.$route.params.id,
+        queryChildren: true,
+      });
       if (commentRes.code === 20000) {
-        this.total = commentRes.total
-        this.comments = commentRes.data.data
+        this.total = commentRes.total;
+        this.comments = commentRes.data.data;
       }
     },
     collectTitles() {
@@ -371,7 +388,6 @@ export default {
         }
       });
     },
-    
   },
   destroyed() {
     window.removeEventListener("scroll", this.handleScroll, false);

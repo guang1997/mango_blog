@@ -59,6 +59,7 @@ public interface Constants {
         String NEXT_BLOG = "nextBlog";
         String OS = "os";
         String BROWSER = "browser";
+        String COMMENT = "comment";
     }
 
     interface SystemConstant {

@@ -11,6 +11,7 @@ import tagApi from "@/api/tag";
 import sortApi from "@/api/sort";
 import commentApi from "@/api/comment";
 import Fingerprint2 from "fingerprintjs2";
+import { storage } from "@/utils/storage";
 export default {
   name: "App",
   data() {
@@ -22,12 +23,12 @@ export default {
   },
   mounted() {
     this.initPannel();
-    if (!localStorage.getItem("mangoBlogBrowserFinger")) {
+    if (!storage.getMangoBlogBrowserFinger()) {
       setTimeout(() => {
         this.createFingerprint();
       }, 1000);
     }
-    if (!localStorage.getItem("mangoBlogScreenInformation")) {
+    if (!storage.getMangoBlogScreenInformation()) {
       this.createScreenInformation();
     }
     
@@ -134,7 +135,7 @@ export default {
           31
         );
         // 保存到localStorage，防止随时变化
-        localStorage.setItem("mangoBlogBrowserFinger", mangoBlogBrowserFinger);
+        storage.setMangoBlogBrowserFinger(mangoBlogBrowserFinger)
       });
     },
     createScreenInformation() {
@@ -152,7 +153,7 @@ export default {
         pixelDepth: window.screen.pixelDepth,
       };
       // 保存到localStorage，防止随时变化
-      localStorage.setItem("mangoBlogScreenInformation", JSON.stringify(screenInformation));
+      storage.setMangoBlogScreenInformation(JSON.stringify(screenInformation));
     },
   },
 };

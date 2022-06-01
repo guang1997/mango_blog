@@ -1,34 +1,34 @@
 <template>
   <div class="comments-item">
     <div class="comments-item__avatar" :class="{ 'comments-item__avatar--small': subType }">
-      <a :href="message.link" target="_blank">
-        <img :src="message.imgUrl" alt="" />
-      </a>
+      <!-- <a :href="comment.link" target="_blank"> -->
+        <img :src="comment.avatar" alt="" />
+      <!-- </a> -->
     </div>
     <div class="comments-item__content">
       <div class="comments-item__visitor">
-        <a :href="message.link" target="_blank">
-          <span class="detail-visitor-name" :class="{ 'detail-visitor-name--bold': message.admin }">
-            {{ message.name }}
+        <!-- <a :href="message.link" target="_blank"> -->
+          <span class="detail-visitor-name" :class="{ 'detail-visitor-name--bold': comment.nickname }">
+            {{ comment.nickname }}
           </span>
-        </a>
-        <span class="detail-visitor-aite" v-if="message.aite" style="fontweight: bold">&nbsp;@&nbsp;</span>
-        <span class="detail-visitor-aited" v-if="message.aite">{{ message.aite }} :</span>
+        <!-- </a> -->
+        <span class="detail-visitor-aite" v-if="comment.answerNickname" style="fontweight: bold">&nbsp;@&nbsp;</span>
+        <span class="detail-visitor-aited" v-if="comment.answerNickname">{{ comment.answerNickname }} :</span>
       </div>
 
-      <div class="comments-item__say">{{ message.content }}</div>
+      <div class="comments-item__say">{{ comment.content }}</div>
 
       <div class="comments-item__detail">
         <i class="el-icon-date"></i>
-        <span class="detail-visitor-date">{{ message.date | formatDate }}</span>
+        <span class="detail-visitor-date">{{ comment.createTime }}</span>
         <i
           class="el-icon-thumb"
-          @click="addLike(message)"
-          :class="{ 'el-icon-thumb--active': message.liked === 1 }"
+          @click="addLike(comment)"
+          :class="{ 'el-icon-thumb--active': comment.liked === 1 }"
         ></i>
-        <span :class="{ 'el-icon-thumb--active': message.liked === 1 }">{{ message.like }}</span>
-        <i class="el-icon-chat-dot-round" @click="changeCurrentReplyMessage(message)"></i>
-        <span>{{ message | replycCount }}</span>
+        <span :class="{ 'el-icon-thumb--active': comment.liked === 1 }">{{ comment.liked }}</span>
+        <i class="el-icon-chat-dot-round" @click="changeCurrentReplyMessage(comment)"></i>
+        <span>{{ comment | replycCount }}</span>
       </div>
     </div>
   </div>
@@ -41,7 +41,7 @@ export default {
       type: Boolean,
       default: false
     },
-    message: {
+    comment: {
       type: Object,
       default() {
         return {}
@@ -50,8 +50,8 @@ export default {
   },
   components: {},
   filters: {
-    replycCount(message) {
-      if (message.reply && message.reply.length) return message.reply.length
+    replycCount(comment) {
+      if (comment.children && comment.children.length) return comment.children.length
       return ''
     }
   },
