@@ -90,6 +90,7 @@ public interface DbConstants {
         String IP = "ip";
         String USER_ID = "user_id";
         String UNIQUE_KEY = "unique_key";
+        String BROWSER_FINGER = "browser_finger";
     }
 
     interface WebVisit {

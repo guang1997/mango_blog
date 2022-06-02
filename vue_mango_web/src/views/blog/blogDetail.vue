@@ -107,12 +107,12 @@ import share from "./components/share";
 import prevnext from "./components/prevnext";
 import { storage } from "@/utils/storage";
 import "@/assets/css/quill.snow.css";
-function jumpAnchor(route) {
-  if (route.query.anchor === "a_cm") {
-    const el = document.querySelector("#a_cm");
-    el.scrollIntoView();
-  }
-}
+// function jumpAnchor(route) {
+//   if (route.query.anchor === "a_cm") {
+//     const el = document.querySelector("#a_cm");
+//     el.scrollIntoView();
+//   }
+// }
 export default {
   name: "blogDetail",
   components: { note, comments, submit, copyright, share, prevnext },
@@ -177,13 +177,17 @@ export default {
   async asyncData({ route, isServer, _ip }) {
     const res = await blogApi.getBlogById({
       id: route.params.id,
-      userId: storage.getVisitor() ? storage.getVisitor() : storage.getMangoBlogBrowserFinger(),
+      userId: storage.getVisitor() ? storage.getVisitor().id : "",
+      browserFinger: storage.getMangoBlogBrowserFinger(),
       screenInformation: JSON.parse(
         storage.getMangoBlogScreenInformation()
       ),
+      page: 1,
+      size: 10
     });
     if (res.code === 20000) {
-      if (!isServer) setTimeout(() => jumpAnchor(route), 0);
+      // if (!isServer) setTimeout(() => jumpAnchor(route), 0);
+      console.log(res.data.commentCount)
       return {
         blog: res.data.data,
         comments: res.data.comment,
@@ -199,11 +203,12 @@ export default {
         blogId: this.blog.id,
         isLiked,
         likeCount: this.blog.likeCount,
-         userId: this.visitorInfo ? this.visitorInfo.id : storage.getMangoBlogBrowserFinger(),
+        userId: this.visitorInfo ? this.visitorInfo.id : "",
         source: "BLOG_INFO_LIKES",
         screenInformation: JSON.parse(
           localStorage.getItem("mangoBlogScreenInformation")
         ),
+        browserFinger: storage.getMangoBlogBrowserFinger(),
         avatar:
           this.visitorInfo && this.visitorInfo.avatar
             ? this.visitorInfo.avatar

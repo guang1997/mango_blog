@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -152,7 +153,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         responseDto.setLiked(getBlogLiked(responseDto.getId(),
                 IpUtils.getIpAddr(request),
                 blogDto.getUserId(),
-                MD5Utils.string2MD5(UniqueKeyUtil.getUniqueKey(request, blogDto.getScreenInformation()))));
+                MD5Utils.string2MD5(UniqueKeyUtil.getUniqueKey(request, blogDto.getScreenInformation())),
+                blogDto.getBrowserFinger()));
         response.data(Constants.ReplyField.DATA, responseDto);
         return response;
     }
@@ -187,22 +189,41 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         return response;
     }
 
-    private Boolean getBlogLiked(String id, String ipAddr, String userId, String uniqueKey) {
-        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommentStatus.REVIEWED);
-        queryWrapper.eq(DbConstants.Comment.BLOG_ID, id);
-        queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
-        queryWrapper.eq(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_LIKES.getSource());
-        queryWrapper.and(wrapper -> wrapper
-                .and(wrapper2 -> wrapper2.eq(DbConstants.Comment.IP, ipAddr).eq(DbConstants.Comment.UNIQUE_KEY, uniqueKey))
-                .or().eq(DbConstants.Comment.USER_ID, userId));
+    private Boolean getBlogLiked(String id, String ipAddr, String userId, String uniqueKey, String browserFinger) {
+        if (StringUtils.isNotBlank(userId)) {
+            QueryWrapper<Comment> userIdQueryWrapper = new QueryWrapper<>();
+            userIdQueryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommentStatus.REVIEWED);
+            userIdQueryWrapper.eq(DbConstants.Comment.BLOG_ID, id);
+            userIdQueryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
+            userIdQueryWrapper.eq(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_LIKES.getSource());
+            userIdQueryWrapper.eq(DbConstants.Comment.USER_ID, userId);
 
-
-        Comment comment = commentMapper.selectOne(queryWrapper);
-        if (Objects.isNull(comment)) {
-            return false;
+            Comment comment = commentMapper.selectOne(userIdQueryWrapper);
+            if (Objects.isNull(comment)) {
+                return false;
+            }
+            return Objects.equals("true", comment.getContent());
+        } else {
+            QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommentStatus.REVIEWED);
+            queryWrapper.eq(DbConstants.Comment.BLOG_ID, id);
+            queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
+            queryWrapper.eq(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_LIKES.getSource());
+            queryWrapper.isNull(DbConstants.Comment.USER_ID);
+            queryWrapper.and(wrapper -> wrapper
+                    .and(wrapper2 -> wrapper2.eq(DbConstants.Comment.IP, ipAddr).eq(DbConstants.Comment.UNIQUE_KEY, uniqueKey))
+                    .or().eq(DbConstants.Comment.BROWSER_FINGER, browserFinger));
+            List<Comment> comments = commentMapper.selectList(queryWrapper);
+            if (CollectionUtils.isEmpty(comments)) {
+                return false;
+            }
+            for (Comment comment : comments) {
+                if (Objects.equals("true", comment.getContent())) {
+                    return true;
+                }
+            }
         }
-        return !Objects.equals("false", comment.getContent());
+        return false;
     }
 
     @Override
@@ -220,15 +241,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         dto.setId(db.getId());
         dto.setCreateTime(db.getCreateTime());
         dto.setUpdateTime(db.getUpdateTime());
-//        dto.setComments(getBlogComments(db.getId()));
-    }
-
-    private List<Comment> getBlogComments(String id) {
-        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Comment.STATUS, 1);
-        queryWrapper.eq(DbConstants.Comment.BLOG_ID, id);
-        queryWrapper.ne(DbConstants.Comment.SOURCE, CommentSourceEnum.BLOG_INFO_LIKES);
-        return commentMapper.selectList(queryWrapper);
     }
 
     private List<Tag> getBlogTags(String blogId) {

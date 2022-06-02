@@ -47,4 +47,6 @@ public class CommentDto extends BaseDto {
     private String answerNickname;
 
     private Boolean queryChildren;
+
+    private String browserFinger;
 }

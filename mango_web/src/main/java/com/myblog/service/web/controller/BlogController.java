@@ -53,7 +53,7 @@ public class BlogController {
     public Response getBlogById(@RequestBody BlogDto blogDto, HttpServletRequest request) throws Exception {
         Response response = blogService.getBlogById(blogDto, request);
         CommentDto param = new CommentDto();
-        param.setPage(blogDto.getSize());
+        param.setPage(blogDto.getPage());
         param.setSize(blogDto.getSize());
         param.setBlogId(blogDto.getId());
         param.setQueryChildren(true);

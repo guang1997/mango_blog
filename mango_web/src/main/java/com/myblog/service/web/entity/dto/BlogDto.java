@@ -43,4 +43,6 @@ public class BlogDto extends BaseDto {
     private String userId;
 
     private UniqueKeyDto screenInformation;
+
+    private String browserFinger;
 }

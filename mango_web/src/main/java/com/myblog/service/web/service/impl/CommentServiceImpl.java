@@ -58,6 +58,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.MESSAGE);
         queryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommonStatus.ENABLED);
+        queryWrapper.eq(DbConstants.Comment.PARENT_ID, "0");
         baseMapper.selectPage(commentPage, queryWrapper);
         List<CommentDto> commentDtos = this.toDtoList(commentPage.getRecords(), CommentDto.class);
         // 查询子评论
@@ -107,9 +108,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         String uniqueKey = UniqueKeyUtil.getUniqueKey(request, commentDto.getScreenInformation());
         LOGGER.debug("likeBlog getUniqueKey:{} success", uniqueKey);
         comment.setUniqueKey(MD5Utils.string2MD5(uniqueKey));
-
         comment.setType(Constants.CommentType.LIKES);
-        comment.setSource(CommentSourceEnum.BLOG_INFO_LIKES.getSource());
         comment.setParentId("0");
         // 已经点过赞，要取消点赞
         if (commentDto.getIsLiked()) {
@@ -126,20 +125,56 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             LOGGER.error("likeBlog failed by change blog likeCount, commentDto:{}", commentDto);
             return Response.error().message(failedMsg);
         }
-        UpdateWrapper<Comment> commentUpdateWrapper = new UpdateWrapper<>();
-        commentUpdateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
-        commentUpdateWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
-        // TODO 暂时先只通过浏览器指纹或者用户id以及ip和设备型号生成的数据来设置点赞,尽量保证唯一性
-        commentUpdateWrapper.and(wrapper -> wrapper
-                .and(wrapper2 -> wrapper2.eq(DbConstants.Comment.IP, comment.getIp()).eq(DbConstants.Comment.UNIQUE_KEY, comment.getUniqueKey()))
-                .or().eq(DbConstants.Comment.USER_ID, comment.getUserId()));
-
-        if (baseMapper.update(comment, commentUpdateWrapper) < 1) {
-            if (baseMapper.insert(comment) < 1) {
+        // 如果userId不为空，说明登录了账号，直接根据账号来更新点赞状态
+        if (StringUtils.isNotBlank(commentDto.getUserId())) {
+            UpdateWrapper<Comment> userIdUpdateWrapper = new UpdateWrapper<>();
+            userIdUpdateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
+            userIdUpdateWrapper.eq(DbConstants.Comment.SOURCE, commentDto.getSource());
+            userIdUpdateWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+            userIdUpdateWrapper.eq(DbConstants.Comment.USER_ID, commentDto.getUserId());
+            if (baseMapper.update(comment, userIdUpdateWrapper) < 1) {
                 LOGGER.error("likeBlog failed by unknowen error, comment:{}", comment);
                 return Response.error().message(failedMsg);
             }
+        } else {
+            // 如果userId为空，使用浏览器指纹和ip以及uniqueKey来更新点赞状态
+            UpdateWrapper<Comment> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
+            updateWrapper.eq(DbConstants.Comment.SOURCE, commentDto.getSource());
+            updateWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+            updateWrapper.and(wrapper -> wrapper
+                    .and(wrapper2 -> wrapper2.eq(DbConstants.Comment.IP, comment.getIp()).eq(DbConstants.Comment.UNIQUE_KEY, comment.getUniqueKey()))
+                    .or().eq(DbConstants.Comment.BROWSER_FINGER, comment.getBrowserFinger()));
+
+            updateWrapper.isNull(DbConstants.Comment.USER_ID);
+            if (baseMapper.update(comment, updateWrapper) < 1) {
+                if (baseMapper.insert(comment) < 1) {
+                    LOGGER.error("likeBlog failed by unknowen error, comment:{}", comment);
+                    return Response.error().message(failedMsg);
+                }
+            }
         }
+//        UpdateWrapper<Comment> userIdUpdateWrapper = new UpdateWrapper<>();
+//        userIdUpdateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
+//        userIdUpdateWrapper.eq(DbConstants.Comment.SOURCE, commentDto.getSource());
+//        userIdUpdateWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+//        userIdUpdateWrapper.eq(DbConstants.Comment.USER_ID, commentDto.getUserId());
+//        if (baseMapper.update(comment, userIdUpdateWrapper) < 1) {
+//            // 根据userId更新失败，再根据指纹更新
+//            UpdateWrapper<Comment> updateWrapper = new UpdateWrapper<>();
+//            updateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
+//            updateWrapper.eq(DbConstants.Comment.SOURCE, commentDto.getSource());
+//            updateWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+//            updateWrapper.eq(DbConstants.Comment.IP, comment.getIp());
+//            updateWrapper.eq(DbConstants.Comment.UNIQUE_KEY, comment.getUniqueKey());
+//            if (baseMapper.update(comment, updateWrapper) < 1) {
+//                if (baseMapper.insert(comment) < 1) {
+//                    LOGGER.error("likeBlog failed by unknowen error, comment:{}", comment);
+//                    return Response.error().message(failedMsg);
+//                }
+//            }
+//
+//        }
         response.setMessage(successMsg);
         return response;
     }

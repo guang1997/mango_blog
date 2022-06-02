@@ -39,6 +39,9 @@ public class Comment extends BaseEntity {
     @ApiModelProperty(value = "唯一标识，如果用户id不同，ip相同，则判断此字段")
     private String uniqueKey;
 
+    @ApiModelProperty(value = "浏览器指纹")
+    private String browserFinger;
+
     @ApiModelProperty(value = "用户头像")
     private String avatar;
 
