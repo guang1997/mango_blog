@@ -23,4 +23,6 @@ public interface CommentService extends IService<Comment>, ServiceConvertHandler
     Response likeBlog(CommentDto commentDto, HttpServletRequest request) throws Exception;
 
     Response saveComment(CommentDto commentDto, HttpServletRequest request) throws Exception;
+
+    Response likeComment(CommentDto commentDto, HttpServletRequest request) throws Exception;
 }

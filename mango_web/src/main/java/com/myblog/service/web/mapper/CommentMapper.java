@@ -2,6 +2,7 @@ package com.myblog.service.web.mapper;
 
 import com.myblog.service.web.entity.Comment;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface CommentMapper extends BaseMapper<Comment> {
 
+    int updateLikeCount(@Param("likeCount") int likeCount, @Param("parentId") String parentId);
 }

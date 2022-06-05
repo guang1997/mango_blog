@@ -4,13 +4,15 @@
       <comments-item
         :comment="msg"
         @changeCurrentReplyMessage="changeCurrentReplyMessage"
-        @addLike="addLike"
+        @likeComment="likeComment"
+         @getComments="getComments"
       ></comments-item>
       <submit
         v-if="msg.id === currentReplyMessage.id"
         :currentReplyMessage="currentReplyMessage"
         @changeCurrentReplyMessage="changeCurrentReplyMessage"
         @submitContent="submitContent"
+        @getComments="getComments"
       ></submit>
       <div class="comments__sub" v-if="msg.children && msg.children.length">
         <template v-for="(reply, _index) in msg.children">
@@ -18,8 +20,9 @@
             :key="'reply_' + _index"
             :comment="reply"
             :subType="true"
-            @addLike="addLike"
+            @likeComment="likeComment"
             @changeCurrentReplyMessage="changeCurrentReplyMessage"
+             @getComments="getComments"
           ></comments-item>
           <submit
             v-if="reply.id === currentReplyMessage.id"
@@ -27,6 +30,7 @@
             :currentReplyMessage="currentReplyMessage"
             @submitContent="submitContent"
             @changeCurrentReplyMessage="changeCurrentReplyMessage"
+            @getComments="getComments"
           ></submit>
         </template>
       </div>
@@ -63,8 +67,11 @@ export default {
     changeCurrentReplyMessage(message) {
       this.currentReplyMessage = message
     },
-    addLike(message) {
-      this.$emit('addLike', message)
+    likeComment(message) {
+      this.$emit('likeComment', message)
+    },
+    getComments() {
+      this.$emit('getCommentByPage');
     }
   }
 }

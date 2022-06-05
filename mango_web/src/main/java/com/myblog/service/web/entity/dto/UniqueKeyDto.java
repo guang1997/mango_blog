@@ -37,11 +37,6 @@ public class UniqueKeyDto {
     private Integer width;
 
     /**
-     * 图像每英寸长度内的像素点数
-     */
-    private Integer dpi;
-
-    /**
      * 像素深度
      */
     private Integer pixelDepth;

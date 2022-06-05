@@ -56,7 +56,8 @@ public class BlogController {
         param.setPage(blogDto.getPage());
         param.setSize(blogDto.getSize());
         param.setBlogId(blogDto.getId());
-        param.setQueryChildren(true);
+        param.setQueryLike(true);
+        param.setUserId(blogDto.getUserId());
         Response commentResponse = commentService.getCommentByPage(param);
         Map<String, Object> commentData = commentResponse.getData();
         response.data(Constants.ReplyField.COMMENT, commentData.get(Constants.ReplyField.DATA));

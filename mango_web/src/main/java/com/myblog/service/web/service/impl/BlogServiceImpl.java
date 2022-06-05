@@ -8,11 +8,13 @@ import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.MD5Utils;
 import com.myblog.service.web.controller.BlogController;
 import com.myblog.service.web.entity.*;
+import com.myblog.service.web.entity.dto.ArchiveDto;
 import com.myblog.service.web.entity.dto.BlogDto;
 import com.myblog.service.web.mapper.*;
 import com.myblog.service.web.service.BlogService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myblog.service.web.util.UniqueKeyUtil;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,7 @@ import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -187,6 +186,26 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             response.data(Constants.ReplyField.NEXT_BLOG, this.toDto(nextBlogList.get(0), BlogDto.class));
         }
         return response;
+    }
+
+    @Override
+    public Response getArchives(ArchiveDto archiveDto) {
+        if (BooleanUtils.isTrue(archiveDto.getQueryByMonth()) && StringUtils.isBlank(archiveDto.getMonth())) {
+            List<ArchiveDto> archiveDtos = baseMapper.selectBlogNumByMouth();
+            return Response.ok().data(Constants.ReplyField.DATA, archiveDtos);
+        }
+        if (Objects.isNull(archiveDto.getPage())) archiveDto.setPage(1);
+        if (Objects.isNull(archiveDto.getSize())) archiveDto.setSize(10);
+        archiveDto.setPage((archiveDto.getPage() - 1) * archiveDto.getSize());
+        List<ArchiveDto> archiveDtos = null;
+//        if (StringUtils.isNotBlank(archiveDto.getFilter())) {
+//            QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
+//            archiveDtos = baseMapper.selectArchivesByMonth(archiveDto);
+//        } else {
+//            archiveDtos = baseMapper.selectArchivesByYear(archiveDto);
+//        }
+
+        return null;
     }
 
     private Boolean getBlogLiked(String id, String ipAddr, String userId, String uniqueKey, String browserFinger) {

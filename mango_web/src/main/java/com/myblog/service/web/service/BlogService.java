@@ -4,6 +4,7 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.web.entity.Blog;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.myblog.service.web.entity.dto.ArchiveDto;
 import com.myblog.service.web.entity.dto.BlogDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,4 +28,6 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
     Response getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception;
 
     Response getPrevNextBlog(BlogDto blogDto) throws Exception;
+
+    Response getArchives(ArchiveDto archiveDto) throws Exception;
 }

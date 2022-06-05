@@ -9,7 +9,7 @@
         <ul v-if="archives.length">
           <li v-for="(archive, index) in archives" :key="index" @click="filterArchives(archive)">
             <span>{{ archive.month }}</span>
-            <span>{{ archive.total }}</span>
+            <span>{{ archive.blogNum }}</span>
           </li>
         </ul>
         <empty v-else></empty>
@@ -31,7 +31,7 @@ export default {
   methods: {
     filterArchives(archive) {
       this.$router.push({
-        name: 'archives',
+        name: 'archive',
         query: {
           filter: archive.month
         }

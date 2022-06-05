@@ -21,4 +21,11 @@ export function getCommentByPage(data) {
       data
     })
   }
-  export default { getCommentByPage, likeBlog, saveComment }
+  export function likeComment(data) {
+    return request({
+      url: '/web/comment/likeComment',
+      method: 'post',
+      data
+    })
+  }
+  export default { getCommentByPage, likeBlog, saveComment, likeComment }

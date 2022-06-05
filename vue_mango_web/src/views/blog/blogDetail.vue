@@ -68,7 +68,7 @@
           <span>文章评论</span>
         </div>
         <div class="comment__submit">
-          <submit @submitContent="submitContent"></submit>
+          <submit @submitContent="submitContent" @getComments="getCommentByPage"></submit>
         </div>
         <div class="comment__total">
           <span>{{ total }}条评论</span>
@@ -77,7 +77,8 @@
           <comments
             :comments="comments"
             @submitReply="submitReply"
-            @addLike="addLike"
+            @likeComment="likeComment"
+            @getCommentByPage="getCommentByPage"
           ></comments>
         </div>
         <div class="comment__page" v-if="total">
@@ -131,7 +132,7 @@ export default {
       blog: {},
       comments: [],
       flatTree: null,
-      components: []
+      components: [],
     };
   },
   computed: {
@@ -179,15 +180,12 @@ export default {
       id: route.params.id,
       userId: storage.getVisitor() ? storage.getVisitor().id : "",
       browserFinger: storage.getMangoBlogBrowserFinger(),
-      screenInformation: JSON.parse(
-        storage.getMangoBlogScreenInformation()
-      ),
+      screenInformation: JSON.parse(storage.getMangoBlogScreenInformation()),
       page: 1,
-      size: 10
+      size: 10,
     });
     if (res.code === 20000) {
       // if (!isServer) setTimeout(() => jumpAnchor(route), 0);
-      console.log(res.data.commentCount)
       return {
         blog: res.data.data,
         comments: res.data.comment,
@@ -205,9 +203,7 @@ export default {
         likeCount: this.blog.likeCount,
         userId: this.visitorInfo ? this.visitorInfo.id : "",
         source: "BLOG_INFO_LIKES",
-        screenInformation: JSON.parse(
-          localStorage.getItem("mangoBlogScreenInformation")
-        ),
+        screenInformation: JSON.parse(storage.getMangoBlogScreenInformation()),
         browserFinger: storage.getMangoBlogBrowserFinger(),
         avatar:
           this.visitorInfo && this.visitorInfo.avatar
@@ -230,20 +226,8 @@ export default {
           this.blog.liked = true;
         } else if (isLiked === true) {
           // 一开始点了赞，后来取消了赞
-          this.blog.likeCount = this.blog.likeCount - 1;
+          this.blog.likeCount = this.blog.likeCount <= 0 ? 0 : this.blog.likeCount - 1;
           this.blog.liked = false;
-        }
-      } else {
-        this.$message({
-          type: "error",
-          message: res.message,
-        });
-        if (isLiked === false) {
-          // 一开始没点过赞，后来点了赞，失败时将博客赞的数量减掉
-          this.blog.likeCount = this.blog.likeCount - 1;
-        } else if (isLiked === true) {
-          // 一开始点了赞，后来取消了赞，失败时将博客赞的数量加回去
-          this.blog.likeCount = this.blog.likeCount + 1;
         }
       }
       // 取消标签焦点，加上button的plain样式，否则会一直显示非朴素按钮
@@ -252,41 +236,39 @@ export default {
         event.target.parentNode.blur();
       }
     },
-    async addLike(message) {
+    async likeComment(message) {
       const isLiked = message.liked ? true : false;
-      const likeRes = await commentApi.likeBlogComment({
-         blogId: this.blog.id,
-        id: message.id,
+      const likeRes = await commentApi.likeComment({
+        blogId: this.blog.id,
         isLiked,
-        userId: this.visitorInfo ? this.visitorInfo.id : storage.getMangoBlogBrowserFinger(),
+        userId: this.visitorInfo.id,
         source: "BLOG_INFO_COMMENT_LIKES",
+        parentId: message.id,
+        userId: this.visitorInfo ? this.visitorInfo.id : "",
+        avatar:
+          this.visitorInfo && this.visitorInfo.avatar
+            ? this.visitorInfo.avatar
+            : "",
+        nickname:
+          this.visitorInfo && this.visitorInfo.nickname
+            ? this.visitorInfo.nickname
+            : "",
       });
       if (likeRes.code === 20000) {
-        let finder;
-        this.comments.some((msg) => {
-          if (msg._id === likeRes.data._id) {
-            finder = msg;
-            return true;
-          }
-          if (msg.reply && msg.reply.length) {
-            let done = false;
-            msg.reply.some((er) => {
-              if (er._id === likeRes.data._id) {
-                finder = er;
-                done = true;
-              }
-            });
-            return done;
-          }
-        });
-        if (finder) {
-          finder.like = likeRes.data.like;
-          finder.liked = likeRes.data.liked;
-        }
         this.$message({
           type: "success",
-          message: likeRes.info,
+          message: likeRes.message,
         });
+        this.getCommentByPage();
+        //  if (isLiked === false) {
+        //   // 一开始没点过赞，后来点了赞
+        //   message.likeCount = message.likeCount + 1;
+        //   message.liked = true;
+        // } else if (isLiked === true) {
+        //   // 一开始点了赞，后来取消了赞
+        //   message.likeCount = message.likeCount <= 0 ? 0 : message.likeCount - 1;
+        //   message.liked = false;
+        // }
       }
     },
     submitContent(content, cb) {
@@ -327,7 +309,6 @@ export default {
     },
     async currentChange(val) {
       this.page = val;
-      debugger;
       this.getCommentByPage();
     },
     async getCommentByPage() {
@@ -335,10 +316,11 @@ export default {
         page: this.page,
         size: this.size,
         blogId: this.$route.params.id,
-        queryChildren: true,
+        queryLike: true,
+        userId: this.visitorInfo.id
       });
       if (commentRes.code === 20000) {
-        this.total = commentRes.total;
+        this.total = commentRes.data.total;
         this.comments = commentRes.data.data;
       }
     },

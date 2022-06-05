@@ -3,6 +3,7 @@ package com.myblog.service.web.mapper;
 import com.myblog.service.web.entity.Blog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.myblog.service.web.entity.Tag;
+import com.myblog.service.web.entity.dto.ArchiveDto;
 import com.myblog.service.web.entity.dto.BlogDto;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -26,4 +27,10 @@ public interface BlogMapper extends BaseMapper<Blog> {
     List<Tag> selectTagByBlogId(@Param("blogs") List<Blog> blogs);
 
     Integer changeLike(@Param("blogId") String blogId, @Param("likeCount") int likeCount);
+
+    List<ArchiveDto> selectBlogNumByMouth();
+
+    List<ArchiveDto> selectArchivesByYear(ArchiveDto archiveDto);
+
+    List<ArchiveDto> selectArchivesByMonth(ArchiveDto archiveDto);
 }

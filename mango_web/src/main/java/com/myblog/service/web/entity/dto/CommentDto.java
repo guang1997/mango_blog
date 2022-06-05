@@ -37,7 +37,7 @@ public class CommentDto extends BaseDto {
 
     private Boolean isLiked;
 
-    private Integer likeCount;
+    private Integer likeCount = 0;
 
     private UniqueKeyDto screenInformation;
 
@@ -46,7 +46,9 @@ public class CommentDto extends BaseDto {
      */
     private String answerNickname;
 
-    private Boolean queryChildren;
+    private Boolean queryLike;
 
     private String browserFinger;
+
+    private Boolean liked;
 }

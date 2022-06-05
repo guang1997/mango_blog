@@ -15,4 +15,16 @@
             #{blog.id}
         </foreach>
     </select>
+    <select id="selectBlogNumByMouth" resultType="com.myblog.service.web.entity.dto.ArchiveDto">
+        SELECT date_format(create_time,'%Y-%m') AS month, COUNT(*) AS blogNum FROM t_blog WHERE is_deleted = 0 GROUP BY date_format(create_time,'%Y-%m')
+    </select>
+    <select id="selectArchivesByYear" resultType="com.myblog.service.web.entity.dto.ArchiveDto">
+        SELECT t.id, t.title, t.file_id, DATE_FORMAT(t.create_time, '%Y') AS year, t.create_time FROM t_blog t
+        WHERE t.is_deleted = 0 ORDER BY t.create_time LIMIT #{page}, #{size};
+    </select>
+
+    <select id="selectArchivesByMonth" resultType="com.myblog.service.web.entity.dto.ArchiveDto">
+        SELECT t.id, t.title, t.file_id, DATE_FORMAT(t.create_time, '%Y-%m') AS month, t.create_time FROM t_blog t
+        WHERE t.is_deleted = 0 AND DATE_FORMAT(t.create_time, '%Y-%m') = #{filter} ORDER BY t.create_time LIMIT #{page}, #{size};
+    </select>
 </mapper>

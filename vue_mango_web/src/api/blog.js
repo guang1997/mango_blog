@@ -36,5 +36,11 @@ export function getBlogByPage(data) {
     })
   }
 
-  
-  export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId, getPrevNextBlog }
+  export function getArchives(data) {
+    return request({
+      url: '/web/blog/getArchives',
+      method: 'post',
+      data
+    })
+  }
+  export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId, getPrevNextBlog, getArchives }

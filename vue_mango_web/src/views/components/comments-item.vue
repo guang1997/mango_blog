@@ -23,17 +23,21 @@
         <span class="detail-visitor-date">{{ comment.createTime }}</span>
         <i
           class="el-icon-thumb"
-          @click="addLike(comment)"
-          :class="{ 'el-icon-thumb--active': comment.liked === 1 }"
+          @click="likeComment(comment)"
+          @focus="focus"
+          :class="{ 'el-icon-thumb--active': comment.liked === true }"
         ></i>
-        <span :class="{ 'el-icon-thumb--active': comment.liked === 1 }">{{ comment.liked }}</span>
+        <span :class="{ 'el-icon-thumb--active': comment.liked === true }">{{ comment.likeCount }}</span>
         <i class="el-icon-chat-dot-round" @click="changeCurrentReplyMessage(comment)"></i>
         <span>{{ comment | replycCount }}</span>
       </div>
     </div>
+     <login :customVisible="customVisible" @changeCustomVisible="changeCustomVisible" @getCommentByLogin="getCommentByLogin"></login>
   </div>
 </template>
 <script>
+import { storage } from "@/utils/storage";
+import login from './login';
 export default {
   name: 'commentsItem',
   props: {
@@ -48,20 +52,39 @@ export default {
       }
     }
   },
-  components: {},
+  data() {
+     return {
+      customVisible: false
+    };
+  },
+  components: {login},
   filters: {
     replycCount(comment) {
       if (comment.children && comment.children.length) return comment.children.length
       return ''
     }
   },
+  
   methods: {
-    addLike(message) {
-      this.$emit('addLike', message)
+    likeComment(message) {
+      if (!storage.getVisitor()) {
+        this.customVisible = true;
+        return;
+      }
+      this.$emit('likeComment', message)
     },
     changeCurrentReplyMessage(message) {
       this.$emit('changeCurrentReplyMessage', message)
-    }
+    },
+      focus() {
+      
+    },
+   changeCustomVisible(val) {
+     this.customVisible = val
+   },
+    getCommentByLogin() {
+     this.$emit("getComments", {})
+   }
   }
 }
 </script>

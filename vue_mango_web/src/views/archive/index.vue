@@ -1,31 +1,31 @@
 <template>
   <div class="archives">
-    <layout _title="归档" cover="/img/cover/archive.jpeg">
+    <layout _title="归档" cover="/static/img/cover/archive.jpeg">
       <template v-if="archives.length">
         <div class="archives__year" v-for="(range, index) in archives" :key="index">
           <div class="year-text">{{ range.year || range.month }}</div>
           <el-timeline>
             <el-timeline-item
-              v-for="(article, mi) in range.months"
+              v-for="(blog, mi) in range.childrens"
               :key="'art_' + mi"
               type="primary"
               :hide-timestamp="true"
             >
               <div class="archives__content">
                 <div class="content-left">
-                  <router-link :to="'/app/article/' + article.articleId">
-                    <img v-lazy="article.headerPic" alt="" />
+                  <router-link :to="'/app/blog/' + blog.id">
+                    <img v-lazy="blog.fileId" alt="" />
                   </router-link>
                 </div>
                 <div class="content-right">
                   <div class="content-right__title">
-                    <router-link :to="'/app/article/' + article.articleId">
-                      {{ article.title }}
+                    <router-link :to="'/app/blog/' + blog.id">
+                      {{ blog.title }}
                     </router-link>
                   </div>
                   <div class="content-right__date">
                     <i class="el-icon-date"></i>
-                    {{ article.createTime | formatDate }}
+                    {{ blog.createTime }}
                   </div>
                 </div>
               </div>
@@ -39,7 +39,7 @@
         <el-pagination
           :total="total"
           layout="prev, pager, next"
-          :page-size="limit"
+          :page-size="size"
           @current-change="currentChange"
         ></el-pagination>
       </div>
@@ -49,16 +49,16 @@
 <script>
 import archiveApi from '@/api/archive'
 
-async function getArchiveRes(route, page = 1, limit = 10) {
+async function getArchiveRes(route, page = 1, size = 10) {
+
   const params = {
-    limit,
-    page
+    page,
+    size
   }
   if (route.query.filter && /(\d+)-(\d+)/.test(route.query.filter)) {
-    params.filter = 1
+    params.queryByMonth = true
     params.month = route.query.filter
   }
-
   const archiveRes = await archiveApi.getArchives(params)
   return archiveRes
 }
@@ -67,30 +67,20 @@ export default {
   name: 'archives',
   metaInfo() {
     return {
-      title: `归档  - Marco's Blog`,
-      meta: [
-        {
-          name: 'description',
-          content: '文章归档'
-        },
-        {
-          name: 'keywords',
-          content: '文章归档'
-        }
-      ]
+      title: `归档  - Lisite's Blog`
     }
   },
   data() {
     return {
       currentPage: 1,
-      limit: 20,
+      size: 10,
       total: 0,
       archives: []
     }
   },
-  async asyncData({ route }) {
-    const archiveRes = await getArchiveRes(route)
-    if (archiveRes.status === 200) return { archives: archiveRes.data, total: archiveRes.total }
+  async asyncData() {
+    const archiveRes = await getArchiveRes()
+    if (archiveRes.code === 20000) return { archives: archiveRes.data.data, total: archiveRes.data.total }
   },
   watch: {
     $route() {
@@ -103,10 +93,10 @@ export default {
       this.getArchiveRes()
     },
     async getArchiveRes() {
-      const archiveRes = await getArchiveRes(this.$route, this.currentPage, this.limit)
-      if (archiveRes.status === 200) {
-        this.archives = archiveRes.data
-        this.total = archiveRes.total
+      const archiveRes = await getArchiveRes(this.currentPage, this.size)
+      if (archiveRes.code === 20000) {
+        this.archives = archiveRes.data.data
+        this.total = archiveRes.data.total
       }
     }
   }

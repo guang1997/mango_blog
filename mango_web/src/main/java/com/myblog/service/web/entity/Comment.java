@@ -65,4 +65,7 @@ public class Comment extends BaseEntity {
 
     @ApiModelProperty(value = "被评论用户昵称")
     private String answerNickname;
+
+    @ApiModelProperty(value = "点赞数量")
+    private Integer likeCount;
 }

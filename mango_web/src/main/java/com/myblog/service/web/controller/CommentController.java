@@ -49,5 +49,12 @@ public class CommentController {
     public Response saveComment(@RequestBody CommentDto commentDto, HttpServletRequest request) throws Exception {
         return commentService.saveComment(commentDto, request);
     }
+
+    @LogByMethod("/web/comment/likeComment")
+    @ApiOperation(value = "给评论点赞", notes = "给评论点赞", response = Response.class)
+    @PostMapping("/likeComment")
+    public Response likeComment(@RequestBody CommentDto commentDto, HttpServletRequest request) throws Exception {
+        return commentService.likeComment(commentDto, request);
+    }
 }
 

@@ -7,6 +7,7 @@
 <script>
 import { mapMutations } from "vuex";
 import blogApi from "@/api/blog";
+import archiveApi from "@/api/archive";
 import tagApi from "@/api/tag";
 import sortApi from "@/api/sort";
 import commentApi from "@/api/comment";
@@ -45,9 +46,9 @@ export default {
       "setScreenInformation",
     ]),
     initPannel() {
-      // this.$api.getArchives({ countType: 'month', page: 1, limit: 1000 }).then((res) => {
-      //   if (res.status === 20000) this.setArchives(res.data)
-      // })
+      archiveApi.getArchives({ queryByMonth: true }).then((res) => {
+        if (res.code === 20000) this.setArchives(res.data.data)
+      })
       sortApi
         .getSortByPage({
           page: 1,
@@ -139,17 +140,16 @@ export default {
       });
     },
     createScreenInformation() {
-      const div = document.createElement("div");
-      div.style.cssText =
-        "height: 1in; left: -100%; position: absolute; top: -100%; width: 1in;";
-      document.body.appendChild(div);
-      const devicePixelRatio = window.devicePixelRatio || 1,
-        dpi = div.offsetWidth * devicePixelRatio;
+      // const div = document.createElement("div");
+      // div.style.cssText =
+      //   "height: 1in; left: -100%; position: absolute; top: -100%; width: 1in;";
+      // document.body.appendChild(div);
+      // const devicePixelRatio = window.devicePixelRatio || 1,
+      //   dpi = div.offsetWidth * devicePixelRatio;
 
       const screenInformation = {
         height: window.screen.height,
         width: window.screen.width,
-        dpi: dpi,
         pixelDepth: window.screen.pixelDepth,
       };
       // 保存到localStorage，防止随时变化
