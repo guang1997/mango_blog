@@ -56,7 +56,6 @@ async function getArchiveRes(route, page = 1, size = 10) {
     size
   }
   if (route.query.filter && /(\d+)-(\d+)/.test(route.query.filter)) {
-    params.queryByMonth = true
     params.month = route.query.filter
   }
   const archiveRes = await archiveApi.getArchives(params)

@@ -6,6 +6,7 @@ import com.myblog.service.base.common.*;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.MD5Utils;
+import com.myblog.service.base.util.ThreadSafeDateFormat;
 import com.myblog.service.web.controller.BlogController;
 import com.myblog.service.web.entity.*;
 import com.myblog.service.web.entity.dto.ArchiveDto;
@@ -190,21 +191,37 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     @Override
     public Response getArchives(ArchiveDto archiveDto) {
+        Response response = Response.ok();
         if (BooleanUtils.isTrue(archiveDto.getQueryByMonth()) && StringUtils.isBlank(archiveDto.getMonth())) {
             List<ArchiveDto> archiveDtos = baseMapper.selectBlogNumByMouth();
             return Response.ok().data(Constants.ReplyField.DATA, archiveDtos);
         }
-        if (Objects.isNull(archiveDto.getPage())) archiveDto.setPage(1);
-        if (Objects.isNull(archiveDto.getSize())) archiveDto.setSize(10);
-        archiveDto.setPage((archiveDto.getPage() - 1) * archiveDto.getSize());
-        List<ArchiveDto> archiveDtos = null;
-//        if (StringUtils.isNotBlank(archiveDto.getFilter())) {
-//            QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
-//            archiveDtos = baseMapper.selectArchivesByMonth(archiveDto);
-//        } else {
-//            archiveDtos = baseMapper.selectArchivesByYear(archiveDto);
-//        }
-
+        int page = 1;
+        int size = 10;
+        if (Objects.nonNull(archiveDto.getPage())) page = archiveDto.getPage();
+        if (Objects.nonNull(archiveDto.getSize())) size = archiveDto.getSize();
+        Page<Blog> archivePage = new Page<>(page, size);
+        QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        if (StringUtils.isNotBlank(archiveDto.getMonth())) {
+            queryWrapper.apply("date_format(create_time, '%Y-%m') = {0}", archiveDto.getMonth());
+        }
+        queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
+        baseMapper.selectPage(archivePage, queryWrapper);
+        if (CollectionUtils.isEmpty(archivePage.getRecords())) {
+            response.data(Constants.ReplyField.DATA, new ArrayList<>());
+        } else {
+            Map<String, ArchiveDto> responseMap = new LinkedHashMap<>();
+            for (Blog blog : archivePage.getRecords()) {
+                String month = ThreadSafeDateFormat.format(blog.getCreateTime(), ThreadSafeDateFormat.YEAR);
+                ArchiveDto yearDto = new ArchiveDto();
+                yearDto.setYear(month);
+                
+            }
+        }
+        response.data(Constants.ReplyField.TOTAL, archivePage.getTotal());
+        response.data(Constants.ReplyField.PAGE, page);
+        response.data(Constants.ReplyField.SIZE, size);
         return null;
     }
 
