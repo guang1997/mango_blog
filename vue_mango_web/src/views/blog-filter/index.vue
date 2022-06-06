@@ -2,7 +2,7 @@
   <div class="article-filter">
     <layout :_title="title" cover="/img/cover/articles.jpeg">
       <template slot="custom-body">
-        <blog-iterator :articles="articles"></blog-iterator>
+        <blog-iterator :blogs="blogs"></blog-iterator>
         <div class="article-filter__page">
           <el-pagination
             :total="total"
@@ -20,14 +20,17 @@ import blogApi from '@/api/blog'
 import blogIterator from '@/views/components/blog-iterator'
 
 // 筛选文章公共请求
-async function fetchArticles(route, page) {
-  const params = { publish: 1, ...page }
+async function fetchArticles(route, page = 1, size = 10) {
+  const params = {
+    page,
+    size
+  }
   // 按标签筛选
-  if (route.params.type === 'tag') params.tag = route.params.param
+  if (route.params.type === 'tag') params.tagId = route.params.param
   // 按分类筛选
-  if (route.params.type === 'category') params.categoryId = route.params.param
+  if (route.params.type === 'sort') params.blogSortId = route.params.param
 
-  const articleRes = await api.getBlogByPage(params, { page: 1, limit: 10 })
+  const articleRes = await blogApi.getBlogByPage(params)
   return articleRes
 }
 
@@ -35,24 +38,14 @@ export default {
   name: 'blogFilter',
   metaInfo() {
     return {
-      title: `文章筛选：${this.title}  - Marco's Blog`,
-      meta: [
-        {
-          name: 'description',
-          content: `${this.title}类文章`
-        },
-        {
-          name: 'keywords',
-          content: `${this.title}`
-        }
-      ]
+      title: `文章筛选：${this.title}  - Lisite's Blog`
     }
   },
   data() {
     return {
       pageSize: 10,
       currentPage: 1,
-      articles: [],
+      blogs: [],
       total: []
     }
   },
@@ -60,12 +53,11 @@ export default {
   components: { blogIterator },
   async asyncData({ route }) {
     const articleRes = await fetchArticles(route)
-    if (articleRes.status === 200) return { articles: articleRes.data, total: articleRes.total }
+    if (articleRes.code === 20000) return { articles: articleRes.data.data, total: articleRes.total }
   },
   computed: {
     title() {
-      if (this.$route.params.type === 'category') return this.$route.query.name
-      return this.$route.params.param
+      return this.$route.query.name
     }
   },
   methods: {
@@ -74,9 +66,9 @@ export default {
       this.getArticles()
     },
     async getArticles() {
-      const articleRes = await fetchArticles(this.$route, { page: this.currentPage, limit: this.pageSize })
-      if (articleRes.status === 200) {
-        this.articles = articleRes.data
+      const articleRes = await fetchArticles(this.$route,  this.currentPage, this.size)
+      if (articleRes.code === 20000) {
+        this.articles = articleRes.data.data
         this.total = articleRes.total
       }
     }

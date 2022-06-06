@@ -3,7 +3,7 @@
     <layout _title="归档" cover="/static/img/cover/archive.jpeg">
       <template v-if="archives.length">
         <div class="archives__year" v-for="(range, index) in archives" :key="index">
-          <div class="year-text">{{ range.year || range.month }}</div>
+          <div class="year-text">{{ range.month || range.year }}</div>
           <el-timeline>
             <el-timeline-item
               v-for="(blog, mi) in range.childrens"
@@ -56,6 +56,7 @@ async function getArchiveRes(route, page = 1, size = 10) {
     size
   }
   if (route.query.filter && /(\d+)-(\d+)/.test(route.query.filter)) {
+    params.queryByMonth = true
     params.month = route.query.filter
   }
   const archiveRes = await archiveApi.getArchives(params)
@@ -71,28 +72,28 @@ export default {
   },
   data() {
     return {
-      currentPage: 1,
+      page: 1,
       size: 10,
       total: 0,
       archives: []
     }
   },
-  async asyncData() {
-    const archiveRes = await getArchiveRes()
+  async asyncData({ route }) {
+    const archiveRes = await getArchiveRes(route)
     if (archiveRes.code === 20000) return { archives: archiveRes.data.data, total: archiveRes.data.total }
   },
   watch: {
     $route() {
-      this.getArchiveRes()
+      this.getArchives()
     }
   },
   methods: {
     currentChange(val) {
-      this.currentPage = val
-      this.getArchiveRes()
+      this.page = val
+      this.getArchives()
     },
-    async getArchiveRes() {
-      const archiveRes = await getArchiveRes(this.currentPage, this.size)
+    async getArchives() {
+      const archiveRes = await getArchiveRes(this.$route, this.page, this.size)
       if (archiveRes.code === 20000) {
         this.archives = archiveRes.data.data
         this.total = archiveRes.data.total

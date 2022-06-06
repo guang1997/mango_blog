@@ -3,14 +3,13 @@ package com.myblog.service.web.entity.dto;
 import com.myblog.service.base.entity.dto.BaseDto;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class ArchiveDto extends BaseDto {
 
     private String title;
-
-    private String summary;
 
     private String fileId;
 
@@ -22,5 +21,5 @@ public class ArchiveDto extends BaseDto {
 
     private Integer blogNum;
 
-    List<ArchiveDto> childrens;
+    List<ArchiveDto> childrens = new ArrayList<>();
 }

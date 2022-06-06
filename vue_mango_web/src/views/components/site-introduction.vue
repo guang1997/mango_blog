@@ -12,15 +12,15 @@
       </p>
     </div>
     <div class="site-introduction__totals">
-      <div class="totals__item" @click="goTo('category')">
+      <div class="totals__item" @click="goTo('sort')">
         <div>文章</div>
         <div class="totals__number">{{ totals.blog }}</div>
       </div>
-      <div class="totals__item" @click="goTo('category')">
+      <div class="totals__item" @click="goTo('sort')">
         <div>分类</div>
         <div class="totals__number">{{ totals.sort }}</div>
       </div>
-      <div class="totals__item" @click="goTo('tags')">
+      <div class="totals__item" @click="goTo('tag')">
         <div>标签</div>
         <div class="totals__number">{{ totals.tag }}</div>
       </div>

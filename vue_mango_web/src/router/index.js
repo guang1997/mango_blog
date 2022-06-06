@@ -55,7 +55,7 @@ const router = new Router({
       component: sort
     },
     {
-      path: '/app/blogs/:type/:param',
+      path: '/app/blog/:type/:param',
       name: 'blogFilter',
       component: blogFilter
     },

@@ -6,7 +6,7 @@
         v-for="(tag, index) in tags"
         :key="index"
         :style="{ color: color(), fontSize: fontSize(), padding: tagPadding }"
-        @click="filterArticles(tag.tagName)"
+        @click="filterArticles(tag.tagName, tag.id)"
       >
         {{ tag.tagName }}
       </span>
@@ -40,12 +40,15 @@ export default {
     }
   },
   methods: {
-    filterArticles(tag) {
+    filterArticles(name, id) {
       this.$router.push({
-        name: 'articleFilter',
+        name: 'blogFilter',
         params: {
           type: 'tag',
-          param: tag
+          param: id
+        },
+        query: {
+          name
         }
       })
     },

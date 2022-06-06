@@ -71,6 +71,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
+        if (Objects.nonNull(blogDto.getSort())) {
+
+        }
         baseMapper.selectPage(blogPage, queryWrapper);
 
         response.data(Constants.ReplyField.DATA, this.toDtoList(blogPage.getRecords(), BlogDto.class));
@@ -197,7 +200,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             return Response.ok().data(Constants.ReplyField.DATA, archiveDtos);
         }
         int page = 1;
-        int size = 10;
+        int size = 1;
         if (Objects.nonNull(archiveDto.getPage())) page = archiveDto.getPage();
         if (Objects.nonNull(archiveDto.getSize())) size = archiveDto.getSize();
         Page<Blog> archivePage = new Page<>(page, size);
@@ -213,16 +216,33 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         } else {
             Map<String, ArchiveDto> responseMap = new LinkedHashMap<>();
             for (Blog blog : archivePage.getRecords()) {
-                String month = ThreadSafeDateFormat.format(blog.getCreateTime(), ThreadSafeDateFormat.YEAR);
+                String year = ThreadSafeDateFormat.format(blog.getCreateTime(), ThreadSafeDateFormat.YEAR);
                 ArchiveDto yearDto = new ArchiveDto();
-                yearDto.setYear(month);
-                
+                if (Objects.nonNull(responseMap.get(year))) {
+                    yearDto = responseMap.get(year);
+                }
+                if (BooleanUtils.isTrue(archiveDto.getQueryByMonth())) {
+                    yearDto.setMonth(ThreadSafeDateFormat.format(blog.getCreateTime(), ThreadSafeDateFormat.MONTH));
+                }
+                yearDto.setYear(year);
+                yearDto.setQueryByMonth(archiveDto.getQueryByMonth());
+                yearDto.getChildrens().add(toArchiveDto(blog));
+                responseMap.put(year, yearDto);
             }
+            response.data(Constants.ReplyField.DATA, responseMap.values());
         }
         response.data(Constants.ReplyField.TOTAL, archivePage.getTotal());
         response.data(Constants.ReplyField.PAGE, page);
         response.data(Constants.ReplyField.SIZE, size);
-        return null;
+        return response;
+    }
+
+    private ArchiveDto toArchiveDto(Blog blog) {
+        ArchiveDto archiveDto = new ArchiveDto();
+        BeanUtil.copyProperties(blog, archiveDto);
+        archiveDto.setMonth(ThreadSafeDateFormat.format(blog.getCreateTime(), ThreadSafeDateFormat.MONTH));
+        archiveDto.setCreateTime(blog.getCreateTime());
+        return archiveDto;
     }
 
     private Boolean getBlogLiked(String id, String ipAddr, String userId, String uniqueKey, String browserFinger) {
