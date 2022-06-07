@@ -18,6 +18,7 @@
 import { getRandomColor } from '@/utils/getRandomColor'
 export default {
   name: 'tagsIterator',
+  inject:['reload'],
   data() {
     return {}
   },
@@ -51,6 +52,7 @@ export default {
           name
         }
       })
+      this.reload()
     },
     color() {
       return getRandomColor()

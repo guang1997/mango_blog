@@ -37,37 +37,35 @@
                 :timestamp="item.createTime"
                 placement="top"
               >
-                <el-card class="el-card-define">
-                  <h4 @click="goToList('blogContent', item)" class="itemTitle">
-                    {{ item.title }}
-                  </h4>
-                  <br />
-                  <el-tag
-                    class="elTag"
-                    v-if="item.author"
-                    @click="goToList('author', item)"
-                    >{{ item.author }}</el-tag
-                  >
-                    <el-tag
-                      class="elTag"
-                      
-                      v-for="tagItem in item.tags"
-                      :key="tagItem.id"
-                      style="margin-left: 3px"
-                      @click="goToList('tag', tagItem)"
-                      type="success"
-                      >{{ tagItem.tagName }}</el-tag
-                    >
-                    <el-tag
-                      class="elSort"
-                      v-if="item.sort"
-                      style="margin-left: 3px"
-                      @click="goToList('tag', tagItem)"
-                      type="warning"
-                      >{{ item.sort.sortName }}</el-tag
-                    >
-
-                </el-card>
+              <el-card class="article-iterator__item" >
+                    <div class="item-content">
+                      <div class="item-content__pic">
+                        <img :src="item.fileId" alt="" />
+                      </div>
+                      <div class="item-content__info">
+                        <div class="item-content__link">
+                          <router-link :to="'/app/blog/' + item.id">{{ item.title }}</router-link>
+                        </div>
+                        <div class="item-content__detail">
+                          <!-- <span>
+                            <i class="el-icon-date"></i>
+                            发表时间 {{ item.createTime }}
+                          </span>
+                          <span>&nbsp;|&nbsp;</span> -->
+                          <span>
+                            <i class="el-icon-chat-dot-round"></i>
+                            评论数 {{ item.comments ? item.comments.length : 0 }}
+                          </span>
+                          <span>&nbsp;|&nbsp;</span>
+                          <span>
+                            <i class="el-icon-star-off"></i>
+                            点赞 {{ item.likeCount }}
+                          </span>
+                        </div>
+                        <div class="item-content__abstract">{{ item.summary }}</div>
+                      </div>
+                    </div>
+                  </el-card>
               </el-timeline-item>
             </el-timeline>
           </div>
@@ -114,6 +112,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import '~@/style/index.scss';
 .sortBox {
   color: #555;
 }
@@ -126,21 +125,90 @@ export default {
 .sortBoxSpanSelect {
   color: #409eff;
 }
-.itemTitle {
-  cursor: pointer;
-}
-.itemTitle:hover {
-  color: #409eff;
-}
-.elTag {
-  cursor: pointer;
-}
-.elSort {
-  cursor: pointer;
-}
-.el-card-define {
-  min-height: 100%;
-  height: 100%;
-  padding: 10px, 10px;
+.article-iterator {
+  &__item {
+    height: 280px;
+    @include respond-to(xs) {
+      height: auto;
+    }
+    > .el-card__body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+    }
+    .item-content {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      @include respond-to(xs) {
+        flex-direction: column;
+      }
+      &__pic {
+        width: 45%;
+        height: 100%;
+        @include respond-to(xs) {
+          width: 100%;
+          height: 230px;
+        }
+        flex: 0 0 auto;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      &__info {
+        width: 55%;
+        padding: 20px 30px;
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        @include respond-to(xs) {
+          width: 100%;
+          justify-content: normal;
+          padding: 16px;
+        }
+      }
+      &__link {
+        flex: 0 0 auto;
+        @include clamp(2);
+        a {
+          font-size: 24px;
+          line-height: 1.5;
+          transition: all ease-in-out 0.25s;
+          @include respond-to(xs) {
+            font-size: 18px;
+          }
+        }
+        a:hover {
+          @include themeify() {
+            color: themed('color-ele-primary');
+          }
+        }
+      }
+      &__detail {
+        @include themeify() {
+          color: themed('color-home-article-detail');
+        }
+        font-size: 12px;
+        padding: 12px 0;
+      }
+      &__abstract {
+        line-height: 2;
+        flex: 0 0 auto;
+        @include clamp(2);
+      }
+    }
+  }
+  &__item:not(:first-child) {
+    margin-top: 20px;
+  }
+  &__item:nth-child(even) .item-content__pic {
+    order: 1;
+    @include respond-to(xs) {
+      order: 0;
+    }
+  }
 }
 </style>

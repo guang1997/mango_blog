@@ -32,5 +32,9 @@ public interface BlogMapper extends BaseMapper<Blog> {
 
     List<ArchiveDto> selectArchivesByYear(ArchiveDto archiveDto);
 
+    List<Blog> selectBlogByRequest(BlogDto blogDto);
+
+    int selectBlogCountByRequest(BlogDto blogDto);
+
     List<ArchiveDto> selectArchivesByMonth(ArchiveDto archiveDto);
 }

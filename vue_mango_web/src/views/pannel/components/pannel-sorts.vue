@@ -7,7 +7,7 @@
       </div>
       <div class="pannel__item-body">
         <ul>
-          <li v-for="(item, index) in sorts" :key="index" @click="filterBlogs(item.name, item.id)">
+          <li v-for="(item, index) in sorts" :key="index" @click="filterBlogs(item.sortName, item.id)">
             <span>{{ item.sortName }}</span>
             <span>{{ item.blogNum }}</span>
           </li>
@@ -21,6 +21,7 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'pannelSorts',
+  inject:['reload'],
   props: {},
   data() {
     return {}
@@ -40,6 +41,7 @@ export default {
           name
         }
       })
+       this.reload()
     }
   }
 }

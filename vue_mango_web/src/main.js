@@ -25,7 +25,6 @@ Vue.component('empty', empty)
 Vue.component('layout', layout)
 
 Vue.config.productionTip = false
-
 new Vue({
   el: '#app',
   router,

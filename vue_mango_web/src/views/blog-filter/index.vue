@@ -1,13 +1,13 @@
 <template>
   <div class="article-filter">
-    <layout :_title="title" cover="/img/cover/articles.jpeg">
+    <layout :_title="title" cover="/static/img/cover/articles.jpeg">
       <template slot="custom-body">
         <blog-iterator :blogs="blogs"></blog-iterator>
         <div class="article-filter__page">
           <el-pagination
             :total="total"
             layout="prev, pager, next"
-            :page-size="pageSize"
+            :page-size="size"
             @current-change="currentChange"
           ></el-pagination>
         </div>
@@ -43,17 +43,17 @@ export default {
   },
   data() {
     return {
-      pageSize: 10,
-      currentPage: 1,
+      size: 10,
+      page: 1,
       blogs: [],
-      total: []
+      total: 0
     }
   },
   created() {},
   components: { blogIterator },
   async asyncData({ route }) {
     const articleRes = await fetchArticles(route)
-    if (articleRes.code === 20000) return { articles: articleRes.data.data, total: articleRes.total }
+    if (articleRes.code === 20000) return { blogs: articleRes.data.data, total: articleRes.data.total }
   },
   computed: {
     title() {
@@ -62,13 +62,13 @@ export default {
   },
   methods: {
     currentChange(val) {
-      this.currentPage = val
+      this.page = val
       this.getArticles()
     },
     async getArticles() {
-      const articleRes = await fetchArticles(this.$route,  this.currentPage, this.size)
+      const articleRes = await fetchArticles(this.$route,  this.page, this.size)
       if (articleRes.code === 20000) {
-        this.articles = articleRes.data.data
+        this.blogs = articleRes.data.data
         this.total = articleRes.total
       }
     }

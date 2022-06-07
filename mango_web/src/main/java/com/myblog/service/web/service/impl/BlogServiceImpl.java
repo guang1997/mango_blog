@@ -63,21 +63,17 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     public Response getBlogByPage(BlogDto blogDto) throws Exception {
         Response response = Response.ok();
         int page = 1;
-        int size = 6;
+        int size = 10;
         if (Objects.nonNull(blogDto.getPage())) page = blogDto.getPage();
         if (Objects.nonNull(blogDto.getSize())) size = blogDto.getSize();
+        blogDto.setPage((blogDto.getPage() - 1) * blogDto.getSize());
 
-        Page<Blog> blogPage = new Page<>(page, size);
-        QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
-        queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
-        if (Objects.nonNull(blogDto.getSort())) {
+        List<Blog> blogList = baseMapper.selectBlogByRequest(blogDto);
+        // 数据总数，由于可能使用left join导致总条数不准，因此重新查一次
+        int totalSize = baseMapper.selectBlogCountByRequest(blogDto);
 
-        }
-        baseMapper.selectPage(blogPage, queryWrapper);
-
-        response.data(Constants.ReplyField.DATA, this.toDtoList(blogPage.getRecords(), BlogDto.class));
-        response.data(Constants.ReplyField.TOTAL, blogPage.getTotal());
+        response.data(Constants.ReplyField.DATA, this.toDtoList(blogList, BlogDto.class));
+        response.data(Constants.ReplyField.TOTAL, totalSize);
         response.data(Constants.ReplyField.PAGE, page);
         response.data(Constants.ReplyField.SIZE, size);
         return response;

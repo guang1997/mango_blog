@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view />
+    <router-view v-if="isRouterActive"/>
   </div>
 </template>
 
@@ -15,11 +15,17 @@ import Fingerprint2 from "fingerprintjs2";
 import { storage } from "@/utils/storage";
 export default {
   name: "App",
+  provide() {
+      return {
+        reload: this.reload
+      }
+  },
   data() {
     return {
       location: [],
       timer: "",
       showBackTop: true,
+      isRouterActive: true
     };
   },
   mounted() {
@@ -155,6 +161,13 @@ export default {
       // 保存到localStorage，防止随时变化
       storage.setMangoBlogScreenInformation(JSON.stringify(screenInformation));
     },
+    // 使用provide/inject解决多个组件在同一页面无法跳转的问题
+    reload() {
+      this.isRouterActive = false
+      this.$nextTick(function() {
+        this.isRouterActive = true
+      });
+    }
   },
 };
 </script>

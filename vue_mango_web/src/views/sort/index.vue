@@ -53,19 +53,7 @@ export default {
       this.selectBlogId = blogSortId;
       blogApi.getBlogBySortId({blogSortId}).then(response => {
         if (response.code == 20000) {
-           var result = []
-
-          for (var a = 0; a < response.data.data.length; a++) {
-            var dataForDate = {
-              id: response.data.data[a].id,
-              title: response.data.data[a].title,
-              createTime: response.data.data[a].createTime,
-              author: response.data.data[a].author,
-              tags: response.data.data[a].tags
-            };
-            result.push(dataForDate);
-          }
-          this.itemByDate = result;
+          this.itemByDate = response.data.data;
         }
       });
     },

@@ -61,7 +61,7 @@ export default {
   data() {
     return {
       total: 0, //
-      pageSize: 6,
+      pageSize: 5,
       dictumInfo: '',
       timer: null,
       backTimer: null,
@@ -82,7 +82,7 @@ export default {
   async asyncData() {
     const res = await blogApi.getBlogByPage({
       page: 1,
-      size: this.pageSize
+      size: 10
     })
     if (res.code === 20000) return { blogs: res.data.data, total: res.data.total }
   },
