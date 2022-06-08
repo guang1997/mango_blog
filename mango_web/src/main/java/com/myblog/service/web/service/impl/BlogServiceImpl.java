@@ -238,6 +238,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         BeanUtil.copyProperties(blog, archiveDto);
         archiveDto.setMonth(ThreadSafeDateFormat.format(blog.getCreateTime(), ThreadSafeDateFormat.MONTH));
         archiveDto.setCreateTime(blog.getCreateTime());
+        archiveDto.setId(blog.getId());
         return archiveDto;
     }
 

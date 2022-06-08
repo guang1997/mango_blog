@@ -45,4 +45,6 @@ public class BlogDto extends BaseDto {
     private UniqueKeyDto screenInformation;
 
     private String browserFinger;
+
+    private String keyword;
 }

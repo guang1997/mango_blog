@@ -244,7 +244,6 @@ export default {
         userId: this.visitorInfo.id,
         source: "BLOG_INFO_COMMENT_LIKES",
         parentId: message.id,
-        userId: this.visitorInfo ? this.visitorInfo.id : "",
         avatar:
           this.visitorInfo && this.visitorInfo.avatar
             ? this.visitorInfo.avatar
@@ -260,15 +259,6 @@ export default {
           message: likeRes.message,
         });
         this.getCommentByPage();
-        //  if (isLiked === false) {
-        //   // 一开始没点过赞，后来点了赞
-        //   message.likeCount = message.likeCount + 1;
-        //   message.liked = true;
-        // } else if (isLiked === true) {
-        //   // 一开始点了赞，后来取消了赞
-        //   message.likeCount = message.likeCount <= 0 ? 0 : message.likeCount - 1;
-        //   message.liked = false;
-        // }
       }
     },
     submitContent(content, cb) {

@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <router-view v-if="isRouterActive"/>
+     <back-top></back-top>
   </div>
 </template>
 
@@ -13,6 +14,7 @@ import sortApi from "@/api/sort";
 import commentApi from "@/api/comment";
 import Fingerprint2 from "fingerprintjs2";
 import { storage } from "@/utils/storage";
+import backTop from '@/components/backTop'
 export default {
   name: "App",
   provide() {
@@ -28,6 +30,7 @@ export default {
       isRouterActive: true
     };
   },
+   components: { backTop },
   mounted() {
     this.initPannel();
     if (!storage.getMangoBlogBrowserFinger()) {

@@ -1,7 +1,3 @@
-<doc>
-  @desc:   点状形状包裹器
-  @author: justJokee 
-</doc>
 <template>
   <div class="dot">
     <slot></slot>

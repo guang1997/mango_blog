@@ -56,6 +56,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (StringUtils.isNotBlank(commentDto.getBlogId())) {
             queryWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
         }
+        if (StringUtils.isNotBlank(commentDto.getSource())) {
+            queryWrapper.eq(DbConstants.Comment.SOURCE, commentDto.getSource());
+        }
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         queryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.MESSAGE);
         queryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommonStatus.ENABLED);
@@ -66,7 +69,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             QueryWrapper<Comment> likeQueryWrapper = new QueryWrapper<>();
             likeQueryWrapper.eq(DbConstants.Comment.STATUS, Constants.CommonStatus.ENABLED);
             likeQueryWrapper.eq(DbConstants.Comment.USER_ID, commentDto.getUserId());
-            likeQueryWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+            if (StringUtils.isNotBlank(commentDto.getBlogId())) {
+                likeQueryWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+            }
             likeQueryWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
             likeQueryWrapper.in(DbConstants.Comment.SOURCE, CommentSourceEnum.getLikeSourceList());
             commentDtos.addAll(this.toDtoList(baseMapper.selectList(likeQueryWrapper), CommentDto.class));
@@ -198,7 +203,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         UpdateWrapper<Comment> userIdUpdateWrapper = new UpdateWrapper<>();
         userIdUpdateWrapper.eq(DbConstants.Comment.TYPE, Constants.CommentType.LIKES);
         userIdUpdateWrapper.eq(DbConstants.Comment.SOURCE, commentDto.getSource());
-        userIdUpdateWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+        if (StringUtils.isNotBlank(commentDto.getBlogId())) {
+            userIdUpdateWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
+        }
         userIdUpdateWrapper.eq(DbConstants.Comment.USER_ID, commentDto.getUserId());
         userIdUpdateWrapper.eq(DbConstants.Comment.PARENT_ID, commentDto.getParentId());
         if (baseMapper.update(comment, userIdUpdateWrapper) < 1) {

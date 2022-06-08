@@ -18,7 +18,7 @@
             <span>{{ total }}条留言</span>
           </div>
           <div class="message-board__list">
-            <comments :messages="messages" @submitReply="submitReply" @addLike="addLike"></comments>
+            <comments :comments="messages" @submitReply="submitReply" @likeComment="likeComment"></comments>
             <div class="message-board__page" v-if="messages.length">
               <el-pagination
                 :current-page.sync="currentPage"
@@ -40,23 +40,13 @@ import note from '@/components/note/'
 import splitLine from '@/components/splitLine/'
 import submit from '@/views/components/submit'
 import comments from '@/views/components/comments'
-import api from '@/api/messageBoard'
-
+import commentApi from '@/api/comment'
+import { storage } from "@/utils/storage";
 export default {
   name: 'messageBoard',
   metaInfo() {
     return {
-      title: `留言板  - Marco's Blog`,
-      meta: [
-        {
-          name: 'description',
-          content: '支持第三方登录的留言板功能'
-        },
-        {
-          name: 'keywords',
-          content: '三方登录,留言板'
-        }
-      ]
+      title: `留言板  - Lisite's Blog`
     }
   },
   components: {
@@ -73,12 +63,16 @@ export default {
       messages: []
     }
   },
-  async asyncData({ _ip }) {
-    const msgRes = await api.getMessageBoard({
+  async asyncData() {
+    console.log(this.visitorInfo)
+    const msgRes = await commentApi.getCommentByPage({
       page: 1,
-      _ip
+      size: 10,
+      source: 'MESSAGE_BOARD_MESSAGE',
+      queryLike: true,
+      userId: storage.getVisitor() ? storage.getVisitor().id : "",
     })
-    if (msgRes.status === 200) return { messages: msgRes.data, total: msgRes.total }
+    if (msgRes.code === 20000) return { messages: msgRes.data.data, total: msgRes.data.total }
   },
   computed: {
     ...mapState(['visitorInfo'])
@@ -91,76 +85,70 @@ export default {
       this.submit(content, currentReplyMessage, cb)
     },
     async submit(content, currentReplyMessage, cb) {
-      let parentId
-      let aite
+      let parentId = "0";
+      let answerNickname;
       if (currentReplyMessage) {
-        if (currentReplyMessage.parentId) parentId = currentReplyMessage.parentId
-        else parentId = currentReplyMessage._id
-        aite = currentReplyMessage.name
+        if (currentReplyMessage.parentId === "0") parentId = currentReplyMessage.id
+        else parentId = currentReplyMessage.parentId
+        answerNickname = currentReplyMessage.nickname
       }
-      const res = await api.saveMessageBoard({
-        name: this.visitorInfo.name,
-        imgUrl: this.visitorInfo.imgUrl,
-        email: this.visitorInfo.email,
-        link: this.visitorInfo.link,
+      const res = await commentApi.saveComment({
+        nickname: this.visitorInfo.nickname,
+        avatar: this.visitorInfo.avatar,
+        userId: this.visitorInfo.id,
         content: content,
         parentId,
-        aite
+        source: "MESSAGE_BOARD_MESSAGE",
+        answerNickname
       })
-      if (res.status === 200) {
+      if (res.code === 20000) {
         if (cb) cb()
         this.$message({
           type: 'success',
           message: '留言成功'
         })
-        this.getMessageBoard()
+        this.getCommentByPage()
       }
     },
-    async getMessageBoard() {
-      const msgRes = await api.getMessageBoard({
-        page: this.currentPage
+    async getCommentByPage() {
+      const msgRes = await commentApi.getCommentByPage({
+        page: this.currentPage,
+        size: this.pageSize,
+        source: 'MESSAGE_BOARD_MESSAGE',
+        queryLike: true,
+         userId: this.visitorInfo.id
       })
-      if (msgRes.status === 200) {
-        this.messages = msgRes.data
-        this.total = msgRes.total
+      if (msgRes.code === 20000) {
+        this.messages = msgRes.data.data
+        this.total = msgRes.data.total
       }
     },
-    async addLike(message) {
-      const inc = message.liked ? -1 : 1
-      const likeRes = await api.likeMessageBoard({
-        _id: message._id,
-        inc
+    async likeComment(message) {
+      const isLiked = message.liked ? true : false;
+      const likeRes = await commentApi.likeComment({
+        isLiked,
+        userId: this.visitorInfo.id,
+        source: "MESSAGE_BOARD_LIKES",
+        parentId: message.id,
+        avatar:
+          this.visitorInfo && this.visitorInfo.avatar
+            ? this.visitorInfo.avatar
+            : "",
+        nickname:
+          this.visitorInfo && this.visitorInfo.nickname
+            ? this.visitorInfo.nickname
+            : "",
       })
-      if (likeRes.status === 200) {
-        let finder
-        this.messages.some((msg) => {
-          if (msg._id === likeRes.data._id) {
-            finder = msg
-            return true
-          }
-          if (msg.reply && msg.reply.length) {
-            let done = false
-            msg.reply.some((er) => {
-              if (er._id === likeRes.data._id) {
-                finder = er
-                done = true
-              }
-            })
-            return done
-          }
-        })
-        if (finder) {
-          finder.like = likeRes.data.like
-          finder.liked = likeRes.data.liked
-        }
-        this.$message({
-          type: 'success',
-          message: likeRes.info
-        })
+      if (likeRes.code === 20000) {
+       this.$message({
+          type: "success",
+          message: likeRes.message,
+        });
+        this.getCommentByPage();
       }
     },
     currentChange() {
-      this.getMessageBoard()
+      this.getCommentByPage()
     }
   }
 }

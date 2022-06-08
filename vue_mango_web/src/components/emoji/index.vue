@@ -1,7 +1,3 @@
-<doc>
-  @desc:   留言、文章评论展示
-  @author: justJokee
-</doc>
 <template>
   <div class="emoji">
     <el-popover

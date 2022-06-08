@@ -10,10 +10,10 @@
       <el-scrollbar>
         <div class="search__content">
           <ul class="search__list">
-            <li v-for="(article, index) in articles" :key="index">
+            <li v-for="(blog, index) in blogs" :key="index">
               <div class="list-item">
-                <div class="list-item__title" v-html="article.title" @click="goto(article)"></div>
-                <div class="list-item__content" v-html="article.content_plain"></div>
+                <div class="list-item__title" v-html="blog.title" @click="goto(blog)"></div>
+                <div class="list-item__content" v-html="blog.content"></div>
               </div>
             </li>
           </ul>
@@ -22,7 +22,7 @@
       </el-scrollbar>
       <div class="search__page">
         <el-pagination
-          v-if="articles.length < total"
+          v-if="blogs.length < total"
           :total="total"
           layout="prev, pager, next"
           :page-size="pageSize"
@@ -34,7 +34,7 @@
 </template>
 <script>
 import splitLine from '@/components/splitLine/'
-
+import blogApi from '@/api/blog'
 export default {
   name: 'search',
   props: {},
@@ -45,7 +45,7 @@ export default {
       total: 0,
       pageSize: 10,
       currentPage: 1,
-      articles: []
+      blogs: []
     }
   },
   components: { splitLine },
@@ -56,38 +56,38 @@ export default {
   },
   computed: {
     showEmptyResult() {
-      return !this.articles.length && this.searched
+      return !this.blogs.length && this.searched
     }
   },
   methods: {
     async search() {
       if (!this.keyword.trim()) {
         this.searched = false
-        this.articles = []
+        this.blogs = []
         this.$message({
           type: 'warning',
           message: '请输入关键词搜索'
         })
         return
       }
-      const searchRes = await this.$api.searchArticle({
+      const searchRes = await blogApi.searchBlogByKeyword({
         keyword: this.keyword.trim(),
         page: this.currentPage,
-        limit: this.pageSize
+        size: this.pageSize
       })
-      if (searchRes.status === 200) {
-        this.articles = searchRes.data
+      if (searchRes.code === 20000) {
+        this.blogs = searchRes.data.data
         this.searched = true
-        this.total = searchRes.total
+        this.total = searchRes.data.total
       }
     },
     currentChange(val) {
       this.currentPage = val
       this.search()
     },
-    goto(article) {
+    goto(blog) {
       this.$emit('hasJumped')
-      this.$router.push({ name: 'articleDetail', params: { id: article.articleId } })
+      this.$router.push({ name: 'blogDetail', params: { id: blog.id } })
     }
   }
 }
