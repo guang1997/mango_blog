@@ -9,6 +9,7 @@ const archive = () => import('@/views/archive/')
 const tag = () => import('@/views/tag/')
 const blogFilter = () => import('@/views/blog-filter/')
 const sort = () => import('@/views/sort/')
+const friendLink = () => import('@/views/friendLink/')
 Vue.use(Router)
 Vue.use(Meta)
 // 避免重复点击相同路由 报错问题
@@ -58,6 +59,11 @@ const router = new Router({
       path: '/app/blog/:type/:param',
       name: 'blogFilter',
       component: blogFilter
+    },
+    {
+      path: '/app/friendLink',
+      name: 'friendLink',
+      component: friendLink
     },
   ],
   scrollBehavior(to, from, savedPosition) {

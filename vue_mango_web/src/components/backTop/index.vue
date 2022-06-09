@@ -3,7 +3,7 @@
         <div class="back-top" v-show="show" @click.stop="getTop">
             <img class="img1" src="@/assets/img/_tortoise.svg" alt="">
             <img class="img2" src="@/assets/img/tortoise.svg" alt="">
-            <p>Top</p>
+            <p style="font-size:25px">Top</p>
         </div>
     </transition>
 </template>
@@ -47,7 +47,7 @@
 
 <style scoped lang="scss">
 .back-top {
-    background-color: #FFFFFF;
+    // background-color: #FFFFFF;
     position: fixed;
     right: 3rem;
     bottom: 8rem;
@@ -58,8 +58,8 @@
     text-align: center;
     z-index: 99;
     img{
-        width: 60px;
-        height: 60px;
+        width: 100px;
+        height: 100px;
     }
     .img2{
         display: none;

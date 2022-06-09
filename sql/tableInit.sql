@@ -14,10 +14,12 @@
 
 
 -- 导出 mango_blog 的数据库结构
+DROP DATABASE IF EXISTS `mango_blog`;
 CREATE DATABASE IF NOT EXISTS `mango_blog` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `mango_blog`;
 
 -- 导出  表 mango_blog.t_admin 结构
+DROP TABLE IF EXISTS `t_admin`;
 CREATE TABLE IF NOT EXISTS `t_admin` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名',
@@ -48,6 +50,7 @@ INSERT INTO `t_admin` (`id`, `username`, `password`, `gender`, `avatar`, `email`
 /*!40000 ALTER TABLE `t_admin` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_blog 结构
+DROP TABLE IF EXISTS `t_blog`;
 CREATE TABLE IF NOT EXISTS `t_blog` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `title` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '博客标题',
@@ -78,6 +81,7 @@ INSERT INTO `t_blog` (`id`, `title`, `summary`, `content`, `click_count`, `like_
 /*!40000 ALTER TABLE `t_blog` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_blog_tag 结构
+DROP TABLE IF EXISTS `t_blog_tag`;
 CREATE TABLE IF NOT EXISTS `t_blog_tag` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `blog_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '博客ID',
@@ -102,6 +106,7 @@ INSERT INTO `t_blog_tag` (`id`, `blog_id`, `tag_id`, `create_time`, `update_time
 /*!40000 ALTER TABLE `t_blog_tag` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_comment 结构
+DROP TABLE IF EXISTS `t_comment`;
 CREATE TABLE IF NOT EXISTS `t_comment` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `parent_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' COMMENT '父id',
@@ -123,7 +128,7 @@ CREATE TABLE IF NOT EXISTS `t_comment` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='评论表';
 
--- 正在导出表  mango_blog.t_comment 的数据：~21 rows (大约)
+-- 正在导出表  mango_blog.t_comment 的数据：~26 rows (大约)
 DELETE FROM `t_comment`;
 /*!40000 ALTER TABLE `t_comment` DISABLE KEYS */;
 INSERT INTO `t_comment` (`id`, `parent_id`, `user_id`, `browser_finger`, `ip`, `unique_key`, `avatar`, `nickname`, `answer_nickname`, `content`, `create_time`, `update_time`, `source`, `type`, `blog_id`, `status`, `like_count`) VALUES
@@ -144,15 +149,22 @@ INSERT INTO `t_comment` (`id`, `parent_id`, `user_id`, `browser_finger`, `ip`, `
 	('1532737616780574721', '0', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '1', '2022-06-03 22:54:59', '2022-06-03 23:18:33', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1, 0),
 	('1532737621163622401', '0', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '1', '2022-06-03 22:55:00', '2022-06-03 23:18:34', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1, 1),
 	('1532737625416646657', '0', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '1', '2022-06-03 22:55:01', '2022-06-03 23:18:37', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1, 0),
-	('1532737683918798850', '0', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '1', '2022-06-03 22:55:15', '2022-06-03 23:18:55', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1, 1),
+	('1532737683918798850', '0', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '1', '2022-06-03 22:55:15', '2022-06-08 21:21:52', 'BLOG_INFO_MESSAGE', 0, '1528008410976800770', 1, 2),
 	('1532737707658559490', '1532737579593875458', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'true', '2022-06-03 22:55:21', '2022-06-03 22:55:21', 'BLOG_INFO_COMMENT_LIKES', 1, '1528008410976800770', 1, 0),
-	('1532738193761615874', '1532737683918798850', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'true', '2022-06-03 22:57:17', '2022-06-03 23:18:55', 'BLOG_INFO_COMMENT_LIKES', 1, '1528008410976800770', 1, 0),
 	('1532738197473574914', '1532737625416646657', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'false', '2022-06-03 22:57:18', '2022-06-03 23:18:37', 'BLOG_INFO_COMMENT_LIKES', 1, '1528008410976800770', 1, 0),
 	('1532738200422170626', '1532737621163622401', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'false', '2022-06-03 22:57:19', '2022-06-03 23:18:33', 'BLOG_INFO_COMMENT_LIKES', 1, '1528008410976800770', 1, 0),
-	('1532738215186120705', '1532737616780574721', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'false', '2022-06-03 22:57:22', '2022-06-03 23:18:33', 'BLOG_INFO_COMMENT_LIKES', 1, '1528008410976800770', 1, 0);
+	('1532738215186120705', '1532737616780574721', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'false', '2022-06-03 22:57:22', '2022-06-03 23:18:33', 'BLOG_INFO_COMMENT_LIKES', 1, '1528008410976800770', 1, 0),
+	('1534523725411893250', '0', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '留言板评论', '2022-06-08 21:12:21', '2022-06-08 21:51:24', 'MESSAGE_BOARD_MESSAGE', 0, NULL, 1, 13),
+	('1534524364216975362', '1534523725411893250', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', '李斯特123', '回复一级评论', '2022-06-08 21:14:53', '2022-06-08 21:14:53', 'MESSAGE_BOARD_MESSAGE', 0, NULL, 1, 0),
+	('1534524403739901953', '1534523725411893250', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', '李斯特123', '回复二级评论', '2022-06-08 21:15:03', '2022-06-08 21:15:03', 'MESSAGE_BOARD_MESSAGE', 0, NULL, 1, 0),
+	('1534524451877928962', '0', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, '留言板评论2', '2022-06-08 21:15:14', '2022-06-08 21:51:33', 'MESSAGE_BOARD_MESSAGE', 0, NULL, 1, 0),
+	('1534525521958100993', '1534523725411893250', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'true', '2022-06-08 21:19:29', '2022-06-08 21:51:24', 'MESSAGE_BOARD_LIKES', 1, NULL, 1, 0),
+	('1534526121278005249', '1532737683918798850', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'true', '2022-06-08 21:21:52', '2022-06-08 21:21:52', 'BLOG_INFO_COMMENT_LIKES', 1, '1528008410976800770', 1, 0),
+	('1534533559247032322', '1534524451877928962', '1530907221067931649', NULL, '192.168.1.7', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', '李斯特123', NULL, 'false', '2022-06-08 21:51:25', '2022-06-08 21:51:32', 'MESSAGE_BOARD_LIKES', 1, NULL, 1, 0);
 /*!40000 ALTER TABLE `t_comment` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_dict 结构
+DROP TABLE IF EXISTS `t_dict`;
 CREATE TABLE IF NOT EXISTS `t_dict` (
   `id` varchar(19) NOT NULL COMMENT '主键',
   `dict_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '字典名称',
@@ -180,6 +192,7 @@ INSERT INTO `t_dict` (`id`, `dict_name`, `summary`, `is_deleted`, `create_time`,
 /*!40000 ALTER TABLE `t_dict` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_dict_detail 结构
+DROP TABLE IF EXISTS `t_dict_detail`;
 CREATE TABLE IF NOT EXISTS `t_dict_detail` (
   `id` varchar(19) NOT NULL COMMENT '主键',
   `dict_id` varchar(255) DEFAULT NULL COMMENT '字典类型ID',
@@ -226,6 +239,7 @@ INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_c
 /*!40000 ALTER TABLE `t_dict_detail` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_email_config 结构
+DROP TABLE IF EXISTS `t_email_config`;
 CREATE TABLE IF NOT EXISTS `t_email_config` (
   `id` varchar(19) NOT NULL COMMENT 'ID',
   `from_user` varchar(255) DEFAULT NULL COMMENT '发件人',
@@ -249,6 +263,7 @@ INSERT INTO `t_email_config` (`id`, `from_user`, `host`, `password`, `port`, `us
 /*!40000 ALTER TABLE `t_email_config` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_exception_log 结构
+DROP TABLE IF EXISTS `t_exception_log`;
 CREATE TABLE IF NOT EXISTS `t_exception_log` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `exception_json` mediumtext COMMENT '异常对象json格式',
@@ -270,6 +285,7 @@ DELETE FROM `t_exception_log`;
 /*!40000 ALTER TABLE `t_exception_log` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_link 结构
+DROP TABLE IF EXISTS `t_link`;
 CREATE TABLE IF NOT EXISTS `t_link` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `title` varchar(255) DEFAULT NULL COMMENT '友情链接标题',
@@ -278,19 +294,19 @@ CREATE TABLE IF NOT EXISTS `t_link` (
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `link_status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '友链状态： 0 申请中， 1：已上线',
-  `file_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '网站图标',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='友情链接表';
 
 -- 正在导出表  mango_blog.t_link 的数据：~2 rows (大约)
 DELETE FROM `t_link`;
 /*!40000 ALTER TABLE `t_link` DISABLE KEYS */;
-INSERT INTO `t_link` (`id`, `title`, `summary`, `url`, `create_time`, `update_time`, `link_status`, `file_id`) VALUES
-	('1507920187256823810', '测试2', NULL, 'https://www.yanshisan.cn/1', '2022-03-27 11:19:23', '2022-05-15 17:34:17', 0, 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg'),
-	('1525771593183432706', '测试2', NULL, 'https://www.yanshisan.cn/12', '2022-05-15 17:34:30', '2022-05-15 17:37:03', 0, 'https://guang1997.oss-cn-shanghai.aliyuncs.com/avatar/2020/07/22/index.jpg');
+INSERT INTO `t_link` (`id`, `title`, `summary`, `url`, `create_time`, `update_time`, `link_status`) VALUES
+	('1507920187256823810', '测试2', '123', 'https://www.yanshisan.cn/1', '2022-03-27 11:19:23', '2022-05-15 17:34:17', 1),
+	('1525771593183432706', '测试2', '123', 'https://www.yanshisan.cn/12', '2022-05-15 17:34:30', '2022-05-15 17:37:03', 1);
 /*!40000 ALTER TABLE `t_link` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_menu 结构
+DROP TABLE IF EXISTS `t_menu`;
 CREATE TABLE IF NOT EXISTS `t_menu` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `name` varchar(255) NOT NULL COMMENT '菜单名称',
@@ -361,6 +377,7 @@ INSERT INTO `t_menu` (`id`, `name`, `title`, `pid`, `icon`, `sort`, `is_deleted`
 /*!40000 ALTER TABLE `t_menu` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_picture 结构
+DROP TABLE IF EXISTS `t_picture`;
 CREATE TABLE IF NOT EXISTS `t_picture` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `file_id` varchar(255) DEFAULT NULL COMMENT '图片id',
@@ -378,6 +395,7 @@ DELETE FROM `t_picture`;
 /*!40000 ALTER TABLE `t_picture` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role 结构
+DROP TABLE IF EXISTS `t_role`;
 CREATE TABLE IF NOT EXISTS `t_role` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `role_name` varchar(255) NOT NULL COMMENT '角色名',
@@ -398,6 +416,7 @@ INSERT INTO `t_role` (`id`, `role_name`, `create_time`, `update_time`, `summary`
 /*!40000 ALTER TABLE `t_role` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role_admin 结构
+DROP TABLE IF EXISTS `t_role_admin`;
 CREATE TABLE IF NOT EXISTS `t_role_admin` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `role_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色ID',
@@ -417,6 +436,7 @@ INSERT INTO `t_role_admin` (`id`, `role_id`, `admin_id`, `create_time`, `update_
 /*!40000 ALTER TABLE `t_role_admin` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_role_menu 结构
+DROP TABLE IF EXISTS `t_role_menu`;
 CREATE TABLE IF NOT EXISTS `t_role_menu` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `role_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色ID',
@@ -495,6 +515,7 @@ INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`, `create_time`, `update_ti
 /*!40000 ALTER TABLE `t_role_menu` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_sort 结构
+DROP TABLE IF EXISTS `t_sort`;
 CREATE TABLE IF NOT EXISTS `t_sort` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `sort_name` varchar(255) DEFAULT NULL COMMENT '分类内容',
@@ -517,6 +538,7 @@ INSERT INTO `t_sort` (`id`, `sort_name`, `summary`, `create_time`, `update_time`
 /*!40000 ALTER TABLE `t_sort` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_tag 结构
+DROP TABLE IF EXISTS `t_tag`;
 CREATE TABLE IF NOT EXISTS `t_tag` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `summary` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '标签描述',
@@ -539,6 +561,7 @@ INSERT INTO `t_tag` (`id`, `summary`, `click_count`, `create_time`, `update_time
 /*!40000 ALTER TABLE `t_tag` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_todo 结构
+DROP TABLE IF EXISTS `t_todo`;
 CREATE TABLE IF NOT EXISTS `t_todo` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `admin_id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '管理员id',
@@ -556,6 +579,7 @@ DELETE FROM `t_todo`;
 /*!40000 ALTER TABLE `t_todo` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_user 结构
+DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE IF NOT EXISTS `t_user` (
   `id` varchar(19) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '唯一id',
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名',
@@ -584,11 +608,12 @@ CREATE TABLE IF NOT EXISTS `t_user` (
 DELETE FROM `t_user`;
 /*!40000 ALTER TABLE `t_user` DISABLE KEYS */;
 INSERT INTO `t_user` (`id`, `username`, `password`, `gender`, `avatar`, `birthday`, `email`, `mobile`, `login_count`, `last_login_time`, `last_login_ip`, `status`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `comment_status`, `user_tag`) VALUES
-	('1530907221067931649', '李斯特123', '$2a$10$mRyGRbLPkiAblV11ATLGDu5sIG5w9.t2uUlSMI2hWvTEKgfHxI9Le', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', NULL, '872174823@qq.com', NULL, 31, NULL, '127.0.0.1', 1, '2022-05-29 21:41:39', '2022-06-03 23:15:03', '李斯特123', NULL, NULL, 1, 0),
+	('1530907221067931649', '李斯特123', '$2a$10$mRyGRbLPkiAblV11ATLGDu5sIG5w9.t2uUlSMI2hWvTEKgfHxI9Le', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', NULL, '872174823@qq.com', NULL, 32, NULL, '127.0.0.1', 1, '2022-05-29 21:41:39', '2022-06-08 20:49:33', '李斯特123', NULL, NULL, 1, 0),
 	('1531998551454093313', '测试123', '$2a$10$2NllPZWFJv5Gmk.57YhdpOT3Bs0OyIwV0Rl/.QWotW87WTC1v/2s.', NULL, 'https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/21/369ec60f-846b-4eb2-ab6e-81044b5babdd-test.jpeg', NULL, 'guang1997qqq@163.com', NULL, 2, NULL, '127.0.0.1', 1, '2022-06-01 21:58:12', '2022-06-03 21:43:02', '测试123', NULL, NULL, 1, 0);
 /*!40000 ALTER TABLE `t_user` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_web_config 结构
+DROP TABLE IF EXISTS `t_web_config`;
 CREATE TABLE IF NOT EXISTS `t_web_config` (
   `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '主键',
   `logo` varchar(255) NOT NULL COMMENT 'logo(文件ID)',
@@ -622,6 +647,7 @@ DELETE FROM `t_web_config`;
 /*!40000 ALTER TABLE `t_web_config` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_web_visit 结构
+DROP TABLE IF EXISTS `t_web_visit`;
 CREATE TABLE IF NOT EXISTS `t_web_visit` (
   `id` varchar(19) NOT NULL COMMENT '主键',
   `user_id` varchar(255) DEFAULT NULL COMMENT '用户id',

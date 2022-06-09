@@ -29,25 +29,11 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-
-    <!-- <el-dropdown class="horizontal-navbar__menu">
-      <span class="navbar-menu-title">
-        <i class="el-icon-camera"></i>
-        娱乐
-        <i class="el-icon-arrow-down"></i>
-      </span>
-      <el-dropdown-menu slot="dropdown" class="menu-list">
-        <el-dropdown-item @click.native="goTo('movies')">
-          <i class="el-icon-video-camera-solid"></i>
-          电影
-        </el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown> -->
     <div class="horizontal-navbar__menu" @click="goTo('messageBoard')">
       <i class="el-icon-chat-dot-round"></i>
       <span>留言板</span>
     </div>
-    <div class="horizontal-navbar__menu" @click="friendLink">
+    <div class="horizontal-navbar__menu" @click="goTo('friendLink')">
       <i class="el-icon-ship"></i>
       <span>友链</span>
     </div>
@@ -61,11 +47,6 @@ export default {
     },
     openSearch() {
       this.$emit('openSearch')
-    },
-    friendLink() {
-      this.$message({
-        message: '拼命开发中😭'
-      })
     }
   }
 }
