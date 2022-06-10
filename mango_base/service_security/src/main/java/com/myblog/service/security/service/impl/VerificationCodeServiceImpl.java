@@ -16,6 +16,7 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.Base64Util;
 import com.myblog.service.base.util.RedisUtil;
+import com.myblog.service.base.util.TwoTuple;
 import com.myblog.service.security.entity.EmailConfig;
 import com.myblog.service.security.service.EmailConfigService;
 import com.myblog.service.security.service.VerificationCodeService;
@@ -45,13 +46,15 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
 
     @Value("${email.sendEmailName}")
     private String sendEmailName;
+
     /**
      * 给邮箱发送验证码
+     *
      * @param email
      * @return
      */
     @Override
-    public Response sendCode(String  email, String source) {
+    public Response sendCode(String email, String source) {
 
         String key = RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + email + RedisConstants.DIVISION + source;
         String content = "";
@@ -60,13 +63,13 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         String redisCode = redisUtil.get(key);
         // 先判断redis中是否已经有验证码，有验证码直接使用
         if (StringUtils.isNotBlank(redisCode)) {
-            content = template.render(Dict.create().set("code",redisCode));
+            content = template.render(Dict.create().set("code", redisCode));
         } else {
             // redis中没有则生成验证码
-            String code = RandomUtil.randomNumbers (6);
+            String code = RandomUtil.randomNumbers(6);
             // 将验证码放到redis中
             redisUtil.setEx(key, code, expiresSecond, TimeUnit.MILLISECONDS);
-            content = template.render(Dict.create().set("code",code));
+            content = template.render(Dict.create().set("code", code));
         }
 
         // 发送验证码
@@ -108,6 +111,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
 
     /**
      * 校验验证码
+     *
      * @param email
      * @param code
      * @return
@@ -126,16 +130,17 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
 
     /**
      * 发送邮件
+     *
      * @param email
      * @param source
      * @return
      */
     @Override
-    public Response sendEmail(String email, String source) {
+    public Response sendEmail(String email, String source, TwoTuple<String, Object> param) {
         TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
-        String templateUrl = "template/email/" + source + "-email.ftl";
+        String templateUrl = "template/email/" + param.getFirst() + "Email.ftl";
         Template template = engine.getTemplate(templateUrl);
-        String content = template.render(Dict.create().set("url", source));
+        String content = template.render(Dict.create().set(param.getFirst(), param.getSecond()));
         // 发送邮件
         QueryWrapper<EmailConfig> emailConfigQueryWrapper = new QueryWrapper<>();
         emailConfigQueryWrapper.eq(DbConstants.EmailConfig.SOURCE, source);

@@ -215,7 +215,7 @@ export default {
           const res = await linkApi
             .saveFriendLink({
               email: this.formInfo.email,
-              nickname: this.formInfo.nickname,
+              title: this.formInfo.title,
               code: this.formInfo.code,
               summary: this.formInfo.summary,
               url: this.formInfo.url

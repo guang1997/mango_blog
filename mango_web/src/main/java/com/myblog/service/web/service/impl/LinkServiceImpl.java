@@ -44,8 +44,6 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
             LOGGER.error("saveFriendLink failed by unknowen error, link:{}", link);
             return Response.error();
         }
-        // 保存成功之后异步发送邮件
-
         return Response.ok();
     }
 }

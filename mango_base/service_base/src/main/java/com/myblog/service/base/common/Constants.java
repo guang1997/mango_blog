@@ -91,6 +91,9 @@ public interface Constants {
         String ADMIN = "ADMIN";
     }
 
+    interface EmailParam {
+        String WEB_LINK = "webLink";
+    }
     /**
      * 用户标签
      */

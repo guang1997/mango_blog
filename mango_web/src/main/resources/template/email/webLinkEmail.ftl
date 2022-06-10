@@ -20,7 +20,7 @@
             border: 1px solid #eee;">
     <div style="padding: 10px;padding-bottom: 0px;">
         <p style="margin-bottom: 10px;padding-bottom: 0px;">尊敬的用户，您好：</p>
-        <p style="text-indent: 2em; margin-bottom: 10px;">您正在申请邮箱验证，您的验证码为：</p>
+        <p style="text-indent: 2em; margin-bottom: 10px;">有朋友正在申请友链，请尽快处理，友链地址：</p>
         <p style="text-align: center;
 			font-family: Times New Roman;
 			font-size: 22px;
@@ -28,7 +28,7 @@
 			padding: 20px 0px;
 			margin-bottom: 10px;
 			font-weight: bold;
-			background: #ebebeb;">${code}</p>
+			background: #ebebeb;">${webLink}</p>
         <div class="foot-hr hr" style="margin: 0 auto;
 			z-index: 111;
 			width: 800px;
