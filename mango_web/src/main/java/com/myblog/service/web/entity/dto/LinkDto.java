@@ -14,5 +14,7 @@ public class LinkDto extends BaseDto {
 
     private Integer linkStatus;
 
+    private String code;
 
+    private String email;
 }

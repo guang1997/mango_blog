@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- 主机:                           127.0.0.1
--- 服务器版本:                        8.0.26 - MySQL Community Server - GPL
+-- 服务器版本:                        8.0.27 - MySQL Community Server - GPL
 -- 服务器操作系统:                      Win64
--- HeidiSQL 版本:                  11.3.0.6295
+-- HeidiSQL 版本:                  10.2.0.5704
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -10,7 +10,6 @@
 /*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
 -- 导出 mango_blog 的数据库结构
@@ -128,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `t_comment` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='评论表';
 
--- 正在导出表  mango_blog.t_comment 的数据：~26 rows (大约)
+-- 正在导出表  mango_blog.t_comment 的数据：~29 rows (大约)
 DELETE FROM `t_comment`;
 /*!40000 ALTER TABLE `t_comment` DISABLE KEYS */;
 INSERT INTO `t_comment` (`id`, `parent_id`, `user_id`, `browser_finger`, `ip`, `unique_key`, `avatar`, `nickname`, `answer_nickname`, `content`, `create_time`, `update_time`, `source`, `type`, `blog_id`, `status`, `like_count`) VALUES
@@ -291,6 +290,7 @@ CREATE TABLE IF NOT EXISTS `t_link` (
   `title` varchar(255) DEFAULT NULL COMMENT '友情链接标题',
   `summary` varchar(255) DEFAULT NULL COMMENT '友情链接介绍',
   `url` varchar(255) DEFAULT NULL COMMENT '友情链接URL',
+  `email` varchar(255) DEFAULT NULL COMMENT '邮箱',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
   `link_status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '友链状态： 0 申请中， 1：已上线',
@@ -300,9 +300,9 @@ CREATE TABLE IF NOT EXISTS `t_link` (
 -- 正在导出表  mango_blog.t_link 的数据：~2 rows (大约)
 DELETE FROM `t_link`;
 /*!40000 ALTER TABLE `t_link` DISABLE KEYS */;
-INSERT INTO `t_link` (`id`, `title`, `summary`, `url`, `create_time`, `update_time`, `link_status`) VALUES
-	('1507920187256823810', '测试2', '123', 'https://www.yanshisan.cn/1', '2022-03-27 11:19:23', '2022-05-15 17:34:17', 1),
-	('1525771593183432706', '测试2', '123', 'https://www.yanshisan.cn/12', '2022-05-15 17:34:30', '2022-05-15 17:37:03', 1);
+INSERT INTO `t_link` (`id`, `title`, `summary`, `url`, `email`, `create_time`, `update_time`, `link_status`) VALUES
+	('1507920187256823810', '测试2', '123', 'https://www.yanshisan.cn/1', NULL, '2022-03-27 11:19:23', '2022-05-15 17:34:17', 1),
+	('1525771593183432706', '测试2', '123', 'https://www.yanshisan.cn/12', NULL, '2022-05-15 17:34:30', '2022-05-15 17:37:03', 1);
 /*!40000 ALTER TABLE `t_link` ENABLE KEYS */;
 
 -- 导出  表 mango_blog.t_menu 结构
@@ -682,6 +682,5 @@ INSERT INTO `t_web_visit` (`id`, `user_id`, `ip`, `create_time`, `update_time`, 
 /*!40000 ALTER TABLE `t_web_visit` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;

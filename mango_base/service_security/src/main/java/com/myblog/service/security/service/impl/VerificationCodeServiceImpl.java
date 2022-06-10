@@ -40,9 +40,11 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     @Autowired
     private EmailConfigService emailConfigService;
 
-    @Value("${email.code.expiresSecond}")
+    @Value("${email.expiresSecond}")
     private Long expiresSecond;
 
+    @Value("${email.sendEmailName}")
+    private String sendEmailName;
     /**
      * 给邮箱发送验证码
      * @param email
@@ -119,6 +121,53 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
             return Response.setResult(ResultCodeEnum.CODE_ERROR);
         }
         // 校验完不删除验证码，5分钟后自动删除
+        return Response.ok();
+    }
+
+    /**
+     * 发送邮件
+     * @param email
+     * @param source
+     * @return
+     */
+    @Override
+    public Response sendEmail(String email, String source) {
+        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
+        String templateUrl = "template/email/" + source + "-email.ftl";
+        Template template = engine.getTemplate(templateUrl);
+        String content = template.render(Dict.create().set("url", source));
+        // 发送邮件
+        QueryWrapper<EmailConfig> emailConfigQueryWrapper = new QueryWrapper<>();
+        emailConfigQueryWrapper.eq(DbConstants.EmailConfig.SOURCE, source);
+        EmailConfig emailConfig = emailConfigService.getOne(emailConfigQueryWrapper);
+        if (Objects.isNull(emailConfig)) {
+            return Response.error().message("发送邮件失败，请联系管理员配置邮箱");
+        }
+        MailAccount account = new MailAccount();
+        // 设置用户
+        account.setUser(emailConfig.getUser());
+        account.setHost(emailConfig.getHost());
+        account.setPort(emailConfig.getPort());
+        account.setAuth(true);
+        account.setPass(Base64Util.decodeToString(emailConfig.getPassword()));
+        account.setFrom(emailConfig.getFromUser());
+        // ssl方式发送
+//        account.setSslEnable(true);
+        // 使用STARTTLS安全连接
+//        account.setStarttlsEnable(true);
+        try {
+            Mail.create(account)
+                    .setTos(email)
+                    .setTitle(emailConfig.getSubject())
+                    .setContent(content)
+                    .setHtml(true)
+                    //关闭session
+                    .setUseGlobalSession(false)
+                    .send();
+        } catch (MailException e) {
+            LOGGER.error("sendEmail failed, exception:", e);
+            return Response.setResult(ResultCodeEnum.SEND_EMAIL_FAILED);
+        }
         return Response.ok();
     }
 }

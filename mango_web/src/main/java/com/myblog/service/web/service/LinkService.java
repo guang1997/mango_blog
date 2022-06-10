@@ -17,4 +17,6 @@ import com.myblog.service.web.entity.dto.LinkDto;
 public interface LinkService extends IService<Link>, ServiceConvertHandler<Link, LinkDto> {
 
     Response getFriendLink(LinkDto linkDto) throws Exception;
+
+    Response saveFriendLink(LinkDto linkDto) throws Exception;
 }

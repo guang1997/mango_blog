@@ -139,7 +139,7 @@ export default {
           {
             type: "email",
             required: true,
-            message: "请填写邮箱",
+            message: "请输入邮箱",
             trigger: "blur",
           },
         ],
