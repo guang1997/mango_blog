@@ -21,6 +21,7 @@
           >回复 {{ currentReplyMessage.nickname }} :</span
         >
         <el-input
+          class="live2d_comment_focus"
           ref="comment"
           type="textarea"
           :rows="3"

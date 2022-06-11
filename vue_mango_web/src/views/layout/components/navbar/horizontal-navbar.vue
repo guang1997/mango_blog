@@ -2,7 +2,7 @@
   <div class="horizontal-navbar">
     <div class="horizontal-navbar__menu" @click="openSearch">
       <i class="el-icon-search"></i>
-      <span>搜索</span>
+      <span class="live2d_search">搜索</span>
     </div>
     <div class="horizontal-navbar__menu" @click="goTo('home')">
       <i class="el-icon-s-home"></i>
@@ -31,7 +31,7 @@
     </el-dropdown>
     <div class="horizontal-navbar__menu" @click="goTo('messageBoard')">
       <i class="el-icon-chat-dot-round"></i>
-      <span>留言板</span>
+      <span class="live2d_message_board">留言板</span>
     </div>
     <div class="horizontal-navbar__menu" @click="goTo('friendLink')">
       <i class="el-icon-ship"></i>

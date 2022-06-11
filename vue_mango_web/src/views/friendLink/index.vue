@@ -49,7 +49,7 @@
                 clearable
               ></el-input>
             </el-form-item>
-            <el-form-item label="站点链接" prop="url" label-width="80px">
+            <el-form-item class="live2d_link_url" label="站点链接" prop="url" label-width="80px">
               <el-input
                 style="display: flex"
                 v-model="formInfo.url"
@@ -198,11 +198,7 @@ export default {
     };
   },
   created() {
-    linkApi.getFriendLink({}).then((response) => {
-      if (response.code == 20000) {
-        this.friendLinkList = response.data.data;
-      }
-    });
+    this.getFriendLink();
   },
   computed: {
     ...mapState(["visitorInfo"]),
@@ -218,14 +214,13 @@ export default {
               title: this.formInfo.title,
               code: this.formInfo.code,
               summary: this.formInfo.summary,
-              url: this.formInfo.url
+              url: this.formInfo.url,
             })
             .catch((err) => {
               this.submitLoading = false;
             });
 
           if (res.code === 20000) {
-            this.$emit("changeCustomVisible", false);
             this.formInfo = {
               title: "",
               email: "",
@@ -233,8 +228,20 @@ export default {
               url: "",
               summary: "",
             };
+            this.$message({
+              showClose: true,
+              message: "保存成功，请等待管理员审核",
+              type: "success",
+            });
+          } else {
+            this.$message({
+              showClose: true,
+              message: res.message,
+              type: "error",
+            });
           }
           this.submitLoading = false;
+          this.customVisible = false;
         }
       });
     },
@@ -243,39 +250,39 @@ export default {
     },
     sendCode() {
       if (this.formInfo.email) {
-      this.buttonName = "验证码发送中";
-      const _this = this;
-      const param = {
-        email: this.formInfo.email,
-      };
-      loginApi
-        .sendCode(param)
-        .then((res) => {
-          this.isDisabled = true;
-          this.$message({
-            showClose: true,
-            message: "发送成功，验证码有效期5分钟",
-            type: "success",
+        this.buttonName = "验证码发送中";
+        const _this = this;
+        const param = {
+          email: this.formInfo.email,
+        };
+        loginApi
+          .sendCode(param)
+          .then((res) => {
+            this.isDisabled = true;
+            this.$message({
+              showClose: true,
+              message: "发送成功，验证码有效期5分钟",
+              type: "success",
+            });
+            this.codeLoading = false;
+            this.codeButtonName = "获取验证码";
+            this.codeButtonName = this.time-- + "秒后重新发送";
+            this.timer = window.setInterval(function () {
+              _this.codeButtonName = _this.time + "秒后重新发送";
+              --_this.time;
+              if (_this.time < 0) {
+                _this.codeButtonName = "重新发送";
+                _this.time = 60;
+                _this.isDisabled = false;
+                window.clearInterval(_this.timer);
+              }
+            }, 1000);
+          })
+          .catch((err) => {
+            this.isDisabled = false;
+            this.codeLoading = false;
+            console.log(err);
           });
-          this.codeLoading = false;
-          this.codeButtonName = "获取验证码";
-          this.codeButtonName = this.time-- + "秒后重新发送";
-          this.timer = window.setInterval(function () {
-            _this.codeButtonName = _this.time + "秒后重新发送";
-            --_this.time;
-            if (_this.time < 0) {
-              _this.codeButtonName = "重新发送";
-              _this.time = 60;
-              _this.isDisabled = false;
-              window.clearInterval(_this.timer);
-            }
-          }, 1000);
-        })
-        .catch((err) => {
-          this.isDisabled = false;
-          this.codeLoading = false;
-          console.log(err);
-        });
       }
     },
     showDialog() {
@@ -301,6 +308,13 @@ export default {
     },
     openVcode() {
       this.isShow = true;
+    },
+    getFriendLink() {
+      linkApi.getFriendLink({}).then((response) => {
+        if (response.code == 20000) {
+          this.friendLinkList = response.data.data;
+        }
+      });
     },
   },
 };

@@ -2,6 +2,7 @@
   <div id="app">
     <router-view v-if="isRouterActive"/>
      <back-top></back-top>
+     <live2d></live2d>
   </div>
 </template>
 
@@ -15,6 +16,7 @@ import commentApi from "@/api/comment";
 import Fingerprint2 from "fingerprintjs2";
 import { storage } from "@/utils/storage";
 import backTop from '@/components/backTop'
+import live2d from '@/components/live2d'
 export default {
   name: "App",
   provide() {
@@ -30,7 +32,7 @@ export default {
       isRouterActive: true
     };
   },
-   components: { backTop },
+   components: { backTop, live2d },
   mounted() {
     this.initPannel();
     if (!storage.getMangoBlogBrowserFinger()) {
@@ -41,7 +43,19 @@ export default {
     if (!storage.getMangoBlogScreenInformation()) {
       this.createScreenInformation();
     }
-    
+    // setTimeout(() => {
+    //   window.L2Dwidget.init({
+    //     pluginRootPath: '../static/live2dw/',
+    //     pluginJsPath: 'lib/',
+    //     pluginModelPath: 'live2d-widget-model-chitose/assets/', //中间这个haru_2就是你的老婆,想换个老婆,换这个就可以了
+    //     tagMode: false,
+    //     debug: false,
+    //     model: { jsonPath: '../static/live2dw/live2d-widget-model-miku/assets/miku.model.json' },
+    //     display: { position: 'left', width: 250, height: 400 },  //调整大小,和位置
+    //     mobile: { show: true },   //要不要盯着你的鼠标看
+    //     log: false,
+    //   })
+    // }, 1)
   },
   methods: {
     ...mapMutations([

@@ -7,4 +7,13 @@ export function getFriendLink(data) {
       data
     })
   }
-  export default { getFriendLink }
+
+  
+export function saveFriendLink(data) {
+  return request({
+    url: '/web/link/saveFriendLink',
+    method: 'post',
+    data
+  })
+}
+  export default { getFriendLink, saveFriendLink }

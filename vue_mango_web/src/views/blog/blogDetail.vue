@@ -38,16 +38,19 @@
       <div class="article-detail__update">
         <span>最后编辑于：{{ blog.updateTime }}</span>
       </div>
-      <div class="article-detail__like" v-if="blog.liked === true">
-        <el-button type="success" @click.prevent="likeBlog($event)"
-          >👍🏻 {{ likeText }}</el-button
-        >
+      <div :class="buttonClass">
+        <div class="article-detail__like" v-if="blog.liked === true">
+          <el-button type="success" @click.prevent="likeBlog($event)"
+            >👍🏻 {{ likeText }}</el-button
+          >
+        </div>
+        <div class="article-detail__like" v-else-if="blog.liked === false">
+          <el-button type="success" plain @click.prevent="likeBlog($event)"
+            >👍🏻 {{ likeText }}</el-button
+          >
+        </div>
       </div>
-      <div class="article-detail__like" v-else-if="blog.liked === false">
-        <el-button type="success" plain @click.prevent="likeBlog($event)"
-          >👍🏻 {{ likeText }}</el-button
-        >
-      </div>
+
       <div class="article-detail__copyright">
         <copyright :url="url" :blogId="blog.id"></copyright>
       </div>
@@ -68,7 +71,10 @@
           <span>文章评论</span>
         </div>
         <div class="comment__submit">
-          <submit @submitContent="submitContent" @getComments="getCommentByPage"></submit>
+          <submit
+            @submitContent="submitContent"
+            @getComments="getCommentByPage"
+          ></submit>
         </div>
         <div class="comment__total">
           <span>{{ total }}条评论</span>
@@ -133,6 +139,7 @@ export default {
       comments: [],
       flatTree: null,
       components: [],
+      buttonClass: null,
     };
   },
   computed: {
@@ -151,8 +158,13 @@ export default {
       return `${process.env.VUE_APP_BASE_API}/app/blog/${this.blog.id}`;
     },
     likeText() {
-      if (this.blog.liked) return "已赞";
-      return "赞";
+      if (this.blog.liked) {
+        this.buttonClass = "live2d_liked_blog_button";
+        return "已赞";
+      } else {
+        this.buttonClass = "live2d_like_blog_button";
+        return "赞";
+      }
     },
   },
   watch: {
@@ -226,7 +238,8 @@ export default {
           this.blog.liked = true;
         } else if (isLiked === true) {
           // 一开始点了赞，后来取消了赞
-          this.blog.likeCount = this.blog.likeCount <= 0 ? 0 : this.blog.likeCount - 1;
+          this.blog.likeCount =
+            this.blog.likeCount <= 0 ? 0 : this.blog.likeCount - 1;
           this.blog.liked = false;
         }
       }
@@ -307,7 +320,7 @@ export default {
         size: this.size,
         blogId: this.$route.params.id,
         queryLike: true,
-        userId: this.visitorInfo.id
+        userId: this.visitorInfo.id,
       });
       if (commentRes.code === 20000) {
         this.total = commentRes.data.total;

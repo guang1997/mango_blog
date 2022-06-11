@@ -16,7 +16,7 @@
               </div>
               <div class="body-info">
                 <div class="body-info__title">
-                  <router-link :to="'/app/blog/' + blog.id">
+                  <router-link class="live2d_router_link" :to="'/app/blog/' + blog.id">
                     {{ blog.title }}
                   </router-link>
                 </div>
