@@ -26,7 +26,7 @@ live2d_settings['hitokotoAPI']          = 'https://api.xiaolin.in/hitokoto';    
 
 // 默认模型
 live2d_settings['modelId']              = 6;            // 默认模型 ID，可在 F12 控制台找到
-live2d_settings['modelName']            = 'tororo';            // 默认本地模型
+live2d_settings['modelName']            = 'tamamo';            // 默认本地模型
 live2d_settings['modelTexturesId']      = 16;           // 默认材质 ID，可在 F12 控制台找到
 
 // 工具栏设置
@@ -53,7 +53,7 @@ live2d_settings['showCopyMessage']      = true;         // 显示 复制内容 �
 live2d_settings['showWelcomeMessage']   = true;         // 显示进入面页欢迎词
 
 //看板娘样式设置
-live2d_settings['waifuSize']            = '210x300';    // 看板娘大小，例如 '280x250', '600x535'
+live2d_settings['waifuSize']            = '210x350';    // 看板娘大小，例如 '280x250', '600x535'
 live2d_settings['waifuTipsSize']        = '210x70';     // 提示框大小，例如 '250x70', '570x150'
 live2d_settings['waifuFontSize']        = '13px';       // 提示框字体，例如 '12px', '30px'
 live2d_settings['waifuToolFont']        = '14px';       // 工具栏字体，例如 '14px', '36px'
@@ -71,7 +71,7 @@ live2d_settings['homePageUrl']          = '/';       // 主页地址，可选 'a
 live2d_settings['aboutPageUrl']         = 'https://phy0412.top/article?articleId=3464';   // 关于页地址, '{URL 网址}'
 live2d_settings['screenshotCaptureName']= 'live2d.png'; // 看板娘截图文件名，例如 'live2d.png'
 live2d_settings['loadLocalModel']       = true; // 加载本地看板娘
-live2d_settings['localModelNames']      = ['haru02','hijiki','koharu','shizuku','tororo','wanko'] // 本地模型
+live2d_settings['localModelNames']      = ['haru02','hijiki','shizuku','tamamo','tororo','remu','Violet','wanko','umaru', 'qingye'] // 本地模型
 
 /****************************************************************************************************/
 
@@ -225,6 +225,7 @@ function loadLocalModel(modelName, modelTexturesId=0) {
     sessionStorage.setItem('modelName', modelName);
     sessionStorage.setItem('modelTexturesId', modelTexturesId);
   } 
+
   loadlive2d('live2d', '/static/live2dw/live2d-widget-model-'+modelName+'/assets/'+modelName+'.model.json', (live2d_settings.showF12Status ? console.log('[Status]','live2d','模型',modelName+'-'+modelTexturesId,'加载完成'):null));
 }
 

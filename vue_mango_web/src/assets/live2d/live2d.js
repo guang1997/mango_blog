@@ -279,8 +279,13 @@
         return n <= u && u <= s && _ <= p && p <= a
       },
       r.prototype.hitTestSimpleCustom = function(t, i, e, r) {
-        // return null !== this.live2DModel && e >= t[0] && e <= i[0] && r <= t[1] && r >= i[1]
-        return null !== this.live2DModel
+        // 因为此处报错，暂未想到好的解决方法，所以先增加判空处理
+        if(e == null || t == null || r == null || i == null) {
+          return null !== this.live2DModel
+        } else {
+          return null !== this.live2DModel && e >= t[0] && e <= i[0] && r <= t[1] && r >= i[1]
+        }
+        
       },
       o.prototype = new AMotion,
       o.EXPRESSION_DEFAULT = "DEFAULT",
@@ -6206,6 +6211,8 @@
         o.prototype.setRandomExpression = function() {
           var t = [];
           for (var i in this.expressions) t.push(i);
+          // 因为此处报错，暂未想到好的解决方法，因此如果数组为空那么注释掉
+          if(t.length <= 0) return;
           var e = parseInt(Math.random() * t.length);
           this.setExpression(t[e])
         },

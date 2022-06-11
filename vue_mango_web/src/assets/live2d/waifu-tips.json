@@ -32,7 +32,12 @@
       "default": ["您好，欢迎来到主人的博客"],
       "tororo": ["您好，我是看板娘十二，欢迎来到两脚兽的博客 ~"],
       "shizuku": ["shizuku talk!　这里是shizuku ~"],
-      "haru02": ["您好，我是看板娘haru，欢迎来到主人的博客 ~"]
+      "haru02": ["您好，我是看板娘haru，欢迎来到主人的博客 ~"],
+      "remu": ["您好，我是来自re0的看板娘蕾姆，欢迎来到主人的博客 ~"],
+      "Violet": ["您好，请问您需要自动手记人偶服务吗？"],
+      "umaru": ["干物妹小埋，参见！"],
+      "qingye": ["我是前辈凉风青叶！请多指教！"],
+      "tamamo": ["您若有事必来帮忙！您值得信赖的巫女狐，Caster降临！的说~"]
     },
     "hitokoto_api_message": {
       "lwl12.com": ["这句一言来自 <span style=\"color:#0099cc;\">『{source}』</span>", "，是 <span style=\"color:#0099cc;\">{creator}</span> 投稿的", "。"],
