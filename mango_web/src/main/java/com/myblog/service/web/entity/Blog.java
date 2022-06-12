@@ -55,15 +55,6 @@ public class Blog extends BaseEntity {
     @ApiModelProperty(value = "博客分类ID")
     private String blogSortId;
 
-    @ApiModelProperty(value = "推荐等级(0:正常)")
-    private Boolean level;
-
-    @ApiModelProperty(value = "排序字段，越大越靠前")
-    private Integer sort;
-
-    @ApiModelProperty(value = "是否开启评论(0:否 1:是)")
-    private Boolean openComment;
-
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic
     private Integer isDeleted;

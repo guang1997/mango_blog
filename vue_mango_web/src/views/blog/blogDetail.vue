@@ -34,7 +34,7 @@
       <note>
         <p>{{ blog.summary }}</p>
       </note>
-      <div v-html="blog.content" class="article-detail__body ql-editor"></div>
+      <div v-highlight v-html="blog.content" class="article-detail__body ql-editor"></div>
       <div class="article-detail__update">
         <span>最后编辑于：{{ blog.updateTime }}</span>
       </div>
@@ -120,6 +120,7 @@ import "@/assets/css/quill.snow.css";
 //     el.scrollIntoView();
 //   }
 // }
+
 export default {
   name: "blogDetail",
   components: { note, comments, submit, copyright, share, prevnext },
@@ -139,7 +140,7 @@ export default {
       comments: [],
       flatTree: null,
       components: [],
-      buttonClass: null,
+      buttonClass: null
     };
   },
   computed: {

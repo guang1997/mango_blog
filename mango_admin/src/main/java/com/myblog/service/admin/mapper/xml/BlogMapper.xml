@@ -10,7 +10,7 @@
     </select>
     <select id="selectBlogByRequest" resultType="com.myblog.service.admin.entity.Blog">
         SELECT t1.id, t1.title, t1.summary, t1.content, t1.click_count,
-        t1.like_count, t1.file_id, t1.create_time, t1.update_time, t1.admin_id, t1.author, t1.blog_sort_id, t1.`level`, t1.sort, t1.open_comment, t1.is_deleted
+        t1.like_count, t1.file_id, t1.create_time, t1.update_time, t1.admin_id, t1.author, t1.blog_sort_id, t1.is_deleted
         FROM t_blog t1
         <choose>
             <when test="tagId!=null">
@@ -25,21 +25,15 @@
 
         AND t1.is_deleted = 0
         <if test="title != null">
-            AND t1.title = #{title,jdbcType=VARCHAR}
+            AND t1.title LIKE CONCAT( '%', #{title,jdbcType=VARCHAR}, '%' )
         </if>
         <if test="author != null">
-            AND t1.author = #{author,jdbcType=TINYINT}
-        </if>
-        <if test="level != null">
-            AND t1.level = #{level,jdbcType=TINYINT}
-        </if>
-        <if test="openComment != null">
-            AND t1.open_comment = #{openComment,jdbcType=TINYINT}
+            AND t1.author LIKE CONCAT( '%', #{author,jdbcType=VARCHAR}, '%' )
         </if>
         <if test="blogSortId != null">
             AND t1.blog_sort_id = #{blogSortId,jdbcType=TINYINT}
         </if>
-         ORDER BY t1.sort DESC
+         ORDER BY t1.create_time DESC
          LIMIT #{page,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}
     </select>
     <select id="selectBlogCountByRequest" resultType="java.lang.Integer">
@@ -58,13 +52,10 @@
 
         AND t1.is_deleted = 0
         <if test="title != null">
-            AND t1.title = #{title,jdbcType=VARCHAR}
+            AND t1.title LIKE CONCAT( '%', #{title,jdbcType=VARCHAR}, '%' )
         </if>
-        <if test="level != null">
-            AND t1.level = #{level,jdbcType=TINYINT}
-        </if>
-        <if test="openComment != null">
-            AND t1.open_comment = #{openComment,jdbcType=TINYINT}
+        <if test="author != null">
+            AND t1.author LIKE CONCAT( '%', #{author,jdbcType=VARCHAR}, '%' )
         </if>
         <if test="blogSortId != null">
             AND t1.blog_sort_id = #{blogSortId,jdbcType=TINYINT}

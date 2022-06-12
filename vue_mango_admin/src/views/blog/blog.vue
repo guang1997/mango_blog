@@ -56,7 +56,7 @@
             :value="item.id"
           />
         </el-select>
-        <el-select
+        <!-- <el-select
           v-model="query.openComment"
           clearable
           size="small"
@@ -71,7 +71,7 @@
             :label="item.dictLabel"
             :value="item.dictValue"
           />
-        </el-select>
+        </el-select> -->
         <rrOperation />
       </div>
       <crudOperation :permission="permission" />
@@ -83,6 +83,7 @@
       :before-close="crud.cancelCU"
       :visible="crud.status.cu > 0"
       :title="crud.status.title"
+      v-if="crud.status.cu > 0"
       fullscreen
     >
       <el-form :model="form" :rules="rules" ref="form">
@@ -161,7 +162,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="4">
+          <!-- <el-col :span="4">
             <el-form-item label="推荐等级" prop="level">
               <el-select
                 v-model="form.level"
@@ -177,20 +178,20 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-          </el-col>
+          </el-col> -->
 
-          <el-col :span="4">
+          <!-- <el-col :span="4">
             <el-form-item label="网站评论">
               <el-radio-group v-model="form.openComment">
                 <el-radio :label="1">开启</el-radio>
                 <el-radio :label="0">关闭</el-radio>
               </el-radio-group>
             </el-form-item>
-          </el-col>
+          </el-col> -->
         </el-row>
 
         <el-form-item label="内容" :label-width="formLabelWidth" prop="content">
-          <WangEditor ref="editor" :content="form.content" ></WangEditor>
+          <CKEditor ref="ckeditor" :content="form.content"></CKEditor>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -248,7 +249,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="推荐等级" width="100">
+          <!-- <el-table-column label="推荐等级" width="100">
             <template slot-scope="scope">
               <template>
                 <el-tag
@@ -259,7 +260,7 @@
                 >
               </template>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column
             :show-overflow-tooltip="true"
             prop="clickCount"
@@ -270,7 +271,7 @@
             prop="likeCount"
             label="喜欢数"
           />
-          <el-table-column label="开启评论" width="100">
+          <!-- <el-table-column label="开启评论" width="100">
             <template slot-scope="scope">
               <template>
                 <el-tag
@@ -281,7 +282,7 @@
                 >
               </template>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column label="创建时间" prop="createTime" width="160" />
           <el-table-column
             v-if="checkPer(['admin', 'blog:edit', 'blog:del'])"
@@ -316,7 +317,7 @@ import crudOperation from "@/components/Crud/CRUD.operation";
 import udOperation from "@/components/Crud/UD.operation";
 import pagination from "@/components/Crud/Pagination";
 import DateRangePicker from "@/components/DateRangePicker";
-import WangEditor from "@/components/WangEditor";
+import CKEditor from "@/components/CKEditor";
 import { mapGetters } from "vuex";
 import { getToken } from '@/utils/auth';
 let blogTags = [];
@@ -330,9 +331,6 @@ const defaultForm = {
   adminId: null,
   author: null,
   blogSortId: null,
-  level: null,
-  sort: 999,
-  openComment: 1
 };
 export default {
   name: "Blog",
@@ -342,7 +340,7 @@ export default {
     rrOperation,
     udOperation,
     DateRangePicker,
-    WangEditor
+    CKEditor
   },
   cruds() {
     return CRUD({
@@ -354,18 +352,18 @@ export default {
   },
   computed: {
     ...mapGetters(["user", "imagesUploadApi"]),
-    filterSysLevel() {
-      return function (level) {
-        return this.dict.sys_blog_level.filter(
-          (item) => item.dictValue == level
-        );
-      };
-    },
-    filterSysYesNo() {
-      return function (value) {
-        return this.dict.sys_yes_no.filter((item) => item.dictValue == value);
-      };
-    },
+    // filterSysLevel() {
+    //   return function (level) {
+    //     return this.dict.sys_blog_level.filter(
+    //       (item) => item.dictValue == level
+    //     );
+    //   };
+    // },
+    // filterSysYesNo() {
+    //   return function (value) {
+    //     return this.dict.sys_yes_no.filter((item) => item.dictValue == value);
+    //   };
+    // },
   },
   created() {
     this.getAllTag()
@@ -373,7 +371,7 @@ export default {
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   // 数据字典
-  dicts: ["sys_blog_level", "sys_yes_no"],
+  dicts: ["sys_yes_no"],
   data() {
     return {
       defaultProps: { children: "children", label: "label", isLeaf: "leaf" },
@@ -397,14 +395,14 @@ export default {
         blogSortId: [
           { required: true, message: "分类不能为空", trigger: "blur" },
         ],
-        level: [
-          { required: true, message: "推荐等级不能为空", trigger: "blur" },
-          { pattern: /^[0-9]\d*$/, message: "推荐等级只能为自然数" },
-        ],
-        openComment: [
-          { required: true, message: "网站评论不能为空", trigger: "blur" },
-          { pattern: /^[0-9]\d*$/, message: "网站评论只能为自然数" },
-        ],
+        // level: [
+        //   { required: true, message: "推荐等级不能为空", trigger: "blur" },
+        //   { pattern: /^[0-9]\d*$/, message: "推荐等级只能为自然数" },
+        // ],
+        // openComment: [
+        //   { required: true, message: "网站评论不能为空", trigger: "blur" },
+        //   { pattern: /^[0-9]\d*$/, message: "网站评论只能为自然数" },
+        // ],
          summary: [{ required: true, message: "简介不能为空", trigger: "blur" }],
       },
       show: false,
@@ -423,19 +421,12 @@ export default {
     // 添加取消之后
     [CRUD.HOOK.afterAddCancel]() {
        this.fileId = null;
-      //  this.$refs.editor.textData = null;
        this.form.tags = null;
-       // 因为组件中关闭模态框时暂时没想到好方法去关闭WangEditor，
-       // 导致数据显示有问题，因此暂时使用刷新页面的方法来将其关闭
-      window.location.reload()
     },
     // 编辑取消之后
     [CRUD.HOOK.afterEditCancel]() {
       this.fileId = null;
-      // this.$refs.editor.textData = null;
       this.form.tags = null;
-      // this.form.content = null;
-      window.location.reload()
     },
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
@@ -487,10 +478,9 @@ export default {
     },
     [CRUD.HOOK.afterSubmit](crud, form) {
       this.form.tags = null;
-      window.location.reload()
     },
      [CRUD.HOOK.beforeSubmit](crud, form) {
-      this.form.content = this.$refs.editor.getData()
+      this.form.content = this.$refs.ckeditor.getData()
     },
     
     // 禁止输入空格

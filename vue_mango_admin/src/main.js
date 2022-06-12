@@ -27,9 +27,8 @@ import dict from '@/components/Dict'
 // 全局工具类
 import prototype from '@/utils/prototype'
 
-
-// ckEditor
-// import CKEditor from 'ckeditor4-vue'
+// 富文本编辑器
+import CKEditor from 'ckeditor4-vue';
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -51,6 +50,8 @@ Vue.use(permission)
 // Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 Vue.use(ElementUI)
+
+Vue.use(CKEditor)
 
 Vue.config.productionTip = false
 

@@ -9,6 +9,8 @@ import store  from './store'
 import mergeAsyncData from '@/mixins/mergeAsyncData'
 import R_O_P from 'resize-observer-polyfill'
 import VueLazyload from '@/utils/lazyLoad'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/atom-one-dark.css'
 const loading = require('@/assets/img/loading.gif')
 if (!window.ResizeObserver) {
   window.ResizeObserver = R_O_P
@@ -24,6 +26,12 @@ Vue.use(VueLazyload, {
 Vue.component('empty', empty)
 Vue.component('layout', layout)
 
+Vue.directive('highlight', function (el) {
+  let blocks = el.querySelectorAll('pre code');
+  blocks.forEach((block) => {
+    hljs.highlightBlock(block)
+  })
+})
 Vue.config.productionTip = false
 new Vue({
   el: '#app',

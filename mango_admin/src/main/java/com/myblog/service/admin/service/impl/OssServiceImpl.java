@@ -3,20 +3,32 @@ package com.myblog.service.admin.service.impl;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.myblog.service.admin.config.AliyunOssProperties;
+import com.myblog.service.admin.config.QiNiuYunOssProperties;
 import com.myblog.service.admin.service.OssService;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
+import com.qiniu.storage.UploadManager;
+import com.qiniu.storage.model.DefaultPutRet;
+import com.qiniu.util.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+
+import static java.util.Objects.*;
 
 @Service
 public class OssServiceImpl implements OssService {
@@ -26,36 +38,72 @@ public class OssServiceImpl implements OssService {
     @Autowired
     private AliyunOssProperties aliyunOssProperties;
 
+    @Autowired
+    private Auth auth;
+
+    @Autowired
+    private UploadManager uploadManager;
+
+    @Autowired
+    private QiNiuYunOssProperties qiNiuYunOssProperties;
+
     @Override
     public Response upload(MultipartFile file, String moduleName) throws IOException {
-        String endpoint = aliyunOssProperties.getEndpoint();
-        String accessKeyId = aliyunOssProperties.getKeyId();
-        String accessKeySecret = aliyunOssProperties.getKeySecret();
-        String bucketName = aliyunOssProperties.getBucketName();
-
-        // 创建OSSClient实例。
-        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-
         String fileName = file.getOriginalFilename(); // 原来的名字
         String date = ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.DATE_PURE_SPLIT);
         String uuidName = UUID.randomUUID().toString();// uuid
-
         // 拼接filename，构建日期路径：avatar/2019/02/26/uuid唯一文件名
         String key = moduleName + Constants.Symbol.COMMA4 + date + Constants.Symbol.COMMA4 + uuidName + Constants.Symbol.COMMA2 + fileName;
-
-        // 上传文件流。
-        String url = "https://" + bucketName + Constants.Symbol.COMMA3 + endpoint + Constants.Symbol.COMMA4 + key;
-        try (InputStream inputStream = file.getInputStream();){
-            ossClient.putObject(bucketName, key, inputStream);
-            // 关闭OSSClient。
-            ossClient.shutdown();
-        } catch (IOException e) {
+        String token = auth.uploadToken(qiNiuYunOssProperties.getBucket());
+        try (InputStream stream = file.getInputStream()) {
+            com.qiniu.http.Response res = uploadManager.put(stream, key, token, null, null);
+            if (res.isOK() && res.isJson()) {
+                DefaultPutRet putRet = JsonUtils.jsonToPojo(res.bodyString(), DefaultPutRet.class);
+                if (Objects.isNull(putRet) || StringUtils.isEmpty(putRet.key)) {
+                    LOGGER.error("oss upload failed by result:{} is empty, fileName:{}", putRet, fileName);
+                    return Response.setResult(ResultCodeEnum.UPLOAD_ERROR);
+                }
+                String url = qiNiuYunOssProperties.getDomainName() + putRet.key;
+                return Response.ok().data(Constants.ReplyField.URL, url);
+            }
+        }catch (IOException e) {
             LOGGER.error("oss upload failed, fileName:{}", fileName);
             throw e;
         }
 
-        return Response.ok().data(Constants.ReplyField.URL, url);
+        return Response.setResult(ResultCodeEnum.UPLOAD_ERROR);
     }
+
+//    @Override
+//    public Response upload(MultipartFile file, String moduleName) throws IOException {
+//        String endpoint = aliyunOssProperties.getEndpoint();
+//        String accessKeyId = aliyunOssProperties.getKeyId();
+//        String accessKeySecret = aliyunOssProperties.getKeySecret();
+//        String bucketName = aliyunOssProperties.getBucketName();
+//
+//        // 创建OSSClient实例。
+//        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+//
+//        String fileName = file.getOriginalFilename(); // 原来的名字
+//        String date = ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.DATE_PURE_SPLIT);
+//        String uuidName = UUID.randomUUID().toString();// uuid
+//
+//        // 拼接filename，构建日期路径：avatar/2019/02/26/uuid唯一文件名
+//        String key = moduleName + Constants.Symbol.COMMA4 + date + Constants.Symbol.COMMA4 + uuidName + Constants.Symbol.COMMA2 + fileName;
+//
+//        // 上传文件流。
+//        String url = "https://" + bucketName + Constants.Symbol.COMMA3 + endpoint + Constants.Symbol.COMMA4 + key;
+//        try (InputStream inputStream = file.getInputStream();){
+//            ossClient.putObject(bucketName, key, inputStream);
+//            // 关闭OSSClient。
+//            ossClient.shutdown();
+//        } catch (IOException e) {
+//            LOGGER.error("oss upload failed, fileName:{}", fileName);
+//            throw e;
+//        }
+//
+//        return Response.ok().data(Constants.ReplyField.URL, url);
+//    }
 
     @Override
     public Response delete(String url) {

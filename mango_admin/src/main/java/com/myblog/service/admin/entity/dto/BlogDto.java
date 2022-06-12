@@ -35,14 +35,6 @@ public class BlogDto extends BaseDto {
 
     private String sortName;
 
-    @NotNull(message = "博客级别不能为空")
-    private Integer level;
-
-    private Integer sort;
-
-    @NotNull(message = "博客是否可见不能为空")
-    private Integer openComment;
-
     private String tagId;
 
     @NotNull(message = "博客标签不能为空")
