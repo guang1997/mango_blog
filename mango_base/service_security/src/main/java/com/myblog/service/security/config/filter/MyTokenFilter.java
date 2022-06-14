@@ -61,8 +61,11 @@ public class MyTokenFilter extends GenericFilterBean {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String headerToken = request.getHeader(Constants.ReplyField.HEADER);
+        if (StringUtils.isBlank(headerToken)) {
+            headerToken = request.getParameter(Constants.ReplyField.HEADER);
+        }
 
-        if (!StringUtils.isEmpty(headerToken)) {
+        if (StringUtils.isNotBlank(headerToken)) {
             //postMan测试时，自动加入的前缀，要去掉。
             String token = headerToken.replace("Bearer", "").trim();
             LOGGER.info("get Token:{} from server", token);

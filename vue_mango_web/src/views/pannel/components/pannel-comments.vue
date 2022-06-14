@@ -8,20 +8,52 @@
         </div>
         <div class="pannel__item-body">
           <template v-if="newComments.length">
-            <div class="body-item" v-for="(comment, index) in newComments" :key="index">
+            <div
+              class="body-item"
+              v-for="(comment, index) in newComments"
+              :key="index"
+            >
               <div class="body-pic">
-                <router-link :to="'/app/article/' + comment.blogId + '?anchor=a_cm'">
-                  <img v-lazy="comment.avatar" alt="" />
-                </router-link>
+                <div v-if="comment.blogId">
+                  <router-link
+                    :to="'/app/blog/' + comment.blogId + '?anchor=a_cm'"
+                    @click.native="reloadBlog()"
+                  >
+                    <img v-lazy="comment.avatar" alt="" />
+                  </router-link>
+                </div>
+                <div v-else>
+                  <router-link
+                    :to="'/app/messageBoard?anchor=a_cm'"
+                    @click.native="reloadBlog()"
+                  >
+                    <img v-lazy="comment.avatar" alt="" />
+                  </router-link>
+                </div>
               </div>
               <div class="body-info">
                 <div class="body-info__title">
-                  <router-link :to="'/app/article/' + comment.blogId + '?anchor=a_cm'">
-                    {{ comment.content }}
-                  </router-link>
+                  <div v-if="comment.blogId">
+                    <router-link
+                      :to="'/app/blog/' + comment.blogId + '?anchor=a_cm'"
+                      @click.native="reloadBlog()"
+                    >
+                      {{ comment.content }}
+                    </router-link>
+                  </div>
+                  <div v-else>
+                    <router-link
+                      :to="'/app/messageBoard?anchor=a_cm'"
+                      @click.native="reloadBlog()"
+                    >
+                      {{ comment.content }}
+                    </router-link>
+                  </div>
                 </div>
                 <div class="body-info__name">{{ comment.name }}</div>
-                <div class="body-info__date">发表于：{{ comment.createTime }}</div>
+                <div class="body-info__date">
+                  发表于：{{ comment.createTime }}
+                </div>
               </div>
             </div>
           </template>
@@ -32,23 +64,28 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState } from "vuex";
 
 export default {
-  name: 'pannelComments',
+  name: "pannelComments",
+  inject: ["reload"],
   props: {},
   data() {
-    return {}
+    return {};
   },
   computed: {
-    ...mapState(['newComments'])
+    ...mapState(["newComments"]),
   },
-  methods: {}
-}
+  methods: {
+    reloadBlog() {
+      this.reload();
+    },
+  },
+};
 </script>
 <style lang="scss">
-@import '~@/style/index.scss';
-@import '~@/views/pannel/style/mixins';
+@import "~@/style/index.scss";
+@import "~@/views/pannel/style/mixins";
 
 .pannel-comments {
   @include articles-comments;

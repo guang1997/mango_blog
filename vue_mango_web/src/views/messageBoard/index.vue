@@ -10,9 +10,11 @@
           <i class="el-icon-chat-dot-round"></i>
           <span>留言</span>
         </div>
+       
         <div class="message-board__submit">
           <submit @submitContent="submitContent"></submit>
         </div>
+        
         <div class="message-board__list">
           <div class="message-board__total">
             <span>{{ total }}条留言</span>

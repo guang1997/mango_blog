@@ -13,14 +13,19 @@
 
 <script>
 import { getToken } from "@/utils/auth";
+import { mapGetters } from "vuex";
 export default {
   props: ["content"],
   name: "app",
+  computed: {
+    ...mapGetters(["imagesUploadApi"]),
+  },
   data() {
     return {
       textData: this.content,
       editorConfig: {
-        extraPlugins: "quicktable,tableresizerowandcolumn,emoji,codesnippet,editorplaceholder,autogrow",// 启动插件
+        extraPlugins:
+          "quicktable,tableresizerowandcolumn,emoji,codesnippet,editorplaceholder,autogrow", // 启动插件
         toolbarGroups: [
           { name: "document", groups: ["mode", "document", "doctools"] },
           { name: "clipboard", groups: ["clipboard", "undo"] },
@@ -43,15 +48,21 @@ export default {
           { name: "tools", groups: ["tools"] },
           { name: "others", groups: ["others"] },
           { name: "about", groups: ["about"] },
-          {name: 'codesnippet'}// 代码片段
+          { name: "codesnippet" }, // 代码片段
         ],
-        codeSnippet_theme: 'vs2015',// 代码高亮主题
-        editorplaceholder: '开始写文章吧~~~',// 编辑器占位符
-        autoGrow_minHeight: 800,// 自动增长最小高度
+        codeSnippet_theme: "vs2015", // 代码高亮主题
+        editorplaceholder: "开始写文章吧~~~", // 编辑器占位符
+        autoGrow_minHeight: 800, // 自动增长最小高度
         removeButtons:
-          "Save,Print,NewPage,About,Smiley,BidiRtl,BidiLtr,Language,CreateDiv,Iframe",// 移除按钮
+          "Save,Print,NewPage,About,Smiley,BidiRtl,BidiLtr,Language,CreateDiv,Iframe", // 移除按钮
       },
       editorUrl: "../../../public/ckeditor/ckeditor.js",
+      filebrowserImageUploadUrl:
+        this.imagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
+      filebrowserUploadUrl:
+        this.imagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
+      pasteUploadFileApi:
+        this.imagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
     };
   },
   created() {

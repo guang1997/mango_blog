@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Meta from 'vue-meta'
-const miss = () => import('@/components/base/miss')
+const miss = () => import('@/components/base/404')
 const home = () => import('@/views/home/')
 const blogDetail = () => import('@/views/blog/blogDetail/')
 const messageBoard = () => import('@/views/messageBoard/')

@@ -10,13 +10,13 @@
           <template v-if="newBlogs.length">
             <div class="body-item" v-for="(blog, index) in newBlogs" :key="index">
               <div class="body-pic">
-                <router-link :to="'/app/blog/' + blog.id">
+                <router-link :to="'/app/blog/' + blog.id" @click.native="reloadBlog()">
                   <img v-lazy="blog.fileId" alt="" />
                 </router-link>
               </div>
               <div class="body-info">
                 <div class="body-info__title">
-                  <router-link class="live2d_router_link" :to="'/app/blog/' + blog.id">
+                  <router-link class="live2d_router_link" :to="'/app/blog/' + blog.id" @click.native="reloadBlog()">
                     {{ blog.title }}
                   </router-link>
                 </div>
@@ -35,6 +35,7 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'pannelBlogs',
+  inject:['reload'],
   props: {},
   data() {
     return {}
@@ -42,7 +43,11 @@ export default {
   computed: {
     ...mapState(['newBlogs'])
   },
-  methods: {}
+  methods: {
+    reloadBlog() {
+      this.reload()
+    }
+  }
 }
 </script>
 <style lang="scss">

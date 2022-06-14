@@ -43,7 +43,17 @@
 			{ "file":"mtn/tamamo_live2D_09.mtn", "sound": "voice/09.mp3", "msg_id":"13" }
 		],
         "tap_body":
-		[						
+		[	{ "file":"mtn/tamamo_live2D_01.mtn", "sound": "voice/01.mp3", "msg_id":"1" },
+			{ "file":"mtn/tamamo_live2D_02.mtn", "sound": "voice/02.mp3", "msg_id":"2" },
+			{ "file":"mtn/tamamo_live2D_03.mtn", "sound": "voice/03.mp3", "msg_id":"3" },
+			{ "file":"mtn/tamamo_live2D_04.mtn", "sound": "voice/04.mp3", "msg_id":"4" },
+			{ "file":"mtn/tamamo_live2D_05.mtn", "sound": "voice/05.mp3", "msg_id":"5" },
+			{ "file":"mtn/tamamo_live2D_06.mtn", "sound": "voice/06.mp3", "msg_id":"6" },	
+			{ "file":"mtn/tamamo_live2D_07.mtn", "sound": "voice/07.mp3", "msg_id":"11" },
+			{ "file":"mtn/tamamo_live2D_17.mtn", "sound": "voice/17.mp3", "msg_id":"34" },
+            { "file":"mtn/tamamo_live2D_23.mtn", "sound": "voice/23.mp3", "msg_id":"36" },
+            { "file":"mtn/tamamo_live2D_08.mtn", "sound": "voice/08.mp3", "msg_id":"12" },
+			{ "file":"mtn/tamamo_live2D_09.mtn", "sound": "voice/09.mp3", "msg_id":"13" },	
 			{ "file":"mtn/tamamo_live2D_10.mtn", "sound": "voice/10.mp3", "msg_id":"14" },
 			{ "file":"mtn/tamamo_live2D_11.mtn", "sound": "voice/11.mp3", "msg_id":"15" },
 			{ "file":"mtn/tamamo_live2D_12.mtn", "sound": "voice/12.mp3", "msg_id":"16" },

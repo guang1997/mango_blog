@@ -63,7 +63,7 @@ public class OssServiceImpl implements OssService {
                     LOGGER.error("oss upload failed by result:{} is empty, fileName:{}", putRet, fileName);
                     return Response.setResult(ResultCodeEnum.UPLOAD_ERROR);
                 }
-                String url = qiNiuYunOssProperties.getDomainName() + putRet.key;
+                String url = "http://" + String.join(Constants.Symbol.COMMA4, qiNiuYunOssProperties.getDomainName(), putRet.key);
                 return Response.ok().data(Constants.ReplyField.URL, url);
             }
         }catch (IOException e) {
