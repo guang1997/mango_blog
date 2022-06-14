@@ -113,7 +113,7 @@ import copyright from "./components/copyright";
 import share from "./components/share";
 import prevnext from "./components/prevnext";
 import { storage } from "@/utils/storage";
-import "@/assets/css/quill.snow.css";
+// import "@/assets/css/quill.snow.css";
 // function jumpAnchor(route) {
 //   if (route.query.anchor === "a_cm") {
 //     const el = document.querySelector("#a_cm");
@@ -179,9 +179,9 @@ export default {
   },
   filters: {},
   mounted() {
-    this.$nextTick(function () {
-      Prism.highlightAll();
-    });
+    // this.$nextTick(function () {
+    //   Prism.highlightAll();
+    // });
     this.collectTitles();
     window.addEventListener("scroll", this.handleScroll, false);
   },

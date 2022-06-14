@@ -191,6 +191,6 @@ export default {
 
 <style lang="scss">
 @import "~@/style/reset.scss";
-@import "./assets/css/prism.css";
+// @import "./assets/css/prism.css";
 @import "./assets/css/emoji-sprite.css";
 </style>

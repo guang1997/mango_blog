@@ -28,6 +28,11 @@ Vue.component('layout', layout)
 
 Vue.directive('highlight', function (el) {
   let blocks = el.querySelectorAll('pre code');
+  let pres = el.querySelectorAll('pre');
+  // 解决背景不变色的问题
+  pres.forEach((pre) => {
+    pre.classList.add("hljs")
+  })
   blocks.forEach((block) => {
     hljs.highlightBlock(block)
   })

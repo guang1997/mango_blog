@@ -16,7 +16,7 @@ const PORT = process.env.PORT && Number(process.env.PORT)
 const devWebpackConfig = merge(baseWebpackConfig, {
   entry: {
     app: './src/main.js',
-    vendors: ['axios', '@/assets/js/prism.js'],
+    // vendors: ['axios', '@/assets/js/prism.js'],
     vues: ['vue', 'vuex', 'vue-router']
   },
   module: {

@@ -8,7 +8,8 @@
           </div>
           <div class="item-content__info">
             <div class="item-content__link">
-              <router-link class="live2d_router_link" :to="'/app/blog/' + blog.id">{{ blog.title }}</router-link>
+              <!-- <router-link class="live2d_router_link" :to="'/app/blog/' + blog.id">{{ blog.title }}</router-link> -->
+              <span class="live2d_router_link" @click="filterArticles(blog.id)">{{ blog.title }}</span>
             </div>
             <div class="item-content__detail">
               <span>
@@ -40,6 +41,7 @@
 
 export default {
   name: 'blogIterator',
+  inject:['reload'],
   props: {
     blogs: {
       type: Array,
@@ -50,6 +52,18 @@ export default {
   },
   data() {
     return {}
+  },
+  methods: {
+    filterArticles(id) {
+      console.log(id)
+      this.$router.push({
+        name: 'blogDetail',
+        params: {
+          param: id
+        }
+      })
+      this.reload()
+    }
   }
 }
 </script>
