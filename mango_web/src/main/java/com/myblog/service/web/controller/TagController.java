@@ -1,6 +1,7 @@
 package com.myblog.service.web.controller;
 
 
+import com.myblog.service.base.common.BehaviorEnum;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.web.entity.dto.TagDto;
@@ -25,7 +26,7 @@ public class TagController {
     @Autowired
     private TagService tagService;
 
-    @LogByMethod("/web/tag/getTagByPage")
+    @LogByMethod(value = "/web/tag/getTagByPage", behavior = BehaviorEnum.TAG)
     @ApiOperation(value = "分页查询标签信息", notes = "分页查询标签信息", response = Response.class)
     @PostMapping("/getTagByPage")
     public Response getTagByPage(@RequestBody TagDto tagDto) throws Exception {

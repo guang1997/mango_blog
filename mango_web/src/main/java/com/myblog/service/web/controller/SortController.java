@@ -1,6 +1,7 @@
 package com.myblog.service.web.controller;
 
 
+import com.myblog.service.base.common.BehaviorEnum;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.web.entity.dto.SortDto;
@@ -25,7 +26,7 @@ public class SortController {
     @Autowired
     private SortService sortService;
 
-    @LogByMethod(value = "/web/sort/getSortByPage")
+    @LogByMethod(value = "/web/sort/getSortByPage", behavior = BehaviorEnum.SORT)
     @ApiOperation(value = "分页查询分类信息", notes = "分页查询分类信息", response = Response.class)
     @PostMapping("/getSortByPage")
     public Response getSortByPage(@RequestBody SortDto sortDto) throws Exception {

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- 主机:                           127.0.0.1
--- 服务器版本:                        8.0.27 - MySQL Community Server - GPL
+-- 服务器版本:                        8.0.26 - MySQL Community Server - GPL
 -- 服务器操作系统:                      Win64
--- HeidiSQL 版本:                  10.2.0.5704
+-- HeidiSQL 版本:                  11.3.0.6295
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -10,6 +10,7 @@
 /*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
 -- 导出 mango_blog 的数据库结构
@@ -67,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `t_blog` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客表';
 
--- 正在导出表  mango_blog.t_blog 的数据：~2 rows (大约)
+-- 正在导出表  mango_blog.t_blog 的数据：~5 rows (大约)
 DELETE FROM `t_blog`;
 /*!40000 ALTER TABLE `t_blog` DISABLE KEYS */;
 INSERT INTO `t_blog` (`id`, `title`, `summary`, `content`, `click_count`, `like_count`, `file_id`, `create_time`, `update_time`, `admin_id`, `author`, `blog_sort_id`, `is_deleted`) VALUES
@@ -209,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `t_dict_detail` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='字典详细数据表';
 
--- 正在导出表  mango_blog.t_dict_detail 的数据：~24 rows (大约)
+-- 正在导出表  mango_blog.t_dict_detail 的数据：~26 rows (大约)
 DELETE FROM `t_dict_detail`;
 /*!40000 ALTER TABLE `t_dict_detail` DISABLE KEYS */;
 INSERT INTO `t_dict_detail` (`id`, `dict_id`, `dict_label`, `dict_value`, `css_class`, `list_class`, `summary`, `is_deleted`, `create_time`, `update_time`, `sort`) VALUES
@@ -410,7 +411,7 @@ CREATE TABLE IF NOT EXISTS `t_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='角色表';
 
--- 正在导出表  mango_blog.t_role 的数据：~3 rows (大约)
+-- 正在导出表  mango_blog.t_role 的数据：~2 rows (大约)
 DELETE FROM `t_role`;
 /*!40000 ALTER TABLE `t_role` DISABLE KEYS */;
 INSERT INTO `t_role` (`id`, `role_name`, `create_time`, `update_time`, `summary`, `level`) VALUES
@@ -529,7 +530,7 @@ CREATE TABLE IF NOT EXISTS `t_sort` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='博客分类表';
 
--- 正在导出表  mango_blog.t_sort 的数据：~0 rows (大约)
+-- 正在导出表  mango_blog.t_sort 的数据：~4 rows (大约)
 DELETE FROM `t_sort`;
 /*!40000 ALTER TABLE `t_sort` DISABLE KEYS */;
 INSERT INTO `t_sort` (`id`, `sort_name`, `summary`, `create_time`, `update_time`, `click_count`) VALUES
@@ -551,7 +552,7 @@ CREATE TABLE IF NOT EXISTS `t_tag` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='标签表';
 
--- 正在导出表  mango_blog.t_tag 的数据：~0 rows (大约)
+-- 正在导出表  mango_blog.t_tag 的数据：~3 rows (大约)
 DELETE FROM `t_tag`;
 /*!40000 ALTER TABLE `t_tag` DISABLE KEYS */;
 INSERT INTO `t_tag` (`id`, `summary`, `click_count`, `create_time`, `update_time`, `tag_name`) VALUES
@@ -604,7 +605,7 @@ CREATE TABLE IF NOT EXISTS `t_user` (
   UNIQUE KEY `idx_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='用户表';
 
--- 正在导出表  mango_blog.t_user 的数据：~0 rows (大约)
+-- 正在导出表  mango_blog.t_user 的数据：~2 rows (大约)
 DELETE FROM `t_user`;
 /*!40000 ALTER TABLE `t_user` DISABLE KEYS */;
 INSERT INTO `t_user` (`id`, `username`, `password`, `gender`, `avatar`, `birthday`, `email`, `mobile`, `login_count`, `last_login_time`, `last_login_ip`, `status`, `create_time`, `update_time`, `nickname`, `qq_number`, `we_chat`, `comment_status`, `user_tag`) VALUES
@@ -650,7 +651,6 @@ DELETE FROM `t_web_config`;
 DROP TABLE IF EXISTS `t_web_visit`;
 CREATE TABLE IF NOT EXISTS `t_web_visit` (
   `id` varchar(19) NOT NULL COMMENT '主键',
-  `user_id` varchar(255) DEFAULT NULL COMMENT '用户id',
   `ip` varchar(255) DEFAULT NULL COMMENT '访问ip地址',
   `create_time` timestamp NOT NULL COMMENT '创建时间',
   `update_time` timestamp NOT NULL COMMENT '更新时间',
@@ -670,5 +670,6 @@ DELETE FROM `t_web_visit`;
 /*!40000 ALTER TABLE `t_web_visit` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;

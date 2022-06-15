@@ -40,7 +40,7 @@ public class BlogController {
     @Autowired
     private CommentService commentService;
 
-    @LogByMethod("/web/blog/getBlogByPage")
+    @LogByMethod(value = "/web/blog/getBlogByPage", behavior = BehaviorEnum.TAG)
     @ApiOperation(value = "分页查询博客信息", notes = "分页查询博客信息", response = Response.class)
     @PostMapping("/getBlogByPage")
     public Response getBlogByPage(@RequestBody BlogDto blogDto) throws Exception {

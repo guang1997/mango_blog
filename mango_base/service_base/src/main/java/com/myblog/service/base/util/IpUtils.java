@@ -1,8 +1,18 @@
 package com.myblog.service.base.util;
 
 import com.myblog.service.base.common.Constants;
+import org.lionsoul.ip2region.DataBlock;
+import org.lionsoul.ip2region.DbConfig;
+import org.lionsoul.ip2region.DbSearcher;
+import org.lionsoul.ip2region.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -17,6 +27,8 @@ import java.util.Map;
  * @date 2021/09/27
  */
 public class IpUtils {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(IpUtils.class);
 
     /**
      * 获取当前ip地址
@@ -90,6 +102,81 @@ public class IpUtils {
         }
     }
 
+    /**
+     * 获取IP地址来源
+     *
+     * @param ip
+     * @param encodingString 服务器端请求编码。如GBK,UTF-8等
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public static String getAddresses(String ip, String encodingString) {
+
+
+        if(StringUtils.isEmpty(ip) || !Util.isIpAddress(ip)) {
+            LOGGER.debug("getAddresses failed by ip is null");
+            return null;
+        }
+
+        // 淘宝IP宕机，目前使用Ip2region：https://github.com/lionsoul2014/ip2region
+        return getCityInfo(ip);
+
+    }
+
+    public static String getCityInfo(String ip) {
+
+        String dbPath ="template/city/ip2region.db";
+        File file = new File(dbPath);
+        if (!file.exists()) {
+            LOGGER.error("getCityInfo failed by cannot find ip2region.db file");
+        }
+
+        //查询算法
+        //B-tree, B树搜索（更快）
+        int algorithm = DbSearcher.BTREE_ALGORITHM;
+
+        //Binary,使用二分搜索
+        //DbSearcher.BINARY_ALGORITHM
+
+        //Memory,加载内存（最快）
+        //DbSearcher.MEMORY_ALGORITYM
+        try {
+            DbConfig config = new DbConfig();
+            DbSearcher searcher = new DbSearcher(config, dbPath);
+
+            //define the method
+            Method method = null;
+            switch (algorithm) {
+                case DbSearcher.BTREE_ALGORITHM:
+                    method = searcher.getClass().getMethod("btreeSearch", String.class);
+                    break;
+                case DbSearcher.BINARY_ALGORITHM:
+                    method = searcher.getClass().getMethod("binarySearch", String.class);
+                    break;
+                case DbSearcher.MEMORY_ALGORITYM:
+                    method = searcher.getClass().getMethod("memorySearch", String.class);
+                    break;
+            }
+
+            DataBlock dataBlock = null;
+            if (!Util.isIpAddress(ip)) {
+                System.out.println("Error: Invalid ip address");
+            }
+
+            dataBlock = (DataBlock) method.invoke(searcher, ip);
+            String ipInfo = dataBlock.getRegion();
+            if (!StringUtils.isEmpty(ipInfo)) {
+                ipInfo = ipInfo.replace("|0", "");
+                ipInfo = ipInfo.replace("0|", "");
+            }
+            return ipInfo;
+
+        } catch (Exception e) {
+            LOGGER.error("getCityInfo failed, exception:", e);
+        }
+
+        return null;
+    }
     /**
      * 获取操作系统,浏览器及浏览器版本信息
      *

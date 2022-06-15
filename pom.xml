@@ -54,6 +54,7 @@
         <mail.version>1.4.7</mail.version>
         <userAgentUtils.version>1.21</userAgentUtils.version>
         <qiniu.version>[7.7.0, 7.10.99]</qiniu.version>
+        <ip2region.version>1.7.2</ip2region.version>
     </properties>
 
     <dependencyManagement>
@@ -287,6 +288,14 @@
                 <groupId>com.qiniu</groupId>
                 <artifactId>qiniu-java-sdk</artifactId>
                 <version>${qiniu.version}</version>
+            </dependency>
+
+            <!--通过ip获取城市信息-->
+            <!-- https://github.com/lionsoul2014/ip2region -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

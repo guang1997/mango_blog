@@ -76,18 +76,18 @@ public class LinkController {
     }
 
     private void sendEmail(String email, String url) {
-        sendEmailExecutor.submit(new sendEmailTask(email, url));
+        sendEmailExecutor.submit(new SendEmailTask(email, url));
     }
     
-    class sendEmailTask implements Runnable {
+    class SendEmailTask implements Runnable {
         private String email;
 
         private String url;
 
-        public sendEmailTask() {
+        public SendEmailTask() {
         }
 
-        public sendEmailTask(String email, String url) {
+        public SendEmailTask(String email, String url) {
             this.email = email;
             this.url = url;
         }

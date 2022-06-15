@@ -1,8 +1,10 @@
 package com.myblog.service.security.annotation;
 
+import com.myblog.service.base.common.BehaviorEnum;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.ValidateUtil;
+import com.myblog.service.security.handler.PersistenLogHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,7 +12,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.ServletRequest;
 import java.util.Objects;
@@ -26,6 +32,9 @@ import java.util.Objects;
 public class LogAspect {
 
     private static Logger LOGGER = LoggerFactory.getLogger(LogAspect.class);
+
+    @Autowired
+    private PersistenLogHandler persistenLogHandler;
 
     /**
      * 配置切入点
@@ -58,7 +67,18 @@ public class LogAspect {
                     return validateResponse;
                 }
             }
+            // 保存门户网站浏览日志
+            if (!Objects.equals(logByMethod.behavior(), BehaviorEnum.DEFAULT)) {
+                RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+                if (Objects.nonNull(requestAttributes)) {
+                    ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
+                    persistenLogHandler.saveWebVisitLog(logByMethod.behavior(), servletRequestAttributes);
+                } else {
+                    LOGGER.error("save web visit log failed by requestAttributes is null, methodName:{}, params:{}", methodName, params);
+                }
+            }
         }
+
         if (classLogger.isDebugEnabled()) {
             classLogger.debug("recieve request:{}, params:{}", methodName, params);
         }
