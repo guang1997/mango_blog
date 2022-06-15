@@ -14,8 +14,6 @@ public class TagDto extends BaseDto {
 
     private Integer clickCount;
 
-    private Integer sort;
-
     private List<String> createTimes;
 
     private Boolean queryAll;

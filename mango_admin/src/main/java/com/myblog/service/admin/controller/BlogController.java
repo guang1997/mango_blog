@@ -3,7 +3,7 @@ package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.entity.dto.BlogDto;
 import com.myblog.service.admin.service.BlogService;
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

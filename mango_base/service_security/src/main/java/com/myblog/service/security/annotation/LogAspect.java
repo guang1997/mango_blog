@@ -1,13 +1,9 @@
-package com.myblog.service.base.aspect;
+package com.myblog.service.security.annotation;
 
-import com.myblog.service.base.annotation.aspect.LogByMethod;
 import com.myblog.service.base.common.Response;
-import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.ValidateUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -17,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletRequest;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -35,7 +30,7 @@ public class LogAspect {
     /**
      * 配置切入点
      */
-    @Pointcut("@annotation(com.myblog.service.base.annotation.aspect.LogByMethod)")
+    @Pointcut("@annotation(com.myblog.service.security.annotation.LogByMethod)")
     public void logPointCut() {
     }
 

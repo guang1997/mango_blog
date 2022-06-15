@@ -3,16 +3,22 @@ package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.entity.dto.LinkDto;
 import com.myblog.service.admin.service.LinkService;
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.security.annotation.LogByMethod;
+import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.util.TwoTuple;
+import com.myblog.service.security.service.VerificationCodeService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -32,6 +38,12 @@ public class LinkController {
 
     @Autowired
     private LinkService linkService;
+
+    @Value("${email.blogAddress}")
+    private String blogAddress;
+
+    @Autowired
+    private VerificationCodeService verificationCodeService;
 
     @LogByMethod("/admin/link/getLinkByPage")
     @ApiOperation(value = "分页查询友情链接", notes = "分页查询友情链接", response = Response.class)
@@ -55,7 +67,12 @@ public class LinkController {
     @ApiOperation(value = "修改友情链接", notes = "修改友情链接", response = Response.class)
     @PutMapping("/editLink")
     public Response editLink(@RequestBody LinkDto linkDto) throws Exception {
-        return linkService.editLink(linkDto);
+        Response response = linkService.editLink(linkDto);
+        // 如果是更改友链状态，更改成功后发送邮件
+        if (response.getSuccess() && BooleanUtils.isTrue(linkDto.getChangeStatus()) && Objects.equals(Constants.CommonStatus.ENABLED, linkDto.getLinkStatus())) {
+            response = verificationCodeService.sendEmail(linkDto.getEmail(), Constants.EmailSource.ADMIN, new TwoTuple<>(Constants.EmailParam.ADMIN_LINK, blogAddress));
+        }
+        return response;
     }
 
     @LogByMethod("/admin/link/delLink")

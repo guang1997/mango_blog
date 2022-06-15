@@ -16,9 +16,6 @@ public class SortDto extends BaseDto {
 
     private Integer clickCount;
 
-    @NotNull(message = "分类级别不能为空")
-    private Integer sortLevel;
-
     private List<String> createTimes;
 
     private Boolean queryAll;

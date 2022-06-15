@@ -2,7 +2,7 @@ package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.config.FileUploadProperties;
 import com.myblog.service.admin.service.OssService;
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Objects;
 

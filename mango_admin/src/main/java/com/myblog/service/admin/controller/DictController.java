@@ -3,7 +3,7 @@ package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.entity.dto.DictDto;
 import com.myblog.service.admin.service.DictService;
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;

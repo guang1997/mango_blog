@@ -1,6 +1,7 @@
 package com.myblog.service.web.controller;
 
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.security.service.VerificationCodeService;
@@ -45,7 +46,7 @@ public class LoginController {
         return verificationCodeService.sendCode(userDto.getEmail(), Constants.EmailSource.WEB);
     }
 
-    @LogByMethod(value = "/web/login/doLogin")
+    @LogByMethod(value = "/web/login/doLogin", behavior = BehaviorEnum.LOGIN)
     @ApiOperation(value = "保存用户", notes = "保存用户", response = Response.class)
     @PostMapping("/doLogin")
     public Response doLogin(@RequestBody UserDto userDto) throws Exception {

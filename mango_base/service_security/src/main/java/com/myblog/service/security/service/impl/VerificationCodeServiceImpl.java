@@ -44,9 +44,6 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     @Value("${email.expiresSecond}")
     private Long expiresSecond;
 
-    @Value("${email.sendEmailName}")
-    private String sendEmailName;
-
     /**
      * 给邮箱发送验证码
      *

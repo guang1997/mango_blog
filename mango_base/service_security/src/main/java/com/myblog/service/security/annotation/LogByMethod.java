@@ -1,4 +1,6 @@
-package com.myblog.service.base.annotation.aspect;
+package com.myblog.service.security.annotation;
+
+import com.myblog.service.base.common.BehaviorEnum;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,4 +21,10 @@ public @interface LogByMethod {
      * @return
      */
     boolean validate() default false;
+
+    /**
+     * 门户网站行为
+     * @return
+     */
+    BehaviorEnum behavior() default BehaviorEnum.DEFAULT;
 }

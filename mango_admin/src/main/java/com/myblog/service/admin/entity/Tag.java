@@ -33,9 +33,4 @@ public class Tag extends BaseEntity {
 
     @ApiModelProperty(value = "点击数")
     private Integer clickCount;
-
-    @ApiModelProperty(value = "排序字段，越小越靠前")
-    private Integer sort;
-
-
 }

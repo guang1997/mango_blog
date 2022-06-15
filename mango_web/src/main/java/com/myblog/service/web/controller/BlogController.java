@@ -1,17 +1,14 @@
 package com.myblog.service.web.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
-import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
-import com.myblog.service.web.entity.Blog;
 import com.myblog.service.web.entity.dto.BlogDto;
 import com.myblog.service.web.entity.dto.CommentDto;
 import com.myblog.service.web.service.BlogService;
 import com.myblog.service.web.service.CommentService;
-import com.myblog.service.web.service.impl.SortServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,7 +47,7 @@ public class BlogController {
         return blogService.getBlogByPage(blogDto);
     }
 
-    @LogByMethod("/web/blog/getBlogById")
+    @LogByMethod(value = "/web/blog/getBlogById", behavior = BehaviorEnum.BLOG_DETAIL)
     @ApiOperation(value = "根据博客id查询博客信息", notes = "根据博客id查询博客信息", response = Response.class)
     @PostMapping("/getBlogById")
     public Response getBlogById(@RequestBody BlogDto blogDto, HttpServletRequest request) throws Exception {
@@ -69,7 +65,7 @@ public class BlogController {
         return response;
     }
 
-    @LogByMethod("/web/blog/getBlogBySortId")
+    @LogByMethod(value = "/web/blog/getBlogBySortId", behavior = BehaviorEnum.BLOG_SORT)
     @ApiOperation(value = "根据分类id查询博客信息", notes = "根据分类id查询博客信息", response = Response.class)
     @PostMapping("/getBlogBySortId")
     public Response getBlogBySortId(@RequestBody BlogDto blogDto) throws Exception {
@@ -80,7 +76,7 @@ public class BlogController {
         return blogService.getBlogBySortId(blogDto);
     }
 
-    @LogByMethod("/web/blog/getBlogByTagId")
+    @LogByMethod(value = "/web/blog/getBlogByTagId", behavior = BehaviorEnum.BLOG_TAG)
     @ApiOperation(value = "根据标签id查询博客信息", notes = "根据分类id查询博客信息", response = Response.class)
     @PostMapping("/getBlogByTagId")
     public Response getBlogByTagId(@RequestBody BlogDto blogDto) throws Exception {
@@ -91,7 +87,7 @@ public class BlogController {
         return blogService.getBlogByTagId(blogDto);
     }
 
-    @LogByMethod("/web/blog/getPrevNextBlog")
+    @LogByMethod(value = "/web/blog/getPrevNextBlog", behavior = BehaviorEnum.BLOG_DETAIL)
     @ApiOperation(value = "查询博客上一篇博客和下一篇博客", notes = "查询博客上一篇博客和下一篇博客", response = Response.class)
     @PostMapping("/getPrevNextBlog")
     public Response getPrevNextBlog(@RequestBody BlogDto blogDto) throws Exception {

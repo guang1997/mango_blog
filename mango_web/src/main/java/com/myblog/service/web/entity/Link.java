@@ -39,5 +39,6 @@ public class Link extends BaseEntity {
     @ApiModelProperty(value = "友链状态： 0 申请中， 1：已上线")
     private Integer linkStatus;
 
-
+    @ApiModelProperty(value = "邮箱")
+    private String email;
 }

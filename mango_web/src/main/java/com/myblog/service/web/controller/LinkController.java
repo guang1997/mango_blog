@@ -2,7 +2,8 @@ package com.myblog.service.web.controller;
 
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.TwoTuple;
@@ -51,7 +52,7 @@ public class LinkController {
             new ThreadFactoryBuilder().setNameFormat("link-send-email").build()
     );
 
-    @LogByMethod("/web/link/getFriendLink")
+    @LogByMethod(value = "/web/link/getFriendLink", behavior = BehaviorEnum.FRIENDSHIP_LINK)
     @ApiOperation(value = "查询友链信息", notes = "查询友链信息", response = Response.class)
     @PostMapping("/getFriendLink")
     public Response getFriendLink(@RequestBody LinkDto linkDto) throws Exception {

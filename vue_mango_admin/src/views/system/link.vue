@@ -50,13 +50,20 @@
                 style="width: 446px"
               />
             </el-form-item>
-             <el-form-item label="友链图标" prop="fileId">
+              <el-form-item label="邮箱" prop="email">
+               <el-input
+                v-model="form.email"
+                placeholder="请输入邮箱"
+                style="width: 446px"
+              />
+            </el-form-item>
+             <!-- <el-form-item label="友链图标" prop="fileId">
                <el-input
                 v-model="form.fileId"
                 placeholder="请输入友链图标"
                 style="width: 446px"
               />
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="友链介绍" prop="summary">
               <el-input
                 v-model="form.summary"
@@ -92,16 +99,17 @@
              @selection-change="crud.selectionChangeHandler"
           >
             <el-table-column type="selection" width="55" />
-            <el-table-column label="友链图标" width="120" align="center">
+            <!-- <el-table-column label="友链图标" width="120" align="center">
               <template slot-scope="scope">
                 <img
                   :src="scope.row.fileId"
                   style="width: 100px;height: 100px;"
                 >
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column :show-overflow-tooltip="true" prop="title" label="友链标题" width="150"/>
              <el-table-column :show-overflow-tooltip="true" prop="url" label="友链url" width="200"/>
+             <el-table-column :show-overflow-tooltip="true" prop="email" label="邮箱" width="200"/>
             <el-table-column :show-overflow-tooltip="true" prop="summary" label="友链描述" width="250"/>
             <el-table-column label="友链状态" align="center" prop="linkStatus" v-permission="permission.edit">
             <template slot-scope="scope">
@@ -160,6 +168,7 @@ export default {
       url: "/admin/link/getLinkByPage",
       crudMethod: { ...crudLink },
       methodType: "post",
+      optShow: {add: false, edit: true, del: true,}
     });
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
@@ -168,10 +177,10 @@ export default {
     return {
       currentId: 0,
       permission: {
-        add: {
-          roles:["admin"],
-          menuButtons:["link:add"]
-        },
+        // add: {
+        //   roles:["admin"],
+        //   menuButtons:["link:add"]
+        // },
         edit: {
           roles:["admin"],
           menuButtons:["link:edit"]
@@ -212,6 +221,7 @@ export default {
       } else {
         data.linkStatus = 0;
       }
+      data.changeStatus = true;
       this.$confirm(
         '此操作将 "' +
           (val === 0 ? "激活" : "禁用") +

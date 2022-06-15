@@ -36,8 +36,5 @@ public class Sort extends BaseEntity {
     @ApiModelProperty(value = "点击数")
     private Integer clickCount;
 
-    @ApiModelProperty(value = "分类级别")
-    private Integer sortLevel;
-
 
 }

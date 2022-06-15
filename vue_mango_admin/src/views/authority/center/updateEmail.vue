@@ -3,11 +3,35 @@
     <el-dialog :visible.sync="dialog" :close-on-click-modal="false" :before-close="cancel" :title="title" append-to-body width="475px" @close="cancel">
       <el-form ref="form" :model="form" :rules="rules" size="small" label-width="88px">
         <el-form-item label="新邮箱" prop="email">
-          <el-input v-model="form.email" auto-complete="on" style="width: 218px;vertical-align: middle;box-sizing: content-box;" />
-          <el-button style="margin-left: 10px;vertical-align: middle;box-sizing: content-box;" :loading="codeLoading" :disabled="isDisabled" size="small" @click="sendCode">{{ buttonName }}</el-button>
+          <el-input v-model="form.email" auto-complete="on" style="width: 320px;" />
         </el-form-item>
         <el-form-item label="验证码" prop="code">
-          <el-input v-model="form.code" style="width: 320px;" />
+           <div style="display: flex;width: 320px;">
+              <el-input
+                style="
+                  vertical-align: middle;
+                  box-sizing: content-box;
+                  width: 100%;
+                "
+                v-model="form.code"
+                placeholder="请输入验证码"
+                clearable
+              />
+               <el-button
+                style="
+                  height: 12px;
+                  vertical-align: middle;
+                  box-sizing: content-box;
+                "
+                :disabled="isDisabled"
+                size="small"
+                @click="openVcode"
+                :loading="codeLoading"
+              >
+                {{ buttonName }}
+              </el-button>
+           </div>
+          <!-- <el-input v-model="form.code" style="width: 320px;" /> -->
         </el-form-item>
         <el-form-item label="当前密码" prop="pass">
           <el-input v-model="form.pass" type="password" style="width: 320px;" />
@@ -18,6 +42,12 @@
         <el-button :loading="loading" type="primary" @click="doSubmit">确认</el-button>
       </div>
     </el-dialog>
+     <Vcode
+      :show="isShow"
+      @success="success"
+      @close="close"
+      style="z-index: 10000"
+    />
   </div>
 </template>
 
@@ -26,6 +56,7 @@ import store from '@/store'
 import { validEmail } from '@/utils/validate'
 import { updateEmail } from '@/api/authority/admin'
 import { sendCode } from '@/api/authority/code'
+import Vcode from "vue-puzzle-vcode";
 export default {
   name: "email",
   props: {
@@ -33,6 +64,9 @@ export default {
       type: String,
       required: true
     }
+  },
+  components: {
+    Vcode,
   },
   data() {
     const validMail = (rule, value, callback) => {
@@ -47,6 +81,7 @@ export default {
       }
     }
     return {
+      isShow: false,
       loading: false, dialog: false, title: '修改邮箱', form: { pass: '', email: '', code: '' },
       user: { email: '', password: '' }, codeLoading: false,
       buttonName: '获取验证码', isDisabled: false, time: 60,
@@ -130,7 +165,19 @@ export default {
       this.buttonName = '获取验证码'
       this.isDisabled = false
       this.form = { pass: '', email: '', code: '' }
-    }
+    },
+    // 用户通过了验证
+    success(msg) {
+      this.isShow = false; // 通过验证后，需要手动隐藏模态框
+      this.sendCode();
+    },
+    // 用户点击遮罩层，应该关闭模态框
+    close() {
+      this.isShow = false;
+    },
+    openVcode() {
+      this.isShow = true;
+    },
   }
 }
 </script>

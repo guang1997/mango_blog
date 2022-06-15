@@ -28,7 +28,7 @@
           size="small"
           placeholder="评论类型"
           class="filter-item"
-          style="width: 90px"
+          style="width: 100px"
           @change="crud.toQuery"
         >
           <el-option
@@ -44,7 +44,7 @@
           size="small"
           placeholder="评论来源"
           class="filter-item"
-          style="width: 90px"
+          style="width: 100px"
           @change="crud.toQuery"
         >
           <el-option
@@ -92,7 +92,7 @@
           />
           <el-table-column
             :show-overflow-tooltip="true"
-            prop="toNickname"
+            prop="answerNickname"
             label="被评论人"
             width="100"
           />

@@ -1,13 +1,11 @@
 package com.myblog.service.web.controller;
 
 
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.web.entity.dto.TagDto;
 import com.myblog.service.web.service.TagService;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

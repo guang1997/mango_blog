@@ -15,8 +15,6 @@ public class SortDto extends BaseDto {
 
     private Integer clickCount;
 
-    private Integer sortLevel;
-
     private Integer blogNum;
 
     private Boolean queryAll;

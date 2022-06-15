@@ -49,7 +49,7 @@
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" :data="crud.data" highlight-current-row style="width: 100%;" @selection-change="crud.selectionChangeHandler">
         <el-table-column label="所属字典">
-          <el-tag>{{ query.dictName }}</el-tag>
+          {{ query.dictName }}
         </el-table-column>
         <el-table-column prop="dictLabel" label="字典标签" />
         <el-table-column prop="dictValue" label="字典值" width="80"/>

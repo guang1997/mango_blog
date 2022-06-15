@@ -61,9 +61,6 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
         if (StringUtils.isNotBlank(sortDto.getSortName())) {
             queryWrapper.like(DbConstants.Sort.SORT_NAME, sortDto.getSortName());
         }
-        if (Objects.nonNull(sortDto.getSortLevel())) {
-            queryWrapper.eq(DbConstants.Sort.SORT_LEVEL, sortDto.getSortLevel());
-        }
         if (!CollectionUtils.isEmpty(sortDto.getCreateTimes()) && Objects.equals(2, sortDto.getCreateTimes().size())) {
             Date beginDate = ThreadSafeDateFormat.parse(sortDto.getCreateTimes().get(0), ThreadSafeDateFormat.DATETIME);
             Date endDate = ThreadSafeDateFormat.parse(sortDto.getCreateTimes().get(1), ThreadSafeDateFormat.DATETIME);
@@ -154,7 +151,7 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
         if (CollectionUtils.isEmpty(delFailedSortNames)) {
             return Response.ok();
         }
-        return Response.error().message(delFailedSortNames.toString() + "已绑定用户, 未删除成功");
+        return Response.error().message(delFailedSortNames.toString() + "已绑定博客, 未删除成功");
     }
 
 }

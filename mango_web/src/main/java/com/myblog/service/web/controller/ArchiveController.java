@@ -1,10 +1,10 @@
 package com.myblog.service.web.controller;
 
 
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.web.entity.dto.ArchiveDto;
-import com.myblog.service.web.entity.dto.BlogDto;
 import com.myblog.service.web.service.BlogService;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class ArchiveController {
     @Autowired
     private BlogService blogService;
 
-    @LogByMethod("/web/archive/getArchives")
+    @LogByMethod(value = "/web/archive/getArchives", behavior = BehaviorEnum.ARCHIVE)
     @ApiOperation(value = "查询归档", notes = "查询归档", response = Response.class)
     @PostMapping("/getArchives")
     public Response getArchives(@RequestBody ArchiveDto archiveDto) throws Exception {

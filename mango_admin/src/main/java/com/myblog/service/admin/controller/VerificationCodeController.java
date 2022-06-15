@@ -1,6 +1,6 @@
 package com.myblog.service.admin.controller;
 
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.security.service.VerificationCodeService;

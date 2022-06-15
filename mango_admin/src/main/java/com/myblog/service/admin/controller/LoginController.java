@@ -1,13 +1,12 @@
 package com.myblog.service.admin.controller;
 
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.annotation.rest.AnonymousPostMapping;
 import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.RedisUtil;
 import com.myblog.service.security.config.entity.MySecurityProperties;
-import com.myblog.service.security.entity.RoleMenu;
 import com.myblog.service.security.entity.dto.LoginDto;
 import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.entity.dto.Meta;
@@ -30,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 

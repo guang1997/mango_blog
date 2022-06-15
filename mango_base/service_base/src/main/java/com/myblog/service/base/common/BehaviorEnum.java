@@ -6,27 +6,28 @@ import java.util.*;
 
 public enum BehaviorEnum {
 
-    BLOG_TAG("点击标签", 0),
-    BLOG_SORT("点击博客分类", 0),
-    VISIT_PAGE("点击首页", 1),
-    BLOG_CONTNET("点击博客", 1),
-    FRIENDSHIP_LINK("点击友情链接", 1),
-    VISIT_SORT("点击归档", 1),
-    BLOG_AUTHOR("点击作者", 1),
-    VISIT_CLASSIFY("点击博客分类页面", 1),
-    VISIT_TAG("点击博客标签页面", 1),
-    BLOG_PRAISE("点赞", 0),
-    BLOG_SEARCH("点击搜索", 0),
-    PUBLISH_COMMENT("发表评论", 0),
-    DELETE_COMMENT("删除评论", 0),
-    REPORT_COMMENT("举报评论", 0);
+    DEFAULT("DEFAULT", "默认行为", 0),
+    BLOG_TAG("BLOG_TAG", "点击标签", 0),
+    BLOG_SORT("BLOG_SORT", "点击分类", 0),
+    BLOG_DETAIL("BLOG_DETAIL", "点击博客页面", 1),
+    FRIENDSHIP_LINK("FRIENDSHIP_LINK", "点击友情链接页面", 1),
+    ARCHIVE("ARCHIVE", "点击归档", 1),
+    SORT("SORT", "点击博客分类页面", 1),
+    TAG("TAG", "点击博客标签页面", 1),
+    LIKE("LIKE", "点赞", 0),
+    SEARCH("SEARCH", "点击搜索", 0),
+    PUBLISH_COMMENT("PUBLISH_COMMENT", "发表评论", 0),
+    LOGIN("LOGIN", "登录", 0),
+    MESSAGE_BOARD("MESSAGE_BOARD", "点击留言板页面", 1);
 
 
+    private String behavior;
     private String content;
     private int isMenu;
 
 
-    BehaviorEnum(String content, int isMenu) {
+    BehaviorEnum(String behavior, String content, int isMenu) {
+        this.behavior = behavior;
         this.content = content;
         this.isMenu = isMenu;
     }
@@ -55,5 +56,13 @@ public enum BehaviorEnum {
             }
         }
         return resultList;
+    }
+
+    public String getBehavior() {
+        return behavior;
+    }
+
+    public void setBehavior(String behavior) {
+        this.behavior = behavior;
     }
 }

@@ -31,15 +31,6 @@
                 style="width: 178px"
               />
             </el-form-item>
-            <el-form-item label="标签排序" prop="sort">
-              <el-input-number
-                v-model.number="form.sort"
-                :min="0"
-                :max="999"
-                controls-position="right"
-                style="width: 178px"
-              />
-            </el-form-item>
             <el-form-item label="描述信息" prop="summary">
               <el-input
                 v-model="form.summary"
@@ -79,7 +70,6 @@
             <el-table-column :show-overflow-tooltip="true" prop="tagName" label="标签名" width="200"/>
             <el-table-column :show-overflow-tooltip="true" prop="summary" label="标签描述" width="300"/>
             <el-table-column label="点击数" width="150" prop="clickCount" />
-            <el-table-column :show-overflow-tooltip="true" prop="sort" label="排序字段" width="200"/>
 
             <el-table-column label="创建时间"  prop="createTime" />
             <el-table-column

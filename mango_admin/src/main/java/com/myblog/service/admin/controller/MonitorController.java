@@ -1,9 +1,8 @@
 package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.service.MonitorService;
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
-import com.myblog.service.security.entity.dto.AdminDto;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

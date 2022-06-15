@@ -18,7 +18,9 @@ public class LinkDto extends BaseDto {
 
     private Integer linkStatus;
 
-    private String fileId;
-
     private String blurry;
+
+    private String email;
+
+    private Boolean changeStatus;
 }

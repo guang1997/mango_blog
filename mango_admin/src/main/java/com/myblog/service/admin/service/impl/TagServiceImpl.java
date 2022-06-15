@@ -63,7 +63,6 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
             Date endDate = ThreadSafeDateFormat.parse(tagDto.getCreateTimes().get(1), ThreadSafeDateFormat.DATETIME);
             queryWrapper.between(DbConstants.Base.CREATE_TIME, beginDate, endDate);
         }
-        queryWrapper.orderByDesc(DbConstants.Base.SORT);
         Page<Tag> tagPage = new Page<>(page, size);
 
         baseMapper.selectPage(tagPage, queryWrapper);
@@ -147,6 +146,6 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         if (CollectionUtils.isEmpty(delFailedTagNames)) {
             return Response.ok();
         }
-        return Response.error().message(delFailedTagNames.toString() + "已绑定用户, 未删除成功");
+        return Response.error().message(delFailedTagNames.toString() + "已绑定博客, 未删除成功");
     }
 }

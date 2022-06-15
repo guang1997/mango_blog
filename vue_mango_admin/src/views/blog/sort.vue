@@ -31,7 +31,7 @@
                 style="width: 178px"
               />
             </el-form-item>
-            <el-form-item label="分类级别" prop="sortLevel">
+            <!-- <el-form-item label="分类级别" prop="sortLevel">
               <el-input-number
                 v-model.number="form.sortLevel"
                 :min="1"
@@ -39,7 +39,7 @@
                 controls-position="right"
                 style="width: 178px"
               />
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="描述信息" prop="summary">
               <el-input
                 v-model="form.summary"
@@ -79,14 +79,14 @@
             <el-table-column :show-overflow-tooltip="true" prop="sortName" label="分类名" width="200"/>
             <el-table-column :show-overflow-tooltip="true" prop="summary" label="分类描述" width="300"/>
             <el-table-column label="点击数" width="150" prop="clickCount" />
-            <el-table-column label="分类级别" width="200">
+            <!-- <el-table-column label="分类级别" width="200">
               <template slot-scope="scope">
                 <template>
                   <el-tag v-for="item in filterSysSortType(scope.row.sortLevel)" 
                   :type="item.listClass" :key="item.id">{{item.dictLabel}}</el-tag>
                 </template>
               </template>
-            </el-table-column>
+            </el-table-column> -->
 
             <el-table-column label="创建时间"  prop="createTime" />
             <el-table-column
@@ -159,11 +159,11 @@ export default {
     };
   },
   computed: {
-    filterSysSortType() {
-      return function(sortLevel) {
-        return this.dict.sys_sort_type.filter(item => item.dictValue == sortLevel)
-      }
-    }
+    // filterSysSortType() {
+    //   return function(sortLevel) {
+    //     return this.dict.sys_sort_type.filter(item => item.dictValue == sortLevel)
+    //   }
+    // }
   },
   methods: {
     // 提交前做的操作

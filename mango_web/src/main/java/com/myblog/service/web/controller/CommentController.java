@@ -1,13 +1,12 @@
 package com.myblog.service.web.controller;
 
 
-import com.myblog.service.base.annotation.aspect.LogByMethod;
+import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.web.entity.dto.CommentDto;
 import com.myblog.service.web.service.CommentService;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,21 +35,21 @@ public class CommentController {
         return commentService.getCommentByPage(commentDto);
     }
 
-    @LogByMethod("/web/comment/likeBlog")
+    @LogByMethod(value = "/web/comment/likeBlog", behavior = BehaviorEnum.LIKE)
     @ApiOperation(value = "给博客点赞", notes = "给博客点赞", response = Response.class)
     @PostMapping("/likeBlog")
     public Response likeBlog(@RequestBody CommentDto commentDto, HttpServletRequest request) throws Exception {
         return commentService.likeBlog(commentDto, request);
     }
 
-    @LogByMethod("/web/comment/saveComment")
+    @LogByMethod(value = "/web/comment/saveComment", behavior = BehaviorEnum.PUBLISH_COMMENT)
     @ApiOperation(value = "保存评论", notes = "保存评论", response = Response.class)
     @PostMapping("/saveComment")
     public Response saveComment(@RequestBody CommentDto commentDto, HttpServletRequest request) throws Exception {
         return commentService.saveComment(commentDto, request);
     }
 
-    @LogByMethod("/web/comment/likeComment")
+    @LogByMethod(value = "/web/comment/likeComment", behavior = BehaviorEnum.LIKE)
     @ApiOperation(value = "给评论点赞", notes = "给评论点赞", response = Response.class)
     @PostMapping("/likeComment")
     public Response likeComment(@RequestBody CommentDto commentDto, HttpServletRequest request) throws Exception {
