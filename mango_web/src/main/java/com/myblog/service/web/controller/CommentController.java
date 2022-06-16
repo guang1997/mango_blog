@@ -28,10 +28,17 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    @LogByMethod("/web/comment/getCommentByPage")
+    @LogByMethod(value = "/web/comment/getCommentByPage")
     @ApiOperation(value = "分页查询评论信息", notes = "分页查询评论信息", response = Response.class)
     @PostMapping("/getCommentByPage")
     public Response getCommentByPage(@RequestBody CommentDto commentDto) throws Exception {
+        return commentService.getCommentByPage(commentDto);
+    }
+
+    @LogByMethod(value = "/web/comment/getMessageBoardCommentByPage", behavior = BehaviorEnum.MESSAGE_BOARD)
+    @ApiOperation(value = "留言板页面分页查询评论信息", notes = "留言板页面分页查询评论信息", response = Response.class)
+    @PostMapping("/getMessageBoardCommentByPage")
+    public Response getMessageBoardCommentByPage(@RequestBody CommentDto commentDto) throws Exception {
         return commentService.getCommentByPage(commentDto);
     }
 

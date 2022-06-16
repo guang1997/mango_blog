@@ -67,7 +67,7 @@ export default {
   },
   async asyncData() {
     console.log(this.visitorInfo)
-    const msgRes = await commentApi.getCommentByPage({
+    const msgRes = await commentApi.getMessageBoardCommentByPage({
       page: 1,
       size: 10,
       source: 'MESSAGE_BOARD_MESSAGE',
@@ -109,11 +109,11 @@ export default {
           type: 'success',
           message: '留言成功'
         })
-        this.getCommentByPage()
+        this.getMessageBoardCommentByPage()
       }
     },
-    async getCommentByPage() {
-      const msgRes = await commentApi.getCommentByPage({
+    async getMessageBoardCommentByPage() {
+      const msgRes = await commentApi.getMessageBoardCommentByPage({
         page: this.currentPage,
         size: this.pageSize,
         source: 'MESSAGE_BOARD_MESSAGE',
@@ -146,11 +146,11 @@ export default {
           type: "success",
           message: likeRes.message,
         });
-        this.getCommentByPage();
+        this.getMessageBoardCommentByPage();
       }
     },
     currentChange() {
-      this.getCommentByPage()
+      this.getMessageBoardCommentByPage()
     }
   }
 }

@@ -7,6 +7,15 @@ export function getCommentByPage(data) {
       data
     })
   }
+
+  export function getMessageBoardCommentByPage(data) {
+    return request({
+      url: '/web/comment/getMessageBoardCommentByPage',
+      method: 'post',
+      data
+    })
+  }
+  
   export function likeBlog(data) {
     return request({
       url: '/web/comment/likeBlog',
@@ -28,4 +37,4 @@ export function getCommentByPage(data) {
       data
     })
   }
-  export default { getCommentByPage, likeBlog, saveComment, likeComment }
+  export default { getCommentByPage, likeBlog, saveComment, likeComment, getMessageBoardCommentByPage }

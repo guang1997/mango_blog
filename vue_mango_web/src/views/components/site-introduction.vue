@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="site-introduction__social">
-      <div class="social-github">
+       <div class="social-github">
         <a href="https://gitee.com/lisite1997/mango_blog" target="_blank">
           <el-button type="primary" size="mini">
             <div class="social-github__icon">
@@ -57,6 +57,7 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'pannelIntroduction',
+  inject:['reload'],
   props: {},
   data() {
     return {}
@@ -67,6 +68,7 @@ export default {
   methods: {
     goTo(name) {
       this.$router.push({ name })
+      this.reload()
     }
   }
 }
