@@ -43,19 +43,6 @@ export default {
     if (!storage.getMangoBlogScreenInformation()) {
       this.createScreenInformation();
     }
-    // setTimeout(() => {
-    //   window.L2Dwidget.init({
-    //     pluginRootPath: '../static/live2dw/',
-    //     pluginJsPath: 'lib/',
-    //     pluginModelPath: 'live2d-widget-model-chitose/assets/', //中间这个haru_2就是你的老婆,想换个老婆,换这个就可以了
-    //     tagMode: false,
-    //     debug: false,
-    //     model: { jsonPath: '../static/live2dw/live2d-widget-model-miku/assets/miku.model.json' },
-    //     display: { position: 'left', width: 250, height: 400 },  //调整大小,和位置
-    //     mobile: { show: true },   //要不要盯着你的鼠标看
-    //     log: false,
-    //   })
-    // }, 1)
   },
   methods: {
     ...mapMutations([
@@ -69,11 +56,11 @@ export default {
       "setScreenInformation",
     ]),
     initPannel() {
-      archiveApi.getArchives({ queryByMonth: true }).then((res) => {
+      archiveApi.initArchives({ queryByMonth: true }).then((res) => {
         if (res.code === 20000) this.setArchives(res.data.data)
       })
       sortApi
-        .getSortByPage({
+        .initSortByPage({
           page: 1,
           size: 5,
         })
@@ -84,7 +71,7 @@ export default {
           }
         });
       tagApi
-        .getTagByPage({
+        .initTagByPage({
           page: 1,
           size: 1000,
         })

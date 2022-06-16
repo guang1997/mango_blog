@@ -191,12 +191,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     public Response getArchives(ArchiveDto archiveDto) {
         Response response = Response.ok();
-        if (BooleanUtils.isTrue(archiveDto.getQueryByMonth()) && StringUtils.isBlank(archiveDto.getMonth())) {
-            List<ArchiveDto> archiveDtos = baseMapper.selectBlogNumByMouth();
-            return Response.ok().data(Constants.ReplyField.DATA, archiveDtos);
-        }
         int page = 1;
-        int size = 1;
+        int size = 10;
         if (Objects.nonNull(archiveDto.getPage())) page = archiveDto.getPage();
         if (Objects.nonNull(archiveDto.getSize())) size = archiveDto.getSize();
         Page<Blog> archivePage = new Page<>(page, size);
@@ -231,6 +227,17 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         response.data(Constants.ReplyField.PAGE, page);
         response.data(Constants.ReplyField.SIZE, size);
         return response;
+    }
+
+    @Override
+    public Response initArchives(ArchiveDto archiveDto) {
+        if (BooleanUtils.isTrue(archiveDto.getQueryByMonth()) && StringUtils.isBlank(archiveDto.getMonth())) {
+            List<ArchiveDto> archiveDtos = baseMapper.selectBlogNumByMouth();
+            return Response.ok().data(Constants.ReplyField.DATA, archiveDtos);
+        } else {
+            LOGGER.error("initArchives failed by illegal param:{}", archiveDto);
+            return Response.error();
+        }
     }
 
     private ArchiveDto toArchiveDto(Blog blog) {

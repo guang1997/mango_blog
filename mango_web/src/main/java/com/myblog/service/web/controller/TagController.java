@@ -32,5 +32,12 @@ public class TagController {
     public Response getTagByPage(@RequestBody TagDto tagDto) throws Exception {
         return tagService.getTagByPage(tagDto);
     }
+
+    @LogByMethod(value = "/web/tag/initTagByPage")
+    @ApiOperation(value = "首页查询标签信息", notes = "首页查询标签信息", response = Response.class)
+    @PostMapping("/initTagByPage")
+    public Response initTagByPage(@RequestBody TagDto tagDto) throws Exception {
+        return tagService.getTagByPage(tagDto);
+    }
 }
 

@@ -1,24 +1,26 @@
 package com.myblog.service.base.util;
 
 import com.myblog.service.base.common.Constants;
-import org.lionsoul.ip2region.DataBlock;
-import org.lionsoul.ip2region.DbConfig;
-import org.lionsoul.ip2region.DbSearcher;
-import org.lionsoul.ip2region.Util;
+import io.netty.util.Constant;
+import org.apache.commons.lang3.StringUtils;
+import org.lionsoul.ip2region.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * IP相关工具类
@@ -30,6 +32,27 @@ public class IpUtils {
 
     private static Logger LOGGER = LoggerFactory.getLogger(IpUtils.class);
 
+    static String dbPath;
+    static DbConfig config;
+    static DbSearcher searcher;
+
+    static {
+        URL xmlpath = IpUtils.class.getClassLoader().getResource("template/city/ip2region.db");
+        if (Objects.isNull(xmlpath)) {
+            throw new RuntimeException("cannot find file by template/city/ip2region.db");
+        }
+        dbPath = xmlpath.getPath();
+        try {
+            config = new DbConfig();
+        } catch (DbMakerConfigException e) {
+            e.printStackTrace();
+        }
+        try {
+            searcher = new DbSearcher(config, dbPath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * 获取当前ip地址
      *
@@ -124,11 +147,13 @@ public class IpUtils {
     }
 
     public static String getCityInfo(String ip) {
-
-        String dbPath ="template/city/ip2region.db";
-        File file = new File(dbPath);
-        if (!file.exists()) {
-            LOGGER.error("getCityInfo failed by cannot find ip2region.db file");
+        if (StringUtils.isEmpty(dbPath)) {
+            LOGGER.error("Error: Invalid ip2region.db file");
+            return null;
+        }
+        if(config == null || searcher == null){
+            LOGGER.error("Error: DbSearcher or DbConfig is null");
+            return null;
         }
 
         //查询算法
@@ -160,7 +185,7 @@ public class IpUtils {
 
             DataBlock dataBlock = null;
             if (!Util.isIpAddress(ip)) {
-                System.out.println("Error: Invalid ip address");
+                LOGGER.error("Error: Invalid ip address, ip:{}", ip);
             }
 
             dataBlock = (DataBlock) method.invoke(searcher, ip);

@@ -36,4 +36,11 @@ public class ArchiveController {
     public Response getArchives(@RequestBody ArchiveDto archiveDto) throws Exception {
         return blogService.getArchives(archiveDto);
     }
+
+    @LogByMethod(value = "/web/archive/initArchives")
+    @ApiOperation(value = "首页初始化归档", notes = "首页初始化归档", response = Response.class)
+    @PostMapping("/initArchives")
+    public Response initArchives(@RequestBody ArchiveDto archiveDto) throws Exception {
+        return blogService.initArchives(archiveDto);
+    }
 }

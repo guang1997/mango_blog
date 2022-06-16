@@ -32,5 +32,12 @@ public class SortController {
     public Response getSortByPage(@RequestBody SortDto sortDto) throws Exception {
         return sortService.getSortByPage(sortDto);
     }
+
+    @LogByMethod(value = "/web/sort/initSortByPage")
+    @ApiOperation(value = "首页查询分类信息", notes = "首页查询分类信息", response = Response.class)
+    @PostMapping("/initSortByPage")
+    public Response initSortByPage(@RequestBody SortDto sortDto) throws Exception {
+        return sortService.getSortByPage(sortDto);
+    }
 }
 

@@ -30,4 +30,6 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
     Response getPrevNextBlog(BlogDto blogDto) throws Exception;
 
     Response getArchives(ArchiveDto archiveDto) throws Exception;
+
+    Response initArchives(ArchiveDto archiveDto);
 }

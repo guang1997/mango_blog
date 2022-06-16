@@ -36,14 +36,6 @@ export function getBlogByPage(data) {
     })
   }
 
-  export function getArchives(data) {
-    return request({
-      url: '/web/blog/getArchives',
-      method: 'post',
-      data
-    })
-  }
-
   export function searchBlogByKeyword(data) {
     return request({
       url: '/web/blog/searchBlogByKeyword',
@@ -51,4 +43,4 @@ export function getBlogByPage(data) {
       data
     })
   }
-  export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId, getPrevNextBlog, getArchives, searchBlogByKeyword }
+  export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId, getPrevNextBlog, searchBlogByKeyword }

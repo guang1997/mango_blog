@@ -6,6 +6,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.security.annotation.LogAspect;
 import com.myblog.service.security.entity.WebVisit;
+import com.myblog.service.security.mapper.WebVisitMapper;
 import com.myblog.service.security.service.WebVisitService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public class PersistenLogHandler {
     );
 
     @Autowired
-    private WebVisitService webVisitService;
+    private WebVisitMapper webVisitMapper;
 
 
     public void saveWebVisitLog(BehaviorEnum behavior, ServletRequestAttributes servletRequestAttributes) {
@@ -78,6 +79,7 @@ public class PersistenLogHandler {
                 Map<String, String> osAndBrowserInfo = IpUtils.getOsAndBrowserInfo(request);
                 webVisit.setOs(osAndBrowserInfo.get(Constants.ReplyField.OS));
                 webVisit.setBrowser(osAndBrowserInfo.get(Constants.ReplyField.BROWSER));
+                webVisitMapper.insert(webVisit);
             } catch (Exception e) {
                 LOGGER.error("save web visit log failed by exception:", e);
             }

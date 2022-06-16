@@ -7,12 +7,9 @@ import java.util.*;
 public enum BehaviorEnum {
 
     DEFAULT("DEFAULT", "默认行为", 0),
-    BLOG_TAG("BLOG_TAG", "点击标签", 0),
-    BLOG_SORT("BLOG_SORT", "点击分类", 0),
     BLOG_DETAIL("BLOG_DETAIL", "点击博客页面", 1),
-    INDEX("INDEX", "点击首页", 1),
     FRIENDSHIP_LINK("FRIENDSHIP_LINK", "点击友情链接页面", 1),
-    ARCHIVE("ARCHIVE", "点击归档", 1),
+    ARCHIVE("ARCHIVE", "点击归档页面", 1),
     SORT("SORT", "点击博客分类页面", 1),
     TAG("TAG", "点击博客标签页面", 1),
     LIKE("LIKE", "点赞", 0),
