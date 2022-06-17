@@ -18,7 +18,7 @@ export default {
   props: ["content"],
   name: "app",
   computed: {
-    ...mapGetters(["imagesUploadApi"]),
+    ...mapGetters(["blogImagesUploadApi"]),
   },
   data() {
     return {
@@ -55,14 +55,18 @@ export default {
         autoGrow_minHeight: 800, // 自动增长最小高度
         removeButtons:
           "Save,Print,NewPage,About,Smiley,BidiRtl,BidiLtr,Language,CreateDiv,Iframe", // 移除按钮
+          removePlugins: 'easyimage,cloudservices',
+          removeDialogTabs: 'image:advanced;link:advanced',
+          addDialogTabs: 'image:uploadButton'
       },
       editorUrl: "../../../public/ckeditor/ckeditor.js",
+      
       filebrowserImageUploadUrl:
-        this.imagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
+        this.blogImagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
       filebrowserUploadUrl:
-        this.imagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
+        this.blogImagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
       pasteUploadFileApi:
-        this.imagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
+        this.blogImagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
     };
   },
   created() {

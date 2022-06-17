@@ -11,6 +11,7 @@ const getters = {
   addRouters: state => state.permission.addRouters,
   sidebarRouters: state => state.permission.sidebarRouters,
   imagesUploadApi: state => state.api.imagesUploadApi,
+  blogImagesUploadApi: state => state.api.blogImagesUploadApi,
   monitorWebsocketApi: state => state.api.monitorWebsocketApi,
   druidApi: state => state.api.druidApi,
   baseApi: state => state.api.baseApi,

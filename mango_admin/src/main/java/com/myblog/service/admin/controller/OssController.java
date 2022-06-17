@@ -45,7 +45,7 @@ public class OssController {
     @PostMapping("/uploadAvatar")
     public Response uploadAvatar(MultipartFile avatar,
                                  @RequestParam("moduleName") String moduleName,
-                                 @RequestParam("id") String id) throws IOException {
+                                 @RequestParam("id") String id) throws Exception {
         // 文件大小验证
         FileUtil.checkSize(fileUploadProperties.getAvatarMaxSize(), avatar.getSize());
         // 验证文件上传的格式
@@ -70,14 +70,37 @@ public class OssController {
     }
 
     /**
-     * 该方法用于上传文件
+     * 该方法用于上传文件到七牛云
      * @return
      */
     @LogByMethod("/admin/oss/upload")
     @ApiOperation(value = "上传文件", notes = "上传文件", response = Response.class)
     @PostMapping("/upload")
-    public Response upload(MultipartFile file, @RequestParam("moduleName") String moduleName) throws IOException {
+    public Response upload(MultipartFile file, @RequestParam("moduleName") String moduleName) throws Exception {
         return ossService.upload(file, moduleName);
+    }
+
+    /**
+     * 该方法用于ckEditor上传图片到七牛云
+     * 响应需要特殊的格式
+     * 上传成功：{
+     *     "uploaded": 1,
+     *     "fileName": "foo.jpg",
+     *     "url": "/files/foo.jpg"
+     *     }
+     * 上传失败：{
+     *     "uploaded": 0,
+     *     "error": {
+     *         "message": "The file is too big."
+     *     }
+     *     }
+     * @return
+     */
+    @LogByMethod("/admin/oss/qiNiuUpload")
+    @ApiOperation(value = "ckEditor使用七牛云上传图片", notes = "ckEditor使用七牛云上传图片", response = Response.class)
+    @PostMapping("/qiNiuUpload")
+    public Object qiNiuUpload(MultipartFile file, @RequestParam("moduleName") String moduleName) throws Exception {
+        return ossService.qiNiuUpload(file, moduleName);
     }
 
     /**

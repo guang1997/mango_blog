@@ -6,7 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface OssService {
-    Response upload(MultipartFile file, String moduleName) throws IOException;
+    Response upload(MultipartFile file, String moduleName) throws Exception;
 
     Response delete(String url);
+
+    Object qiNiuUpload(MultipartFile file, String moduleName);
 }

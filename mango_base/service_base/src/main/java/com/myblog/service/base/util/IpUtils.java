@@ -32,9 +32,9 @@ public class IpUtils {
 
     private static Logger LOGGER = LoggerFactory.getLogger(IpUtils.class);
 
-    static String dbPath;
-    static DbConfig config;
-    static DbSearcher searcher;
+    private static String dbPath;
+    private static DbConfig config;
+    private static DbSearcher searcher;
 
     static {
         URL xmlpath = IpUtils.class.getClassLoader().getResource("template/city/ip2region.db");

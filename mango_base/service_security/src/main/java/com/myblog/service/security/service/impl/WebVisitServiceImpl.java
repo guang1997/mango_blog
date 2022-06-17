@@ -31,7 +31,7 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
 
     private static Logger LOGGER = LoggerFactory.getLogger(WebVisitServiceImpl.class);
 
-    @Value("${dashboard.webvisit.radarMaxValue:10}")
+    @Value("${dashboard.webvisit.radarMaxValue:50}")
     private Integer radarMaxValue;
 
     @Override
@@ -121,7 +121,7 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
                     continue;
                 }
                 Map<String, Object> countMap = countList.stream()
-                        .filter(map -> Objects.equals(map.get("behavior"), menuBehavior.getContent()))
+                        .filter(map -> Objects.equals(map.get("behavior"), menuBehavior.getBehavior()))
                         .findAny().orElse(null);
                 if (CollectionUtils.isEmpty(countMap)) {
                     behaviorCounts.add(0);

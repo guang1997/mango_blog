@@ -23,10 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.Objects.*;
 
@@ -48,12 +45,13 @@ public class OssServiceImpl implements OssService {
     private QiNiuYunOssProperties qiNiuYunOssProperties;
 
     @Override
-    public Response upload(MultipartFile file, String moduleName) throws IOException {
+    public Response upload(MultipartFile file, String moduleName) throws Exception {
+        Response response = Response.ok();
         String fileName = file.getOriginalFilename(); // 原来的名字
         String date = ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.DATE_PURE_SPLIT);
-        String uuidName = UUID.randomUUID().toString();// uuid
+        String newFileName = UUID.randomUUID().toString() + Constants.Symbol.COMMA2 + fileName;
         // 拼接filename，构建日期路径：avatar/2019/02/26/uuid唯一文件名
-        String key = moduleName + Constants.Symbol.COMMA4 + date + Constants.Symbol.COMMA4 + uuidName + Constants.Symbol.COMMA2 + fileName;
+        String key = moduleName + Constants.Symbol.COMMA4 + date + Constants.Symbol.COMMA4 + newFileName;
         String token = auth.uploadToken(qiNiuYunOssProperties.getBucket());
         try (InputStream stream = file.getInputStream()) {
             com.qiniu.http.Response res = uploadManager.put(stream, key, token, null, null);
@@ -64,14 +62,17 @@ public class OssServiceImpl implements OssService {
                     return Response.setResult(ResultCodeEnum.UPLOAD_ERROR);
                 }
                 String url = "http://" + String.join(Constants.Symbol.COMMA4, qiNiuYunOssProperties.getDomainName(), putRet.key);
-                return Response.ok().data(Constants.ReplyField.URL, url);
+                response.data(Constants.ReplyField.URL, url);
+                response.data(Constants.ReplyField.UPLOADED, 1);
+                response.data(Constants.ReplyField.FILE_NAME, newFileName);
+                return response;
             }
-        }catch (IOException e) {
-            LOGGER.error("oss upload failed, fileName:{}", fileName);
+        }catch (Exception e) {
+            LOGGER.error("oss upload failed, fileName:{}, exception:", fileName, e);
             throw e;
         }
 
-        return Response.setResult(ResultCodeEnum.UPLOAD_ERROR);
+        return Response.error().data(Constants.ReplyField.ERROR, "上传失败，请联系管理员处理");
     }
 
 //    @Override
@@ -129,5 +130,38 @@ public class OssServiceImpl implements OssService {
             throw e;
         }
         return Response.ok();
+    }
+
+    @Override
+    public Object qiNiuUpload(MultipartFile file, String moduleName) {
+        Map<String, Object> response = new HashMap<>();
+        String fileName = file.getOriginalFilename(); // 原来的名字
+        String date = ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.DATE_PURE_SPLIT);
+        String newFileName = UUID.randomUUID().toString() + Constants.Symbol.COMMA2 + fileName;
+        // 拼接filename，构建日期路径：avatar/2019/02/26/uuid唯一文件名
+        String key = moduleName + Constants.Symbol.COMMA4 + date + Constants.Symbol.COMMA4 + newFileName;
+        String token = auth.uploadToken(qiNiuYunOssProperties.getBucket());
+        try (InputStream stream = file.getInputStream()) {
+            com.qiniu.http.Response res = uploadManager.put(stream, key, token, null, null);
+            if (res.isOK() && res.isJson()) {
+                DefaultPutRet putRet = JsonUtils.jsonToPojo(res.bodyString(), DefaultPutRet.class);
+                if (Objects.isNull(putRet) || StringUtils.isEmpty(putRet.key)) {
+                    LOGGER.error("oss upload failed by result:{} is empty, fileName:{}", putRet, fileName);
+                    return Response.setResult(ResultCodeEnum.UPLOAD_ERROR);
+                }
+                String url = "http://" + String.join(Constants.Symbol.COMMA4, qiNiuYunOssProperties.getDomainName(), putRet.key);
+                response.put(Constants.ReplyField.URL, url);
+                response.put(Constants.ReplyField.UPLOADED, 1);
+                response.put(Constants.ReplyField.FILE_NAME, newFileName);
+                return response;
+            }
+        }catch (Exception e) {
+            LOGGER.error("oss upload failed, fileName:{}, exception:", fileName, e);
+        }
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put(Constants.ReplyField.MESSAGE, "上传失败，请联系管理员处理");
+        response.put(Constants.ReplyField.UPLOADED, 0);
+        response.put(Constants.ReplyField.MESSAGE, errorMap);
+        return response;
     }
 }

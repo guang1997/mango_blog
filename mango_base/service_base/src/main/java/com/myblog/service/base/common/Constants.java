@@ -60,6 +60,10 @@ public interface Constants {
         String OS = "os";
         String BROWSER = "browser";
         String COMMENT = "comment";
+        String UPLOADED = "uploaded";
+        String FILE_NAME = "fileName";
+        String ERROR = "error";
+        String MESSAGE = "message";
     }
 
     interface SystemConstant {
