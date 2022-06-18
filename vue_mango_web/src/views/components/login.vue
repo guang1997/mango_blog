@@ -229,7 +229,7 @@ export default {
 
           if (res.status === 200) {
             if (res.data._saved) {
-              this.setVisitorInfo(res.data.info);
+              this.setVisitorInfo(res.data.data);
               this.$emit("changeCustomVisible", false);
             } else {
               // 存储

@@ -6,6 +6,8 @@ import com.myblog.service.web.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.web.entity.dto.UserDto;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * <p>
  * 用户表 服务类
@@ -16,5 +18,7 @@ import com.myblog.service.web.entity.dto.UserDto;
  */
 public interface UserService extends IService<User>, ServiceConvertHandler<User, UserDto> {
 
-    Response doLogin(UserDto userDto) throws Exception;
+    Response doLogin(UserDto userDto, HttpServletRequest request) throws Exception;
+
+    Response getUser(UserDto userDto) throws Exception;
 }

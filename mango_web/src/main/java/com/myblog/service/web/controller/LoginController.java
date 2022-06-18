@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * <p>
  * 登陆 前端控制器
@@ -49,11 +51,18 @@ public class LoginController {
     @LogByMethod(value = "/web/login/doLogin", behavior = BehaviorEnum.LOGIN)
     @ApiOperation(value = "保存用户", notes = "保存用户", response = Response.class)
     @PostMapping("/doLogin")
-    public Response doLogin(@RequestBody UserDto userDto) throws Exception {
+    public Response doLogin(@RequestBody UserDto userDto, HttpServletRequest request) throws Exception {
         // 校验验证码
         if (!verificationCodeService.validateCode(userDto.getEmail(), userDto.getCode(), Constants.EmailSource.WEB).getSuccess()) {
             return Response.error().message("验证码错误");
         }
-        return userService.doLogin(userDto);
+        return userService.doLogin(userDto, request);
+    }
+
+    @LogByMethod(value = "/web/login/getUser", behavior = BehaviorEnum.LOGIN)
+    @ApiOperation(value = "获取用户", notes = "获取用户", response = Response.class)
+    @PostMapping("/getUser")
+    public Response getUser(@RequestBody UserDto userDto) throws Exception {
+        return userService.getUser(userDto);
     }
 }

@@ -3,24 +3,30 @@
     <layout _title="留言板" cover="/static/img/cover/msgboard.jpeg">
       <div class="message-board__content">
         <note>
-          <p class="message-board__welcome">you must be a surprise someone is looking forward to</p>
+          <p class="message-board__welcome">
+            you must be a surprise someone is looking forward to
+          </p>
         </note>
         <splitLine></splitLine>
         <div class="message-board__title">
           <i class="el-icon-chat-dot-round"></i>
           <span>留言</span>
         </div>
-       
+
         <div class="message-board__submit">
           <submit @submitContent="submitContent"></submit>
         </div>
-        
+
         <div class="message-board__list">
           <div class="message-board__total">
             <span>{{ total }}条留言</span>
           </div>
           <div class="message-board__list">
-            <comments :comments="messages" @submitReply="submitReply" @likeComment="likeComment"></comments>
+            <comments
+              :comments="messages"
+              @submitReply="submitReply"
+              @likeComment="likeComment"
+            ></comments>
             <div class="message-board__page" v-if="messages.length">
               <el-pagination
                 :current-page.sync="currentPage"
@@ -37,62 +43,75 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
-import note from '@/components/note/'
-import splitLine from '@/components/splitLine/'
-import submit from '@/views/components/submit'
-import comments from '@/views/components/comments'
-import commentApi from '@/api/comment'
+import { mapState, mapMutations } from "vuex";
+import note from "@/components/note/";
+import splitLine from "@/components/splitLine/";
+import submit from "@/views/components/submit";
+import comments from "@/views/components/comments";
+import commentApi from "@/api/comment";
 import { storage } from "@/utils/storage";
+import loginApi from "@/api/login";
 export default {
-  name: 'messageBoard',
+  name: "messageBoard",
   metaInfo() {
     return {
-      title: `留言板  - Lisite's Blog`
-    }
+      title: `留言板  - Lisite's Blog`,
+    };
   },
   components: {
     note,
     submit,
     splitLine,
-    comments
+    comments,
   },
   data() {
     return {
       currentPage: 1,
       total: 0,
       pageSize: 10,
-      messages: []
-    }
+      messages: [],
+    };
   },
   async asyncData() {
-    console.log(this.visitorInfo)
     const msgRes = await commentApi.getMessageBoardCommentByPage({
       page: 1,
       size: 10,
-      source: 'MESSAGE_BOARD_MESSAGE',
+      source: "MESSAGE_BOARD_MESSAGE",
       queryLike: true,
       userId: storage.getVisitor() ? storage.getVisitor().id : "",
-    })
-    if (msgRes.code === 20000) return { messages: msgRes.data.data, total: msgRes.data.total }
+    });
+    if (msgRes.code === 20000)
+      return { messages: msgRes.data.data, total: msgRes.data.total };
   },
   computed: {
-    ...mapState(['visitorInfo'])
+    ...mapState(["visitorInfo"]),
+  },
+  created() {
+    this.updateVisitorInfo()
   },
   methods: {
+     ...mapMutations(["setVisitor"]),
     submitContent(content, cb) {
-      this.submit(content, null, cb)
+      this.submit(content, null, cb);
     },
     submitReply(content, currentReplyMessage, cb) {
-      this.submit(content, currentReplyMessage, cb)
+      this.submit(content, currentReplyMessage, cb);
     },
     async submit(content, currentReplyMessage, cb) {
+      if(this.visitorInfo.commentStatus == 0) {
+        this.$message({
+          type: "warning",
+          message: "您被禁言了，请联系管理员处理",
+        });
+        return;
+      }
       let parentId = "0";
       let answerNickname;
       if (currentReplyMessage) {
-        if (currentReplyMessage.parentId === "0") parentId = currentReplyMessage.id
-        else parentId = currentReplyMessage.parentId
-        answerNickname = currentReplyMessage.nickname
+        if (currentReplyMessage.parentId === "0")
+          parentId = currentReplyMessage.id;
+        else parentId = currentReplyMessage.parentId;
+        answerNickname = currentReplyMessage.nickname;
       }
       const res = await commentApi.saveComment({
         nickname: this.visitorInfo.nickname,
@@ -101,28 +120,28 @@ export default {
         content: content,
         parentId,
         source: "MESSAGE_BOARD_MESSAGE",
-        answerNickname
-      })
+        answerNickname,
+      });
       if (res.code === 20000) {
-        if (cb) cb()
+        if (cb) cb();
         this.$message({
-          type: 'success',
-          message: '留言成功'
-        })
-        this.getMessageBoardCommentByPage()
+          type: "success",
+          message: "留言成功",
+        });
+        this.getMessageBoardCommentByPage();
       }
     },
     async getMessageBoardCommentByPage() {
       const msgRes = await commentApi.getMessageBoardCommentByPage({
         page: this.currentPage,
         size: this.pageSize,
-        source: 'MESSAGE_BOARD_MESSAGE',
+        source: "MESSAGE_BOARD_MESSAGE",
         queryLike: true,
-         userId: this.visitorInfo.id
-      })
+        userId: this.visitorInfo.id,
+      });
       if (msgRes.code === 20000) {
-        this.messages = msgRes.data.data
-        this.total = msgRes.data.total
+        this.messages = msgRes.data.data;
+        this.total = msgRes.data.total;
       }
     },
     async likeComment(message) {
@@ -140,27 +159,41 @@ export default {
           this.visitorInfo && this.visitorInfo.nickname
             ? this.visitorInfo.nickname
             : "",
-      })
+      });
       if (likeRes.code === 20000) {
-       this.$message({
+        this.$message({
           type: "success",
           message: likeRes.message,
         });
         this.getMessageBoardCommentByPage();
       }
     },
-    currentChange() {
-      this.getMessageBoardCommentByPage()
+   updateVisitorInfo() {
+    // 如果用户没有退出账号就关闭网页了，再次打开网页的时候去更新网页
+    if(storage.getVisitor()) {
+      loginApi.getUser(storage.getVisitor()).then(res => {
+        if (res.code === 20000) {
+            this.setVisitorInfo(res.data.data);
+        }
+      })
     }
-  }
-}
+  },
+  setVisitorInfo(info) {
+      this.setVisitor(info);
+      storage.setVisitor(info);
+    },
+    currentChange() {
+      this.getMessageBoardCommentByPage();
+    },
+  },
+};
 </script>
 <style lang="scss">
-@import '~@/style/index.scss';
+@import "~@/style/index.scss";
 
 .message-board {
   &__welcome {
-    font-family: 'sf-arch';
+    font-family: "sf-arch";
     font-size: 28px;
     line-height: 1.8;
     @include respond-to(xs) {
@@ -171,7 +204,7 @@ export default {
     padding: 16px 0;
     font-size: 20px;
     font-weight: 700;
-    > [class^='el-icon-'] {
+    > [class^="el-icon-"] {
       font-weight: 700;
     }
     span {

@@ -36,4 +36,7 @@ public interface AdminService extends IService<Admin>, ServiceConvertHandler<Adm
     Response updatePass(PassAndEmailDto passAndEmailDto) throws Exception;
 
     Response editAdmin(AdminDto adminDto) throws Exception;
+
+    int getAdminCount();
+
 }

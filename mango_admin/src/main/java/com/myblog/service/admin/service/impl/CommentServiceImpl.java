@@ -69,6 +69,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             queryWrapper.between(DbConstants.Base.CREATE_TIME, beginDate, endDate);
         }
         queryWrapper.eq(DbConstants.Comment.STATUS, 1);
+        queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         Page<Comment> commentPage = new Page<>(page, size);
         baseMapper.selectPage(commentPage, queryWrapper);
 

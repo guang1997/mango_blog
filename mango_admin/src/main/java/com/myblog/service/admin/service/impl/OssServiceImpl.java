@@ -1,7 +1,5 @@
 package com.myblog.service.admin.service.impl;
 
-import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
 import com.myblog.service.admin.config.AliyunOssProperties;
 import com.myblog.service.admin.config.QiNiuYunOssProperties;
 import com.myblog.service.admin.service.OssService;
@@ -10,15 +8,17 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
+import com.qiniu.common.QiniuException;
+import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -42,6 +42,9 @@ public class OssServiceImpl implements OssService {
     private UploadManager uploadManager;
 
     @Autowired
+    private BucketManager bucketManager;
+
+    @Autowired
     private QiNiuYunOssProperties qiNiuYunOssProperties;
 
     @Override
@@ -57,7 +60,7 @@ public class OssServiceImpl implements OssService {
             com.qiniu.http.Response res = uploadManager.put(stream, key, token, null, null);
             if (res.isOK() && res.isJson()) {
                 DefaultPutRet putRet = JsonUtils.jsonToPojo(res.bodyString(), DefaultPutRet.class);
-                if (Objects.isNull(putRet) || StringUtils.isEmpty(putRet.key)) {
+                if (Objects.isNull(putRet) || StringUtils.isBlank(putRet.key)) {
                     LOGGER.error("oss upload failed by result:{} is empty, fileName:{}", putRet, fileName);
                     return Response.setResult(ResultCodeEnum.UPLOAD_ERROR);
                 }
@@ -67,12 +70,34 @@ public class OssServiceImpl implements OssService {
                 response.data(Constants.ReplyField.FILE_NAME, newFileName);
                 return response;
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("oss upload failed, fileName:{}, exception:", fileName, e);
             throw e;
         }
 
         return Response.error().data(Constants.ReplyField.ERROR, "上传失败，请联系管理员处理");
+    }
+
+    @Override
+    public Response delete(String url) {
+        if (StringUtils.isBlank(url)) {
+            LOGGER.error("delete failed from qiniu by url:{} is empty", url);
+            return Response.error();
+        }
+        // 获取文件名
+        String fileName = StringUtils.substring(url, StringUtils.lastIndexOf(url, Constants.Symbol.COMMA4));
+        if (StringUtils.isBlank(fileName)) {
+            LOGGER.error("delete failed from qiniu by fileName is empty, file url:{}", url);
+            return Response.error();
+        }
+        try {
+            bucketManager.delete(qiNiuYunOssProperties.getBucket(), fileName);
+        } catch (QiniuException e) {
+            LOGGER.error("delete failed from qiniu by exception:", e);
+            return Response.error();
+        }
+
+        return Response.ok();
     }
 
 //    @Override
@@ -106,31 +131,31 @@ public class OssServiceImpl implements OssService {
 //        return Response.ok().data(Constants.ReplyField.URL, url);
 //    }
 
-    @Override
-    public Response delete(String url) {
-        try {
-            String endpoint = aliyunOssProperties.getEndpoint();
-            String accessKeyId = aliyunOssProperties.getKeyId();
-            String accessKeySecret = aliyunOssProperties.getKeySecret();
-            String bucketName = aliyunOssProperties.getBucketName();
-
-            // 创建OSSClient实例。
-            OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-            // 拼接前端的路径
-            String host = "https://" + bucketName + Constants.Symbol.COMMA3 + endpoint + Constants.Symbol.COMMA4;
-            // 通过剪切路径，获取要删除的头像的路径和名称
-            String objectName = url.substring(host.length());
-            // 删除文件。如需删除文件夹，请将ObjectName设置为对应的文件夹名称。如果文件夹非空，则需要将文件夹下的所有object删除后才能删除该文件夹。
-            ossClient.deleteObject(bucketName, objectName);
-
-            // 关闭OSSClient。
-            ossClient.shutdown();
-        } catch (Exception e) {
-            LOGGER.error("oss delete failed, url:{}", url);
-            throw e;
-        }
-        return Response.ok();
-    }
+//    @Override
+//    public Response delete(String url) {
+//        try {
+//            String endpoint = aliyunOssProperties.getEndpoint();
+//            String accessKeyId = aliyunOssProperties.getKeyId();
+//            String accessKeySecret = aliyunOssProperties.getKeySecret();
+//            String bucketName = aliyunOssProperties.getBucketName();
+//
+//            // 创建OSSClient实例。
+//            OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+//            // 拼接前端的路径
+//            String host = "https://" + bucketName + Constants.Symbol.COMMA3 + endpoint + Constants.Symbol.COMMA4;
+//            // 通过剪切路径，获取要删除的头像的路径和名称
+//            String objectName = url.substring(host.length());
+//            // 删除文件。如需删除文件夹，请将ObjectName设置为对应的文件夹名称。如果文件夹非空，则需要将文件夹下的所有object删除后才能删除该文件夹。
+//            ossClient.deleteObject(bucketName, objectName);
+//
+//            // 关闭OSSClient。
+//            ossClient.shutdown();
+//        } catch (Exception e) {
+//            LOGGER.error("oss delete failed, url:{}", url);
+//            throw e;
+//        }
+//        return Response.ok();
+//    }
 
     @Override
     public Object qiNiuUpload(MultipartFile file, String moduleName) {
@@ -155,7 +180,7 @@ public class OssServiceImpl implements OssService {
                 response.put(Constants.ReplyField.FILE_NAME, newFileName);
                 return response;
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("oss upload failed, fileName:{}, exception:", fileName, e);
         }
         Map<String, String> errorMap = new HashMap<>();

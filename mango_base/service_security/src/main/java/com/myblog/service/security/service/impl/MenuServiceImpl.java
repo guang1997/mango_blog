@@ -1,6 +1,7 @@
 package com.myblog.service.security.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
@@ -71,7 +72,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             pid = "0";
         }
         QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-        wrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        wrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         wrapper.orderByDesc(DbConstants.Base.SORT);
         wrapper.eq(DbConstants.Base.PID, pid);
         return this.toDtoList(baseMapper.selectList(wrapper), MenuDto.class);
@@ -89,7 +90,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         // 如果是0，说明是最高级别的菜单了
         if (Objects.equals("0", menuDto.getPid())) {
             QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-            wrapper.eq(DbConstants.Base.IS_DELETED, 0);
+            wrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
             wrapper.orderByDesc(DbConstants.Base.SORT);
             wrapper.eq(DbConstants.Base.PID, "0");
             menuDtos.addAll(toDtoList(baseMapper.selectList(wrapper), MenuDto.class));
@@ -131,7 +132,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     public Response addMenu(MenuDto menuDto) throws Exception {
         // 校验菜单是否已经存在
         QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         queryWrapper.orderByDesc(DbConstants.Base.SORT);
         queryWrapper.eq(DbConstants.Menu.TITLE, menuDto.getTitle());
         if (!Objects.equals("Layout", menuDto.getComponent())) {
@@ -161,7 +162,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             return Response.ok();
         }
         QueryWrapper<Menu> countWrapper = new QueryWrapper<>();
-        countWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        countWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         countWrapper.eq(DbConstants.Base.PID, menu.getPid());
         Integer subCount = baseMapper.selectCount(countWrapper);
         if (baseMapper.updateSubCount(menu.getPid(), ++subCount) < 1) {

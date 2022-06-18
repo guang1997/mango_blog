@@ -15,8 +15,15 @@ export function doLogin(data) {
     data
   })
 }
-
+export function getUser(data) {
+  return request({
+    url: '/web/login/getUser',
+    method: 'post',
+    data
+  })
+}
 export default {
   sendCode,
-  doLogin
+  doLogin,
+  getUser
 }

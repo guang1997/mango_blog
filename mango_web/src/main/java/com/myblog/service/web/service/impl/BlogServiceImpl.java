@@ -89,7 +89,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     public Response getBlogBySortId(BlogDto blogDto) throws Exception {
         Response response = Response.ok();
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         queryWrapper.eq(DbConstants.Blog.BLOG_SORT_ID, blogDto.getBlogSortId());
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         List<Blog> blogs = baseMapper.selectList(queryWrapper);
@@ -170,7 +170,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         // 获取上一篇博客
         QueryWrapper<Blog> prevQueryWrapper = new QueryWrapper<>();
         prevQueryWrapper.lt(DbConstants.Base.CREATE_TIME, blogDto.getCreateTime());
-        prevQueryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        prevQueryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         prevQueryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         List<Blog> prevBlogList = baseMapper.selectList(prevQueryWrapper);
         if (!CollectionUtils.isEmpty(prevBlogList)) {
@@ -179,7 +179,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         // 获取下一篇博客
         QueryWrapper<Blog> nextQueryWrapper = new QueryWrapper<>();
         nextQueryWrapper.gt(DbConstants.Base.CREATE_TIME, blogDto.getCreateTime());
-        prevQueryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        prevQueryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         prevQueryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         List<Blog> nextBlogList = baseMapper.selectList(nextQueryWrapper);
         if (!CollectionUtils.isEmpty(nextBlogList)) {
@@ -197,7 +197,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         if (Objects.nonNull(archiveDto.getSize())) size = archiveDto.getSize();
         Page<Blog> archivePage = new Page<>(page, size);
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         if (StringUtils.isNotBlank(archiveDto.getMonth())) {
             queryWrapper.apply("date_format(create_time, '%Y-%m') = {0}", archiveDto.getMonth());
         }

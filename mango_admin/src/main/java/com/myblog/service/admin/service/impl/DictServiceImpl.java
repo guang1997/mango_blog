@@ -60,7 +60,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
                     .or()
                     .like(DbConstants.Base.SUMMARY, dictDto.getBlurry());
         }
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, "0");
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         queryWrapper.orderByDesc(DbConstants.Base.SORT);
         Page<Dict> dictPage = new Page<>(page, size);
 

@@ -1,5 +1,6 @@
 package com.myblog.service.admin.config;
 
+import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
@@ -25,6 +26,7 @@ public class QiNiuYunOssProperties {
     private String secretKey;
     private String bucket;
     private String domainName;
+    private Boolean deletePicture;
 
     @Bean
     public Auth getAuth() {
@@ -34,5 +36,10 @@ public class QiNiuYunOssProperties {
     @Bean
     public UploadManager getUploadManager(){
         return new UploadManager(new Configuration());
+    }
+
+    @Bean
+    public BucketManager getBucketManager(){
+        return new BucketManager(getAuth(), new Configuration());
     }
 }

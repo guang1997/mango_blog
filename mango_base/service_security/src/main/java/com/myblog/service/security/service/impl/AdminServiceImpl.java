@@ -81,7 +81,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         } else {
             adminWrapper.eq(DbConstants.Admin.USERNAME, username);
         }
-        adminWrapper.eq(DbConstants.Base.IS_DELETED, "0");
+        adminWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         Admin admin = baseMapper.selectOne(adminWrapper);
         if (admin == null) {
             LOGGER.error("admin login failed, cannot find admin by userName:{}", username);
@@ -113,7 +113,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Page<Admin> adminPage = new Page<>(page, size);
 
         QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         if (StringUtils.isNotBlank(adminDto.getBlurry())) {
             queryWrapper.like(DbConstants.Admin.USERNAME, adminDto.getBlurry())
                     .or()
@@ -153,7 +153,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         // 校验管理员是否已经存在
         QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Admin.USERNAME, adminDto.getUsername());
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         List<Admin> admins = baseMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(admins)) {
             LOGGER.error("addAdmin failed, admin already exist in db, admin:{}", adminDto);
@@ -163,6 +163,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         // 给管理员设置默认密码，规则为用户名+yyyy
         admin.setPassword(passwordEncoder.encode(admin.getUsername() + ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.YEAR)));
         admin.setUpdateTime(new Date());
+        admin.setCreateTime(new Date());
         admin.setCreateTime(new Date());
         admin.setLoginCount(0);
         admin.setLastLoginIp(null);
@@ -207,6 +208,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Response delAdmin(Set<String> ids) throws Exception {
+        List<String> urlList = new ArrayList<>();
         for (String id : ids) {
             Admin admin = baseMapper.selectById(id);
             // 清理缓存信息
@@ -216,8 +218,13 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             UpdateWrapper<RoleAdmin> roleAdminUpdateWrapper = new UpdateWrapper<>();
             roleAdminUpdateWrapper.eq(DbConstants.RoleAdmin.ADMIN_ID, id);
             roleAdminMapper.delete(roleAdminUpdateWrapper);
+            if (StringUtils.isNotBlank(admin.getAvatar())) {
+                urlList.add(admin.getAvatar());
+            }
         }
-        return Response.ok();
+        Response response = Response.ok();
+        response.data(Constants.ReplyField.DELETED_FILE_LIST, urlList);
+        return response;
     }
 
     /**
@@ -275,10 +282,18 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         QueryWrapper<Admin> wrapper = new QueryWrapper<>();
         String currentUsername = SecurityUtils.getCurrentUsername();
         wrapper.eq(DbConstants.Admin.USERNAME, currentUsername);
+        wrapper.eq(DbConstants.Admin.EMAIL, passAndEmailDto.getOldEmail());
         Admin admin = baseMapper.selectOne(wrapper);
         if (Objects.isNull(admin)) {
-            LOGGER.error("updatePass failed, cannot find admin from db, username:{}", currentUsername);
+            LOGGER.error("updateEmail failed, cannot find admin from db, username:{}", currentUsername);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+        }
+        // 如果新邮箱已经被绑定，那么返回错误
+        QueryWrapper<Admin> newQueryWrapper = new QueryWrapper<>();
+        newQueryWrapper.eq(DbConstants.Admin.EMAIL, passAndEmailDto.getEmail());
+        if (!CollectionUtils.isEmpty(baseMapper.selectList(newQueryWrapper))) {
+            LOGGER.error("updateEmail failed, email already in use, email:{}", passAndEmailDto.getEmail());
+            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("邮箱已被绑定，请更换其他邮箱");
         }
         // 对密码进行校验
         String pass = RsaUtils.decryptByPrivateKey(mySecurityProperties.getRsaPrivateKey(), passAndEmailDto.getPass());
@@ -345,7 +360,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
                 .eq(DbConstants.Admin.PHONE, adminDto.getPhone())
                 .or()
                 .eq(DbConstants.Admin.EMAIL, adminDto.getEmail());
-        usernameQueryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        usernameQueryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         Admin dbAdmin = baseMapper.selectOne(usernameQueryWrapper);
         if (Objects.nonNull(dbAdmin) && !Objects.equals(dbAdmin.getId(), adminDto.getId())) {
             LOGGER.error("editAdmin failed, username or phone or email already exist, admin:{}", adminDto);
@@ -377,6 +392,14 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         }
         redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + oldAdmin.getUsername());
         return Response.ok();
+    }
+
+    @Override
+    public int getAdminCount() {
+        QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
+        Integer count = baseMapper.selectCount(queryWrapper);
+        return Objects.isNull(count) ? 0 : count;
     }
 
     @Override

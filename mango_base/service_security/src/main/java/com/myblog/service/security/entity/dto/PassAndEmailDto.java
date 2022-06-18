@@ -14,4 +14,6 @@ public class PassAndEmailDto {
     private String email;
 
     private String code;
+
+    private String oldEmail;
 }

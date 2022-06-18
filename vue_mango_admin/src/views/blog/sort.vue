@@ -116,7 +116,7 @@ import crudOperation from "@/components/Crud/CRUD.operation";
 import udOperation from "@/components/Crud/UD.operation";
 import pagination from "@/components/Crud/Pagination";
 import DateRangePicker from "@/components/DateRangePicker";
-const defaultForm = { id: null, name: null, summary: null, sortLevel: 1};
+const defaultForm = { id: null, sortName: null, summary: null};
 export default {
   name: "Sort",
   components: {
@@ -135,7 +135,7 @@ export default {
     });
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
-  dicts:['sys_sort_type'],
+  // dicts:['sys_sort_type'],
   data() {
     return {
       currentId: 0,

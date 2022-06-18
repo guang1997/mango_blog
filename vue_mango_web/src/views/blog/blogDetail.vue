@@ -113,6 +113,7 @@ import copyright from "./components/copyright";
 import share from "./components/share";
 import prevnext from "./components/prevnext";
 import { storage } from "@/utils/storage";
+import loginApi from "@/api/login";
 // import "@/assets/css/quill.snow.css";
 function jumpAnchor(route) {
   if (route.query.anchor === "a_cm") {
@@ -185,7 +186,9 @@ export default {
     this.collectTitles();
     window.addEventListener("scroll", this.handleScroll, false);
   },
-  created() {},
+  created() {
+    this.updateVisitorInfo()
+  },
   updated() {},
 
   async asyncData({ route, isServer, _ip }) {
@@ -207,7 +210,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setCatalogs", "setActiveCatalog"]),
+    ...mapMutations(["setCatalogs", "setActiveCatalog", "setVisitor"]),
     async likeBlog(event) {
       const isLiked = this.blog.liked ? true : false;
       const res = await commentApi.likeBlog({
@@ -282,6 +285,13 @@ export default {
       this.submit(content, currentReplyComment, cb);
     },
     async submit(content, currentReplyComment, cb) {
+       if(this.visitorInfo.commentStatus == 0) {
+        this.$message({
+          type: "warning",
+          message: "您被禁言了，请联系管理员处理",
+        });
+        return;
+      }
       let parentId = "0";
       let answerNickname;
       if (currentReplyComment) {
@@ -378,6 +388,20 @@ export default {
           return true;
         }
       });
+    },
+     updateVisitorInfo() {
+    // 如果用户没有退出账号就关闭网页了，再次打开网页的时候去更新网页
+    if(storage.getVisitor()) {
+      loginApi.getUser(storage.getVisitor()).then(res => {
+        if (res.code === 20000) {
+           this.setVisitorInfo(res.data.data)
+        }
+      })
+    }
+  },
+  setVisitorInfo(info) {
+      this.setVisitor(info);
+      storage.setVisitor(info);
     },
   },
   destroyed() {

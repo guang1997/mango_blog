@@ -266,7 +266,6 @@ function CRUD(options) {
       }
       // 清除表单验证
       if (crud.findVM('form').$refs['form']) {
-        // crud.findVM('form').$refs['form'].resetFields()
         crud.findVM('form').$refs['form'].clearValidate()
       }
     },
@@ -465,7 +464,6 @@ function CRUD(options) {
       // add by ghl 2020-10-04  页面重复添加信息时，下拉框的校验会存在，需要找工取消
       if (crud.findVM('form').$refs['form']) {
         crud.findVM('form').$refs['form'].clearValidate()
-        // crud.findVM('form').$refs['form'].resetFields()
       }
     },
     /**

@@ -52,6 +52,7 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
         if (StringUtils.isNotBlank(webVisitDto.getBehavior())) {
             queryWrapper.like(DbConstants.WebVisit.BEHAVIOR, webVisitDto.getBehavior());
         }
+        queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         Page<WebVisit> webVisitPage = new Page<>(page, size);
         baseMapper.selectPage(webVisitPage, queryWrapper);
         List<WebVisitDto> tagDtos = this.toDtoList(webVisitPage.getRecords(), WebVisitDto.class);

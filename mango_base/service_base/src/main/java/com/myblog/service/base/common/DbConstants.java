@@ -107,5 +107,6 @@ public interface DbConstants {
         String USERNAME = "username";
         String NICKNAME = "nickname";
         String STATUS = "status";
+        String COMMENT_STATUS = "comment_status";
     }
 }

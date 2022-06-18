@@ -1,6 +1,8 @@
 package com.myblog.service.admin.controller;
 
 
+import com.myblog.service.admin.config.QiNiuYunOssProperties;
+import com.myblog.service.admin.service.OssService;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
@@ -47,6 +49,11 @@ public class AdminController {
     @Autowired
     private RoleService roleService;
 
+    @Autowired
+    private QiNiuYunOssProperties qiNiuYunOssProperties;
+
+    @Autowired
+    private OssService ossService;
 
     @Autowired
     private VerificationCodeService verificationCodeService;
@@ -148,7 +155,19 @@ public class AdminController {
                 return response;
             }
         }
-        return adminService.delAdmin(ids);
+        Response response = adminService.delAdmin(ids);
+        if (response.getSuccess() && qiNiuYunOssProperties.getDeletePicture()) {
+            // 删除账号后同时删除其头像
+            try {
+                List<String> urlList = (List<String>) response.getData().get(Constants.ReplyField.DELETED_FILE_LIST);
+                for (String url : urlList) {
+                    ossService.delete(url);
+                }
+            } catch (Exception e) {
+                LOGGER.error("delAdmin success but delete admin avatar failed, adminIds:{}", ids);
+            }
+        }
+        return response;
 
     }
 }

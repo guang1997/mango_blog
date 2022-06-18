@@ -60,7 +60,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     public int getBlogCount() {
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, 0);
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         return baseMapper.selectCount(queryWrapper);
     }
 
@@ -287,13 +287,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Response delBlog(Set<String> ids) {
+        List<String> fileIdList = new ArrayList<>();
         for (String blogId : ids) {
-            // 如果博客中的作者与当前登陆用户不一致不删除
             Blog dbBlog = baseMapper.selectById(blogId);
             if (Objects.isNull(dbBlog)) {
                 LOGGER.error("delBlog failed, cannot find blog from db, blogId:{}", blogId);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
+            // 如果博客中的作者与当前登陆用户不一致不删除
             String currentUserId = SecurityUtils.getCurrentUserId();
             if (!Objects.equals(currentUserId, dbBlog.getAdminId())) {
                 LOGGER.error("delBlog failed, current adminId:{} not equals db adminId:{}, blogId:{}", currentUserId, dbBlog.getAdminId(), blogId);
@@ -307,8 +308,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 LOGGER.error("delBlog failed by unknown error, blogId:{}", blogId);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
+            fileIdList.add(dbBlog.getFileId());
         }
-        return Response.ok();
+        Response response = Response.ok();
+        response.data(Constants.ReplyField.DELETED_FILE_LIST, fileIdList);
+        return response;
     }
 
     @Override

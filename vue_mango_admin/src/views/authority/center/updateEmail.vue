@@ -134,9 +134,12 @@ export default {
       }
     },
     doSubmit() {
+      
       this.$refs['form'].validate((valid) => {
         if (valid) {
           this.loading = true
+          this.form.oldEmail = this.email
+          console.log(this.form)
           updateEmail(this.form).then(res => {
             this.loading = false
             this.resetForm()

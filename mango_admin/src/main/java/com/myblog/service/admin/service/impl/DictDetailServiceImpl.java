@@ -53,7 +53,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
         if (StringUtils.isNotBlank(dictDetailDto.getDictId())) {
             queryWrapper.eq(DbConstants.DictDetail.DICT_ID, dictDetailDto.getDictId());
         }
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, "0");
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         queryWrapper.orderByDesc(DbConstants.Base.SORT);
         Page<DictDetail> dictDetailPage = new Page<>(page, size);
 

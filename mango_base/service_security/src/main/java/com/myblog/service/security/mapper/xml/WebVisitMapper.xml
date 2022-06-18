@@ -8,6 +8,6 @@
 		   GROUP BY behavior,DATE_FORMAT(request_time, '%Y-%m-%d')
     </select>
     <select id="getVisitByWeek" resultType="java.util.Map">
-        SELECT DISTINCT DATE_FORMAT(create_time, '%Y-%m-%d') date, COUNT(id) count FROM t_web_visit WHERE create_time BETWEEN #{startTime} AND #{endTime} GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d');
+        SELECT DISTINCT DATE_FORMAT(request_time, '%Y-%m-%d') date, COUNT(id) count FROM t_web_visit WHERE request_time BETWEEN #{startTime} AND #{endTime} GROUP BY DATE_FORMAT(request_time, '%Y-%m-%d');
     </select>
 </mapper>

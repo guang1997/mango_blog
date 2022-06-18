@@ -1,9 +1,6 @@
-package com.myblog.service.web.entity;
+package com.myblog.service.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import java.util.Date;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.myblog.service.base.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,13 +9,15 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 /**
  * <p>
  * 用户表
  * </p>
  *
  * @author 李斯特
- * @since 2022-05-27
+ * @since 2022-06-18
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -74,5 +73,6 @@ public class User extends BaseEntity {
 
     @ApiModelProperty(value = "评论状态 1:正常 0:禁言")
     private Integer commentStatus;
+
 
 }

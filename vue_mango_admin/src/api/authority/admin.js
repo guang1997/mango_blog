@@ -61,7 +61,8 @@ export function getAdminByIds(data) {
     const data = {
       pass: encrypt(form.pass),
       email: form.email,
-      code: form.code
+      code: form.code,
+      oldEmail: form.oldEmail
     }
     return request({
       url: '/admin/manager/updateEmail',

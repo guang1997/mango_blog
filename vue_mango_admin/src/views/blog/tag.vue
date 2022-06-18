@@ -99,7 +99,7 @@ import crudOperation from "@/components/Crud/CRUD.operation";
 import udOperation from "@/components/Crud/UD.operation";
 import pagination from "@/components/Crud/Pagination";
 import DateRangePicker from "@/components/DateRangePicker";
-const defaultForm = { id: null, name: null, summary: null, sort: 999,};
+const defaultForm = { id: null, tagName: null, summary: null, sort: 999,};
 export default {
   name: "Tag",
   components: {

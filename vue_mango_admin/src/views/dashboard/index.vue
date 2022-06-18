@@ -233,7 +233,7 @@ export default {
       switch (type) {
         case "ips":
           {
-            this.$router.push({ path: "/log/webVisit" });
+            this.$router.push({ path: "/system/webVisit" });
           }
           break;
         case "peoples":

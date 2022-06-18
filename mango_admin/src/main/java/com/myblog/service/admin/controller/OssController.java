@@ -99,7 +99,7 @@ public class OssController {
     @LogByMethod("/admin/oss/qiNiuUpload")
     @ApiOperation(value = "ckEditor使用七牛云上传图片", notes = "ckEditor使用七牛云上传图片", response = Response.class)
     @PostMapping("/qiNiuUpload")
-    public Object qiNiuUpload(MultipartFile file, @RequestParam("moduleName") String moduleName) throws Exception {
+    public Object qiNiuUpload(@RequestParam("upload") MultipartFile file, @RequestParam("moduleName") String moduleName) throws Exception {
         return ossService.qiNiuUpload(file, moduleName);
     }
 
@@ -108,14 +108,14 @@ public class OssController {
      * @param url
      * @return
      */
-    @LogByMethod("/admin/oss/delete")
-    @ApiOperation(value = "删除文件", notes = "删除文件", response = Response.class)
-    @DeleteMapping("/delete")
-    public Response delete(@RequestBody String url) {
-        if (StringUtils.isBlank(url)) {
-            LOGGER.error("oss delete failed, url cannot be null");
-            return Response.setResult(ResultCodeEnum.DELETE_FAILED);
-        }
-        return ossService.delete(url);
-    }
+//    @LogByMethod("/admin/oss/delete")
+//    @ApiOperation(value = "删除文件", notes = "删除文件", response = Response.class)
+//    @DeleteMapping("/delete")
+//    public Response delete(@RequestBody String url) {
+//        if (StringUtils.isBlank(url)) {
+//            LOGGER.error("oss delete failed, url cannot be null");
+//            return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+//        }
+//        return ossService.delete(url);
+//    }
 }

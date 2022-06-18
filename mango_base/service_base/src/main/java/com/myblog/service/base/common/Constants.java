@@ -64,6 +64,7 @@ public interface Constants {
         String FILE_NAME = "fileName";
         String ERROR = "error";
         String MESSAGE = "message";
+        String DELETED_FILE_LIST = "deletedFileList";
     }
 
     interface SystemConstant {
@@ -100,19 +101,18 @@ public interface Constants {
         String ADMIN_LINK = "adminLink";
     }
     /**
-     * 用户标签
-     */
-    interface UserTag {
-        int ORDINARY_USERS = 0;
-        int ADMIN = 1;
-        int BLOG_USERS = 2;
-    }
-
-    /**
      * 通用状态
      */
     interface CommonStatus {
         int DISABLED = 0;
         int ENABLED = 1;
+    }
+
+    /**
+     * 通用状态
+     */
+    interface IsDeleted {
+        int YES = 1;
+        int NO = 0;
     }
 }

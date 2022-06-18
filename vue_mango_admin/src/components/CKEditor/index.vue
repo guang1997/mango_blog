@@ -12,8 +12,9 @@
 </template>
 
 <script>
-import { getToken } from "@/utils/auth";
+
 import { mapGetters } from "vuex";
+import { getToken } from '@/utils/auth';
 export default {
   props: ["content"],
   name: "app",
@@ -57,16 +58,11 @@ export default {
           "Save,Print,NewPage,About,Smiley,BidiRtl,BidiLtr,Language,CreateDiv,Iframe", // 移除按钮
           removePlugins: 'easyimage,cloudservices',
           removeDialogTabs: 'image:advanced;link:advanced',
-          addDialogTabs: 'image:uploadButton'
+          addDialogTabs: 'image:uploadButton',
+           filebrowserImageUploadUrl:
+        process.env.VUE_APP_BLOG_IMAGES_UPLOAD_API + "?moduleName=blog&Authorization=" + getToken(),
       },
-      editorUrl: "../../../public/ckeditor/ckeditor.js",
-      
-      filebrowserImageUploadUrl:
-        this.blogImagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
-      filebrowserUploadUrl:
-        this.blogImagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
-      pasteUploadFileApi:
-        this.blogImagesUploadApi + "?moduleName=blog&Authorization=" + getToken(),
+      editorUrl: "../../../public/ckeditor/ckeditor.js"
     };
   },
   created() {

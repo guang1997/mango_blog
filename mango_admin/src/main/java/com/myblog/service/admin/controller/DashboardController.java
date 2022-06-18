@@ -50,11 +50,12 @@ public class DashboardController {
         int commentCount = commentService.getCommentCount(Constants.CommentStatus.REVIEWED);
         int blogCount = blogService.getBlogCount();
         int webVisitCount = webVisitService.getWebVisitCount();
+        int adminCount = adminService.getAdminCount();
 
         response.data(Constants.ReplyField.COMMENT_COUNT, commentCount)
                 .data(Constants.ReplyField.BLOG_COUNT, blogCount)
                 .data(Constants.ReplyField.VISIT_COUNT, webVisitCount)
-                .data(Constants.ReplyField.USER_COUNT, 0);
+                .data(Constants.ReplyField.USER_COUNT, adminCount);
         return response;
     }
 
