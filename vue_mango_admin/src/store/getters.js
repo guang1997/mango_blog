@@ -16,6 +16,7 @@ const getters = {
   druidApi: state => state.api.druidApi,
   baseApi: state => state.api.baseApi,
   uploadAvatarApi: state => state.api.uploadAvatarApi,
-  menuButtons: state => state.user.menuButtons
+  menuButtons: state => state.user.menuButtons,
+  nacosApi: state => state.api.nacosApi
 }
 export default getters

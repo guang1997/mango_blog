@@ -14,7 +14,9 @@ const api = {
     // druid
     druidApi: baseUrl + '/druid',
     // baseUrl，
-    baseApi: baseUrl
+    baseApi: baseUrl,
+    // nacos
+    nacosApi: 'http://localhost:8848/nacos'
   }
 }
 
