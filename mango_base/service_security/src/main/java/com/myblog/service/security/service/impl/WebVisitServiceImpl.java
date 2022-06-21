@@ -31,7 +31,7 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
 
     private static Logger LOGGER = LoggerFactory.getLogger(WebVisitServiceImpl.class);
 
-    @Value("${dashboard.webvisit.radarMaxValue:50}")
+    @Value("${dashboard.webvisit.radarMaxValue:100}")
     private Integer radarMaxValue;
 
     @Override
