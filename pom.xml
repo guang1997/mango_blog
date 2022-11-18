@@ -55,6 +55,7 @@
         <userAgentUtils.version>1.21</userAgentUtils.version>
         <qiniu.version>[7.7.0, 7.10.99]</qiniu.version>
         <ip2region.version>1.7.2</ip2region.version>
+        <elasticsearch.version>6.8.12</elasticsearch.version>
     </properties>
 
     <dependencyManagement>
@@ -90,6 +91,11 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-websocket</artifactId>
                 <version>${springboot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
             </dependency>
 
             <!-- 引入druid数据源 -->
