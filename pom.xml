@@ -22,6 +22,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <elasticsearch.version>6.8.12</elasticsearch.version>
         <cloud.version>Hoxton.SR3</cloud.version>
         <alibaba.version>2.2.0.RELEASE</alibaba.version>
         <mybatis-plus.version>3.3.1</mybatis-plus.version>
@@ -55,7 +56,7 @@
         <userAgentUtils.version>1.21</userAgentUtils.version>
         <qiniu.version>[7.7.0, 7.10.99]</qiniu.version>
         <ip2region.version>1.7.2</ip2region.version>
-        <elasticsearch.version>6.8.12</elasticsearch.version>
+        <elasticsearch-data.version>2.2.5.RELEASE</elasticsearch-data.version>
     </properties>
 
     <dependencyManagement>
@@ -96,6 +97,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+                <version>${elasticsearch-data.version}</version>
             </dependency>
 
             <!-- 引入druid数据源 -->
