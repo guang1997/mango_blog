@@ -8,6 +8,7 @@ import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.service.RoleService;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +25,11 @@ import java.util.Set;
  * @author 李斯特
  * @since 2021-10-02
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/role")
 public class RoleController {
-
-
-    private static Logger LOGGER = LoggerFactory.getLogger(RoleController.class);
 
     @Autowired
     private RoleService roleService;
@@ -76,7 +75,7 @@ public class RoleController {
     @PostMapping("/menu")
     public Response menu(@RequestBody RoleDto roleDto) throws Exception {
         if (StringUtils.isBlank(roleDto.getId())) {
-            LOGGER.error("editMenu failed, roleId cannot be null, role:{}", roleDto);
+            log.error("editMenu failed, roleId cannot be null, role:{}", roleDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return roleService.updateMenu(roleDto);

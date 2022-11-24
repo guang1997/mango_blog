@@ -9,9 +9,8 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.RedisUtil;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,12 +24,12 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-21
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/dict")
 public class DictController {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
     private DictService dictService;
@@ -50,7 +49,7 @@ public class DictController {
     @PostMapping("/addDict")
     public Response addDict(@RequestBody DictDto dictDto) throws Exception {
         if (StringUtils.isBlank(dictDto.getDictName())) {
-            LOGGER.error("addDict failed, dictName cannot be null, dict:{}", dictDto);
+            log.error("addDict failed, dictName cannot be null, dict:{}", dictDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return dictService.addDict(dictDto);

@@ -10,6 +10,7 @@ import com.myblog.service.admin.service.DictDetailService;
 import com.myblog.service.base.common.*;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.RedisUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,9 @@ import java.util.concurrent.TimeUnit;
  * @author 李斯特
  * @since 2022-03-21
  */
+@Slf4j
 @Service
 public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDetail> implements DictDetailService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(DictDetailServiceImpl.class);
 
     @Autowired
     private RedisUtil redisUtil;
@@ -48,8 +48,12 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
 
         int page = 1;
         int size = 10;
-        if (Objects.nonNull(dictDetailDto.getPage())) page = dictDetailDto.getPage();
-        if (Objects.nonNull(dictDetailDto.getSize())) size = dictDetailDto.getSize();
+        if (Objects.nonNull(dictDetailDto.getPage())) {
+            page = dictDetailDto.getPage();
+        }
+        if (Objects.nonNull(dictDetailDto.getSize())) {
+            size = dictDetailDto.getSize();
+        }
         if (StringUtils.isNotBlank(dictDetailDto.getDictId())) {
             queryWrapper.eq(DbConstants.DictDetail.DICT_ID, dictDetailDto.getDictId());
         }
@@ -73,7 +77,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
         queryWrapper.eq(DbConstants.DictDetail.DICT_ID, dictDetailDto.getDictId());
         DictDetail dictDetail = this.toDb(dictDetailDto, DictDetail.class);
         if (baseMapper.updateById(dictDetail) < 1) {
-            LOGGER.error("editDictDetail failed by unknown error, dictDetail:{}", dictDetail);
+            log.error("editDictDetail failed by unknown error, dictDetail:{}", dictDetail);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();
@@ -83,7 +87,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
     public Response delDictDetails(Set<String> ids) throws Exception{
         for (String id : ids) {
             if (baseMapper.deleteById(id) < 1) {
-                LOGGER.error("delDictDetails failed by unknown error, dictDetailId:{}", id);
+                log.error("delDictDetails failed by unknown error, dictDetailId:{}", id);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }
@@ -98,7 +102,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
         if (!CollectionUtils.isEmpty(dbDictDetails)) {
             boolean present = dbDictDetails.stream().anyMatch(db -> Objects.equals(dictDetailDto.getDictId(), db.getDictId()));
             if (present) {
-                LOGGER.error("addDictDetail failed, dictLabel is already exist, dictDetailDto:{}", dictDetailDto);
+                log.error("addDictDetail failed, dictLabel is already exist, dictDetailDto:{}", dictDetailDto);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
         }
@@ -108,7 +112,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
         dictDetail.setUpdateTime(new Date());
         if (baseMapper.updateByDictLabel(dictDetail) < 1) {
             if (baseMapper.insert(dictDetail) < 1) {
-                LOGGER.error("addDictDetail failed by unknown error, dictDetail:{}", dictDetail);
+                log.error("addDictDetail failed by unknown error, dictDetail:{}", dictDetail);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
         }
@@ -130,7 +134,7 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
         }
         List<DictDetail> detailList = baseMapper.getDetailsByDictName(dictName);
         if (CollectionUtils.isEmpty(detailList)) {
-            LOGGER.warn("getDetailsByDictName failed, cannot find dictDetails from db, dictName:{}", dictName);
+            log.warn("getDetailsByDictName failed, cannot find dictDetails from db, dictName:{}", dictName);
             return Response.ok();
         }
         Map<String, Object> result = new HashMap<>();

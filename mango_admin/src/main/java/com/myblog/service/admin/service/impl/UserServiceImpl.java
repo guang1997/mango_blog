@@ -14,6 +14,7 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import com.myblog.service.security.entity.dto.AdminDto;
 import com.myblog.service.security.service.impl.AdminServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,9 @@ import java.util.Objects;
  * @author 李斯特
  * @since 2022-06-18
  */
+@Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     public Response getUserByPage(UserDto userDto) throws Exception {
@@ -79,7 +79,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setId(userDto.getId());
         user.setCommentStatus(userDto.getCommentStatus());
         if (baseMapper.update(user, updateWrapper) < 1) {
-            LOGGER.error("editUser failed by unknown error, user:{}", userDto);
+            log.error("editUser failed by unknown error, user:{}", userDto);
             return Response.error();
         }
         return Response.ok();

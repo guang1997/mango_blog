@@ -13,6 +13,7 @@ import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +28,9 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
+@Slf4j
 @Service
 public class OssServiceImpl implements OssService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(OssServiceImpl.class);
 
     @Autowired
     private AliyunOssProperties aliyunOssProperties;
@@ -61,7 +61,7 @@ public class OssServiceImpl implements OssService {
             if (res.isOK() && res.isJson()) {
                 DefaultPutRet putRet = JsonUtils.jsonToPojo(res.bodyString(), DefaultPutRet.class);
                 if (Objects.isNull(putRet) || StringUtils.isBlank(putRet.key)) {
-                    LOGGER.error("oss upload failed by result:{} is empty, fileName:{}", putRet, fileName);
+                    log.error("oss upload failed by result:{} is empty, fileName:{}", putRet, fileName);
                     return Response.setResult(ResultCodeEnum.UPLOAD_ERROR);
                 }
                 String url = "http://" + String.join(Constants.Symbol.COMMA4, qiNiuYunOssProperties.getDomainName(), putRet.key);
@@ -71,7 +71,7 @@ public class OssServiceImpl implements OssService {
                 return response;
             }
         } catch (Exception e) {
-            LOGGER.error("oss upload failed, fileName:{}, exception:", fileName, e);
+            log.error("oss upload failed, fileName:{}, exception:", fileName, e);
             throw e;
         }
 
@@ -81,19 +81,19 @@ public class OssServiceImpl implements OssService {
     @Override
     public Response delete(String url) {
         if (StringUtils.isBlank(url)) {
-            LOGGER.error("delete failed from qiniu by url:{} is empty", url);
+            log.error("delete failed from qiniu by url:{} is empty", url);
             return Response.error();
         }
         // 获取文件名
         String fileName = StringUtils.substring(url, StringUtils.lastIndexOf(url, Constants.Symbol.COMMA4));
         if (StringUtils.isBlank(fileName)) {
-            LOGGER.error("delete failed from qiniu by fileName is empty, file url:{}", url);
+            log.error("delete failed from qiniu by fileName is empty, file url:{}", url);
             return Response.error();
         }
         try {
             bucketManager.delete(qiNiuYunOssProperties.getBucket(), fileName);
         } catch (QiniuException e) {
-            LOGGER.error("delete failed from qiniu by exception:", e);
+            log.error("delete failed from qiniu by exception:", e);
             return Response.error();
         }
 
@@ -124,7 +124,7 @@ public class OssServiceImpl implements OssService {
 //            // 关闭OSSClient。
 //            ossClient.shutdown();
 //        } catch (IOException e) {
-//            LOGGER.error("oss upload failed, fileName:{}", fileName);
+//            log.error("oss upload failed, fileName:{}", fileName);
 //            throw e;
 //        }
 //
@@ -151,7 +151,7 @@ public class OssServiceImpl implements OssService {
 //            // 关闭OSSClient。
 //            ossClient.shutdown();
 //        } catch (Exception e) {
-//            LOGGER.error("oss delete failed, url:{}", url);
+//            log.error("oss delete failed, url:{}", url);
 //            throw e;
 //        }
 //        return Response.ok();
@@ -171,7 +171,7 @@ public class OssServiceImpl implements OssService {
             if (res.isOK() && res.isJson()) {
                 DefaultPutRet putRet = JsonUtils.jsonToPojo(res.bodyString(), DefaultPutRet.class);
                 if (Objects.isNull(putRet) || StringUtils.isEmpty(putRet.key)) {
-                    LOGGER.error("oss upload failed by result:{} is empty, fileName:{}", putRet, fileName);
+                    log.error("oss upload failed by result:{} is empty, fileName:{}", putRet, fileName);
                     return Response.setResult(ResultCodeEnum.UPLOAD_ERROR);
                 }
                 String url = "http://" + String.join(Constants.Symbol.COMMA4, qiNiuYunOssProperties.getDomainName(), putRet.key);
@@ -181,7 +181,7 @@ public class OssServiceImpl implements OssService {
                 return response;
             }
         } catch (Exception e) {
-            LOGGER.error("oss upload failed, fileName:{}, exception:", fileName, e);
+            log.error("oss upload failed, fileName:{}, exception:", fileName, e);
         }
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put(Constants.ReplyField.MESSAGE, "上传失败，请联系管理员处理");

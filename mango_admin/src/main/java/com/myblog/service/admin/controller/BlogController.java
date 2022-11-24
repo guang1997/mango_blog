@@ -9,8 +9,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,12 +24,11 @@ import java.util.Set;
  * @author 李斯特
  * @since 2021-09-28
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/blog")
 public class BlogController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(BlogController.class);
 
     @Autowired
     private BlogService blogService;
@@ -76,7 +74,7 @@ public class BlogController {
                 }
             } catch (Exception e) {
                 // 图片删除失败不影响博客删除
-                LOGGER.error("delBlog success but delete blog fileId failed, blogIds:{}", ids);
+                log.error("delBlog success but delete blog fileId failed, blogIds:{}", ids);
             }
         }
         return response;

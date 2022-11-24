@@ -6,8 +6,7 @@ import com.myblog.service.admin.service.CommentService;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +24,6 @@ import java.util.Set;
 @RestController
 @RequestMapping("/admin/comment")
 public class CommentController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(CommentController.class);
 
     @Autowired
     private CommentService commentService;

@@ -7,9 +7,8 @@ import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +22,11 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-21
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/dictDetail")
 public class DictDetailController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
     private DictDetailService dictDetailService;
@@ -46,7 +44,7 @@ public class DictDetailController {
     public Response getDetailsByDictName(@RequestBody DictDetailDto dictDetailDto) {
         Response response = Response.ok();
         if (dictDetailDto == null || StringUtils.isBlank(dictDetailDto.getDictName())) {
-            LOGGER.error("getDetailsByDictName failed, dictName cannot be null, dictDetailDto:{}", dictDetailDto);
+            log.error("getDetailsByDictName failed, dictName cannot be null, dictDetailDto:{}", dictDetailDto);
             return response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
         }
         return dictDetailService.getDetailsByDictName(dictDetailDto.getDictName());

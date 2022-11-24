@@ -10,6 +10,7 @@ import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.FileUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,10 +38,9 @@ import java.util.List;
  * @author 李斯特
  * @since 2022-03-28
  */
+@Slf4j
 @Service
 public class MonitorServiceImpl implements MonitorService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(MonitorServiceImpl.class);
 
     private final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -67,7 +67,7 @@ public class MonitorServiceImpl implements MonitorService {
             response.data(Constants.ReplyField.DISK, getDiskInfo(os));
             response.data(Constants.ReplyField.TIME, ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.TIME));
         } catch (Exception e) {
-            LOGGER.error("getServers failed, exception:", e);
+            log.error("getServers failed, exception:", e);
             return Response.setResult(ResultCodeEnum.QUERY_FAILED);
         }
         return response;

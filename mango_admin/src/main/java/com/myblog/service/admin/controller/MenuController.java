@@ -11,6 +11,7 @@ import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.service.MenuService;
 import com.myblog.service.security.util.TreeUtil;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +29,11 @@ import java.util.stream.Collectors;
  * @author 李斯特
  * @since 2021-10-02
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/menu")
 public class MenuController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(MenuController.class);
 
     @Autowired
     private MenuService menuService;
@@ -79,7 +79,7 @@ public class MenuController {
     public Response addMenu(@RequestBody MenuDto menuDto) throws Exception {
         MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menuDto.getMenuType());
         if (menuType == null) {
-            LOGGER.error("addMenu failed, cannot find menuType, menu:{}", menuDto);
+            log.error("addMenu failed, cannot find menuType, menu:{}", menuDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
@@ -88,7 +88,7 @@ public class MenuController {
         menuDto.setSubCount(0);
         if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
                 && (StringUtils.isBlank(menuDto.getTitle()) || StringUtils.isBlank(menuDto.getComponent()))) {
-            LOGGER.error("addMenu failed, title or component is empty, menu:{}", menuDto);
+            log.error("addMenu failed, title or component is empty, menu:{}", menuDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return menuService.addMenu(menuDto);
@@ -100,7 +100,7 @@ public class MenuController {
     public Response editMenu(@RequestBody MenuDto menuDto) throws Exception {
         MenuTypeEnum menuType = MenuTypeEnum.getMenyTypeEnumByCode(menuDto.getMenuType());
         if (menuType == null) {
-            LOGGER.error("editMenu failed, cannot find menuType, menu:{}", menuDto);
+            log.error("editMenu failed, cannot find menuType, menu:{}", menuDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         if (Objects.equals(menuType, MenuTypeEnum.CATALOGUE)) {
@@ -108,7 +108,7 @@ public class MenuController {
         }
         if (!Objects.equals(menuType, MenuTypeEnum.BUTTON)
                 && (StringUtils.isBlank(menuDto.getTitle()) || StringUtils.isBlank(menuDto.getComponent()))) {
-            LOGGER.error("editMenu failed, title or component is empty, menu:{}", menuDto);
+            log.error("editMenu failed, title or component is empty, menu:{}", menuDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
 

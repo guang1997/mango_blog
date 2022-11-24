@@ -12,6 +12,7 @@ import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +32,9 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-04-11
  */
+@Slf4j
 @Service
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements CommentService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
 
     /**
      * 分页查询评论
@@ -90,7 +90,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public Response delComment(Set<String> ids) {
         for (String id : ids) {
             if (baseMapper.deleteById(id) < 1) {
-                LOGGER.error("delComment failed by unknown error, commentId:{}", id);
+                log.error("delComment failed by unknown error, commentId:{}", id);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }

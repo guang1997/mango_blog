@@ -24,6 +24,7 @@ import com.myblog.service.security.service.MenuService;
 import com.myblog.service.security.service.RoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,13 +46,12 @@ import java.util.stream.Collectors;
  * @author 李斯特
  * @since 2021-10-04
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/auth")
 @Api(value = "后台登录相关接口", tags = {"后台登录相关接口"})
 public class LoginController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     private AdminService adminService;
@@ -116,7 +116,7 @@ public class LoginController {
                 token = jwtTokenUtil.createToken(admin, roles, rememberMe, properties.getBase64Secret());
                 //把新的token存储到缓存中
                 redisUtil.setEx(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + loginDto.getUsername(), token, rememberMe / ( 1000 * 60 * 60 ), TimeUnit.HOURS);
-                LOGGER.info("cannot find token from redis cache, create it:{}", token);
+                log.info("cannot find token from redis cache, create it:{}", token);
             }
             // 登录成功之后更新数据库信息
             admin.setLastLoginIp(IpUtils.getIpAddr(request));
@@ -147,12 +147,12 @@ public class LoginController {
             String token = request.getHeader(Constants.ReplyField.HEADER);
             AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
             if (Objects.isNull(authUser)) {
-                LOGGER.error("getAdminInfo Error, authUser:{}", authUser);
+                log.error("getAdminInfo Error, authUser:{}", authUser);
                 return response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
             }
             Admin admin = adminService.getById(authUser.getId());
             if (Objects.isNull(admin)) {
-                LOGGER.error("getAdminInfo Error, admin is null, authUser:{}", authUser);
+                log.error("getAdminInfo Error, admin is null, authUser:{}", authUser);
                 return response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
             }
             // 获取角色信息
@@ -197,7 +197,7 @@ public class LoginController {
             String token = request.getHeader(Constants.ReplyField.HEADER);
             AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
             if (authUser == null) {
-                LOGGER.error("logOut Error, authUser:{}", authUser);
+                log.error("logOut Error, authUser:{}", authUser);
                 return response.code(ResultCodeEnum.LOGOUT_ERROR.getCode()).message(ResultCodeEnum.LOGOUT_ERROR.getMessage());
             }
             // 去掉redis中token信息
@@ -240,12 +240,12 @@ public class LoginController {
             String token = request.getHeader(Constants.ReplyField.HEADER);
             AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
             if (authUser == null || authUser.getId() == null) {
-                LOGGER.error("getMenu Error, authUser:{}", authUser);
+                log.error("getMenu Error, authUser:{}", authUser);
                 return response.code(ResultCodeEnum.GET_USERMENU_ERROR.getCode()).message(ResultCodeEnum.GET_USERMENU_ERROR.getMessage());
             }
             Admin admin = adminService.getById(authUser.getId());
             if (admin == null) {
-                LOGGER.error("getMenu Error, admin:{}", admin);
+                log.error("getMenu Error, admin:{}", admin);
                 return response.code(ResultCodeEnum.GET_USERMENU_ERROR.getCode()).message(ResultCodeEnum.GET_USERMENU_ERROR.getMessage());
             }
             // 获取用户角色信息
@@ -254,7 +254,7 @@ public class LoginController {
             // 根据角色信息获取用户菜单列表
             List<Menu> menus = menuService.getMenuByRoles(roles);
             if (menus == null) {
-                LOGGER.error("getMenu Error, admin:{}, menus:{}", authUser, menus);
+                log.error("getMenu Error, admin:{}, menus:{}", authUser, menus);
                 return response.code(ResultCodeEnum.GET_USERMENU_ERROR.getCode()).message(ResultCodeEnum.GET_USERMENU_ERROR.getMessage());
             }
             // 组装菜单信息给页面

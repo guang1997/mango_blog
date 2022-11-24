@@ -14,6 +14,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +34,9 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-21
  */
+@Slf4j
 @Service
 public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements DictService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(DictServiceImpl.class);
 
     @Autowired
     private DictDetailMapper dictDetailMapper;
@@ -84,7 +84,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         QueryWrapper<Dict> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Dict.DICT_NAME, dictDto.getDictName());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
-            LOGGER.error("addDict failed, dictName is already exist, dictDto:{}", dictDto);
+            log.error("addDict failed, dictName is already exist, dictDto:{}", dictDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         Dict dict = this.toDb(dictDto, Dict.class);
@@ -93,7 +93,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         dict.setUpdateTime(new Date());
         if (baseMapper.updateByDictName(dict) < 1) {
             if (baseMapper.insert(dict) < 1) {
-                LOGGER.error("addDict failed by unknown error, dict:{}", dict);
+                log.error("addDict failed by unknown error, dict:{}", dict);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
         }
@@ -120,7 +120,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         }
         Dict dict = this.toDb(dictDto, Dict.class);
         if (baseMapper.updateById(dict) < 1) {
-            LOGGER.error("editDict failed by unknown error, dict:{}", dict);
+            log.error("editDict failed by unknown error, dict:{}", dict);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();
@@ -140,7 +140,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             dictDetailMapper.delete(dictDetailUpdateWrapper);
             // 然后删除对应的字典
             if (baseMapper.deleteById(id) < 1) {
-                LOGGER.error("delDict failed by unknown error, dictId:{}", id);
+                log.error("delDict failed by unknown error, dictId:{}", id);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }

@@ -20,6 +20,7 @@ import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import com.myblog.service.security.config.util.SecurityUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +39,9 @@ import java.util.stream.Collectors;
  * @author 李斯特
  * @since 2021-09-28
  */
+@Slf4j
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements BlogService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(BlogServiceImpl.class);
 
     @Autowired
     private BlogTagMapper blogTagMapper;
@@ -86,7 +86,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                     .filter(tag -> Objects.equals(tag.getId(), blogTagMap.get("tagId")))
                     .findAny().orElse(null);
             if (Objects.isNull(blogTag)) {
-                LOGGER.error("getBlogCountByTag failed, cannot find tag from db by id:{}", blogTagMap.get("tagId"));
+                log.error("getBlogCountByTag failed, cannot find tag from db by id:{}", blogTagMap.get("tagId"));
                 response.setCode(ResultCodeEnum.QUERY_FAILED.getCode());
                 response.setMessage(ResultCodeEnum.QUERY_FAILED.getMessage());
                 return response;
@@ -119,7 +119,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                     .filter(tag -> Objects.equals(tag.getId(), blogSortMap.get("sortId")))
                     .findAny().orElse(null);
             if (Objects.isNull(sort)) {
-                LOGGER.error("getBlogCountByBlogSort failed, cannot find sort from db by id:{}", blogSortMap.get("sortId"));
+                log.error("getBlogCountByBlogSort failed, cannot find sort from db by id:{}", blogSortMap.get("sortId"));
                 response.setCode(ResultCodeEnum.QUERY_FAILED.getCode());
                 response.setMessage(ResultCodeEnum.QUERY_FAILED.getMessage());
                 return response;
@@ -217,7 +217,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         // 保存博客
         Blog blog = toDb(blogDto, Blog.class);
         if (baseMapper.insert(blog) < 1) {
-            LOGGER.error("addBlog failed by unknown error, blog:{}", blog);
+            log.error("addBlog failed by unknown error, blog:{}", blog);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         // 查询已经保存的博客
@@ -229,7 +229,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             blogTag.setBlogId(dbBlog.getId());
             blogTag.setTagId(tagId);
             if (blogTagMapper.insert(blogTag) < 1) {
-                LOGGER.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, dbBlog);
+                log.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, dbBlog);
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
         }
@@ -258,7 +258,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         // 保存博客
         Blog blog = toDb(blogDto, Blog.class);
         if (baseMapper.updateById(blog) < 1) {
-            LOGGER.error("editBlog failed by unknown error, blog:{}", blog);
+            log.error("editBlog failed by unknown error, blog:{}", blog);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         // 保存标签
@@ -271,7 +271,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             blogTag.setBlogId(blog.getId());
             blogTag.setTagId(tagId);
             if (blogTagMapper.insert(blogTag) < 1) {
-                LOGGER.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, blog);
+                log.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, blog);
                 return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
             }
         }
@@ -291,13 +291,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         for (String blogId : ids) {
             Blog dbBlog = baseMapper.selectById(blogId);
             if (Objects.isNull(dbBlog)) {
-                LOGGER.error("delBlog failed, cannot find blog from db, blogId:{}", blogId);
+                log.error("delBlog failed, cannot find blog from db, blogId:{}", blogId);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
             // 如果博客中的作者与当前登陆用户不一致不删除
             String currentUserId = SecurityUtils.getCurrentUserId();
             if (!Objects.equals(currentUserId, dbBlog.getAdminId())) {
-                LOGGER.error("delBlog failed, current adminId:{} not equals db adminId:{}, blogId:{}", currentUserId, dbBlog.getAdminId(), blogId);
+                log.error("delBlog failed, current adminId:{} not equals db adminId:{}, blogId:{}", currentUserId, dbBlog.getAdminId(), blogId);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
             // 删除绑定的菜单
@@ -305,7 +305,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             blogTagUpdateWrapper.eq(DbConstants.BlogTag.BLOG_ID, blogId);
             blogTagMapper.delete(blogTagUpdateWrapper);
             if (baseMapper.deleteById(blogId) < 1) {
-                LOGGER.error("delBlog failed by unknown error, blogId:{}", blogId);
+                log.error("delBlog failed by unknown error, blogId:{}", blogId);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
             fileIdList.add(dbBlog.getFileId());

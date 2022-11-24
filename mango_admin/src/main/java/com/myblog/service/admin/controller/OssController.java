@@ -10,6 +10,7 @@ import com.myblog.service.base.util.FileUtil;
 import com.myblog.service.security.entity.Admin;
 import com.myblog.service.security.service.AdminService;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Objects;
 
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/oss")
 public class OssController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(OssController.class);
 
     @Autowired
     private OssService ossService;
@@ -54,12 +54,12 @@ public class OssController {
             throw new RuntimeException("文件格式错误！, 仅支持 " + fileUploadProperties.getAvatarImgType() +" 格式");
         }
         if (StringUtils.isBlank(id)) {
-            LOGGER.error("uploadAvatar failed, id cannot be null");
+            log.error("uploadAvatar failed, id cannot be null");
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         Admin admin = adminService.getById(id);
         if (Objects.isNull(admin)) {
-            LOGGER.error("uploadAvatar failed, cannot find admin by id:{}", id);
+            log.error("uploadAvatar failed, cannot find admin by id:{}", id);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         Response response = ossService.upload(avatar, moduleName);
@@ -113,7 +113,7 @@ public class OssController {
 //    @DeleteMapping("/delete")
 //    public Response delete(@RequestBody String url) {
 //        if (StringUtils.isBlank(url)) {
-//            LOGGER.error("oss delete failed, url cannot be null");
+//            log.error("oss delete failed, url cannot be null");
 //            return Response.setResult(ResultCodeEnum.DELETE_FAILED);
 //        }
 //        return ossService.delete(url);

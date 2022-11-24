@@ -9,8 +9,6 @@ import com.myblog.service.security.service.AdminService;
 import com.myblog.service.security.service.WebVisitService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +25,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/dashboard")
 @Api(value = "首页相关接口", tags = {"首页相关接口"})
 public class DashboardController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(DashboardController.class);
 
     @Autowired
     private AdminService adminService;

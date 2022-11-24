@@ -6,9 +6,8 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.security.service.VerificationCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +20,12 @@ import org.springframework.web.bind.annotation.*;
  * @author 李斯特
  * @since 2022-04-03
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/code")
 @Api(value = "验证码相关接口", tags = {"验证码相关接口"})
 public class VerificationCodeController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(VerificationCodeController.class);
 
     @Autowired
     private VerificationCodeService verificationCodeService;
@@ -37,7 +35,7 @@ public class VerificationCodeController {
     @GetMapping("/sendCode")
     public Response sendCode(String email) {
         if (StringUtils.isBlank(email)) {
-            LOGGER.error("sendCode failed, email:[{}] cannot be null", email);
+            log.error("sendCode failed, email:[{}] cannot be null", email);
             return Response.error().message("邮箱不能为空");
         }
         return verificationCodeService.sendCode(email, Constants.EmailSource.ADMIN);

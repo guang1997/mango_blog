@@ -16,9 +16,8 @@ import com.myblog.service.security.service.RoleService;
 import com.myblog.service.security.service.VerificationCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -35,13 +34,13 @@ import java.util.Set;
  * @author 李斯特
  * @since 2021-09-26
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/manager")
 @Api(value = "管理员相关接口", tags = {"管理员相关接口"})
 public class AdminController {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
     private AdminService adminService;
@@ -73,7 +72,7 @@ public class AdminController {
                 || StringUtils.isBlank(adminDto.getEmail())
                 || StringUtils.isBlank(adminDto.getPhone())
                 || StringUtils.isBlank(adminDto.getNickname())) {
-            LOGGER.error("addAdmin failed, username or email or phone or nickname cannot be null, admin:{}", adminDto);
+            log.error("addAdmin failed, username or email or phone or nickname cannot be null, admin:{}", adminDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         List<RoleDto> roles = adminDto.getRoles();
@@ -106,7 +105,7 @@ public class AdminController {
     public Response editAdminFromCenter(@RequestBody AdminDto adminDto) throws Exception {
         if (StringUtils.isBlank(adminDto.getQqNumber())
                 || StringUtils.isBlank(adminDto.getWeChat())) {
-            LOGGER.error("editAdminFromCenter failed, qqNumber or weChat cannot be null, admin:{}", adminDto);
+            log.error("editAdminFromCenter failed, qqNumber or weChat cannot be null, admin:{}", adminDto);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return adminService.editAdminFromCenter(adminDto);
@@ -119,7 +118,7 @@ public class AdminController {
     public Response updatePass(@RequestBody PassAndEmailDto passAndEmailDto) throws Exception {
         if (StringUtils.isBlank(passAndEmailDto.getOldPass())
                 || StringUtils.isBlank(passAndEmailDto.getNewPass())) {
-            LOGGER.error("updatePass failed, pass cannot be null");
+            log.error("updatePass failed, pass cannot be null");
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return adminService.updatePass(passAndEmailDto);
@@ -133,7 +132,7 @@ public class AdminController {
     public Response updateEmail(@RequestBody PassAndEmailDto passAndEmailDto) throws Exception {
         if (StringUtils.isBlank(passAndEmailDto.getPass())
                 || StringUtils.isBlank(passAndEmailDto.getEmail())) {
-            LOGGER.error("updateEmail failed, pass or email cannot be null");
+            log.error("updateEmail failed, pass or email cannot be null");
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         // 对验证码进行校验
@@ -164,7 +163,7 @@ public class AdminController {
                     ossService.delete(url);
                 }
             } catch (Exception e) {
-                LOGGER.error("delAdmin success but delete admin avatar failed, adminIds:{}", ids);
+                log.error("delAdmin success but delete admin avatar failed, adminIds:{}", ids);
             }
         }
         return response;

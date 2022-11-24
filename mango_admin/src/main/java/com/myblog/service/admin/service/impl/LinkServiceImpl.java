@@ -8,6 +8,7 @@ import com.myblog.service.admin.entity.dto.LinkDto;
 import com.myblog.service.admin.mapper.LinkMapper;
 import com.myblog.service.admin.service.LinkService;
 import com.myblog.service.base.common.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +28,10 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-24
  */
+@Slf4j
 @Service
 public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements LinkService {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(LinkServiceImpl.class);
     /**
      * 分页查询友情链接
      * @param linkDto
@@ -73,14 +74,14 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
         QueryWrapper<Link> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Link.URL, linkDto.getUrl());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
-            LOGGER.error("addLink failed, url is already exist, link:{}", linkDto);
+            log.error("addLink failed, url is already exist, link:{}", linkDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         Link link = this.toDb(linkDto, Link.class);
         // 添加时设置为申请中状态
         link.setLinkStatus(LinkStatusEnum.APPLY.getCode());
         if (baseMapper.insert(link) < 1) {
-            LOGGER.error("addLink failed by unknown error, link:{}", link);
+            log.error("addLink failed by unknown error, link:{}", link);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return Response.ok();
@@ -100,7 +101,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
         }
         Link link = this.toDb(linkDto, Link.class);
         if (baseMapper.updateById(link) < 1) {
-            LOGGER.error("editLink failed by unknown error, link:{}", link);
+            log.error("editLink failed by unknown error, link:{}", link);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();
@@ -110,7 +111,7 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     public Response delLink(Set<String> ids) throws Exception{
         for (String id : ids) {
             if (baseMapper.deleteById(id) < 1) {
-                LOGGER.error("delLink failed by unknown error, linkId:{}", id);
+                log.error("delLink failed by unknown error, linkId:{}", id);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }

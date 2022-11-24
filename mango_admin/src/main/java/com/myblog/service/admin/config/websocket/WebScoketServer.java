@@ -1,6 +1,7 @@
 package com.myblog.service.admin.config.websocket;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,12 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author 李斯特
  * 2022年4月4日
  */
+@Slf4j
 @Data
 @Component
 @ServerEndpoint("/admin/websocket")
 public class WebScoketServer {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(WebScoketServer.class);
 
     /**
      * 记录当前在线连接数
@@ -45,7 +45,7 @@ public class WebScoketServer {
     public void onOpen(Session session) {
         allClients.add(session);
         int onlineCount = WebScoketServer.onlineCount.incrementAndGet();
-        LOGGER.info("connent to webSocket, id:{}, onlineCount:{}", session.getId(), onlineCount);
+        log.info("connent to webSocket, id:{}, onlineCount:{}", session.getId(), onlineCount);
     }
 
     /**
@@ -55,7 +55,7 @@ public class WebScoketServer {
     public void onClose(Session session) {
         allClients.remove(session);
         int onlineCount = WebScoketServer.onlineCount.decrementAndGet();
-        LOGGER.info("close webSocket, id:{}. onlineCount:{}", session.getId(), onlineCount);
+        log.info("close webSocket, id:{}. onlineCount:{}", session.getId(), onlineCount);
 
     }
 
@@ -64,7 +64,7 @@ public class WebScoketServer {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        LOGGER.error("connect webSocket exception", error);
+        log.error("connect webSocket exception", error);
     }
 
     public void sendMessage(String message) throws IOException {

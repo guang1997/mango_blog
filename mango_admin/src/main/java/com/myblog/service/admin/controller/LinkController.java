@@ -10,10 +10,9 @@ import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.TwoTuple;
 import com.myblog.service.security.service.VerificationCodeService;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +28,11 @@ import java.util.Set;
  * @author 李斯特
  * @since 2022-03-24
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/link")
 public class LinkController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(LinkController.class);
 
     @Autowired
     private LinkService linkService;
@@ -57,7 +55,7 @@ public class LinkController {
     @PostMapping("/addLink")
     public Response addLink(@RequestBody LinkDto linkDto) throws Exception {
         if (StringUtils.isBlank(linkDto.getUrl()) || StringUtils.isBlank(linkDto.getTitle())) {
-            LOGGER.error("addLink failed, url or title cannot be null, link:{}", linkDto);
+            log.error("addLink failed, url or title cannot be null, link:{}", linkDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return linkService.addLink(linkDto);

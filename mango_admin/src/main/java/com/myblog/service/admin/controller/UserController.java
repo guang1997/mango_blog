@@ -5,10 +5,7 @@ import com.myblog.service.admin.entity.dto.UserDto;
 import com.myblog.service.admin.service.UserService;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.security.annotation.LogByMethod;
-import com.myblog.service.security.entity.dto.AdminDto;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/admin/user")
 public class UserController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;

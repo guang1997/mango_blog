@@ -12,6 +12,7 @@ import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +30,9 @@ import java.util.*;
  * @author 李斯特
  * @since 2022-03-18
  */
+@Slf4j
 @Service
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);
 
     /**
      * 分页查询标签信息
@@ -85,12 +85,12 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         QueryWrapper<Tag> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Tag.TAG_NAME, tagDto.getTagName());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
-            LOGGER.error("addTag failed, tagName is already exist, tag:{}", tagDto);
+            log.error("addTag failed, tagName is already exist, tag:{}", tagDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         Tag tag = this.toDb(tagDto, Tag.class);
         if (baseMapper.insert(tag) < 1) {
-            LOGGER.error("addTag failed by unknown error, tag:{}", tag);
+            log.error("addTag failed by unknown error, tag:{}", tag);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return Response.ok();
@@ -115,7 +115,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         }
         Tag tag = this.toDb(tagDto, Tag.class);
         if (baseMapper.updateById(tag) < 1) {
-            LOGGER.error("editTag failed by unknown error, tag:{}", tag);
+            log.error("editTag failed by unknown error, tag:{}", tag);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();
@@ -134,12 +134,12 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
             List<String> blogIdsByTagId = baseMapper.selectBlogIdsByTagId(id);
             if (!CollectionUtils.isEmpty(blogIdsByTagId)) {
                 Tag tag = baseMapper.selectById(id);
-                LOGGER.warn("delete tag failed, the tag:{} has been bound", tag);
+                log.warn("delete tag failed, the tag:{} has been bound", tag);
                 delFailedTagNames.add(tag.getTagName());
                 continue;
             }
             if (baseMapper.deleteById(id) < 1) {
-                LOGGER.error("delTags failed by unknown error, tagId:{}", id);
+                log.error("delTags failed by unknown error, tagId:{}", id);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }

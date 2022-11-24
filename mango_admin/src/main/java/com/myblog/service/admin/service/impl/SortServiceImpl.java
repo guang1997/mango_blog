@@ -14,6 +14,7 @@ import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +32,9 @@ import java.util.*;
  * @author 李斯特
  * @since 2022-03-18
  */
+@Slf4j
 @Service
 public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements SortService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(SortServiceImpl.class);
 
     @Autowired
     private BlogMapper blogMapper;
@@ -88,12 +88,12 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
         QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Sort.SORT_NAME, sortDto.getSortName());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
-            LOGGER.error("addSort failed, sortName is already exist, tag:{}", sortDto);
+            log.error("addSort failed, sortName is already exist, tag:{}", sortDto);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         Sort sort = this.toDb(sortDto, Sort.class);
         if (baseMapper.insert(sort) < 1) {
-            LOGGER.error("addSort failed by unknown error, sort:{}", sort);
+            log.error("addSort failed by unknown error, sort:{}", sort);
             return Response.setResult(ResultCodeEnum.SAVE_FAILED);
         }
         return Response.ok();
@@ -118,7 +118,7 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
         }
         Sort sort = this.toDb(sortDto, Sort.class);
         if (baseMapper.updateById(sort) < 1) {
-            LOGGER.error("editSort failed by unknown error, sort:{}", sort);
+            log.error("editSort failed by unknown error, sort:{}", sort);
             return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         return Response.ok();
@@ -139,12 +139,12 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
             List<Blog> blogsBySortId = blogMapper.selectList(blogQueryWrapper);
             if (!CollectionUtils.isEmpty(blogsBySortId)) {
                 Sort sort = baseMapper.selectById(id);
-                LOGGER.warn("delete sort failed, the sort:{} has been bound", sort);
+                log.warn("delete sort failed, the sort:{} has been bound", sort);
                 delFailedSortNames.add(sort.getSortName());
                 continue;
             }
             if (baseMapper.deleteById(id) < 1) {
-                LOGGER.error("delSorts failed by unknown error, sortId:{}", id);
+                log.error("delSorts failed by unknown error, sortId:{}", id);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }

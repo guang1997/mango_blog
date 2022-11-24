@@ -10,9 +10,8 @@ import com.myblog.service.web.entity.dto.CommentDto;
 import com.myblog.service.web.service.BlogService;
 import com.myblog.service.web.service.CommentService;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,12 +26,12 @@ import java.util.Map;
  * @author 李斯特
  * @since 2022-05-17
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/web/blog")
 public class BlogController {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(BlogController.class);
 
     @Autowired
     private BlogService blogService;
@@ -70,7 +69,7 @@ public class BlogController {
     @PostMapping("/getBlogBySortId")
     public Response getBlogBySortId(@RequestBody BlogDto blogDto) throws Exception {
         if (StringUtils.isBlank(blogDto.getBlogSortId())) {
-            LOGGER.warn("getBlogBySortId return empty, blogSortId is null, blogDto:{}", blogDto);
+            log.warn("getBlogBySortId return empty, blogSortId is null, blogDto:{}", blogDto);
             return Response.ok();
         }
         return blogService.getBlogBySortId(blogDto);
@@ -81,7 +80,7 @@ public class BlogController {
     @PostMapping("/getBlogByTagId")
     public Response getBlogByTagId(@RequestBody BlogDto blogDto) throws Exception {
         if (StringUtils.isBlank(blogDto.getTagId())) {
-            LOGGER.warn("getBlogByTagId return empty, tagId is null, blogDto:{}", blogDto);
+            log.warn("getBlogByTagId return empty, tagId is null, blogDto:{}", blogDto);
             return Response.ok();
         }
         return blogService.getBlogByTagId(blogDto);

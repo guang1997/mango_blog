@@ -6,8 +6,6 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.security.entity.dto.WebVisitDto;
 import com.myblog.service.security.service.WebVisitService;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +23,6 @@ import java.util.Set;
 @RestController
 @RequestMapping("/admin/webVisit")
 public class WebVisitController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(WebVisitController.class);
 
     @Autowired
     private WebVisitService webVisitService;
