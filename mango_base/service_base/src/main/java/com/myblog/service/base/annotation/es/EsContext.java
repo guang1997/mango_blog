@@ -19,11 +19,17 @@ public @interface EsContext {
      * es的type
      * @return
      */
-    String type();
+    //String type();
 
     /**
      * 后缀，web或者admin
      * @return
      */
     String suffix();
+
+    /**
+     * es的索引内容文件所在的路径
+     * @return
+     */
+    String mappingFilePath();
 }

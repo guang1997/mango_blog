@@ -17,6 +17,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.handler.es.EsOperateManager;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import com.myblog.service.security.config.util.SecurityUtils;
@@ -30,6 +31,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 /**
  * <p>
@@ -51,6 +54,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     @Autowired
     private SortMapper sortMapper;
+
+    @Autowired
+    private EsOperateManager esOperateManager;
 
     /**
      * 获取博客总数量，用于首页展示

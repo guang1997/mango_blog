@@ -1,0 +1,17 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "title": {
+      "type": "keyword"
+    },
+    "summary": {
+      "type": "text"
+    },
+    "content": {
+      "type": "text",
+      "analyzer": "ik_smart"
+    }
+  }
+}
