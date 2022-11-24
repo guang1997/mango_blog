@@ -8,6 +8,7 @@ public interface Constants {
         String COMMA3 = ".";
         String COMMA4 = "/";
         String COMMA5 = ";";
+        String COMMA6 = "_";
     }
 
     interface ReplyField {

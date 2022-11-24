@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
@@ -76,6 +77,21 @@ public class EsOperateManager {
         throws IOException {
         AbstractEsOperateHandler<T> handler = getHandler(clazz);
         return handler.existIndex(index);
+    }
+
+    public <T> boolean bulk(List<T> esModelList, Class<? extends AbstractEsOperateHandler<T>> clazz)
+            throws Exception {
+        AbstractEsOperateHandler<T> handler = getHandler(clazz);
+        List<T> failedModelList = handler.bulk(esModelList);
+        if (CollectionUtils.isEmpty(failedModelList)) {
+            return true;
+        }
+        List<T> retryFailedList = handler.retry(failedModelList);
+        if (CollectionUtils.isEmpty(retryFailedList)) {
+            return true;
+        }
+        log.error("index:{} suffex:{} bulk failedList:{}", handler.getIndex(), handler.getSuffix(), retryFailedList);
+        return false;
     }
 
     public <T> AbstractEsOperateHandler<T> getHandler(Class<? extends AbstractEsOperateHandler<T>> clazz) {
