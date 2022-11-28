@@ -8,6 +8,8 @@ import com.myblog.service.admin.entity.BlogTag;
 import com.myblog.service.admin.entity.Sort;
 import com.myblog.service.admin.entity.Tag;
 import com.myblog.service.admin.entity.dto.BlogDto;
+import com.myblog.service.admin.entity.dto.es.BlogEsDto;
+import com.myblog.service.admin.handler.BlogEsOperateHandler;
 import com.myblog.service.admin.mapper.BlogMapper;
 import com.myblog.service.admin.mapper.BlogTagMapper;
 import com.myblog.service.admin.mapper.SortMapper;
@@ -15,6 +17,7 @@ import com.myblog.service.admin.mapper.TagMapper;
 import com.myblog.service.admin.service.BlogService;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
+import com.myblog.service.base.common.EsBulkBehaviorEnum;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.handler.es.EsOperateManager;
@@ -22,6 +25,7 @@ import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import com.myblog.service.security.config.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +61,22 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     @Autowired
     private EsOperateManager esOperateManager;
+
+    @PostConstruct
+    private void init() throws Exception {
+        // 将数据库中的博客保存到es中
+        QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
+        List<Blog> dbBlogList = baseMapper.selectList(queryWrapper);
+        List<BlogEsDto> esBlogList = dbBlogList.stream().map(dbBlog -> {
+            return toEsDto(dbBlog);
+        }).collect(Collectors.toList());
+        boolean response = esOperateManager.bulk(esBlogList, EsBulkBehaviorEnum.INDEX, BlogEsOperateHandler.class);
+        if (BooleanUtils.isFalse(response)) {
+            log.error("init failed by blog insert es failed, dbBlogList:{}, esBlogList:{}", dbBlogList, esBlogList);
+            throw new RuntimeException("标签插入es失败");
+        }
+    }
 
     /**
      * 获取博客总数量，用于首页展示
@@ -185,8 +205,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         Response response = Response.ok();
         int page = 1;
         int size = 10;
-        if (Objects.nonNull(blogDto.getPage())) page = blogDto.getPage();
-        if (Objects.nonNull(blogDto.getSize())) size = blogDto.getSize();
+        if (Objects.nonNull(blogDto.getPage())) {
+            page = blogDto.getPage();
+        }
+        if (Objects.nonNull(blogDto.getSize())) {
+            size = blogDto.getSize();
+        }
         blogDto.setPage((blogDto.getPage() - 1) * blogDto.getSize());
 
         List<Blog> blogList = baseMapper.selectBlogByRequest(blogDto);
@@ -239,6 +263,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 return Response.setResult(ResultCodeEnum.SAVE_FAILED);
             }
         }
+        // 保存数据到es
+        boolean insertEsResponse = esOperateManager.insert(toEsDto(dbBlog), BlogEsOperateHandler.class);
+        if (BooleanUtils.isFalse(insertEsResponse)) {
+            log.warn("insertEs failed, dbBlog:{}", dbBlog);
+        }
         return Response.ok();
     }
 
@@ -250,7 +279,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response editBlog(BlogDto blogDto) {
+    public Response editBlog(BlogDto blogDto) throws Exception {
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Blog.TITLE, blogDto.getTitle());
         List<Blog> dbBlogList = baseMapper.selectList(queryWrapper);
@@ -281,6 +310,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
             }
         }
+        // 更新es的数据
+        boolean updateEsResponse = esOperateManager.update(toEsDto(blog), BlogEsOperateHandler.class);
+        if (BooleanUtils.isFalse(updateEsResponse)) {
+            log.warn("updateEs failed, dbBlog:{}", blog);
+        }
         return Response.ok();
     }
 
@@ -292,7 +326,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response delBlog(Set<String> ids) {
+    public Response delBlog(Set<String> ids) throws Exception {
         List<String> fileIdList = new ArrayList<>();
         for (String blogId : ids) {
             Blog dbBlog = baseMapper.selectById(blogId);
@@ -318,6 +352,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         }
         Response response = Response.ok();
         response.data(Constants.ReplyField.DELETED_FILE_LIST, fileIdList);
+        List<BlogEsDto> delEsList = ids.stream().map(id -> {
+            BlogEsDto blogEsDto = new BlogEsDto();
+            blogEsDto.setId(id);
+            return blogEsDto;
+        }).collect(Collectors.toList());
+        boolean esResponse = esOperateManager.bulk(delEsList, EsBulkBehaviorEnum.DELETE, BlogEsOperateHandler.class);
+        if (BooleanUtils.isFalse(esResponse)) {
+            log.error("delblog delete es failed, ids:{}, delEsList:{}", ids, delEsList);
+            return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+        }
         return response;
     }
 
@@ -351,5 +395,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         blog.setAdminId(SecurityUtils.getCurrentUserId());
         blog.setAuthor(SecurityUtils.getCurrentUsername());
         return blog;
+    }
+
+    public BlogEsDto toEsDto(Blog blog) {
+        BlogEsDto blogEsDto = new BlogEsDto();
+        BeanUtil.copyProperties(blog, blogEsDto);
+        blogEsDto.setId(blog.getId());
+        return blogEsDto;
     }
 }

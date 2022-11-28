@@ -30,7 +30,7 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
 
     Response addBlog(BlogDto blogDto) throws Exception;
 
-    Response editBlog(BlogDto blogDto);
+    Response editBlog(BlogDto blogDto) throws Exception;
 
-    Response delBlog(Set<String> ids);
+    Response delBlog(Set<String> ids) throws Exception;
 }

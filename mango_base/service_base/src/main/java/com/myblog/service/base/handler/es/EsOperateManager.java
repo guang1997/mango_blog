@@ -1,23 +1,17 @@
 package com.myblog.service.base.handler.es;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Scanner;
 
 import javax.annotation.PostConstruct;
 
+import com.myblog.service.base.common.EsBulkBehaviorEnum;
+import com.myblog.service.base.entity.es.BaseEsEntity;
 import com.myblog.service.base.util.FileUtil;
-import com.myblog.service.base.util.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,32 +55,32 @@ public class EsOperateManager {
         }
     }
 
-    public <T> boolean createIndex(String index, String mapping, Class<? extends AbstractEsOperateHandler<T>> clazz)
+    public <T extends BaseEsEntity> boolean createIndex(String index, String mapping, Class<? extends AbstractEsOperateHandler<T>> clazz)
         throws IOException {
         AbstractEsOperateHandler<T> handler = getHandler(clazz);
         return handler.createIndex(index, mapping);
     }
 
-    public <T> boolean deleteIndex(String index, Class<? extends AbstractEsOperateHandler<T>> clazz)
+    public <T extends BaseEsEntity> boolean deleteIndex(String index, Class<? extends AbstractEsOperateHandler<T>> clazz)
         throws IOException {
         AbstractEsOperateHandler<T> handler = getHandler(clazz);
         return handler.deleteIndex(index);
     }
 
-    public <T> boolean existIndex(String index, Class<? extends AbstractEsOperateHandler<T>> clazz)
+    public <T extends BaseEsEntity> boolean existIndex(String index, Class<? extends AbstractEsOperateHandler<T>> clazz)
         throws IOException {
         AbstractEsOperateHandler<T> handler = getHandler(clazz);
         return handler.existIndex(index);
     }
 
-    public <T> boolean bulk(List<T> esModelList, Class<? extends AbstractEsOperateHandler<T>> clazz)
+    public <T extends BaseEsEntity> boolean bulk(List<T> esModelList, EsBulkBehaviorEnum type, Class<? extends AbstractEsOperateHandler<T>> clazz)
             throws Exception {
         AbstractEsOperateHandler<T> handler = getHandler(clazz);
-        List<T> failedModelList = handler.bulk(esModelList);
+        List<T> failedModelList = handler.bulk(esModelList, type);
         if (CollectionUtils.isEmpty(failedModelList)) {
             return true;
         }
-        List<T> retryFailedList = handler.retry(failedModelList);
+        List<T> retryFailedList = handler.retry(failedModelList, type);
         if (CollectionUtils.isEmpty(retryFailedList)) {
             return true;
         }
@@ -94,7 +88,24 @@ public class EsOperateManager {
         return false;
     }
 
-    public <T> AbstractEsOperateHandler<T> getHandler(Class<? extends AbstractEsOperateHandler<T>> clazz) {
+    public <T extends BaseEsEntity> boolean insert(T esModel, Class<? extends AbstractEsOperateHandler<T>> clazz)
+        throws IOException {
+        AbstractEsOperateHandler<T> handler = getHandler(clazz);
+        return handler.insert(esModel);
+    }
+
+    public <T extends BaseEsEntity> boolean update(T esModel, Class<? extends AbstractEsOperateHandler<T>> clazz)
+        throws IOException {
+        AbstractEsOperateHandler<T> handler = getHandler(clazz);
+        return handler.update(esModel);
+    }
+
+    public <T extends BaseEsEntity> boolean delete(String id, Class<? extends AbstractEsOperateHandler<T>> clazz)
+        throws IOException {
+        AbstractEsOperateHandler<T> handler = getHandler(clazz);
+        return handler.delete(id);
+    }
+    public <T extends BaseEsEntity> AbstractEsOperateHandler<T> getHandler(Class<? extends AbstractEsOperateHandler<T>> clazz) {
         if (Objects.isNull(clazz)) {
             log.error("EsOperateManager execute failed, cannot find handler by clazz:{}", clazz);
             throw new RuntimeException("操作失败");
