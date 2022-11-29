@@ -116,4 +116,8 @@ public interface Constants {
         int YES = 1;
         int NO = 0;
     }
+
+    interface EsContants {
+        String BLOG_CONTENT = "content";
+    }
 }

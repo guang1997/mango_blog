@@ -1,23 +1,44 @@
-package com.myblog.service.admin.handler;
+package com.myblog.service.base.handler.es.impl;
 
-import com.myblog.service.admin.entity.dto.es.BlogEsDto;
 import com.myblog.service.base.annotation.es.EsContext;
+import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.EsBulkBehaviorEnum;
 import com.myblog.service.base.handler.es.AbstractEsOperateHandler;
+import com.myblog.service.base.handler.es.entity.BlogEsDto;
 import com.myblog.service.base.util.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Component
 @EsContext(index = "blog", suffix = "admin", mappingFilePath = "classpath:template/esModel/blog.json")
 public class BlogEsOperateHandler extends AbstractEsOperateHandler<BlogEsDto> {
+
+    @Override
+    protected SearchSourceBuilder buildSearchJson(Map<String, Object> param) {
+        Object blogContent = param.get(Constants.EsContants.BLOG_CONTENT);
+        if (Objects.isNull(blogContent) || StringUtils.isBlank(blogContent.toString())) {
+            log.error("buildSearchJson failed, param is illegal, paramMap:{}", param);
+            throw new RuntimeException("查询失败");
+        }
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders
+                .fuzzyQuery(Constants.EsContants.BLOG_CONTENT, String.valueOf(blogContent))
+        );
+        return searchSourceBuilder;
+    }
 
     @Override
     protected DocWriteRequest buildBulkJson(BlogEsDto blogEsDto, EsBulkBehaviorEnum type) {
@@ -40,15 +61,15 @@ public class BlogEsOperateHandler extends AbstractEsOperateHandler<BlogEsDto> {
 
     private IndexRequest buildIndexRequest(BlogEsDto blogEsDto) {
         return new IndexRequest(getIndex())
-            .id(blogEsDto.getId())
-            .source(buildInsertJson(blogEsDto));
+                .id(blogEsDto.getId())
+                .source(buildInsertJson(blogEsDto));
     }
 
     private UpdateRequest buildUpdateRequest(BlogEsDto blogEsDto) {
         return new UpdateRequest()
-            .index(getIndex())
-            .id(blogEsDto.getId())
-            .doc(buildUpdateJson(blogEsDto));
+                .index(getIndex())
+                .id(blogEsDto.getId())
+                .doc(buildUpdateJson(blogEsDto));
     }
 
     @Override

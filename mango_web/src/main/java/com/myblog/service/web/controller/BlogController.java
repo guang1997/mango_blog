@@ -92,5 +92,12 @@ public class BlogController {
     public Response getPrevNextBlog(@RequestBody BlogDto blogDto) throws Exception {
         return blogService.getPrevNextBlog(blogDto);
     }
+
+    @LogByMethod(value = "/web/blog/fuzzy")
+    @ApiOperation(value = "模糊查询", notes = "模糊查询", response = Response.class)
+    @PostMapping("/getPrevNextBlog")
+    public Response fuzzy(@RequestBody BlogDto blogDto) throws Exception {
+        return blogService.fuzzy(blogDto);
+    }
 }
 

@@ -1,4 +1,4 @@
-package com.myblog.service.admin.entity.dto.es;
+package com.myblog.service.base.handler.es.entity;
 
 import com.myblog.service.base.entity.es.BaseEsEntity;
 import lombok.Data;

@@ -8,6 +8,7 @@ import com.myblog.service.web.entity.dto.ArchiveDto;
 import com.myblog.service.web.entity.dto.BlogDto;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * <p>
@@ -32,4 +33,6 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
     Response getArchives(ArchiveDto archiveDto) throws Exception;
 
     Response initArchives(ArchiveDto archiveDto);
+
+    Response fuzzy(BlogDto blogDto) throws Exception;
 }

@@ -3,6 +3,9 @@ package com.myblog.service.web.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.*;
+import com.myblog.service.base.handler.es.EsOperateManager;
+import com.myblog.service.base.handler.es.entity.BlogEsDto;
+import com.myblog.service.base.handler.es.impl.BlogEsOperateHandler;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.MD5Utils;
@@ -24,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +55,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     @Autowired
     private CommentMapper commentMapper;
+
+    @Autowired
+    private EsOperateManager esOperateManager;
 
     /**
      * 分页查询博客信息
@@ -238,6 +245,17 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             LOGGER.error("initArchives failed by illegal param:{}", archiveDto);
             return Response.error();
         }
+    }
+
+    @Override
+    public Response fuzzy(BlogDto blogDto) throws Exception {
+        if (StringUtils.isBlank(blogDto.getContent())) {
+            return Response.error().message("请输入查询条件");
+        }
+        Map<String, Object> param = new HashMap<>();
+        param.put(Constants.EsContants.BLOG_CONTENT, blogDto.getContent());
+        List<BlogEsDto> result = esOperateManager.search(param, BlogEsOperateHandler.class, BlogEsDto.class);
+        return Response.ok().data(Constants.ReplyField.DATA, result);
     }
 
     private ArchiveDto toArchiveDto(Blog blog) {

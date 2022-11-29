@@ -3,9 +3,8 @@ package com.myblog.service.base.handler.es;
 import com.myblog.service.base.annotation.es.EsContextAware;
 import com.myblog.service.base.common.EsBulkBehaviorEnum;
 import com.myblog.service.base.entity.es.BaseEsEntity;
+import com.myblog.service.base.util.JsonUtils;
 import org.elasticsearch.action.DocWriteRequest;
-import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.DocWriteResponse.Result;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -14,6 +13,8 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -26,6 +27,8 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +37,9 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implements EsContextAware {
     @Autowired
@@ -191,6 +196,33 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
         return true;
     }
 
+    public List<T> search(Map<String, Object> param, Class<T> resultClass) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(getIndex());
+        searchRequest.source(buildSearchJson(param));
+
+        SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHit[] hits = response.getHits().getHits();
+        List<T> result = new ArrayList<T>();
+        if (Objects.isNull(hits) || hits.length <= 0) {
+            return result;
+        }
+        for (SearchHit hit : hits) {
+            if (Objects.isNull(hit)) {
+                getLogger().error("search failed, hit is null, index:{}, param:{}, hit:{}",
+                        getIndex(), param, hit);
+            }
+            T model = JsonUtils.jsonToPojo(hit.getSourceAsString(), resultClass);
+            if (Objects.isNull(model)) {
+                getLogger().error("search failed, result is null, index:{}, param:{}, resultModel:{}",
+                        getIndex(), param, hit.getSourceAsString());
+            }
+            result.add(model);
+        }
+        return result;
+    }
+
+
+
     protected List<T> retry(List<T> esModelList, EsBulkBehaviorEnum type) throws Exception {
         int num = 0;
         while (num++ < retryTime) {
@@ -202,6 +234,9 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
         }
         return esModelList;
     }
+
+    protected abstract SearchSourceBuilder buildSearchJson(Map<String, Object> param);
+
     protected abstract DocWriteRequest buildBulkJson(T t, EsBulkBehaviorEnum type);
 
     protected abstract String buildInsertJson(T esModel);

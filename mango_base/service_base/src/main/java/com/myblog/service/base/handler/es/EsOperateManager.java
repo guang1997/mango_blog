@@ -105,6 +105,12 @@ public class EsOperateManager {
         AbstractEsOperateHandler<T> handler = getHandler(clazz);
         return handler.delete(id);
     }
+
+    public <T extends BaseEsEntity> List<T> search(Map<String, Object> param, Class<? extends AbstractEsOperateHandler<T>> clazz,
+                                                   Class<T> resultClass) throws IOException {
+        AbstractEsOperateHandler<T> handler = getHandler(clazz);
+        return handler.search(param, resultClass);
+    }
     public <T extends BaseEsEntity> AbstractEsOperateHandler<T> getHandler(Class<? extends AbstractEsOperateHandler<T>> clazz) {
         if (Objects.isNull(clazz)) {
             log.error("EsOperateManager execute failed, cannot find handler by clazz:{}", clazz);
