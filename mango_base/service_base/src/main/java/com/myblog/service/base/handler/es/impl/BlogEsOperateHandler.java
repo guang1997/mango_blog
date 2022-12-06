@@ -2,6 +2,7 @@ package com.myblog.service.base.handler.es.impl;
 
 import com.myblog.service.base.annotation.es.EsContext;
 import com.myblog.service.base.common.Constants;
+import com.myblog.service.base.common.Constants.EsContants;
 import com.myblog.service.base.common.EsBulkBehaviorEnum;
 import com.myblog.service.base.handler.es.AbstractEsOperateHandler;
 import com.myblog.service.base.handler.es.entity.BlogEsDto;
@@ -18,6 +19,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -56,20 +58,21 @@ public class BlogEsOperateHandler extends AbstractEsOperateHandler<BlogEsDto> {
     }
 
     private DeleteRequest buildDeleteRequest(BlogEsDto blogEsDto) {
-        return new DeleteRequest().id(blogEsDto.getId());
+        return new DeleteRequest(getIndex(), getType(), blogEsDto.getId());
     }
 
     private IndexRequest buildIndexRequest(BlogEsDto blogEsDto) {
-        return new IndexRequest(getIndex())
+        return new IndexRequest(getIndex(), getType())
                 .id(blogEsDto.getId())
-                .source(buildInsertJson(blogEsDto));
+                .source(buildInsertJson(blogEsDto), XContentType.JSON);
     }
 
     private UpdateRequest buildUpdateRequest(BlogEsDto blogEsDto) {
         return new UpdateRequest()
                 .index(getIndex())
+                .type(getType())
                 .id(blogEsDto.getId())
-                .doc(buildUpdateJson(blogEsDto));
+                .doc(buildUpdateJson(blogEsDto), XContentType.JSON);
     }
 
     @Override

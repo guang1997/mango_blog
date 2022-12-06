@@ -120,7 +120,6 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
         BulkItemResponse[] responseItems = bulkResponse.getItems();
         List<T> failedModelList = new ArrayList<>();
         for (BulkItemResponse responseItem : responseItems) {
-            int itemId = responseItem.getItemId();
             if (responseItem.isFailed()) {
                 failedModelList.add(esModelList.get(responseItem.getItemId()));
             }

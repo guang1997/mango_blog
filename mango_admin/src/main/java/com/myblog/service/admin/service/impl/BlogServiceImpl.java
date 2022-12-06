@@ -66,9 +66,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         List<Blog> dbBlogList = baseMapper.selectList(queryWrapper);
-        List<BlogEsDto> esBlogList = dbBlogList.stream().map(dbBlog -> {
-            return toEsDto(dbBlog);
-        }).collect(Collectors.toList());
+        List<BlogEsDto> esBlogList = dbBlogList.stream().map(this::toEsDto).collect(Collectors.toList());
         boolean response = esOperateManager.bulk(esBlogList, EsBulkBehaviorEnum.INDEX, BlogEsOperateHandler.class);
         if (BooleanUtils.isFalse(response)) {
             log.error("init failed by blog insert es failed, dbBlogList:{}, esBlogList:{}", dbBlogList, esBlogList);

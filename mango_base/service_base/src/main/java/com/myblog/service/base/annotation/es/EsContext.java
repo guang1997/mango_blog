@@ -19,7 +19,7 @@ public @interface EsContext {
      * es的type
      * @return
      */
-    //String type();
+    String type() default "_doc";
 
     /**
      * 后缀，web或者admin

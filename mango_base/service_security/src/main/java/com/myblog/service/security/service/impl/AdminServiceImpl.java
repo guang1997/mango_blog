@@ -108,8 +108,12 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Response response = Response.ok();
         int page = 1;
         int size = 10;
-        if (Objects.nonNull(adminDto.getPage())) page = adminDto.getPage();
-        if (Objects.nonNull(adminDto.getSize())) size = adminDto.getSize();
+        if (Objects.nonNull(adminDto.getPage())) {
+            page = adminDto.getPage();
+        }
+        if (Objects.nonNull(adminDto.getSize())) {
+            size = adminDto.getSize();
+        }
         Page<Admin> adminPage = new Page<>(page, size);
 
         QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();

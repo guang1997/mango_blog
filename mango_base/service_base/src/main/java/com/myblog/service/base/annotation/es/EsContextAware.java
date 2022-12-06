@@ -12,13 +12,13 @@ public interface EsContextAware {
         return "";
     }
 
-    //default String getType() {
-    //    EsContext exContext = getClass().getAnnotation(EsContext.class);
-    //    if (Objects.nonNull(exContext)) {
-    //        return exContext.type();
-    //    }
-    //    return "";
-    //}
+    default String getType() {
+        EsContext exContext = getClass().getAnnotation(EsContext.class);
+        if (Objects.nonNull(exContext)) {
+            return exContext.type();
+        }
+        return "";
+    }
 
     default String getSuffix() {
         EsContext exContext = getClass().getAnnotation(EsContext.class);
