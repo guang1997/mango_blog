@@ -1,0 +1,155 @@
+[
+  {
+    "checked": false,
+    "children": [
+      {
+        "checked": false,
+        "createBy": 2,
+        "createTime": 1668740686000,
+        "id": 290,
+        "labelCode": "418521F754A74F09936B394C1F55141D",
+        "name": "变压器",
+        "parentId": 286,
+        "updateBy": 2,
+        "updateTime": 1669603088000
+      },
+      {
+        "checked": false,
+        "createBy": 2,
+        "createTime": 1668740693000,
+        "id": 291,
+        "labelCode": "23E731B3F2B44671B2A91C2F12226DD9",
+        "name": "组合电器",
+        "parentId": 286,
+        "updateBy": 2,
+        "updateTime": 1669603498000
+      },
+      {
+        "checked": false,
+        "createBy": 2,
+        "createTime": 1669603507000,
+        "id": 375,
+        "labelCode": "3C35E0810DCF4189861C455EC9F5574C",
+        "name": "电缆",
+        "parentId": 286,
+        "updateBy": 2,
+        "updateTime": 1669603507000
+      },
+      {
+        "checked": false,
+        "createBy": 2,
+        "createTime": 1669603514000,
+        "id": 376,
+        "labelCode": "F9978B7757414DAAB330E42BE75F8E03",
+        "name": "避雷器",
+        "parentId": 286,
+        "updateBy": 2,
+        "updateTime": 1669603514000
+      },
+      {
+        "checked": false,
+        "createBy": 2,
+        "createTime": 1669603521000,
+        "id": 377,
+        "labelCode": "C79621A479F142D882AED7D72652C2B9",
+        "name": "竣工验收",
+        "parentId": 286,
+        "updateBy": 2,
+        "updateTime": 1669603521000
+      },
+      {
+        "checked": false,
+        "createBy": 2,
+        "createTime": 1669603534000,
+        "id": 378,
+        "labelCode": "30F14A37DCA546B7891956B8F329C120",
+        "name": "设备调试",
+        "parentId": 286,
+        "updateBy": 2,
+        "updateTime": 1669603534000
+      }
+    ],
+    "createBy": 2,
+    "createTime": 1668740651000,
+    "id": 286,
+    "labelCode": "A0A8AE7B49B54242991D35BCE5E95547",
+    "name": "技术监督",
+    "parentId": 0,
+    "updateBy": 2,
+    "updateTime": 1669603126000
+  },
+  {
+    "checked": false,
+    "children": [
+      {
+        "checked": false,
+        "createBy": 2,
+        "createTime": 1669605244000,
+        "id": 380,
+        "labelCode": "FAF15EA7049844FABCF2ECE8AACE29FB",
+        "name": "111111",
+        "parentId": 379,
+        "updateBy": 2,
+        "updateTime": 1669644060000
+      }
+    ],
+    "createBy": 2,
+    "createTime": 1669605232000,
+    "id": 379,
+    "labelCode": "8771D84FAB1F414FA73AF4198E6F1A53",
+    "name": "相关文档",
+    "parentId": 0,
+    "updateBy": 2,
+    "updateTime": 1669605232000
+  },
+  {
+    "checked": false,
+    "children": [
+      {
+        "checked": false,
+        "children": [
+          {
+            "checked": false,
+            "children": [
+              {
+                "checked": false,
+                "createBy": 2,
+                "createTime": 1670298454000,
+                "id": 408,
+                "labelCode": "0E2C6A1C54584EBFAFC93EBBBC13FD2C",
+                "name": "测试4",
+                "parentId": 407,
+                "updateBy": 2,
+                "updateTime": 1670298454000
+              }
+            ],
+            "createBy": 2,
+            "createTime": 1670298449000,
+            "id": 407,
+            "labelCode": "1C07C1419F3C406F83FECDF2BBB8A68A",
+            "name": "测试3",
+            "parentId": 406,
+            "updateBy": 2,
+            "updateTime": 1670298449000
+          }
+        ],
+        "createBy": 2,
+        "createTime": 1670298442000,
+        "id": 406,
+        "labelCode": "F6F4FABF06CA460A9ED60C9D2E4AA6E4",
+        "name": "测试2",
+        "parentId": 405,
+        "updateBy": 2,
+        "updateTime": 1670298442000
+      }
+    ],
+    "createBy": 2,
+    "createTime": 1670298334000,
+    "id": 405,
+    "labelCode": "18629498F9A44CE8866FDFE730272DC6",
+    "name": "测试1",
+    "parentId": 0,
+    "updateBy": 2,
+    "updateTime": 1670298334000
+  }
+]
