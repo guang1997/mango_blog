@@ -70,8 +70,8 @@ export default {
         })
         return
       }
-      const searchRes = await blogApi.searchBlogByKeyword({
-        keyword: this.keyword.trim(),
+      const searchRes = await blogApi.getBlogByKeyword({
+        content: this.keyword.trim(),
         page: this.currentPage,
         size: this.pageSize
       })

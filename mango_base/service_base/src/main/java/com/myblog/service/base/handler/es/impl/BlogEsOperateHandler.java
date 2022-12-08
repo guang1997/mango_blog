@@ -14,8 +14,10 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -35,10 +37,17 @@ public class BlogEsOperateHandler extends AbstractEsOperateHandler<BlogEsDto> {
             log.error("buildSearchJson failed, param is illegal, paramMap:{}", param);
             throw new RuntimeException("查询失败");
         }
+        // 高亮显示
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.field("description")//若有关键字切可以分词，则可以高亮，写*可以匹配所有字段
+                        .field("title")//若有关键字切可以分词，则可以高亮，写*可以匹配所有字段
+                        .preTags("<span style='color:red;'>")//手动前缀标签
+                        .postTags("</span>");
+
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(QueryBuilders
                 .fuzzyQuery(Constants.EsContants.BLOG_CONTENT, String.valueOf(blogContent))
-        );
+        ).highlighter(highlightBuilder);
         return searchSourceBuilder;
     }
 

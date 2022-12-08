@@ -8,6 +8,7 @@ import com.myblog.service.security.service.VerificationCodeService;
 import com.myblog.service.web.entity.dto.UserDto;
 import com.myblog.service.web.service.UserService;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +25,11 @@ import javax.servlet.http.HttpServletRequest;
  * @author 李斯特
  * @since 2022-05-28
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/web/login")
 public class LoginController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     private VerificationCodeService verificationCodeService;
@@ -42,7 +42,7 @@ public class LoginController {
     @PostMapping("/sendCode")
     public Response sendCode(@RequestBody UserDto userDto) {
         if (StringUtils.isBlank(userDto.getEmail())) {
-            LOGGER.error("sendCode failed, email:[{}] cannot be null", userDto.getEmail());
+            log.error("sendCode failed, email:[{}] cannot be null", userDto.getEmail());
             return Response.error().message("邮箱不能为空");
         }
         return verificationCodeService.sendCode(userDto.getEmail(), Constants.EmailSource.WEB);

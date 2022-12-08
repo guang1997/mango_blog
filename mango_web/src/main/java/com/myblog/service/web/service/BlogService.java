@@ -34,5 +34,5 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
 
     Response initArchives(ArchiveDto archiveDto);
 
-    Response fuzzy(BlogDto blogDto) throws Exception;
+    Response getBlogByKeyword(BlogDto blogDto) throws Exception;
 }

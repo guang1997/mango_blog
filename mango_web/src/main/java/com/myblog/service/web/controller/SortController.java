@@ -7,6 +7,7 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.web.entity.dto.SortDto;
 import com.myblog.service.web.service.SortService;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * @author 李斯特
  * @since 2022-05-19
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/web/sort")

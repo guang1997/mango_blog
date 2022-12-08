@@ -11,6 +11,7 @@ import com.myblog.service.security.service.VerificationCodeService;
 import com.myblog.service.web.entity.dto.LinkDto;
 import com.myblog.service.web.service.LinkService;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,11 @@ import java.util.concurrent.TimeUnit;
  * @author 李斯特
  * @since 2022-06-09
  */
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping("/web/link")
 public class LinkController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(LinkController.class);
 
     @Autowired
     private LinkService linkService;
@@ -97,7 +97,7 @@ public class LinkController {
             try {
                 verificationCodeService.sendEmail(email, Constants.EmailSource.WEB, new TwoTuple<>(Constants.EmailParam.WEB_LINK, url));
             } catch (Exception e) {
-                LOGGER.error("saveFriendLink sendEmail failed, exception:", e);
+                log.error("saveFriendLink sendEmail failed, exception:", e);
             }
         }
 

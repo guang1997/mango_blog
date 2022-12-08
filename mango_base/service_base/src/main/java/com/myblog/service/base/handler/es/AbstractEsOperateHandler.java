@@ -53,6 +53,7 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
 
     /**
      * 创建索引
+     *
      * @param index
      * @param mapping
      * @return
@@ -76,6 +77,7 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
 
     /**
      * 删除索引
+     *
      * @param index
      * @return
      * @throws IOException
@@ -91,6 +93,7 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
 
     /**
      * 判断索引是否存在
+     *
      * @param index
      * @return
      * @throws IOException
@@ -102,6 +105,7 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
 
     /**
      * 批量操作，暂时只支持单种批量方式，如批量插入或者更新或者删除
+     *
      * @param esModelList
      * @return
      * @throws IOException
@@ -129,12 +133,13 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
 
     /**
      * 向es中插入单条数据
+     *
      * @param esModel
      * @return
      * @throws IOException
      */
     public boolean insert(T esModel) throws IOException {
-        IndexRequest request = new IndexRequest(getIndex());
+        IndexRequest request = new IndexRequest(getIndex(), getType());
         request.id(esModel.getId());
         request.source(buildInsertJson(esModel), XContentType.JSON);
         IndexResponse response = restHighLevelClient.index(request, RequestOptions.DEFAULT);
@@ -151,6 +156,7 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
 
     /**
      * 更新es中的单条数据
+     *
      * @param esModel
      * @return
      * @throws IOException
@@ -158,10 +164,11 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
     public boolean update(T esModel) throws IOException {
         UpdateRequest request = new UpdateRequest();
         request.index(getIndex())
-               .id(esModel.getId())
-               .doc(buildUpdateJson(esModel), XContentType.JSON)
-               // 有就更新，没有就新增
-               .docAsUpsert(true);
+                .type(getType())
+                .id(esModel.getId())
+                .doc(buildUpdateJson(esModel), XContentType.JSON)
+                // 有就更新，没有就新增
+                .docAsUpsert(true);
         UpdateResponse response = restHighLevelClient.update(request, RequestOptions.DEFAULT);
         if (Objects.isNull(response)) {
             getLogger().error("update failed, indexResponse is null, esModel:{}", esModel);
@@ -176,6 +183,7 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
 
     /**
      * 删除es中的单条数据
+     *
      * @param id
      * @return
      * @throws IOException
@@ -198,7 +206,6 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
     public List<T> search(Map<String, Object> param, Class<T> resultClass) throws IOException {
         SearchRequest searchRequest = new SearchRequest(getIndex());
         searchRequest.source(buildSearchJson(param));
-
         SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
         SearchHit[] hits = response.getHits().getHits();
         List<T> result = new ArrayList<T>();
@@ -221,7 +228,6 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
     }
 
 
-
     protected List<T> retry(List<T> esModelList, EsBulkBehaviorEnum type) throws Exception {
         int num = 0;
         while (num++ < retryTime) {
@@ -241,5 +247,6 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
     protected abstract String buildInsertJson(T esModel);
 
     protected abstract String buildUpdateJson(T esModel);
+
     protected abstract Logger getLogger();
 }

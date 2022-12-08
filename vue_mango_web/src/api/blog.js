@@ -36,11 +36,11 @@ export function getBlogByPage(data) {
     })
   }
 
-  export function searchBlogByKeyword(data) {
+  export function getBlogByKeyword(data) {
     return request({
-      url: '/web/blog/searchBlogByKeyword',
+      url: '/web/blog/getBlogByKeyword',
       method: 'post',
       data
     })
   }
-  export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId, getPrevNextBlog, searchBlogByKeyword }
+  export default { getBlogByPage, getBlogById, getBlogBySortId, getBlogByTagId, getPrevNextBlog, getBlogByKeyword }

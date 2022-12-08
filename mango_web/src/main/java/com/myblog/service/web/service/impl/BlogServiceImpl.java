@@ -248,7 +248,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
-    public Response fuzzy(BlogDto blogDto) throws Exception {
+    public Response getBlogByKeyword(BlogDto blogDto) throws Exception {
         if (StringUtils.isBlank(blogDto.getContent())) {
             return Response.error().message("请输入查询条件");
         }
