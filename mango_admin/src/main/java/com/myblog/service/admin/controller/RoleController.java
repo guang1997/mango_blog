@@ -28,7 +28,7 @@ import java.util.Set;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/role")
+@RequestMapping("/role")
 public class RoleController {
 
     @Autowired

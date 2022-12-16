@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/auth")
+@RequestMapping("/auth")
 @Api(value = "后台登录相关接口", tags = {"后台登录相关接口"})
 public class LoginController {
 

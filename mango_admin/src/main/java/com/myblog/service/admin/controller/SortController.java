@@ -21,7 +21,7 @@ import java.util.Set;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/sort")
+@RequestMapping("/sort")
 public class SortController {
 
     @Autowired

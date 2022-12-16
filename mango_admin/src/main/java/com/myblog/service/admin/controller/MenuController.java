@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/menu")
+@RequestMapping("/menu")
 public class MenuController {
 
     @Autowired

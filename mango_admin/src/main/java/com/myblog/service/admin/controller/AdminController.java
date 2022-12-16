@@ -37,7 +37,7 @@ import java.util.Set;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/manager")
+@RequestMapping("/manager")
 @Api(value = "管理员相关接口", tags = {"管理员相关接口"})
 public class AdminController {
 

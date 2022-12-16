@@ -22,7 +22,7 @@ import java.util.Set;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/comment")
+@RequestMapping("/comment")
 public class CommentController {
 
     @Autowired

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/code")
+@RequestMapping("/code")
 @Api(value = "验证码相关接口", tags = {"验证码相关接口"})
 public class VerificationCodeController {
 

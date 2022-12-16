@@ -27,7 +27,7 @@ import java.util.Set;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/blog")
+@RequestMapping("/blog")
 public class BlogController {
 
     @Autowired

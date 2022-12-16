@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/dashboard")
+@RequestMapping("/dashboard")
 @Api(value = "首页相关接口", tags = {"首页相关接口"})
 public class DashboardController {
 

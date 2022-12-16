@@ -44,8 +44,12 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
 
         int page = 1;
         int size = 10;
-        if (Objects.nonNull(linkDto.getPage())) page = linkDto.getPage();
-        if (Objects.nonNull(linkDto.getSize())) size = linkDto.getSize();
+        if (Objects.nonNull(linkDto.getPage())) {
+            page = linkDto.getPage();
+        }
+        if (Objects.nonNull(linkDto.getSize())) {
+            size = linkDto.getSize();
+        }
 
         if (StringUtils.isNotBlank(linkDto.getBlurry())) {
             queryWrapper.like(DbConstants.Link.TITLE, linkDto.getBlurry())

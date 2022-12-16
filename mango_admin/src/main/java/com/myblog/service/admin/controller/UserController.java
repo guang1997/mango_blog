@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/user")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired

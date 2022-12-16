@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/web/login")
+@RequestMapping("/login")
 public class LoginController {
 
     @Autowired

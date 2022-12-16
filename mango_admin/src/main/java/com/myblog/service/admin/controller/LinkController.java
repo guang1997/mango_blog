@@ -31,7 +31,7 @@ import java.util.Set;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/link")
+@RequestMapping("/link")
 public class LinkController {
 
     @Autowired

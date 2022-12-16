@@ -27,7 +27,7 @@ import java.util.Set;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/dict")
+@RequestMapping("/dict")
 public class DictController {
 
 

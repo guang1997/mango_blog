@@ -21,7 +21,7 @@ import java.util.Set;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/tag")
+@RequestMapping("/tag")
 public class TagController {
 
     @Autowired

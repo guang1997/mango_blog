@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/monitor")
+@RequestMapping("/monitor")
 public class MonitorController {
 
     @Autowired

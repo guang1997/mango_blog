@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/web/archive")
+@RequestMapping("/archive")
 @Slf4j
 public class ArchiveController {
 

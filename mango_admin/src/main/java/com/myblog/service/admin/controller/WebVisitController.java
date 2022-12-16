@@ -21,7 +21,7 @@ import java.util.Set;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/webVisit")
+@RequestMapping("/webVisit")
 public class WebVisitController {
 
     @Autowired

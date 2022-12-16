@@ -24,7 +24,7 @@ import java.util.Objects;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/admin/oss")
+@RequestMapping("/oss")
 public class OssController {
 
     @Autowired

@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/web/comment")
+@RequestMapping("/comment")
 public class CommentController {
 
     @Autowired

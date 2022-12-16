@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/web/sort")
+@RequestMapping("/sort")
 public class SortController {
 
     @Autowired
