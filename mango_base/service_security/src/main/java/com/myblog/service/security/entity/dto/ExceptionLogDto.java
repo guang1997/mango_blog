@@ -1,4 +1,4 @@
-package com.myblog.service.admin.entity.dto;
+package com.myblog.service.security.entity.dto;
 
 import java.util.List;
 
@@ -17,6 +17,8 @@ public class ExceptionLogDto extends BaseDto {
     private String method;
 
     private String params;
+
+    private String exceptionDetails;
 
     private List<String> createTimes;
 }

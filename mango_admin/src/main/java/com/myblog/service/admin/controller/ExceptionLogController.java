@@ -2,13 +2,14 @@ package com.myblog.service.admin.controller;
 
 import java.util.Set;
 
-import com.myblog.service.admin.entity.dto.ExceptionLogDto;
 import com.myblog.service.admin.service.ExceptionLogService;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.security.annotation.LogByMethod;
+import com.myblog.service.security.entity.dto.ExceptionLogDto;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 李斯特
  * @since 2022-12-16
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/exceptionLog")
 public class ExceptionLogController {
@@ -41,7 +43,6 @@ public class ExceptionLogController {
     @ApiOperation(value = "删除报错信息", notes = "删除报错信息", response = Response.class)
     @DeleteMapping("/delExceptionLog")
     public Response delExceptionLog(@RequestBody Set<String> ids) {
-        boolean success = exceptionLogService.removeByIds(ids);
         if (exceptionLogService.removeByIds(ids)) {
             return Response.ok();
         }

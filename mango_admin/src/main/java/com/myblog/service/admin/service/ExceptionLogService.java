@@ -4,10 +4,10 @@ import java.text.ParseException;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.myblog.service.admin.entity.ExceptionLog;
-import com.myblog.service.admin.entity.dto.ExceptionLogDto;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
+import com.myblog.service.security.entity.ExceptionLog;
+import com.myblog.service.security.entity.dto.ExceptionLogDto;
 
 /**
  * <p>

@@ -1,10 +1,10 @@
 package com.myblog.service.admin.controller;
 
 
+import com.myblog.service.admin.service.WebVisitService;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.security.entity.dto.WebVisitDto;
-import com.myblog.service.security.service.WebVisitService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

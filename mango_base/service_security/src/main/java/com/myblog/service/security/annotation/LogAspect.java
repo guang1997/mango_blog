@@ -4,7 +4,10 @@ import com.myblog.service.base.common.BehaviorEnum;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.ValidateUtil;
-import com.myblog.service.security.handler.PersistenLogHandler;
+import com.myblog.service.security.handler.ExceptionLogHandler;
+import com.myblog.service.security.handler.WebVisitLogHandler;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -27,14 +30,16 @@ import java.util.Objects;
  * @author 李斯特
  * @date 2022/02/21
  */
+@Slf4j
 @Aspect
 @Component
 public class LogAspect {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(LogAspect.class);
+    @Autowired
+    private WebVisitLogHandler webVisitLogHandler;
 
     @Autowired
-    private PersistenLogHandler persistenLogHandler;
+    private ExceptionLogHandler exceptionLogHandler;
 
     /**
      * 配置切入点
@@ -72,9 +77,9 @@ public class LogAspect {
                 RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
                 if (Objects.nonNull(requestAttributes)) {
                     ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
-                    persistenLogHandler.saveWebVisitLog(logByMethod.behavior(), servletRequestAttributes);
+                    webVisitLogHandler.saveWebVisitLog(logByMethod.behavior(), servletRequestAttributes);
                 } else {
-                    LOGGER.error("save web visit log failed by requestAttributes is null, methodName:{}, params:{}", methodName, params);
+                    log.error("save web visit log failed by requestAttributes is null, methodName:{}, params:{}", methodName, params);
                 }
             }
         }
@@ -89,12 +94,32 @@ public class LogAspect {
             classLogger.info("method:{} invoke success, cost:{}, response:{}", methodName, (System.currentTimeMillis() - start), response);
         } catch (Exception e) {
             classLogger.error("method:" + methodName + " invoke failed, exception:", e);
+            // 保存异常信息到数据库
+            saveExceptionMessage(methodName, joinPoint, params, e);
             if (Objects.nonNull(response)) {
                 return response;
             }
             return Response.error();
         }
         return response;
+    }
+
+    private void saveExceptionMessage(String methodName, ProceedingJoinPoint joinPoint, String params, Exception e) {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (Objects.nonNull(requestAttributes)) {
+            ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
+            String method = methodName;
+            if (joinPoint.getSignature() instanceof MethodSignature) {
+                MethodSignature methodSignature = (MethodSignature)joinPoint;
+                ApiOperation annotation = methodSignature.getMethod().getAnnotation(ApiOperation.class);
+                if (Objects.nonNull(annotation)) {
+                    method = annotation.value();
+                }
+            }
+            exceptionLogHandler.saveExceptionLog(e, params, servletRequestAttributes, method);
+        } else {
+            log.error("save exception log failed by requestAttributes is null, methodName:{}, params:{}", methodName, params);
+        }
     }
 
     private String getParams(Object[] args) {

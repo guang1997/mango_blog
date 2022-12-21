@@ -135,6 +135,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         queryWrapper.orderByDesc(DbConstants.Base.SORT);
         queryWrapper.eq(DbConstants.Menu.TITLE, menuDto.getTitle());
+        queryWrapper.eq(DbConstants.Menu.PID, menuDto.getPid());
         if (!Objects.equals("Layout", menuDto.getComponent())) {
             queryWrapper.or().eq(DbConstants.Menu.COMPONENT, menuDto.getComponent());
         }

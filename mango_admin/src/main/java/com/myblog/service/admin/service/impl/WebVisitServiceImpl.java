@@ -1,22 +1,31 @@
-package com.myblog.service.security.service.impl;
+package com.myblog.service.admin.service.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.myblog.service.base.common.*;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myblog.service.admin.service.WebVisitService;
+import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.base.common.Constants;
+import com.myblog.service.base.common.DbConstants;
+import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import com.myblog.service.security.entity.WebVisit;
 import com.myblog.service.security.entity.dto.WebVisitDto;
 import com.myblog.service.security.mapper.WebVisitMapper;
-import com.myblog.service.security.service.WebVisitService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.util.*;
 
 /**
  * <p>
@@ -26,10 +35,9 @@ import java.util.*;
  * @author 李斯特
  * @since 2022-06-15
  */
+@Slf4j
 @Service
 public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> implements WebVisitService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(WebVisitServiceImpl.class);
 
     @Value("${dashboard.webvisit.radarMaxValue:100}")
     private Integer radarMaxValue;
@@ -67,7 +75,7 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
     public Response delWebVisit(Set<String> ids) {
         for (String id : ids) {
             if (baseMapper.deleteById(id) < 1) {
-                LOGGER.error("delWebVisit failed by unknown error, webVisitId:{}", id);
+                log.error("delWebVisit failed by unknown error, webVisitId:{}", id);
                 return Response.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }

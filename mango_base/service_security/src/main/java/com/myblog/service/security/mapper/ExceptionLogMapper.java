@@ -1,7 +1,7 @@
-package com.myblog.service.admin.mapper;
+package com.myblog.service.security.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.myblog.service.admin.entity.ExceptionLog;
+import com.myblog.service.security.entity.ExceptionLog;
 
 /**
  * <p>

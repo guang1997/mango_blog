@@ -1,4 +1,4 @@
-package com.myblog.service.admin.entity;
+package com.myblog.service.security.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.myblog.service.base.entity.BaseEntity;
@@ -40,5 +40,6 @@ public class ExceptionLog extends BaseEntity {
     @ApiModelProperty(value = "请求参数")
     private String params;
 
-
+    @ApiModelProperty(value = "异常详细信息")
+    private String exceptionDetails;
 }

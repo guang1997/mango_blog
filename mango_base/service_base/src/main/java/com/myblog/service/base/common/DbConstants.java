@@ -30,6 +30,8 @@ public interface DbConstants {
         String NAME = "name";
         String COMPONENT = "component";
         String TITLE = "title";
+
+        String PID = "pid";
     }
 
     interface Role{
