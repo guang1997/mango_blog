@@ -45,12 +45,12 @@ public class IpUtils {
         try {
             config = new DbConfig();
         } catch (DbMakerConfigException e) {
-            e.printStackTrace();
+            LOGGER.error("IpUtils init exception:", e);
         }
         try {
             searcher = new DbSearcher(config, dbPath);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.error("IpUtils init exception:", e);
         }
     }
     /**
@@ -147,12 +147,16 @@ public class IpUtils {
     }
 
     public static String getCityInfo(String ip) {
+        if (StringUtils.isBlank(ip)) {
+            LOGGER.error("Error: Invalid ip:{}", ip);
+            return null;
+        }
         if (StringUtils.isEmpty(dbPath)) {
-            LOGGER.error("Error: Invalid ip2region.db file");
+            LOGGER.error("Error: Invalid ip2region.db file, dbPath:{}", dbPath);
             return null;
         }
         if(config == null || searcher == null){
-            LOGGER.error("Error: DbSearcher or DbConfig is null");
+            LOGGER.error("Error: DbSearcher:{} or DbConfig:{} is null", searcher, config);
             return null;
         }
 
@@ -186,6 +190,7 @@ public class IpUtils {
             DataBlock dataBlock = null;
             if (!Util.isIpAddress(ip)) {
                 LOGGER.error("Error: Invalid ip address, ip:{}", ip);
+                return null;
             }
 
             dataBlock = (DataBlock) method.invoke(searcher, ip);

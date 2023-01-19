@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/link")
+@RequestMapping("/web/link")
 public class LinkController {
 
     @Autowired

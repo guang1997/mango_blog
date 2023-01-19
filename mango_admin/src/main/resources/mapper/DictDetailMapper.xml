@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myblog.service.admin.mapper.DictDetailMapper">
+
+    <update id="updateByDictLabel">
+        UPDATE t_dict_detail
+        <set>
+            is_deleted = 0,
+            <if test="dictId != null">
+                dict_id = #{dictId,jdbcType=VARCHAR},
+            </if>
+            <if test="dictLabel != null">
+                dict_label = #{dictLabel,jdbcType=VARCHAR},
+            </if>
+            <if test="dictValue != null">
+                dict_value = #{dictValue,jdbcType=VARCHAR},
+            </if>
+            <if test="cssClass != null">
+                css_class = #{cssClass,jdbcType=VARCHAR},
+            </if>
+            <if test="listClass != null">
+                list_class = #{listClass,jdbcType=VARCHAR},
+            </if>
+            <if test="summary != null">
+                summary = #{summary,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        WHERE dict_label = #{dictLabel,jdbcType=VARCHAR}
+    </update>
+    <select id="getDetailsByDictName" resultType="com.myblog.service.admin.entity.DictDetail">
+        SELECT t1.id, t1.dict_id, t1.dict_label, t1.dict_value, t1.css_class, t1.list_class, t1.summary, t1.create_time, t1.update_time, t1.sort
+        FROM t_dict_detail t1
+        LEFT JOIN t_dict t2 ON t1.dict_id=t2.id
+        WHERE t2.is_deleted = 0 AND t2.dict_name=#{dictName}
+    </select>
+</mapper>

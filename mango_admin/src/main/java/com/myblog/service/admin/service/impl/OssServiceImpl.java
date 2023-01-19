@@ -1,6 +1,5 @@
 package com.myblog.service.admin.service.impl;
 
-import com.myblog.service.admin.config.AliyunOssProperties;
 import com.myblog.service.admin.config.QiNiuYunOssProperties;
 import com.myblog.service.admin.service.OssService;
 import com.myblog.service.base.common.Constants;
@@ -31,9 +30,6 @@ import static java.util.Objects.*;
 @Slf4j
 @Service
 public class OssServiceImpl implements OssService {
-
-    @Autowired
-    private AliyunOssProperties aliyunOssProperties;
 
     @Autowired
     private Auth auth;

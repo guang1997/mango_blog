@@ -29,7 +29,7 @@ import java.util.Map;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/blog")
+@RequestMapping("/web/blog")
 public class BlogController {
 
 

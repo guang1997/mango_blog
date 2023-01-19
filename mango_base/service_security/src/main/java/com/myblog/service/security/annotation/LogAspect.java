@@ -62,38 +62,42 @@ public class LogAspect {
         // 获取入参
         String params = getParams(joinPoint.getArgs());
         // 对入参进行校验
-        if (joinPoint.getSignature() instanceof MethodSignature) {
-            MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-            // 配置了注解并且标识为校验入参的方法才进行入参校验
-            LogByMethod logByMethod = methodSignature.getMethod().getAnnotation(LogByMethod.class);
-            if (Objects.nonNull(logByMethod) && logByMethod.validate()) {
-                Response validateResponse = ValidateUtil.validate(joinPoint.getArgs()[0]);
-                if (!validateResponse.getSuccess()) {
-                    return validateResponse;
-                }
+        if (!(joinPoint.getSignature() instanceof MethodSignature)) {
+            log.warn("signature:{} not instance of MethodSignature, methodName:{}", joinPoint.getSignature(), methodName);
+            return joinPoint.proceed();
+        }
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        // 配置了注解并且标识为校验入参的方法才进行入参校验
+        LogByMethod logByMethod = methodSignature.getMethod().getAnnotation(LogByMethod.class);
+        if (Objects.nonNull(logByMethod) && logByMethod.validate()) {
+            Response validateResponse = ValidateUtil.validate(joinPoint.getArgs()[0]);
+            if (!validateResponse.getSuccess()) {
+                return validateResponse;
             }
-            // 保存门户网站浏览日志
-            if (!Objects.equals(logByMethod.behavior(), BehaviorEnum.DEFAULT)) {
-                RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-                if (Objects.nonNull(requestAttributes)) {
-                    ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
-                    webVisitLogHandler.saveWebVisitLog(logByMethod.behavior(), servletRequestAttributes);
-                } else {
-                    log.error("save web visit log failed by requestAttributes is null, methodName:{}, params:{}", methodName, params);
-                }
+        }
+        // 保存门户网站浏览日志
+        if (!Objects.equals(logByMethod.behavior(), BehaviorEnum.DEFAULT)) {
+            RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+            if (Objects.nonNull(requestAttributes)) {
+                ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
+                webVisitLogHandler.saveWebVisitLog(logByMethod.behavior(), servletRequestAttributes);
+            } else {
+                log.error("save web visit log failed by requestAttributes is null, methodName:{}, params:{}", methodName, params);
             }
         }
 
         if (classLogger.isDebugEnabled()) {
-            classLogger.debug("recieve request:{}, params:{}", methodName, params);
+            classLogger.debug("receive request:{}, params:{}", methodName, params);
         }
         long start = System.currentTimeMillis();
         Object response = null;
         try {
             response = joinPoint.proceed();
-            classLogger.info("method:{} invoke success, cost:{}, response:{}", methodName, (System.currentTimeMillis() - start), response);
+            if (logByMethod.printResponse()) {
+                classLogger.info("method:{} invoke success, cost:{}, response:{}", methodName, (System.currentTimeMillis() - start), response);
+            }
         } catch (Exception e) {
-            classLogger.error("method:" + methodName + " invoke failed, exception:", e);
+            classLogger.error("method:{} invoke failed, exception:", methodName, e);
             // 保存异常信息到数据库
             saveExceptionMessage(methodName, joinPoint, params, e);
             if (Objects.nonNull(response)) {
@@ -110,7 +114,7 @@ public class LogAspect {
             ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
             String method = methodName;
             if (joinPoint.getSignature() instanceof MethodSignature) {
-                MethodSignature methodSignature = (MethodSignature)joinPoint;
+                MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
                 ApiOperation annotation = methodSignature.getMethod().getAnnotation(ApiOperation.class);
                 if (Objects.nonNull(annotation)) {
                     method = annotation.value();

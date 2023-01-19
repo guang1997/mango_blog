@@ -1,7 +1,12 @@
 package com.myblog.service.base.handler.es;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ResourceUtils;
@@ -27,8 +35,13 @@ public class EsOperateManager {
     @Autowired
     private Map<String, AbstractEsOperateHandler> handlers;
 
+    @Value("${elasticsearch.config.index.create}")
+    public boolean createIndex;
     @PostConstruct
     public void init() throws Exception {
+        if (!createIndex) {
+            return;
+        }
         // 创建索引
         if (CollectionUtils.isEmpty(handlers)) {
             return;
@@ -39,8 +52,20 @@ public class EsOperateManager {
                 log.info("index:{} already exists, delete it, response:{}", handler.getIndex(), deleteResponse);
             }
             // 获取文件流
-            File jsonFile = ResourceUtils.getFile(handler.getMappingFilePath());
-            String mappingJson = FileUtil.readString(jsonFile, StandardCharsets.UTF_8);
+            Resource resource = new ClassPathResource(handler.getMappingFilePath());
+            if (!resource.exists()) {
+                throw new RuntimeException("cannot find es file by path:" + handler.getMappingFilePath());
+            }
+            StringBuilder esStrBuilder = new StringBuilder();
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+                String readLine = "";
+                while ((readLine = reader.readLine()) != null) {
+                    esStrBuilder.append(readLine);
+                }
+            }
+            //File jsonFile = ResourceUtils.getFile(handler.getMappingFilePath());
+            //String mappingJson = FileUtil.readString(jsonFile, StandardCharsets.UTF_8);
+            String mappingJson = esStrBuilder.toString();
             if (StringUtils.isBlank(mappingJson)) {
                 log.error("EsOperateManager init failed, mappingJson is null, handler:{}, filePath:{}", handler,
                     handler.getMappingFilePath());

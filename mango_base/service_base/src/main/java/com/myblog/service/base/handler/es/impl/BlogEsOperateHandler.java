@@ -27,7 +27,7 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-@EsContext(index = "blog", suffix = "admin", mappingFilePath = "classpath:template/esModel/blog.json")
+@EsContext(index = "blog", suffix = "admin", mappingFilePath = "template/esModel/blog.json")
 public class BlogEsOperateHandler extends AbstractEsOperateHandler<BlogEsDto> {
 
     @Override

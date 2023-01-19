@@ -27,4 +27,10 @@ public @interface LogByMethod {
      * @return
      */
     BehaviorEnum behavior() default BehaviorEnum.DEFAULT;
+
+    /**
+     * 是否打印出参
+     * @return
+     */
+    boolean printResponse() default true;
 }

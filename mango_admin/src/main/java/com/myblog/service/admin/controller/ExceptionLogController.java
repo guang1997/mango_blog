@@ -32,7 +32,7 @@ public class ExceptionLogController {
     @Autowired
     private ExceptionLogService exceptionLogService;
 
-    @LogByMethod("/admin/exceptionLog/getExceptionByPage")
+    @LogByMethod(value = "/admin/exceptionLog/getExceptionByPage", printResponse = false)
     @ApiOperation(value = "分页查询报错信息", notes = "分页查询报错信息", response = Response.class)
     @PostMapping("/getExceptionByPage")
     public Response getExceptionByPage(@RequestBody ExceptionLogDto exceptionLogDto) throws Exception {
