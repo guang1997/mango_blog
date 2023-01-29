@@ -10,13 +10,13 @@
           <template v-if="newBlogs.length">
             <div class="body-item" v-for="(blog, index) in newBlogs" :key="index">
               <div class="body-pic">
-                <router-link :to="'/app/blog/' + blog.id" @click.native="reloadBlog()">
+                <router-link :to="'/blog/' + blog.id" @click.native="reloadBlog()">
                   <img v-lazy="blog.fileId" alt="" />
                 </router-link>
               </div>
               <div class="body-info">
                 <div class="body-info__title">
-                  <router-link class="live2d_router_link" :to="'/app/blog/' + blog.id" @click.native="reloadBlog()">
+                  <router-link class="live2d_router_link" :to="'/blog/' + blog.id" @click.native="reloadBlog()">
                     {{ blog.title }}
                   </router-link>
                 </div>

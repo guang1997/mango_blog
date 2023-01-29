@@ -13,13 +13,13 @@
             >
               <div class="archives__content">
                 <div class="content-left">
-                  <router-link :to="'/app/blog/' + blog.id">
+                  <router-link :to="'/blog/' + blog.id">
                     <img v-lazy="blog.fileId" alt="" />
                   </router-link>
                 </div>
                 <div class="content-right">
                   <div class="content-right__title">
-                    <router-link class="live2d_router_link" :to="'/app/blog/' + blog.id">
+                    <router-link class="live2d_router_link" :to="'/blog/' + blog.id">
                       {{ blog.title }}
                     </router-link>
                   </div>
@@ -50,12 +50,11 @@
 import archiveApi from '@/api/archive'
 
 async function getArchiveRes(route, page = 1, size = 10) {
-
   const params = {
     page,
     size
   }
-  if (route.query.filter && /(\d+)-(\d+)/.test(route.query.filter)) {
+  if (route && route.query.filter && /(\d+)-(\d+)/.test(route.query.filter)) {
     params.queryByMonth = true
     params.month = route.query.filter
   }
@@ -78,9 +77,8 @@ export default {
       archives: []
     }
   },
-  async asyncData({ route }) {
-    const archiveRes = await getArchiveRes(route)
-    if (archiveRes.code === 20000) return { archives: archiveRes.data.data, total: archiveRes.data.total }
+  created() {
+    this.asyncData(this.$route)
   },
   watch: {
     $route() {
@@ -88,6 +86,13 @@ export default {
     }
   },
   methods: {
+    async asyncData({ route }) {
+    const archiveRes = await getArchiveRes(route)
+    if (archiveRes.code === 20000) {
+      this.archives = archiveRes.data.data
+      this.total = archiveRes.data.total
+    }
+  },
     currentChange(val) {
       this.page = val
       this.getArchives()

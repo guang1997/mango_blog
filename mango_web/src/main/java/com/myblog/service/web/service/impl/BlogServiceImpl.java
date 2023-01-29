@@ -71,8 +71,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         Response response = Response.ok();
         int page = 1;
         int size = 10;
-        if (Objects.nonNull(blogDto.getPage())) page = blogDto.getPage();
-        if (Objects.nonNull(blogDto.getSize())) size = blogDto.getSize();
+        if (Objects.nonNull(blogDto.getPage())) {
+            page = blogDto.getPage();
+        }
+        if (Objects.nonNull(blogDto.getSize())) {
+            size = blogDto.getSize();
+        }
         blogDto.setPage((blogDto.getPage() - 1) * blogDto.getSize());
 
         List<Blog> blogList = baseMapper.selectBlogByRequest(blogDto);

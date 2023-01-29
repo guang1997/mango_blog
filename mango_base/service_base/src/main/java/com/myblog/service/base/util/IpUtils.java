@@ -1,16 +1,11 @@
 package com.myblog.service.base.util;
 
 import com.myblog.service.base.common.Constants;
-import io.netty.util.Constant;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.lionsoul.ip2region.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
@@ -28,9 +23,8 @@ import java.util.Objects;
  * @author 李斯特
  * @date 2021/09/27
  */
+@Slf4j
 public class IpUtils {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(IpUtils.class);
 
     private static String dbPath;
     private static DbConfig config;
@@ -45,12 +39,12 @@ public class IpUtils {
         try {
             config = new DbConfig();
         } catch (DbMakerConfigException e) {
-            LOGGER.error("IpUtils init exception:", e);
+            log.error("IpUtils init exception:", e);
         }
         try {
             searcher = new DbSearcher(config, dbPath);
         } catch (FileNotFoundException e) {
-            LOGGER.error("IpUtils init exception:", e);
+            log.error("IpUtils init exception:", e);
         }
     }
     /**
@@ -137,7 +131,7 @@ public class IpUtils {
 
 
         if(StringUtils.isEmpty(ip) || !Util.isIpAddress(ip)) {
-            LOGGER.debug("getAddresses failed by ip is null");
+            log.debug("getAddresses failed by ip is null");
             return null;
         }
 
@@ -148,15 +142,15 @@ public class IpUtils {
 
     public static String getCityInfo(String ip) {
         if (StringUtils.isBlank(ip)) {
-            LOGGER.error("Error: Invalid ip:{}", ip);
+            log.error("Error: Invalid ip:{}", ip);
             return null;
         }
         if (StringUtils.isEmpty(dbPath)) {
-            LOGGER.error("Error: Invalid ip2region.db file, dbPath:{}", dbPath);
+            log.error("Error: Invalid ip2region.db file, dbPath:{}", dbPath);
             return null;
         }
         if(config == null || searcher == null){
-            LOGGER.error("Error: DbSearcher:{} or DbConfig:{} is null", searcher, config);
+            log.error("Error: DbSearcher:{} or DbConfig:{} is null", searcher, config);
             return null;
         }
 
@@ -189,7 +183,7 @@ public class IpUtils {
 
             DataBlock dataBlock = null;
             if (!Util.isIpAddress(ip)) {
-                LOGGER.error("Error: Invalid ip address, ip:{}", ip);
+                log.error("Error: Invalid ip address, ip:{}", ip);
                 return null;
             }
 
@@ -202,7 +196,7 @@ public class IpUtils {
             return ipInfo;
 
         } catch (Exception e) {
-            LOGGER.error("getCityInfo failed, exception:", e);
+            log.error("getCityInfo failed, exception:", e);
         }
 
         return null;
@@ -215,6 +209,11 @@ public class IpUtils {
      */
     public static Map<String, String> getOsAndBrowserInfo(HttpServletRequest request) {
         String userAgent = request.getHeader("User-Agent");
+        Map<String, String> result = new HashMap<>(2);
+        if (StringUtils.isBlank(userAgent)) {
+            log.warn("getOsAndBrowserInfo failed by userAgent is null");
+            return result;
+        }
         String user = userAgent.toLowerCase();
 
         String os = "";
@@ -267,7 +266,6 @@ public class IpUtils {
         } else {
             browser = "UnKnown, More-Info: " + userAgent;
         }
-        Map<String, String> result = new HashMap<>(2);
         result.put(Constants.ReplyField.OS, os);
         result.put(Constants.ReplyField.BROWSER, browser);
         return result;

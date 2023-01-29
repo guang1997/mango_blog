@@ -38,7 +38,6 @@ export default {
     }
   },
   created() {
-    // console.log(this.nextBlog)
     
   },
   components: {},
@@ -53,8 +52,8 @@ export default {
       }
     },
     getHref(type) {
-      if (type === 'prev') return `/app/blog/${this.prevBlog.id}`
-      else return `/app/blog/${this.nextBlog.id}`
+      if (type === 'prev') return `/blog/${this.prevBlog.id}`
+      else return `/blog/${this.nextBlog.id}`
     }
   },
   watch: {

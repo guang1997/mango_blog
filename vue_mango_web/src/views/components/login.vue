@@ -9,7 +9,7 @@
     >
       <div class="submit__login">
         <el-form
-          label-width="60px"
+          label-width="61px"
           :model="formInfo"
           :rules="submitRules"
           ref="customForm"
@@ -60,9 +60,10 @@
           <el-button
             size="small"
             type="primary"
+            style="display:block;margin:0 auto"
             @click="doLogin"
             :loading="submitLoading"
-            >登陆</el-button
+            >注册并登陆</el-button
           >
         </div>
         <div class="submit__third-part">

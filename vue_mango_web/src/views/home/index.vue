@@ -74,19 +74,26 @@ export default {
       ]
     }
   },
+  created() {
+    this.asyncData()
+    
+  },
   computed: {},
   watch: {},
   async mounted() {
     this.startPlay()
   },
-  async asyncData() {
-    const res = await blogApi.getBlogByPage({
-      page: 1,
-      size: 10
-    })
-    if (res.code === 20000) return { blogs: res.data.data, total: res.data.total }
-  },
   methods: {
+    async asyncData() {
+      const res = await blogApi.getBlogByPage({
+        page: 1,
+        size: 10
+      })
+      if(res.code === 20000) {
+        this.blogs = res.data.data
+        this.total = res.data.total
+      }
+    },
     async currentChange(val) {
       const res = await blogApi.getBlogByPage({
         page: val,

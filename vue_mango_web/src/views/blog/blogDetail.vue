@@ -157,7 +157,7 @@ export default {
       return "";
     },
     url() {
-      return `${process.env.VUE_APP_BASE_API}/app/blog/${this.blog.id}`;
+      return `${process.env.VUE_APP_BASE_API}/blog/${this.blog.id}`;
     },
     likeText() {
       if (this.blog.liked) {
@@ -188,12 +188,34 @@ export default {
   },
   created() {
     this.updateVisitorInfo()
+    this.asyncData(this.$route.params.id)
   },
   updated() {},
 
-  async asyncData({ route, isServer, _ip }) {
-    const res = await blogApi.getBlogById({
-      id: route.params.id,
+  // async asyncData({ route, isServer, _ip }) {
+  //   this.blogId = route.params.id
+  //   const res = await blogApi.getBlogById({
+  //     id: route.params.id,
+  //     userId: storage.getVisitor() ? storage.getVisitor().id : "",
+  //     browserFinger: storage.getMangoBlogBrowserFinger(),
+  //     screenInformation: JSON.parse(storage.getMangoBlogScreenInformation()),
+  //     page: 1,
+  //     size: 10,
+  //   });
+  //   if (res.code === 20000) {
+  //     // if (!isServer) setTimeout(() => jumpAnchor(route), 0);
+  //     return {
+  //       blog: res.data.data,
+  //       comments: res.data.comment,
+  //       total: res.data.commentCount,
+  //     };
+  //   }
+  // },
+  methods: {
+    ...mapMutations(["setCatalogs", "setActiveCatalog", "setVisitor"]),
+    async asyncData(blogId) {
+      const res = await blogApi.getBlogById({
+      id: blogId,
       userId: storage.getVisitor() ? storage.getVisitor().id : "",
       browserFinger: storage.getMangoBlogBrowserFinger(),
       screenInformation: JSON.parse(storage.getMangoBlogScreenInformation()),
@@ -201,16 +223,11 @@ export default {
       size: 10,
     });
     if (res.code === 20000) {
-      // if (!isServer) setTimeout(() => jumpAnchor(route), 0);
-      return {
-        blog: res.data.data,
-        comments: res.data.comment,
-        total: res.data.commentCount,
-      };
+        this.blog = res.data.data
+        this.comments = res.data.comment
+        this.total = res.data.commentCount
     }
-  },
-  methods: {
-    ...mapMutations(["setCatalogs", "setActiveCatalog", "setVisitor"]),
+    },
     async likeBlog(event) {
       const isLiked = this.blog.liked ? true : false;
       const res = await commentApi.likeBlog({

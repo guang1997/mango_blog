@@ -98,6 +98,7 @@ export default {
           if (res.code === 20000) {
             this.setTotals({ key: "blog", value: res.data.total });
             this.setNewBlogs(res.data.data);
+            
           }
         });
     },

@@ -8,7 +8,7 @@
           </div>
           <div class="item-content__info">
             <div class="item-content__link">
-              <router-link class="live2d_router_link" :to="'/app/blog/' + blog.id">{{ blog.title }}</router-link>
+              <router-link class="live2d_router_link" :to="'/blog/' + blog.id">{{ blog.title }}</router-link>
             </div>
             <div class="item-content__detail">
               <span>
@@ -37,7 +37,6 @@
   </div>
 </template>
 <script>
-
 export default {
   name: 'blogIterator',
   props: {

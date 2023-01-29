@@ -60,7 +60,7 @@ export default {
     }
   },
   methods: {
-    async search() {
+   search() {
       if (!this.keyword.trim()) {
         this.searched = false
         this.blogs = []
@@ -70,16 +70,23 @@ export default {
         })
         return
       }
-      const searchRes = await blogApi.getBlogByKeyword({
+      blogApi.getBlogByKeyword({
         content: this.keyword.trim(),
         page: this.currentPage,
         size: this.pageSize
-      })
-      if (searchRes.code === 20000) {
+      }).then((searchRes) => {
+        if (searchRes.code === 20000) {
         this.blogs = searchRes.data.data
         this.searched = true
         this.total = searchRes.data.total
+      } else {
+        this.$message({
+          type: 'error',
+          message: '搜索失败'
+        })
       }
+      })
+      
     },
     currentChange(val) {
       this.currentPage = val

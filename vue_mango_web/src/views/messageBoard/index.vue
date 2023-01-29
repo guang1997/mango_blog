@@ -72,25 +72,29 @@ export default {
       messages: [],
     };
   },
-  async asyncData() {
-    const msgRes = await commentApi.getMessageBoardCommentByPage({
-      page: 1,
-      size: 10,
-      source: "MESSAGE_BOARD_MESSAGE",
-      queryLike: true,
-      userId: storage.getVisitor() ? storage.getVisitor().id : "",
-    });
-    if (msgRes.code === 20000)
-      return { messages: msgRes.data.data, total: msgRes.data.total };
-  },
   computed: {
     ...mapState(["visitorInfo"]),
   },
   created() {
     this.updateVisitorInfo()
+    this.asyncData()
   },
   methods: {
      ...mapMutations(["setVisitor"]),
+    asyncData() {
+    commentApi.getMessageBoardCommentByPage({
+      page: 1,
+      size: 10,
+      source: "MESSAGE_BOARD_MESSAGE",
+      queryLike: true,
+      userId: storage.getVisitor() ? storage.getVisitor().id : "",
+    }).then((res) => {
+      if (res.code === 20000) {
+        this.messages = res.data.data
+        this.total = res.data.total
+      }
+    });
+  },
     submitContent(content, cb) {
       this.submit(content, null, cb);
     },

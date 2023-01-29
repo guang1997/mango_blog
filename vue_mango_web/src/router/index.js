@@ -31,37 +31,37 @@ const router = new Router({
       component: home
     },
     {
-      path: '/app/blog/:id',
+      path: '/blog/:id',
       name: 'blogDetail',
       component: blogDetail
     },
     {
-      path: '/app/messageBoard',
+      path: '/messageBoard',
       name: 'messageBoard',
       component: messageBoard
     },
     {
-      path: '/app/archive',
+      path: '/archive',
       name: 'archive',
       component: archive
     },
     {
-      path: '/app/tag',
+      path: '/tag',
       name: 'tag',
       component: tag
     },
     {
-      path: '/app/sort',
+      path: '/sort',
       name: 'sort',
       component: sort
     },
     {
-      path: '/app/blog/:type/:param',
+      path: '/blog/:type/:param',
       name: 'blogFilter',
       component: blogFilter
     },
     {
-      path: '/app/friendLink',
+      path: '/friendLink',
       name: 'friendLink',
       component: friendLink
     },

@@ -9,7 +9,7 @@ export default {
   name: 'WebSite',
   data() {
     return {
-      url: process.env.BLOG_WEB_URL
+      url: process.env.VUE_BLOG_WEB_URL
     }
   },
   methods: {

@@ -9,7 +9,7 @@ export default {
   name: 'MangoGit',
   data() {
     return {
-      url: 'https://gitee.com/lisite1997/mango_blog'
+      url: process.env.VUE_GITEE_URL
     }
   },
   methods: {

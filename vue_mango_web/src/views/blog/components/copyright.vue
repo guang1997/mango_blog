@@ -10,7 +10,7 @@
       <li>
         <span class="copyright__label">文章链接：</span>
         <span>
-           <router-link :to="'/app/blog/' + blogId" @click.native="onClick()">
+           <router-link :to="'/blog/' + blogId" @click.native="onClick()">
                     {{ url }}
                   </router-link>
         </span>

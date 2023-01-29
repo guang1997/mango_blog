@@ -16,7 +16,7 @@
               <div class="body-pic">
                 <div v-if="comment.blogId">
                   <router-link
-                    :to="'/app/blog/' + comment.blogId + '?anchor=a_cm'"
+                    :to="'/blog/' + comment.blogId + '?anchor=a_cm'"
                     @click.native="reloadBlog()"
                   >
                     <img v-lazy="comment.avatar" alt="" />
@@ -24,7 +24,7 @@
                 </div>
                 <div v-else>
                   <router-link
-                    :to="'/app/messageBoard?anchor=a_cm'"
+                    :to="'/messageBoard?anchor=a_cm'"
                     @click.native="reloadBlog()"
                   >
                     <img v-lazy="comment.avatar" alt="" />
@@ -35,7 +35,7 @@
                 <div class="body-info__title">
                   <div v-if="comment.blogId">
                     <router-link
-                      :to="'/app/blog/' + comment.blogId + '?anchor=a_cm'"
+                      :to="'/blog/' + comment.blogId + '?anchor=a_cm'"
                       @click.native="reloadBlog()"
                     >
                       {{ comment.content }}
@@ -43,7 +43,7 @@
                   </div>
                   <div v-else>
                     <router-link
-                      :to="'/app/messageBoard?anchor=a_cm'"
+                      :to="'/messageBoard?anchor=a_cm'"
                       @click.native="reloadBlog()"
                     >
                       {{ comment.content }}

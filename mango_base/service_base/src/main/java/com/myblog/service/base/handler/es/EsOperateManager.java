@@ -37,6 +37,7 @@ public class EsOperateManager {
 
     @Value("${elasticsearch.config.index.create}")
     public boolean createIndex;
+
     @PostConstruct
     public void init() throws Exception {
         if (!createIndex) {
