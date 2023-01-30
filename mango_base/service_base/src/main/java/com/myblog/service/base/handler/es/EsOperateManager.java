@@ -49,8 +49,8 @@ public class EsOperateManager {
         }
         for (AbstractEsOperateHandler handler : handlers.values()) {
             if (handler.existIndex(handler.getIndex())) {
-                boolean deleteResponse = handler.deleteIndex(handler.getIndex());
-                log.info("index:{} already exists, delete it, response:{}", handler.getIndex(), deleteResponse);
+                log.info("index:{} already exists, not create it", handler.getIndex());
+                continue;
             }
             // 获取文件流
             Resource resource = new ClassPathResource(handler.getMappingFilePath());
@@ -64,8 +64,6 @@ public class EsOperateManager {
                     esStrBuilder.append(readLine);
                 }
             }
-            //File jsonFile = ResourceUtils.getFile(handler.getMappingFilePath());
-            //String mappingJson = FileUtil.readString(jsonFile, StandardCharsets.UTF_8);
             String mappingJson = esStrBuilder.toString();
             if (StringUtils.isBlank(mappingJson)) {
                 log.error("EsOperateManager init failed, mappingJson is null, handler:{}, filePath:{}", handler,
@@ -78,6 +76,7 @@ public class EsOperateManager {
                     handler.getMappingFilePath());
                 throw new RuntimeException("EsOperateManager初始化失败");
             }
+            log.info("create elasticsearch index:{} success", handler.getIndex());
         }
     }
 
@@ -110,7 +109,7 @@ public class EsOperateManager {
         if (CollectionUtils.isEmpty(retryFailedList)) {
             return true;
         }
-        log.error("index:{} suffex:{} bulk failedList:{}", handler.getIndex(), handler.getSuffix(), retryFailedList);
+        log.error("index:{} bulk failedList:{}", handler.getIndex(), retryFailedList);
         return false;
     }
 

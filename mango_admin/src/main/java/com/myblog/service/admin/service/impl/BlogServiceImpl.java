@@ -68,6 +68,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         List<Blog> dbBlogList = baseMapper.selectList(queryWrapper);
         List<BlogEsDto> esBlogList = dbBlogList.stream().map(this::toEsDto).collect(Collectors.toList());
         boolean response = esOperateManager.bulk(esBlogList, EsBulkBehaviorEnum.INDEX, BlogEsOperateHandler.class);
+        log.info("BlogServiceImpl init success, dbBlogList:{}", esBlogList);
         if (BooleanUtils.isFalse(response)) {
             log.error("init failed by blog insert es failed, dbBlogList:{}, esBlogList:{}", dbBlogList, esBlogList);
             throw new RuntimeException("标签插入es失败");

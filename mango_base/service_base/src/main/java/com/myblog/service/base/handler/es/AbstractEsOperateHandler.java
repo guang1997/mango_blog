@@ -217,7 +217,7 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
                 getLogger().error("search failed, hit is null, index:{}, param:{}, hit:{}",
                         getIndex(), param, hit);
             }
-            T model = JsonUtils.jsonToPojo(hit.getSourceAsString(), resultClass);
+            T model = buildResultModel(hit, resultClass);
             if (Objects.isNull(model)) {
                 getLogger().error("search failed, result is null, index:{}, param:{}, resultModel:{}",
                         getIndex(), param, hit.getSourceAsString());
@@ -227,6 +227,7 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
         return result;
     }
 
+    protected abstract T buildResultModel(SearchHit hit, Class<T> resultClass);
 
     protected List<T> retry(List<T> esModelList, EsBulkBehaviorEnum type) throws Exception {
         int num = 0;

@@ -22,12 +22,6 @@ public @interface EsContext {
     String type() default "_doc";
 
     /**
-     * 后缀，web或者admin
-     * @return
-     */
-    String suffix();
-
-    /**
      * es的索引内容文件所在的路径
      * @return
      */

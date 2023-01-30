@@ -20,14 +20,6 @@ public interface EsContextAware {
         return "";
     }
 
-    default String getSuffix() {
-        EsContext exContext = getClass().getAnnotation(EsContext.class);
-        if (Objects.nonNull(exContext)) {
-            return exContext.suffix();
-        }
-        return "";
-    }
-
     default String getMappingFilePath() {
         EsContext exContext = getClass().getAnnotation(EsContext.class);
         if (Objects.nonNull(exContext)) {

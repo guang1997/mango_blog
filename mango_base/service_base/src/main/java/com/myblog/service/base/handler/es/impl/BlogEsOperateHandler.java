@@ -13,13 +13,17 @@ import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +31,34 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-@EsContext(index = "blog", suffix = "admin", mappingFilePath = "template/esModel/blog.json")
+@EsContext(index = "blog", mappingFilePath = "template/esModel/blog.json")
 public class BlogEsOperateHandler extends AbstractEsOperateHandler<BlogEsDto> {
+
+    private static final String HIGHLIGHT_FIELD = "content";
+    private static final String PRE_TAG = "<span style='color:red;'>";
+    private static final String POST_TAG = "</span>";
+
+    @Override
+    protected BlogEsDto buildResultModel(SearchHit hit, Class<BlogEsDto> resultClass) {
+        BlogEsDto blogEsDto = JsonUtils.jsonToPojo(hit.getSourceAsString(), resultClass);
+        if (Objects.isNull(blogEsDto)) {
+            log.warn("jsonToPojo failed, es source:{}", hit.getSourceAsString());
+            return new BlogEsDto();
+        }
+        Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+        if (!CollectionUtils.isEmpty(highlightFields)) {
+            HighlightField highlightField = highlightFields.get(HIGHLIGHT_FIELD);
+            if (Objects.isNull(highlightField)) {
+                return blogEsDto;
+            }
+            Text[] fragments = highlightField.getFragments();
+            if (Objects.isNull(fragments) || Objects.equals(0, fragments.length)) {
+                return blogEsDto;
+            }
+            blogEsDto.setContent(fragments[0].string());
+        }
+        return blogEsDto;
+    }
 
     @Override
     protected SearchSourceBuilder buildSearchJson(Map<String, Object> param) {
@@ -39,10 +69,10 @@ public class BlogEsOperateHandler extends AbstractEsOperateHandler<BlogEsDto> {
         }
         // 高亮显示
         HighlightBuilder highlightBuilder = new HighlightBuilder();
-        highlightBuilder.field("description")//若有关键字切可以分词，则可以高亮，写*可以匹配所有字段
-                        .field("title")//若有关键字切可以分词，则可以高亮，写*可以匹配所有字段
-                        .preTags("<span style='color:red;'>")//手动前缀标签
-                        .postTags("</span>");
+        highlightBuilder.field(HIGHLIGHT_FIELD)
+                        //手动前缀标签
+                        .preTags(PRE_TAG)
+                        .postTags(POST_TAG);
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(QueryBuilders

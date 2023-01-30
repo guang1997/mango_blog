@@ -30,14 +30,13 @@
       <slot name="footer">
         <div class="layout__footer-content" :style="{ backgroundImage: 'url(' + cover + ')' }">
           <div class="layout__footer-item">
-            <span>©2022 - 2024&nbsp;&nbsp;&nbsp;</span>
+            <span>©2023 - 2025&nbsp;&nbsp;&nbsp;</span>
             <a href="https://github.com/justJokee" target="_blank">lisite</a>
           </div>
           <div class="layout__footer-item">Powerd by Vue2.x ssr</div>
           <div class="layout__footer-item item-icp">
             <img src="@/assets/img/icp.png" alt="" />
-            <a href="http://www.beian.gov.cn/portal/index.do" target="_blank">鲁公安网备 37012502000331号</a>
-            <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">鲁ICP备 17052342号</a>
+            <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">鲁ICP备 2022023673号</a>
           </div>
         </div>
       </slot>
