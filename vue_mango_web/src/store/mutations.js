@@ -28,5 +28,8 @@ export default {
   },
   setTotals(state, kv) {
     state.totals[kv.key] = kv.value
+  },
+  setWebConfig(state, webConfig) {
+    state.webConfig = webConfig
   }
 }

@@ -28,6 +28,15 @@ const store = new Vuex.Store({
       blog: 0,
       tag: 0,
       sort: 0
+    },
+    webConfig: {
+      // name: "",
+      // summary: "",
+      // author: "",
+      // recordNum: "",
+      // github: "",
+      // gitee: "",
+      // rollingSentences: []
     }
   },
   mutations,

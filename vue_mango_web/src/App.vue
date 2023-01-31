@@ -13,6 +13,7 @@ import archiveApi from "@/api/archive";
 import tagApi from "@/api/tag";
 import sortApi from "@/api/sort";
 import commentApi from "@/api/comment";
+import webConfigApi from "@/api/webConfig";
 import Fingerprint2 from "fingerprintjs2";
 import { storage } from "@/utils/storage";
 import backTop from '@/components/backTop'
@@ -34,7 +35,8 @@ export default {
   },
    components: { backTop, live2d },
   mounted() {
-    this.initPannel();
+    this.initPannel()
+    this.initWebConfig()
     if (!storage.getMangoBlogBrowserFinger()) {
       setTimeout(() => {
         this.createFingerprint();
@@ -54,6 +56,7 @@ export default {
       "setTotals",
       "setBrowserFinger",
       "setScreenInformation",
+      "setWebConfig"
     ]),
     initPannel() {
       archiveApi.initArchives({ queryByMonth: true }).then((res) => {
@@ -101,6 +104,14 @@ export default {
             
           }
         });
+    },
+    initWebConfig() {
+      webConfigApi.getWebConfig().then((res) => {
+        if(res.code === 20000) {
+          this.setWebConfig(res.data.data)
+          console.log("setWebConfig", res.data.data)
+        }
+      })
     },
     createFingerprint() {
       let options = (Fingerprint2.Options = {

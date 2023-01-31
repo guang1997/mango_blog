@@ -3,7 +3,7 @@
     <layout cover="/static/img/cover/home.jpg">
       <div id="home-article-header" class="home-article__header" slot="header">
         <div class="home-article__dictum">
-          <div class="home-article__site-name">Lisite's Blog</div>
+          <div class="home-article__site-name">{{ webConfig.name }}</div>
           <div class="home-article__dictum-info">
             <span>{{ dictumInfo }}</span>
             <span class="home-article__typed-cursor" :class="{ 'is-typed-cursor-anmation': watingTyped }">|</span>
@@ -35,24 +35,10 @@
 import scrollTo from '@/utils/scrollTo'
 import blogApi from '@/api/blog'
 import blogIterator from '@/views/components/blog-iterator'
+import { mapState } from "vuex";
 export default {
   // 组件名称
   name: 'home',
-  metaInfo() {
-    return {
-      title: `首页  - Lisite's Blog`,
-      meta: [
-        {
-          name: 'description',
-          content: `这是一个用vue开发的个人博客，记录学习与生活 - Lisite's Blog`
-        },
-        {
-          name: 'keywords',
-          content: 'vue博客,技术博客'
-        }
-      ]
-    }
-  },
   // 子组件
   components: {
     blogIterator
@@ -78,7 +64,9 @@ export default {
     this.asyncData()
     
   },
-  computed: {},
+  computed: {
+    ...mapState(["webConfig"]),
+  },
   watch: {},
   async mounted() {
     this.startPlay()

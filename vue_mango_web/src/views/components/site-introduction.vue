@@ -4,11 +4,9 @@
       <img src="https://lisite-blog.oss-cn-shanghai.aliyuncs.com/blog/2022/05/15/09fb67b0-f1d2-4d63-afda-a72219d55c65-avatar.jpeg" alt="" />
     </div>
     <div class="site-introduction__info" @click="goTo('home')">
-      <p class="site-introduction__sitename">Lisite</p>
+      <p class="site-introduction__sitename">{{ webConfig.author }}</p>
       <p>
-        Hi，欢迎来到 Lisite's Blog，这是一个使用 vue 开发的，记录学习与生活的个人博客，你可以在
-        <a href="https://mapblog.cn/article/8">这里</a>
-        了解到关于本站的更多技术细节。
+        {{ webConfig.summary }}
       </p>
     </div>
     <div class="site-introduction__totals">
@@ -54,6 +52,7 @@
 </template>
 <script>
 import { mapState } from 'vuex'
+import webConfig from '../../api/webConfig'
 
 export default {
   name: 'pannelIntroduction',
@@ -63,7 +62,7 @@ export default {
     return {}
   },
   computed: {
-    ...mapState(['totals'])
+    ...mapState(['totals', 'webConfig'])
   },
   methods: {
     goTo(name) {
