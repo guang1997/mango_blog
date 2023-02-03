@@ -5,8 +5,7 @@
     </div>
     <div class="site-introduction__info" @click="goTo('home')">
       <p class="site-introduction__sitename">{{ webConfig.author }}</p>
-      <p>
-        {{ webConfig.summary }}
+      <p v-html="webConfig.summary">
       </p>
     </div>
     <div class="site-introduction__totals">
@@ -25,7 +24,7 @@
     </div>
     <div class="site-introduction__social">
        <div class="social-github">
-        <a href="https://gitee.com/lisite1997/mango_blog" target="_blank">
+        <a :href="webConfig.github" target="_blank">
           <el-button type="primary" size="mini">
             <div class="social-github__icon">
               <svg

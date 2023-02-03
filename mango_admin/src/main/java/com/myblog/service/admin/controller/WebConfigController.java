@@ -1,8 +1,11 @@
 package com.myblog.service.admin.controller;
 
 
+import javax.annotation.PostConstruct;
+
 import com.myblog.service.admin.entity.WebConfig;
 import com.myblog.service.admin.entity.dto.TagDto;
+import com.myblog.service.admin.entity.dto.WebConfigDto;
 import com.myblog.service.admin.service.WebConfigService;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Constants.ReplyField;
@@ -11,6 +14,7 @@ import com.myblog.service.security.annotation.LogByMethod;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,14 +43,14 @@ public class WebConfigController {
     @ApiOperation(value = "查询网站配置信息", notes = "查询网站配置信息", response = Response.class)
     @PostMapping("/getWebConfig")
     public Response getWebConfig() throws Exception {
-        return Response.ok().data(ReplyField.DATA, webConfigService.getOne(null));
+        return webConfigService.getWebConfig();
     }
 
     @LogByMethod("/admin/webConfig/editWebConfig")
     @ApiOperation(value = "修改网站配置信息", notes = "修改网站配置信息", response = Response.class)
     @PostMapping("/editWebConfig")
-    public Response editWebConfig(@RequestBody WebConfig webConfig) throws Exception {
-        return Response.ok().data(ReplyField.DATA, webConfigService.saveOrUpdate(webConfig));
+    public Response editWebConfig(@RequestBody WebConfigDto webConfigDto) throws Exception {
+        return webConfigService.editWebConfig(webConfigDto);
     }
 }
 

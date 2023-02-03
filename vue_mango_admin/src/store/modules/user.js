@@ -58,11 +58,11 @@ const user = {
           password: password.trim(),
           rememberMe: rememberMe
         }).then(response => {
-          const data = response.data
+          const token = response.data
           // 向store中设置token
-          commit('SET_TOKEN', data.token)
+          commit('SET_TOKEN', token)
           // 向cookie中设置token
-          setToken(data.token, rememberMe)
+          setToken(token, rememberMe)
           // 第一次加载菜单时用到， 具体见 src 目录下的 permission.js
           commit('SET_LOAD_MENUS', true)
           resolve()

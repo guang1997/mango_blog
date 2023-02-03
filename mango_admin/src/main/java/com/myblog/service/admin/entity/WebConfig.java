@@ -39,14 +39,13 @@ public class WebConfig extends BaseEntity {
     @ApiModelProperty(value = "备案号")
     private String recordNum;
 
-    @ApiModelProperty(value = "简介")
-    private String title;
-
     @ApiModelProperty(value = "github地址")
     private String github;
 
     @ApiModelProperty(value = "gitee地址")
     private String gitee;
 
+    @ApiModelProperty(value = "首页滚动句子")
+    private String rollingSentences;
 
 }

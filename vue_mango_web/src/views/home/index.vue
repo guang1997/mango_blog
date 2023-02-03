@@ -43,6 +43,11 @@ export default {
   components: {
     blogIterator
   },
+  metaInfo() {
+    return {
+      title: `首页  - Lisite's Blog`
+    }
+  },
   props: {},
   data() {
     return {
@@ -54,10 +59,10 @@ export default {
       watingTyped: false,
       hidePage: false,
       blogs: [],
-      dictums: [
-        ['小鱼干是换不来幸福的，因为它本身就是幸福'],
-        ['有些事本来很遥远，你争取，它就会离你愈来愈近'],
-      ]
+      // dictums: [
+      //   ['小鱼干是换不来幸福的，因为它本身就是幸福'],
+      //   ['有些事本来很遥远，你争取，它就会离你愈来愈近'],
+      // ]
     }
   },
   created() {
@@ -72,6 +77,11 @@ export default {
     this.startPlay()
   },
   methods: {
+    randArr(arr){
+    return arr.sort(()=>{
+        return (Math.random()-0.5);
+    })
+    }, 
     async asyncData() {
       const res = await blogApi.getBlogByPage({
         page: 1,
@@ -98,7 +108,7 @@ export default {
       scrollTo(height)
     },
     async startPlay() {
-      const dictums = this.dictums.flat()
+      const dictums = this.randArr(this.webConfig.rollingSentences.flat())
       const tasks = dictums.map((dictum) => {
         return this.createTask(async (resolve) => {
           let i = 0

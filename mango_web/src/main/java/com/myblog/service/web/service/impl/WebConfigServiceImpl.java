@@ -1,9 +1,19 @@
 package com.myblog.service.web.service.impl;
 
+import java.util.Arrays;
+import java.util.Objects;
+
+import com.myblog.service.base.common.Constants;
+import com.myblog.service.base.common.Constants.ReplyField;
+import com.myblog.service.base.common.Constants.Symbol;
+import com.myblog.service.base.common.Response;
+import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.web.entity.WebConfig;
+import com.myblog.service.web.entity.dto.WebConfigDto;
 import com.myblog.service.web.mapper.WebConfigMapper;
 import com.myblog.service.web.service.WebConfigService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,4 +27,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class WebConfigServiceImpl extends ServiceImpl<WebConfigMapper, WebConfig> implements WebConfigService {
 
+    @Override
+    public Response getWebConfig() throws Exception {
+        WebConfig webConfig = baseMapper.selectOne(null);
+        if (Objects.isNull(webConfig)) {
+            return Response.error();
+        }
+        WebConfigDto webConfigDto = this.toDto(webConfig, WebConfigDto.class);
+        String rollingSentences = webConfig.getRollingSentences();
+        if (StringUtils.isNotBlank(rollingSentences)) {
+            webConfigDto.setRollingSentences(Arrays.asList(rollingSentences.split(Symbol.COMMA7)));
+        }
+        return Response.ok().data(ReplyField.DATA, webConfigDto);
+    }
 }

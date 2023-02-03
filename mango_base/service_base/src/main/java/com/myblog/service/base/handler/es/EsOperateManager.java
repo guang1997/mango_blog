@@ -1,13 +1,8 @@
 package com.myblog.service.base.handler.es;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,7 +11,6 @@ import javax.annotation.PostConstruct;
 
 import com.myblog.service.base.common.EsBulkBehaviorEnum;
 import com.myblog.service.base.entity.es.BaseEsEntity;
-import com.myblog.service.base.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +20,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ResourceUtils;
 
 @Slf4j
 @Component
@@ -135,6 +128,11 @@ public class EsOperateManager {
                                                    Class<T> resultClass) throws IOException {
         AbstractEsOperateHandler<T> handler = getHandler(clazz);
         return handler.search(param, resultClass);
+    }
+
+    public <T extends BaseEsEntity> T searchById(String id, Class<? extends AbstractEsOperateHandler<T>> clazz, Class<T> resultClass) throws IOException {
+        AbstractEsOperateHandler<T> handler = getHandler(clazz);
+        return handler.searchById(id, resultClass);
     }
     public <T extends BaseEsEntity> AbstractEsOperateHandler<T> getHandler(Class<? extends AbstractEsOperateHandler<T>> clazz) {
         if (Objects.isNull(clazz)) {

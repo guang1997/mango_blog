@@ -9,6 +9,8 @@ public interface Constants {
         String COMMA4 = "/";
         String COMMA5 = ";";
         String COMMA6 = "_";
+
+        String COMMA7 = "##";
     }
 
     interface ReplyField {
@@ -119,5 +121,7 @@ public interface Constants {
 
     interface EsContants {
         String BLOG_CONTENT = "content";
+
+        String ID = "id";
     }
 }

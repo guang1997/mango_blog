@@ -44,5 +44,6 @@ public class WebConfig extends BaseEntity {
     @ApiModelProperty(value = "gitee地址")
     private String gitee;
 
-
+    @ApiModelProperty(value = "首页滚动句子")
+    private String rollingSentences;
 }

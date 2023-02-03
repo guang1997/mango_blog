@@ -1,6 +1,8 @@
 package com.myblog.service.base.handler.es;
 
 import com.myblog.service.base.annotation.es.EsContextAware;
+import com.myblog.service.base.common.Constants;
+import com.myblog.service.base.common.Constants.EsContants;
 import com.myblog.service.base.common.EsBulkBehaviorEnum;
 import com.myblog.service.base.entity.es.BaseEsEntity;
 import com.myblog.service.base.util.JsonUtils;
@@ -26,8 +28,10 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,6 +231,20 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
         return result;
     }
 
+    public T searchById(String id, Class<T> resultClass) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(getIndex());
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders
+            .matchQuery(EsContants.ID, id)
+        );
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHit[] hits = response.getHits().getHits();
+        if (Objects.isNull(hits) || hits.length == 0) {
+            return null;
+        }
+        return buildResultModel(hits[0], resultClass);
+    }
     protected abstract T buildResultModel(SearchHit hit, Class<T> resultClass);
 
     protected List<T> retry(List<T> esModelList, EsBulkBehaviorEnum type) throws Exception {

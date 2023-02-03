@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar" :class="{ 'navbar-rollup': rollBack, 'navbar-transparent': rollbackTop }">
     <div class="navbar__name">
-      <a href="https://mapblog.cn">Lisite's Blog</a>
+      <a href="http://web.webConfig.vip">{{ webConfig.name }}</a>
     </div>
     <div class="navbar__menus">
       <horizontal-navbar @goTo="goTo" @openSearch="openSearch"></horizontal-navbar>
@@ -55,7 +55,7 @@ export default {
     window.addEventListener('resize', this.resizeHandler)
   },
   computed: {
-    ...mapState(['rollBack'])
+    ...mapState(['rollBack', 'webConfig'])
   },
   methods: {
     ...mapMutations(['setRollBack']),

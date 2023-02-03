@@ -18,6 +18,10 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
         <!--服务调用-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -97,7 +101,7 @@
                     <logsDirectory>logs</logsDirectory>
 
                     <!--java启动参数-->
-                    <extraJvmArguments>-Xms512m -Xmx512m -Xmn128m</extraJvmArguments>
+                    <extraJvmArguments>-Xms512m -Xmx512m -Xmn128m -Dspring.profiles.active=prod</extraJvmArguments>
                     <programs>
                         <program>
                             <!--指定主类，脚本名。会生成shell/bat两种类型,也可用platforms指定运行平台-->
@@ -148,4 +152,22 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <package.environment>dev</package.environment>
+            </properties>
+            <!--默认选择-->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <package.environment>prod</package.environment>
+            </properties>
+        </profile>
+    </profiles>
 </project>

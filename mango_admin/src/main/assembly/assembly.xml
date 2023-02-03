@@ -55,10 +55,11 @@
             <directory>target/deploy/config</directory>
             <outputDirectory>./config</outputDirectory>
             <includes>
-                <include>**/*</include>
-<!--                <include>template/*</include>-->
-<!--                <include>*.properties</include>-->
-<!--                <include>*.xml</include>-->
+                <include>**/*.xml</include>
+                <include>template/**/*</include>
+                <include>application.properties</include>
+                <include>bootstrap.properties</include>
+                <include>bootstrap-${package.environment}.properties</include>
             </includes>
             <fileMode>0755</fileMode>
         </fileSet>

@@ -1,5 +1,7 @@
 package com.myblog.service.admin.controller;
 
+import com.myblog.service.admin.entity.dto.UserInfoDto;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.annotation.rest.AnonymousPostMapping;
 import com.myblog.service.base.common.RedisConstants;
@@ -26,8 +28,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
@@ -81,55 +81,48 @@ public class LoginController {
     @LogByMethod(value = "/admin/auth/login", validate = true)
     @ApiOperation(value = "登录", notes = "登录", response = Response.class)
     @AnonymousPostMapping(value = "/login")
-    public Response login(@RequestBody LoginDto loginDto, HttpServletRequest request) throws Exception {
-        Response response = Response.ok();
+    public ResultModel<String> login(@RequestBody LoginDto loginDto, HttpServletRequest request) throws Exception {
         String token = "";
-        try {
-            // 校验用户是否失败次数过多
-            String key = String.join(RedisConstants.DIVISION, RedisConstants.LOGIN_LIMIT, loginDto.getUsername(), IpUtils.getIpAddr(request));
-            String limitCount = redisUtil.get(key);
-            if (StringUtils.isNotEmpty(limitCount)) {
-                int tempLimitCount = Integer.parseInt(limitCount);
-                if (tempLimitCount <= 1) {
-                    return response.code(ResultCodeEnum.LOGIN_LOCKED.getCode()).message(ResultCodeEnum.LOGIN_LOCKED.getMessage());
-                }
+        // 校验用户是否失败次数过多
+        String key = String.join(RedisConstants.DIVISION, RedisConstants.LOGIN_LIMIT, loginDto.getUsername(), IpUtils.getIpAddr(request));
+        String limitCount = redisUtil.get(key);
+        if (StringUtils.isNotEmpty(limitCount)) {
+            int tempLimitCount = Integer.parseInt(limitCount);
+            if (tempLimitCount <= 1) {
+                return ResultModel.setResult(ResultCodeEnum.LOGIN_LOCKED);
             }
-
-            Admin admin = adminService.checkLogin(loginDto);
-            if (admin == null) {
-                return response.code(ResultCodeEnum.LOGIN_ERROR_LOCKED.getCode()).message(String.format(ResultCodeEnum.LOGIN_ERROR_LOCKED.getMessage(),
-                        setLoginCommit(key)));
-            }
-            // 如果账号已禁用，登陆失败
-            if (!admin.getEnabled()) {
-                return response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message("登陆失败，该账号已被禁用，请联系管理员处理");
-            }
-            //查找角色
-            List<Role> roles =  roleService.getRolesByUserId(admin.getId());
-
-            // 创建token
-            long rememberMe = (loginDto.getRememberMe() == null || !loginDto.getRememberMe())
-                    ? properties.getExpiresSecond() : properties.getRememberMeExpiresSecond();
-            // 从缓存中获取token
-            token = redisUtil.get(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
-            if (StringUtils.isBlank(token)) {
-                token = jwtTokenUtil.createToken(admin, roles, rememberMe, properties.getBase64Secret());
-                //把新的token存储到缓存中
-                redisUtil.setEx(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + loginDto.getUsername(), token, rememberMe / ( 1000 * 60 * 60 ), TimeUnit.HOURS);
-                log.info("cannot find token from redis cache, create it:{}", token);
-            }
-            // 登录成功之后更新数据库信息
-            admin.setLastLoginIp(IpUtils.getIpAddr(request));
-            admin.setLastLoginTime(new Date());
-            admin.setLoginCount(admin.getLoginCount() + 1);
-            adminService.updateById(admin);
-            // 将token返回到页面
-            response.data(Constants.ReplyField.TOKEN, token);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.LOGIN_ERROR.getCode()).message(ResultCodeEnum.LOGIN_ERROR.getMessage());
-            throw e;
         }
-        return response;
+
+        Admin admin = adminService.checkLogin(loginDto);
+        if (admin == null) {
+            return ResultModel.<String>setResult(ResultCodeEnum.LOGIN_ERROR_LOCKED).message(String.format(ResultCodeEnum.LOGIN_ERROR_LOCKED.getMessage(),
+                    setLoginCommit(key)));
+        }
+        // 如果账号已禁用，登陆失败
+        if (!admin.getEnabled()) {
+            return ResultModel.<String>setResult(ResultCodeEnum.LOGIN_ERROR).message("登陆失败，该账号已被禁用，请联系管理员处理");
+        }
+        //查找角色
+        List<Role> roles =  roleService.getRolesByUserId(admin.getId());
+
+        // 创建token
+        long rememberMe = (loginDto.getRememberMe() == null || !loginDto.getRememberMe())
+                ? properties.getExpiresSecond() : properties.getRememberMeExpiresSecond();
+        // 从缓存中获取token
+        token = redisUtil.get(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
+        if (StringUtils.isBlank(token)) {
+            token = jwtTokenUtil.createToken(admin, roles, rememberMe, properties.getBase64Secret());
+            //把新的token存储到缓存中
+            redisUtil.setEx(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + loginDto.getUsername(), token, rememberMe / ( 1000 * 60 * 60 ), TimeUnit.HOURS);
+            log.info("cannot find token from redis cache, create it:{}", token);
+        }
+        // 登录成功之后更新数据库信息
+        admin.setLastLoginIp(IpUtils.getIpAddr(request));
+        admin.setLastLoginTime(new Date());
+        admin.setLoginCount(admin.getLoginCount() + 1);
+        adminService.updateById(admin);
+        // 将token返回到页面
+        return ResultModel.ok(token);
     }
     /**
      * 获取用户信息
@@ -140,47 +133,43 @@ public class LoginController {
     @LogByMethod("/admin/auth/info")
     @ApiOperation(value = "用户信息", notes = "用户信息", response = Response.class)
     @GetMapping("/info")
-    public Response info(HttpServletRequest request) throws Exception {
+    public ResultModel<UserInfoDto> info(HttpServletRequest request) throws Exception {
 
-        Response response = Response.ok();
-        try {
-            String token = request.getHeader(Constants.ReplyField.HEADER);
-            AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
-            if (Objects.isNull(authUser)) {
-                log.error("getAdminInfo Error, authUser:{}", authUser);
-                return response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
-            }
-            Admin admin = adminService.getById(authUser.getId());
-            if (Objects.isNull(admin)) {
-                log.error("getAdminInfo Error, admin is null, authUser:{}", authUser);
-                return response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
-            }
-            // 获取角色信息
-            List<Role> roles = roleService.getRolesByUserId(admin.getId());
-            // 获取角色对应的按钮信息
-            List<String> roleIds = roles.stream().map(Role::getId).collect(Collectors.toList());
-            List<String> menuButtons = roleService.getMenusByRoleId(roleIds);
-            if (!CollectionUtils.isEmpty(menuButtons)) {
-                menuButtons = menuButtons.stream().distinct().collect(Collectors.toList());
-            }
-            Set<String> roleNameSets = roles.stream().map(Role::getRoleName).collect(Collectors.toSet());
-            response.data(Constants.ReplyField.ROLES, roleNameSets)
-                    .data(Constants.ReplyField.TOKEN, token)
-                    .data(Constants.ReplyField.USERNAME, admin.getUsername())
-                    .data(Constants.ReplyField.NICKNAME, admin.getNickname())
-                    .data(Constants.ReplyField.PHONE, admin.getPhone())
-                    .data(Constants.ReplyField.EMAIL, admin.getEmail())
-                    .data(Constants.ReplyField.GENDER, admin.getGender())
-                    .data(Constants.ReplyField.QQ_NUMBER, admin.getQqNumber())
-                    .data(Constants.ReplyField.WE_CHAT, admin.getWeChat())
-                    .data(Constants.ReplyField.ID, authUser.getId())
-                    .data(Constants.ReplyField.AVATAR, admin.getAvatar())
-                    .data(Constants.ReplyField.MENU_BUTTONS, menuButtons);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.GET_USERINFO_ERROR.getCode()).message(ResultCodeEnum.GET_USERINFO_ERROR.getMessage());
-            throw e;
+        String token = request.getHeader(Constants.ReplyField.HEADER);
+        AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
+        if (Objects.isNull(authUser)) {
+            log.error("getAdminInfo Error, authUser:{}", authUser);
+            return ResultModel.setResult(ResultCodeEnum.GET_USERINFO_ERROR);
         }
-        return response;
+        Admin admin = adminService.getById(authUser.getId());
+        if (Objects.isNull(admin)) {
+            log.error("getAdminInfo Error, admin is null, authUser:{}", authUser);
+            return ResultModel.setResult(ResultCodeEnum.GET_USERINFO_ERROR);
+        }
+        // 获取角色信息
+        List<Role> roles = roleService.getRolesByUserId(admin.getId());
+        // 获取角色对应的按钮信息
+        List<String> roleIds = roles.stream().map(Role::getId).collect(Collectors.toList());
+        List<String> menuButtons = roleService.getMenusByRoleId(roleIds);
+        if (!CollectionUtils.isEmpty(menuButtons)) {
+            menuButtons = menuButtons.stream().distinct().collect(Collectors.toList());
+        }
+        Set<String> roleNameSets = roles.stream().map(Role::getRoleName).collect(Collectors.toSet());
+        UserInfoDto userInfoDto = new UserInfoDto();
+        userInfoDto.setRoles(roleNameSets);
+        userInfoDto.setToken(token);
+        userInfoDto.setUsername(admin.getUsername());
+        userInfoDto.setNickname(admin.getNickname());
+        userInfoDto.setPhone(admin.getPhone());
+        userInfoDto.setEmail(admin.getEmail());
+        userInfoDto.setGender(admin.getGender());
+        userInfoDto.setQqNumber(admin.getQqNumber());
+        userInfoDto.setWeChat(admin.getWeChat());
+        userInfoDto.setId(authUser.getId());
+        userInfoDto.setAvatar(admin.getAvatar());
+        userInfoDto.setMenuButtons(menuButtons);
+
+        return ResultModel.ok(userInfoDto);
     }
 
     /**
@@ -191,22 +180,16 @@ public class LoginController {
     @LogByMethod("/admin/auth/logout")
     @ApiOperation(value = "退出登录", notes = "退出登录", response = Response.class)
     @AnonymousPostMapping(value = "/logout")
-    public Response logout(HttpServletRequest request) throws Exception {
-        Response response = Response.ok();
-        try {
-            String token = request.getHeader(Constants.ReplyField.HEADER);
-            AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
-            if (authUser == null) {
-                log.error("logOut Error, authUser:{}", authUser);
-                return response.code(ResultCodeEnum.LOGOUT_ERROR.getCode()).message(ResultCodeEnum.LOGOUT_ERROR.getMessage());
-            }
-            // 去掉redis中token信息
-            redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + authUser.getUsername());
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.LOGOUT_ERROR.getCode()).message(ResultCodeEnum.LOGOUT_ERROR.getMessage());
-            throw e;
+    public ResultModel<Object> logout(HttpServletRequest request) throws Exception {
+        String token = request.getHeader(Constants.ReplyField.HEADER);
+        AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
+        if (authUser == null) {
+            log.error("logOut Error, authUser:{}", authUser);
+            return ResultModel.setResult(ResultCodeEnum.LOGOUT_ERROR);
         }
-        return response;
+        // 去掉redis中token信息
+        redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + authUser.getUsername());
+        return ResultModel.ok();
     }
 
     /**
@@ -234,41 +217,34 @@ public class LoginController {
     @LogByMethod("/admin/auth/getMenu")
     @ApiOperation(value = "获取当前用户菜单", notes = "获取当前用户菜单", response = Response.class)
     @GetMapping(value = "/getMenu")
-    public Response getMenu(HttpServletRequest request) throws Exception {
-        Response response = Response.ok();
-        try {
-            String token = request.getHeader(Constants.ReplyField.HEADER);
-            AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
-            if (authUser == null || authUser.getId() == null) {
-                log.error("getMenu Error, authUser:{}", authUser);
-                return response.code(ResultCodeEnum.GET_USERMENU_ERROR.getCode()).message(ResultCodeEnum.GET_USERMENU_ERROR.getMessage());
-            }
-            Admin admin = adminService.getById(authUser.getId());
-            if (admin == null) {
-                log.error("getMenu Error, admin:{}", admin);
-                return response.code(ResultCodeEnum.GET_USERMENU_ERROR.getCode()).message(ResultCodeEnum.GET_USERMENU_ERROR.getMessage());
-            }
-            // 获取用户角色信息
-            List<Role> roles = roleService.getRolesByUserId(admin.getId());
-            List<String> roleNames = roles.stream().map(Role::getRoleName).collect(Collectors.toList());
-            // 根据角色信息获取用户菜单列表
-            List<Menu> menus = menuService.getMenuByRoles(roles);
-            if (menus == null) {
-                log.error("getMenu Error, admin:{}, menus:{}", authUser, menus);
-                return response.code(ResultCodeEnum.GET_USERMENU_ERROR.getCode()).message(ResultCodeEnum.GET_USERMENU_ERROR.getMessage());
-            }
-            // 组装菜单信息给页面
-            List<MenuDto> menuDtos = new ArrayList<>();
-            for (Menu menu : menus) {
-                menuDtos.add(convertToMenuDto(menu, roleNames));
-            }
-            List<MenuDto> resultList = TreeUtil.toMenuDtoTree(menuDtos, "0");
-            response.data(Constants.ReplyField.MENU, resultList);
-        } catch (Exception e) {
-            response.code(ResultCodeEnum.QUERY_FAILED.getCode()).message(ResultCodeEnum.QUERY_FAILED.getMessage());
-            throw e;
+    public ResultModel<List<MenuDto>> getMenu(HttpServletRequest request) throws Exception {
+        String token = request.getHeader(Constants.ReplyField.HEADER);
+        AuthUser authUser = jwtTokenUtil.getAuthUser(token, properties.getBase64Secret());
+        if (authUser == null || authUser.getId() == null) {
+            log.error("getMenu Error, authUser:{}", authUser);
+            return ResultModel.setResult(ResultCodeEnum.GET_USERMENU_ERROR);
         }
-        return response;
+        Admin admin = adminService.getById(authUser.getId());
+        if (admin == null) {
+            log.error("getMenu Error, admin:{}", admin);
+            return ResultModel.setResult(ResultCodeEnum.GET_USERMENU_ERROR);
+        }
+        // 获取用户角色信息
+        List<Role> roles = roleService.getRolesByUserId(admin.getId());
+        List<String> roleNames = roles.stream().map(Role::getRoleName).collect(Collectors.toList());
+        // 根据角色信息获取用户菜单列表
+        List<Menu> menus = menuService.getMenuByRoles(roles);
+        if (menus == null) {
+            log.error("getMenu Error, admin:{}, menus:{}", authUser, menus);
+            return ResultModel.setResult(ResultCodeEnum.GET_USERMENU_ERROR);
+        }
+        // 组装菜单信息给页面
+        List<MenuDto> menuDtos = new ArrayList<>();
+        for (Menu menu : menus) {
+            menuDtos.add(convertToMenuDto(menu, roleNames));
+        }
+        List<MenuDto> resultList = TreeUtil.toMenuDtoTree(menuDtos, "0");
+        return ResultModel.ok(resultList);
     }
 
     private MenuDto convertToMenuDto(Menu menu, List<String> roleNames) {

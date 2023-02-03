@@ -75,12 +75,6 @@ export default {
         })
       })
     }
-    // logout() {
-    //   this.$store.dispatch('Logout').then(() => {
-    //     location.reload()
-    //   })
-    //   // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
-    // }
   }
 }
 </script>

@@ -31,12 +31,12 @@
         <div class="layout__footer-content" :style="{ backgroundImage: 'url(' + cover + ')' }">
           <div class="layout__footer-item">
             <span>©2023 - 2025&nbsp;&nbsp;&nbsp;</span>
-            <a href="https://github.com/justJokee" target="_blank">lisite</a>
+            <a :href="webConfig.github" target="_blank">{{ webConfig.author }}</a>
           </div>
           <div class="layout__footer-item">Powerd by Vue2.x ssr</div>
           <div class="layout__footer-item item-icp">
             <img src="@/assets/img/icp.png" alt="" />
-            <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">鲁ICP备 2022023673号</a>
+            <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">{{ webConfig.recordNum }}</a>
           </div>
         </div>
       </slot>
@@ -48,6 +48,8 @@ import navbar from '@/views/layout/components/navbar'
 import layoutHeader from '@/views/layout/components/header'
 
 import pannel from '@/views/pannel/'
+import { mapState } from 'vuex'
+import webConfig from '../../api/webConfig'
 
 export default {
   props: {
@@ -59,6 +61,9 @@ export default {
       type: String,
       default: '/static/img/cover/home.jpg'
     }
+  },
+  computed: {
+    ...mapState(['webConfig'])
   },
   components: {
     pannel,
