@@ -14,17 +14,16 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -47,14 +46,8 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * @return
      */
     @Override
-    public Response getDictByPage(DictDto dictDto) throws Exception{
-        Response response = Response.ok();
+    public Map<String, Object> getDictByPage(DictDto dictDto) throws Exception{
         QueryWrapper<Dict> queryWrapper = new QueryWrapper<>();
-
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(dictDto.getPage())) page = dictDto.getPage();
-        if (Objects.nonNull(dictDto.getSize())) size = dictDto.getSize();
         if (StringUtils.isNotBlank(dictDto.getBlurry())) {
             queryWrapper.like(DbConstants.Dict.DICT_NAME, dictDto.getBlurry())
                     .or()
@@ -62,16 +55,17 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         }
         queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         queryWrapper.orderByDesc(DbConstants.Base.SORT);
-        Page<Dict> dictPage = new Page<>(page, size);
+        Page<Dict> dictPage = new Page<>(dictDto.getPage(), dictDto.getSize());
 
         baseMapper.selectPage(dictPage, queryWrapper);
 
         List<DictDto> dictDtos = this.toDtoList(dictPage.getRecords(), DictDto.class);
-        response.data(Constants.ReplyField.DATA, dictDtos);
-        response.data(Constants.ReplyField.TOTAL, dictPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put(Constants.ReplyField.DATA, dictDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, dictPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, dictDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, dictDto.getSize());
+        return resultMap;
     }
 
     /**
@@ -80,12 +74,11 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * @return
      */
     @Override
-    public Response addDict(DictDto dictDto) throws Exception{
+    public Boolean addDict(DictDto dictDto) throws Exception{
         QueryWrapper<Dict> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Dict.DICT_NAME, dictDto.getDictName());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
-            log.error("addDict failed, dictName is already exist, dictDto:{}", dictDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            throw new BusinessException("字典名称{" + dictDto.getDictName() +"}已存在");
         }
         Dict dict = this.toDb(dictDto, Dict.class);
         // 如果已经有同名且被删除的字典，那么只更新
@@ -94,11 +87,11 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         if (baseMapper.updateByDictName(dict) < 1) {
             if (baseMapper.insert(dict) < 1) {
                 log.error("addDict failed by unknown error, dict:{}", dict);
-                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+                return false;
             }
         }
 
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -107,23 +100,23 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * @return
      */
     @Override
-    public Response editDict(DictDto dictDto) throws Exception{
+    public Boolean editDict(DictDto dictDto) throws Exception{
         QueryWrapper<Dict> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Dict.DICT_NAME, dictDto.getDictName());
         List<Dict> dicts = baseMapper.selectList(queryWrapper);
         if (dicts.size() > 0) {
             for (Dict dict : dicts) {
                 if (!Objects.equals(dictDto.getId(), dict.getId())) {
-                    return Response.error().message("更新失败, 已存在相同名称的字典");
+                    throw new BusinessException("更新失败, 已存在相同名称的字典");
                 }
             }
         }
         Dict dict = this.toDb(dictDto, Dict.class);
         if (baseMapper.updateById(dict) < 1) {
             log.error("editDict failed by unknown error, dict:{}", dict);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -132,7 +125,8 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * @return
      */
     @Override
-    public Response delDict(Set<String> ids) throws Exception{
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean delDict(Set<String> ids) throws Exception{
         for (String id : ids) {
             // 删除字典时需要删除对应的字典详情
             UpdateWrapper<DictDetail> dictDetailUpdateWrapper = new UpdateWrapper<>();
@@ -141,10 +135,10 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             // 然后删除对应的字典
             if (baseMapper.deleteById(id) < 1) {
                 log.error("delDict failed by unknown error, dictId:{}", id);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+                throw new BusinessException("删除失败");
             }
         }
-        return Response.ok();
+        return true;
     }
 
 }

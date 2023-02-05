@@ -6,6 +6,7 @@ import com.myblog.service.admin.entity.dto.CommentDto;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,9 +19,9 @@ import java.util.Set;
  */
 public interface CommentService extends IService<Comment>, ServiceConvertHandler<Comment, CommentDto> {
 
-    Response getCommentByPage(CommentDto commentDto) throws Exception;
+    Map<String, Object> getCommentByPage(CommentDto commentDto) throws Exception;
 
-    Response delComment(Set<String> ids);
+    Boolean delComment(Set<String> ids);
 
     int getCommentCount(int status);
 }

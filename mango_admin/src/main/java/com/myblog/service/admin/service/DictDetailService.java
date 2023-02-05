@@ -6,6 +6,7 @@ import com.myblog.service.admin.entity.dto.DictDetailDto;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,13 +19,13 @@ import java.util.Set;
  */
 public interface DictDetailService extends IService<DictDetail>, ServiceConvertHandler<DictDetail, DictDetailDto> {
 
-    Response getDictDetailByPage(DictDetailDto dictDetailDto) throws Exception;
+    Map<String, Object> getDictDetailByPage(DictDetailDto dictDetailDto) throws Exception;
 
-    Response editDictDetail(DictDetailDto dictDetailDto) throws Exception;
+    Boolean editDictDetail(DictDetailDto dictDetailDto) throws Exception;
 
-    Response delDictDetails(Set<String> ids) throws Exception;
+    Boolean delDictDetails(Set<String> ids) throws Exception;
 
-    Response addDictDetail(DictDetailDto dictDetailDto) throws Exception;
+    Boolean addDictDetail(DictDetailDto dictDetailDto) throws Exception;
 
-    Response getDetailsByDictName(String dictName);
+    Map<String, Object> getDetailsByDictName(String dictName);
 }

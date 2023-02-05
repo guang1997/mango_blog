@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @TableName("t_dict_detail")
 @ApiModel(value="DictDetail对象", description="字典详细数据表")
-public class DictDetail extends BaseEntity {
+public class  DictDetail extends BaseEntity {
 
     private static final long serialVersionUID=1L;
 

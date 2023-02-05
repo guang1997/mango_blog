@@ -42,81 +42,69 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
      * @return
      */
     @Override
-    public Response getDictDetailByPage(DictDetailDto dictDetailDto) throws Exception{
-        Response response = Response.ok();
+    public Map<String, Object> getDictDetailByPage(DictDetailDto dictDetailDto) throws Exception{
         QueryWrapper<DictDetail> queryWrapper = new QueryWrapper<>();
 
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(dictDetailDto.getPage())) {
-            page = dictDetailDto.getPage();
-        }
-        if (Objects.nonNull(dictDetailDto.getSize())) {
-            size = dictDetailDto.getSize();
-        }
         if (StringUtils.isNotBlank(dictDetailDto.getDictId())) {
             queryWrapper.eq(DbConstants.DictDetail.DICT_ID, dictDetailDto.getDictId());
         }
         queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         queryWrapper.orderByDesc(DbConstants.Base.SORT);
-        Page<DictDetail> dictDetailPage = new Page<>(page, size);
+        Page<DictDetail> dictDetailPage = new Page<>(dictDetailDto.getPage(), dictDetailDto.getSize());
 
         baseMapper.selectPage(dictDetailPage, queryWrapper);
 
+        Map<String, Object> resultMap = new HashMap<>();
         List<DictDetailDto> dictDetailDtos = this.toDtoList(dictDetailPage.getRecords(), DictDetailDto.class);
-        response.data(Constants.ReplyField.DATA, dictDetailDtos);
-        response.data(Constants.ReplyField.TOTAL, dictDetailPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, dictDetailDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, dictDetailPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, dictDetailDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, dictDetailDto.getSize());
+        return resultMap;
     }
 
     @Override
-    public Response editDictDetail(DictDetailDto dictDetailDto) throws Exception{
+    public Boolean editDictDetail(DictDetailDto dictDetailDto) throws Exception{
         QueryWrapper<DictDetail> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.DictDetail.DICT_ID, dictDetailDto.getDictId());
         DictDetail dictDetail = this.toDb(dictDetailDto, DictDetail.class);
         if (baseMapper.updateById(dictDetail) < 1) {
             log.error("editDictDetail failed by unknown error, dictDetail:{}", dictDetail);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     @Override
-    public Response delDictDetails(Set<String> ids) throws Exception{
+    public Boolean delDictDetails(Set<String> ids) throws Exception{
         for (String id : ids) {
             if (baseMapper.deleteById(id) < 1) {
                 log.error("delDictDetails failed by unknown error, dictDetailId:{}", id);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+                return false;
             }
         }
-        return Response.ok();
+        return true;
     }
 
     @Override
-    public Response addDictDetail(DictDetailDto dictDetailDto) throws Exception{
+    public Boolean addDictDetail(DictDetailDto dictDetailDto) throws Exception{
         QueryWrapper<DictDetail> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.DictDetail.DICT_LABEL, dictDetailDto.getDictLabel());
+        queryWrapper.eq(DbConstants.DictDetail.DICT_ID, dictDetailDto.getDictId());
         List<DictDetail> dbDictDetails = baseMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(dbDictDetails)) {
-            boolean present = dbDictDetails.stream().anyMatch(db -> Objects.equals(dictDetailDto.getDictId(), db.getDictId()));
-            if (present) {
-                log.error("addDictDetail failed, dictLabel is already exist, dictDetailDto:{}", dictDetailDto);
-                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
-            }
+            log.error("addDictDetail failed, dictLabel is already exist, dictDetailDto:{}", dictDetailDto);
+            return false;
         }
         DictDetail dictDetail = this.toDb(dictDetailDto, DictDetail.class);
         // 如果已经有同名且被删除的字典，那么只更新
-        dictDetail.setCreateTime(new Date());
-        dictDetail.setUpdateTime(new Date());
         if (baseMapper.updateByDictLabel(dictDetail) < 1) {
             if (baseMapper.insert(dictDetail) < 1) {
                 log.error("addDictDetail failed by unknown error, dictDetail:{}", dictDetail);
-                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+                return false;
             }
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -125,21 +113,20 @@ public class DictDetailServiceImpl extends ServiceImpl<DictDetailMapper, DictDet
      * @return
      */
     @Override
-    public Response getDetailsByDictName(String dictName) {
+    public Map<String, Object> getDetailsByDictName(String dictName) {
         // 先从redis中获取数据，如果取到数据那么直接返回
         String redisStr = redisUtil.get(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictName);
-        if (!StringUtils.isBlank(redisStr)) {
-            Map<String, Object> result = JsonUtils.jsonToMap(redisStr);
-            return Response.ok().data(result);
+        if (StringUtils.isNotBlank(redisStr)) {
+            return JsonUtils.jsonToMap(redisStr);
         }
         List<DictDetail> detailList = baseMapper.getDetailsByDictName(dictName);
         if (CollectionUtils.isEmpty(detailList)) {
             log.warn("getDetailsByDictName failed, cannot find dictDetails from db, dictName:{}", dictName);
-            return Response.ok();
+            return new HashMap<>();
         }
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.ReplyField.DATA, detailList);
         redisUtil.setEx(RedisConstants.REDIS_DICT_TYPE + RedisConstants.DIVISION + dictName, JsonUtils.objectToJson(result), 1, TimeUnit.DAYS);
-        return Response.ok().data(result);
+        return result;
     }
 }

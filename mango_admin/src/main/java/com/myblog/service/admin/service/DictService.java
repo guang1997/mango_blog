@@ -6,6 +6,7 @@ import com.myblog.service.admin.entity.dto.DictDto;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,11 +19,11 @@ import java.util.Set;
  */
 public interface DictService extends IService<Dict>, ServiceConvertHandler<Dict, DictDto> {
 
-    Response getDictByPage(DictDto dictDto) throws Exception;
+    Map<String, Object> getDictByPage(DictDto dictDto) throws Exception;
 
-    Response addDict(DictDto dictDto) throws Exception;
+    Boolean addDict(DictDto dictDto) throws Exception;
 
-    Response editDict(DictDto dictDto) throws Exception;
+    Boolean editDict(DictDto dictDto) throws Exception;
 
-    Response delDict(Set<String> ids) throws Exception;
+    Boolean delDict(Set<String> ids) throws Exception;
 }

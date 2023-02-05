@@ -11,6 +11,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.entity.BaseEntity;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,10 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -43,14 +42,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
      * @return
      */
     @Override
-    public Response getCommentByPage(CommentDto commentDto) throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getCommentByPage(CommentDto commentDto) throws Exception {
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
 
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(commentDto.getPage())) page = commentDto.getPage();
-        if (Objects.nonNull(commentDto.getSize())) size = commentDto.getSize();
         if (StringUtils.isNotBlank(commentDto.getNickname())) {
             queryWrapper.like(DbConstants.Admin.NICKNAME, commentDto.getNickname());
         }
@@ -70,15 +64,16 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         }
         queryWrapper.eq(DbConstants.Comment.STATUS, 1);
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
-        Page<Comment> commentPage = new Page<>(page, size);
+        Page<Comment> commentPage = new Page<>(commentDto.getPage(), commentDto.getSize());
         baseMapper.selectPage(commentPage, queryWrapper);
 
+        Map<String, Object> resultMap = new HashMap<>();
         List<CommentDto> commentDtos = this.toDtoList(commentPage.getRecords(), CommentDto.class);
-        response.data(Constants.ReplyField.DATA, commentDtos);
-        response.data(Constants.ReplyField.TOTAL, commentPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, commentDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, commentPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, commentDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, commentDto.getSize());
+        return resultMap;
     }
 
     /**
@@ -87,14 +82,39 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
      * @return
      */
     @Override
-    public Response delComment(Set<String> ids) {
-        for (String id : ids) {
-            if (baseMapper.deleteById(id) < 1) {
-                log.error("delComment failed by unknown error, commentId:{}", id);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+    public Boolean delComment(Set<String> ids) {
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(DbConstants.Base.ID, ids);
+        List<Comment> comments = baseMapper.selectList(queryWrapper);
+        // 查询所有需要删除的评论
+        Set<Comment> delComments = new HashSet<>();
+        getComments(comments, delComments);
+
+        List<String> delIds = delComments.stream()
+                .map(BaseEntity::getId)
+                .collect(Collectors.toList());
+        QueryWrapper<Comment> delWrapper = new QueryWrapper<>();
+        delWrapper.in(DbConstants.Base.ID, delIds);
+        if (baseMapper.delete(delWrapper) < 1) {
+            log.error("delComment failed by unknown error, commentIds:{}", delIds);
+            return false;
+        }
+        return true;
+    }
+
+    private void getComments(List<Comment> comments, Set<Comment> delComments) {
+        if (CollectionUtils.isEmpty(comments)) {
+            return;
+        }
+        for (Comment comment : comments) {
+            delComments.add(comment);
+            QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq(DbConstants.Comment.PARENT_ID, comment.getId());
+            List<Comment> childrenComments = baseMapper.selectList(queryWrapper);
+            if (!CollectionUtils.isEmpty(childrenComments)) {
+                getComments(childrenComments, delComments);
             }
         }
-        return Response.ok();
     }
 
     /**
