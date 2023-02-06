@@ -7,6 +7,7 @@ import com.myblog.service.admin.service.MonitorService;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.util.FileUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
@@ -28,7 +29,9 @@ import oshi.util.Util;
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -49,28 +52,28 @@ public class MonitorServiceImpl implements MonitorService {
      * @return
      */
     @Override
-    public Response getServers(){
-        Response response = Response.ok();
+    public Map<String, Object> getServers(){
+        Map<String, Object> resultMap = new HashMap<>();
         try {
             SystemInfo si = new SystemInfo();
             OperatingSystem os = si.getOperatingSystem();
             HardwareAbstractionLayer hal = si.getHardware();
             // 系统信息
-            response.data(Constants.ReplyField.SYS, getSystemInfo(os));
+            resultMap.put(Constants.ReplyField.SYS, getSystemInfo(os));
             // cpu 信息
-            response.data(Constants.ReplyField.CPU, getCpuInfo(hal.getProcessor()));
+            resultMap.put(Constants.ReplyField.CPU, getCpuInfo(hal.getProcessor()));
             // 内存信息
-            response.data(Constants.ReplyField.MEMORY, getMemoryInfo(hal.getMemory()));
+            resultMap.put(Constants.ReplyField.MEMORY, getMemoryInfo(hal.getMemory()));
             // 交换区信息
-            response.data(Constants.ReplyField.SWAP, getSwapInfo(hal.getMemory()));
+            resultMap.put(Constants.ReplyField.SWAP, getSwapInfo(hal.getMemory()));
             // 磁盘
-            response.data(Constants.ReplyField.DISK, getDiskInfo(os));
-            response.data(Constants.ReplyField.TIME, ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.TIME));
+            resultMap.put(Constants.ReplyField.DISK, getDiskInfo(os));
+            resultMap.put(Constants.ReplyField.TIME, ThreadSafeDateFormat.format(new Date(), ThreadSafeDateFormat.TIME));
         } catch (Exception e) {
             log.error("getServers failed, exception:", e);
-            return Response.setResult(ResultCodeEnum.QUERY_FAILED);
+            throw new BusinessException("获取信息失败");
         }
-        return response;
+        return resultMap;
     }
 
     /**

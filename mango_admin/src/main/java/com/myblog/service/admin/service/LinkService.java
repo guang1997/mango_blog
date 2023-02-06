@@ -6,6 +6,7 @@ import com.myblog.service.admin.entity.dto.LinkDto;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,11 +19,11 @@ import java.util.Set;
  */
 public interface LinkService extends IService<Link>, ServiceConvertHandler<Link, LinkDto> {
 
-    Response getLinkByPage(LinkDto linkDto) throws Exception;
+    Map<String, Object> getLinkByPage(LinkDto linkDto) throws Exception;
 
-    Response addLink(LinkDto linkDto) throws Exception;
+    Boolean addLink(LinkDto linkDto) throws Exception;
 
-    Response editLink(LinkDto linkDto) throws Exception;
+    Boolean editLink(LinkDto linkDto) throws Exception;
 
-    Response delLink(Set<String> ids) throws Exception;
+    Boolean delLink(Set<String> ids) throws Exception;
 }

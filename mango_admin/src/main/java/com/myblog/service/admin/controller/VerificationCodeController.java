@@ -1,5 +1,7 @@
 package com.myblog.service.admin.controller;
 
+import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
@@ -33,11 +35,14 @@ public class VerificationCodeController {
     @LogByMethod(value = "/admin/code/sendCode")
     @ApiOperation(value = "发送验证码", notes = "发送验证码", response = Response.class)
     @GetMapping("/sendCode")
-    public Response sendCode(String email) {
+    public ResultModel<Object> sendCode(String email) {
         if (StringUtils.isBlank(email)) {
             log.error("sendCode failed, email:[{}] cannot be null", email);
-            return Response.error().message("邮箱不能为空");
+            return ResultModel.error().message("邮箱不能为空");
         }
-        return verificationCodeService.sendCode(email, Constants.EmailSource.ADMIN);
+        if (verificationCodeService.sendCode(email, Constants.EmailSource.ADMIN)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.SEND_CODE_FAILED);
     }
 }

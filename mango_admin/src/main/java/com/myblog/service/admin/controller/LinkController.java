@@ -3,6 +3,7 @@ package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.entity.dto.LinkDto;
 import com.myblog.service.admin.service.LinkService;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
@@ -15,8 +16,10 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -46,38 +49,43 @@ public class LinkController {
     @LogByMethod("/admin/link/getLinkByPage")
     @ApiOperation(value = "分页查询友情链接", notes = "分页查询友情链接", response = Response.class)
     @PostMapping("/getLinkByPage")
-    public Response getLinkByPage(@RequestBody LinkDto linkDto) throws Exception {
-        return linkService.getLinkByPage(linkDto);
+    public ResultModel<Map<String, Object>> getLinkByPage(@RequestBody LinkDto linkDto) throws Exception {
+        return ResultModel.ok(linkService.getLinkByPage(linkDto));
     }
 
     @LogByMethod(value = "/admin/link/addLink", validate = true)
     @ApiOperation(value = "新增友情链接", notes = "新增友情链接", response = Response.class)
     @PostMapping("/addLink")
-    public Response addLink(@RequestBody LinkDto linkDto) throws Exception {
-        if (StringUtils.isBlank(linkDto.getUrl()) || StringUtils.isBlank(linkDto.getTitle())) {
-            log.error("addLink failed, url or title cannot be null, link:{}", linkDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+    public ResultModel<Object> addLink(@RequestBody @Validated LinkDto linkDto) throws Exception {
+        if (linkService.addLink(linkDto)) {
+            return ResultModel.ok();
         }
-        return linkService.addLink(linkDto);
+        return ResultModel.setResult(ResultCodeEnum.SAVE_FAILED);
     }
 
     @LogByMethod(value = "/admin/link/editLink", validate = true)
     @ApiOperation(value = "修改友情链接", notes = "修改友情链接", response = Response.class)
     @PutMapping("/editLink")
-    public Response editLink(@RequestBody LinkDto linkDto) throws Exception {
-        Response response = linkService.editLink(linkDto);
+    public ResultModel<Object> editLink(@RequestBody @Validated LinkDto linkDto) throws Exception {
+        Boolean editSuccess = linkService.editLink(linkDto);
         // 如果是更改友链状态，更改成功后发送邮件
-        if (response.getSuccess() && BooleanUtils.isTrue(linkDto.getChangeStatus()) && Objects.equals(Constants.CommonStatus.ENABLED, linkDto.getLinkStatus())) {
-            response = verificationCodeService.sendEmail(linkDto.getEmail(), Constants.EmailSource.ADMIN, new TwoTuple<>(Constants.EmailParam.ADMIN_LINK, blogAddress));
+        if (BooleanUtils.isTrue(editSuccess) && BooleanUtils.isTrue(linkDto.getChangeStatus()) && Objects.equals(Constants.CommonStatus.ENABLED, linkDto.getLinkStatus())) {
+            editSuccess = verificationCodeService.sendEmail(linkDto.getEmail(), Constants.EmailSource.ADMIN, new TwoTuple<>(Constants.EmailParam.ADMIN_LINK, blogAddress));
         }
-        return response;
+        if (editSuccess) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.UPDATE_FAILED);
     }
 
     @LogByMethod("/admin/link/delLink")
     @ApiOperation(value = "删除友情链接", notes = "删除友情链接", response = Response.class)
     @DeleteMapping("/delLink")
-    public Response delLink(@RequestBody Set<String> ids) throws Exception {
-        return linkService.delLink(ids);
+    public ResultModel<Object> delLink(@RequestBody Set<String> ids) throws Exception {
+        if (linkService.delLink(ids)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.DELETE_FAILED);
     }
 }
 

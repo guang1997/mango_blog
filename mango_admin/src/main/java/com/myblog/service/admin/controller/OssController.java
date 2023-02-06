@@ -2,6 +2,7 @@ package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.config.FileUploadProperties;
 import com.myblog.service.admin.service.OssService;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -43,7 +45,7 @@ public class OssController {
     @LogByMethod("/admin/oss/uploadAvatar")
     @ApiOperation(value = "个人中心页面上传头像", notes = "个人中心页面上传头像", response = Response.class)
     @PostMapping("/uploadAvatar")
-    public Response uploadAvatar(MultipartFile avatar,
+    public ResultModel<Map<String, Object>> uploadAvatar(MultipartFile avatar,
                                  @RequestParam("moduleName") String moduleName,
                                  @RequestParam("id") String id) throws Exception {
         // 文件大小验证
@@ -55,18 +57,18 @@ public class OssController {
         }
         if (StringUtils.isBlank(id)) {
             log.error("uploadAvatar failed, id cannot be null");
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return ResultModel.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
         Admin admin = adminService.getById(id);
         if (Objects.isNull(admin)) {
             log.error("uploadAvatar failed, cannot find admin by id:{}", id);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return ResultModel.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
-        Response response = ossService.upload(avatar, moduleName);
+        Map<String, Object> resultMap = ossService.upload(avatar, moduleName);
         // 更新用户数据
-        admin.setAvatar(response.getData().get(Constants.ReplyField.URL).toString());
+        admin.setAvatar(resultMap.get(Constants.ReplyField.URL).toString());
         adminService.updateById(admin);
-        return response;
+        return ResultModel.ok(resultMap);
     }
 
     /**
@@ -76,8 +78,8 @@ public class OssController {
     @LogByMethod("/admin/oss/upload")
     @ApiOperation(value = "上传文件", notes = "上传文件", response = Response.class)
     @PostMapping("/upload")
-    public Response upload(MultipartFile file, @RequestParam("moduleName") String moduleName) throws Exception {
-        return ossService.upload(file, moduleName);
+    public ResultModel<Map<String, Object>> upload(MultipartFile file, @RequestParam("moduleName") String moduleName) throws Exception {
+        return ResultModel.ok(ossService.upload(file, moduleName));
     }
 
     /**

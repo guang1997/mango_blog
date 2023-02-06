@@ -62,11 +62,12 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
-    public Response getRoleByPage(RoleDto roleDto) throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getRoleByPage(RoleDto roleDto) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
         if (Objects.nonNull(roleDto.getSearchAll()) && roleDto.getSearchAll()) {
             QueryWrapper<Role> allQueryWrapper = new QueryWrapper<>();
-            return response.data(Constants.ReplyField.DATA, this.toDtoList(baseMapper.selectList(allQueryWrapper), RoleDto.class));
+            resultMap.put(Constants.ReplyField.DATA, this.toDtoList(baseMapper.selectList(allQueryWrapper), RoleDto.class));
+            return resultMap;
         }
 
         Page<Role> rolePage = new Page<>(roleDto.getPage(), roleDto.getSize());
@@ -88,11 +89,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             dto.setMenus(menuDtos);
         }
 
-        response.data(Constants.ReplyField.DATA, roleDtos);
-        response.data(Constants.ReplyField.TOTAL, rolePage.getTotal());
-        response.data(Constants.ReplyField.PAGE, roleDto.getPage());
-        response.data(Constants.ReplyField.SIZE, roleDto.getSize());
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, roleDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, rolePage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, roleDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, roleDto.getSize());
+        return resultMap;
     }
 
     /**
@@ -102,21 +103,21 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response addRole(RoleDto roleDto) throws Exception{
+    public Boolean addRole(RoleDto roleDto) throws Exception{
         // 校验角色是否已经存在
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Role.ROLE_NAME, roleDto.getRoleName());
         List<Role> roles = baseMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(roles)) {
             LOGGER.error("addRole failed, role already exist in db, role:{}", roleDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
         Role role = this.toDb(roleDto, Role.class);
         if (baseMapper.insert(role) < 1) {
             LOGGER.error("addRole failed by unknown error, role:{}", role);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -126,14 +127,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response delRole(Set<String> ids) {
+    public Boolean delRole(Set<String> ids) {
         // 如果角色已经绑定了用户，那么不删除该角色
         List<String> delFailedRoleNames = new ArrayList<>();
         List<String> delSuccessedRoleIds = new ArrayList<>();
         for (String id : ids) {
             Role deleteRole = baseMapper.selectById(id);
             if (!validRoleLevel(deleteRole.getLevel(), deleteRole.getRoleName())) {
-                return Response.error();
+                return false;
             }
             List<String> adminIdsByRoleId = baseMapper.getAdminIdsByRoleId(id);
             if (!CollectionUtils.isEmpty(adminIdsByRoleId)) {
@@ -144,7 +145,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             }
             if (baseMapper.deleteById(id) < 1) {
                 LOGGER.error("delRole failed by unknown error, roleId:{}", id);
-                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+                return false;
             }
             delSuccessedRoleIds.add(id);
         }
@@ -154,9 +155,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             roleAdminMapper.delete(roleMenuQueryWrapper);
         }
         if (CollectionUtils.isEmpty(delFailedRoleNames)) {
-            return Response.ok();
+            return true;
         }
-        return Response.error().message(delFailedRoleNames.toString() + "已绑定用户, 未删除成功");
+        throw new BusinessException(delFailedRoleNames.toString() + "已绑定用户, 未删除成功");
     }
 
     /**
@@ -166,10 +167,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response editRole(RoleDto roleDto) throws Exception{
+    public Boolean editRole(RoleDto roleDto) throws Exception{
         Role dbRole = baseMapper.selectById(roleDto.getId());
         if (!validRoleLevel(dbRole.getLevel(), dbRole.getRoleName())) {
-            return Response.error();
+            return false;
         }
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Role.ROLE_NAME, roleDto.getRoleName());
@@ -177,16 +178,16 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         if (roles.size() > 0) {
             for (Role role : roles) {
                 if (!Objects.equals(role.getId(), roleDto.getId())) {
-                    return Response.error().message("更新失败, 已存在相同名称的角色");
+                    throw new BusinessException("更新失败, 已存在相同名称的角色");
                 }
             }
         }
         Role role = this.toDb(roleDto, Role.class);
         if (baseMapper.updateById(role) < 1) {
             LOGGER.error("editRole failed by unknown error, role:{}", role);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -196,10 +197,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response updateMenu(RoleDto roleDto) throws Exception{
+    public Boolean updateMenu(RoleDto roleDto) throws Exception{
         Role dbRole = baseMapper.selectById(roleDto.getId());
         if (!validRoleLevel(dbRole.getLevel(), dbRole.getRoleName())) {
-            return Response.error();
+            return false;
         }
 
         // 先删掉该角色绑定的所有菜单的信息
@@ -214,10 +215,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         for (RoleMenu roleMenu : roleMenus) {
             if (roleMenuMapper.insert(roleMenu) < 1) {
                 LOGGER.error("updateMenu failed by unknown error, role:{}, roleMenus:{}", roleDto, roleMenu);
-                return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+                return false;
             }
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -226,10 +227,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return
      */
     @Override
-    public Response getRoleById(Role role) throws Exception{
+    public RoleDto getRoleById(Role role) throws Exception{
         RoleDto roleDto = this.toDto(role, RoleDto.class);
         roleDto.setMenus(baseMapper.selectRoleMenu(roleDto.getId()));
-        return Response.ok().data(Constants.ReplyField.DATA, roleDto);
+        return roleDto;
     }
 
     private RoleMenu toRoleMenu(String menuId, String roleId) {

@@ -34,26 +34,26 @@ import org.springframework.util.CollectionUtils;
 public class WebConfigServiceImpl extends ServiceImpl<WebConfigMapper, WebConfig> implements WebConfigService {
 
     @Override
-    public Response getWebConfig() throws Exception {
+    public WebConfigDto getWebConfig() throws Exception {
         WebConfig webConfig = baseMapper.selectOne(null);
         if (Objects.isNull(webConfig)) {
-            return Response.ok();
+            return new WebConfigDto();
         }
         WebConfigDto webConfigDto = this.toDto(webConfig, WebConfigDto.class);
         String rollingSentences = webConfig.getRollingSentences();
         if (StringUtils.isNotBlank(rollingSentences)) {
             webConfigDto.setRollingSentences(Arrays.asList(rollingSentences.split(Symbol.COMMA7)));
         }
-        return Response.ok().data(ReplyField.DATA, webConfigDto);
+        return webConfigDto;
     }
 
     @Override
-    public Response editWebConfig(WebConfigDto webConfigDto) throws Exception{
+    public Boolean editWebConfig(WebConfigDto webConfigDto) throws Exception{
         if (BooleanUtil.isTrue(webConfigDto.getDeleteSentence())) {
             WebConfig webConfig = baseMapper.selectById(webConfigDto.getId());
             if (Objects.isNull(webConfig)) {
                 log.error("cannot find webConfig by id:{}", webConfigDto.getId());
-                return Response.error();
+                return false;
             }
             String[] split = webConfig.getRollingSentences().split(Symbol.COMMA7);
             String newSentences = Arrays.stream(split)
@@ -63,10 +63,10 @@ public class WebConfigServiceImpl extends ServiceImpl<WebConfigMapper, WebConfig
             if (baseMapper.updateById(webConfig) < 1) {
                 if (baseMapper.insert(webConfig) < 1) {
                     log.error("editWebConfig failed by unknown error, webConfig:{}", webConfig);
-                    return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+                    return false;
                 }
             }
-            return Response.ok();
+            return true;
         }
         WebConfig webConfig = this.toDb(webConfigDto, WebConfig.class);
         if (!CollectionUtils.isEmpty(webConfigDto.getRollingSentences())) {
@@ -75,10 +75,10 @@ public class WebConfigServiceImpl extends ServiceImpl<WebConfigMapper, WebConfig
         if (baseMapper.updateById(webConfig) < 1) {
             if (baseMapper.insert(webConfig) < 1) {
                 log.error("editWebConfig failed by unknown error, webConfig:{}", webConfig);
-                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+                return false;
             }
 
         }
-        return Response.ok();
+        return true;
     }
 }

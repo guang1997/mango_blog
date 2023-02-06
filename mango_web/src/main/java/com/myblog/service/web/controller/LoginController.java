@@ -1,9 +1,7 @@
 package com.myblog.service.web.controller;
 
-import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.base.common.*;
 import com.myblog.service.security.annotation.LogByMethod;
-import com.myblog.service.base.common.Constants;
-import com.myblog.service.base.common.Response;
 import com.myblog.service.security.service.VerificationCodeService;
 import com.myblog.service.web.entity.dto.UserDto;
 import com.myblog.service.web.service.UserService;
@@ -40,12 +38,15 @@ public class LoginController {
     @LogByMethod(value = "/web/login/sendCode")
     @ApiOperation(value = "发送验证码", notes = "发送验证码", response = Response.class)
     @PostMapping("/sendCode")
-    public Response sendCode(@RequestBody UserDto userDto) {
+    public ResultModel<Object> sendCode(@RequestBody UserDto userDto) {
         if (StringUtils.isBlank(userDto.getEmail())) {
             log.error("sendCode failed, email:[{}] cannot be null", userDto.getEmail());
-            return Response.error().message("邮箱不能为空");
+            return ResultModel.error().message("邮箱不能为空");
         }
-        return verificationCodeService.sendCode(userDto.getEmail(), Constants.EmailSource.WEB);
+        if (verificationCodeService.sendCode(userDto.getEmail(), Constants.EmailSource.ADMIN)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.SEND_CODE_FAILED);
     }
 
     @LogByMethod(value = "/web/login/doLogin", behavior = BehaviorEnum.LOGIN)

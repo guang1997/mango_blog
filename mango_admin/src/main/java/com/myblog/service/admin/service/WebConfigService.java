@@ -15,7 +15,7 @@ import com.myblog.service.base.handler.ServiceConvertHandler;
  * @since 2023-01-30
  */
 public interface WebConfigService extends IService<WebConfig>, ServiceConvertHandler<WebConfig, WebConfigDto> {
-    Response getWebConfig() throws Exception;
+    WebConfigDto getWebConfig() throws Exception;
 
-    Response editWebConfig(WebConfigDto webConfigDto) throws Exception;
+    Boolean editWebConfig(WebConfigDto webConfigDto) throws Exception;
 }

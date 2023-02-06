@@ -5,6 +5,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.security.entity.Menu;
 import com.myblog.service.security.entity.Role;
@@ -16,9 +17,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -129,7 +132,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @return
      */
     @Override
-    public Response addMenu(MenuDto menuDto) throws Exception {
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean addMenu(MenuDto menuDto) throws Exception {
         // 校验菜单是否已经存在
         QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
@@ -142,7 +146,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         List<Menu> menus = baseMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(menus)) {
             LOGGER.error("addMenu failed, menu already exist in db, menu:{}", menuDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
         if (StringUtils.isBlank(menuDto.getName())) {
             menuDto.setName(menuDto.getTitle());
@@ -154,23 +158,23 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (baseMapper.updateByTitle(menu) < 1) {
             if (baseMapper.insert(menu) < 1) {
                 LOGGER.error("addMenu failed by unknown error, menu:{}", menu);
-                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+                return false;
             }
         }
 
-        // 更新父菜单subCount
         if (Objects.equals("0", menu.getPid())) {
-            return Response.ok();
+            return true;
         }
+        // 更新父菜单subCount
         QueryWrapper<Menu> countWrapper = new QueryWrapper<>();
         countWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         countWrapper.eq(DbConstants.Base.PID, menu.getPid());
         Integer subCount = baseMapper.selectCount(countWrapper);
         if (baseMapper.updateSubCount(menu.getPid(), ++subCount) < 1) {
             LOGGER.error("addMenu failed by updateSubCount, menu:{}", menu);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            throw new BusinessException("保存失败，更新子菜单数目失败");
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -180,14 +184,14 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @return
      */
     @Override
-    public Response editMenu(MenuDto menuDto) throws Exception {
+    public Boolean editMenu(MenuDto menuDto) throws Exception {
         QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Base.PID, menuDto.getPid());
         List<Menu> menus = baseMapper.selectList(queryWrapper);
         if (menus.size() > 0) {
             for (Menu menu : menus) {
                 if (Objects.equals(menu.getTitle(), menuDto.getTitle()) && !Objects.equals(menu.getId(), menuDto.getId())) {
-                    return Response.error().message("更新失败, 该父菜单下已存在相同名称的菜单");
+                    throw new BusinessException("更新失败, 该父菜单下已存在相同名称的菜单");
                 }
             }
         }
@@ -196,7 +200,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         Menu menu = this.toDb(menuDto, Menu.class);
         if (baseMapper.updateById(menu) < 1) {
             LOGGER.error("editMenu failed, menu:{}", menu);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
 
         if (!Objects.equals(oldMenu.getPid(), menu.getPid())) {
@@ -205,7 +209,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             baseMapper.updateSubCount(oldParentMenu.getId(), oldParentMenu.getSubCount() - 1);
             baseMapper.updateSubCount(newParentMenu.getId(), newParentMenu.getSubCount() + 1);
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -215,14 +219,24 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @return
      */
     @Override
-    public Response delMenu(List<String> ids) throws Exception {
-        if (baseMapper.deleteBatchIds(ids) < 1) {
+    public Boolean delMenu(List<String> ids) throws Exception {
+        QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(DbConstants.Base.ID, ids);
+        List<Menu> delMenus = baseMapper.selectList(queryWrapper);
+        List<MenuDto> delMenuDtos = this.toDtoList(delMenus, MenuDto.class);
+        // 找到子菜单
+        Set<MenuDto> dtos = new HashSet<>();
+        Set<MenuDto> children = getChildren(delMenuDtos, dtos);
+        List<String> delIds = children.stream()
+                .map(MenuDto::getId)
+                .collect(Collectors.toList());
+        if (baseMapper.deleteBatchIds(delIds) < 1) {
             LOGGER.error("delMenu failed by unknown error, ids:{}", ids);
-            return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+            return false;
         }
         // 清除角色和菜单中间表
         baseMapper.batchDeleteRoleMenuByMenuId(ids);
-        return Response.ok();
+        return true;
     }
 
     @Override

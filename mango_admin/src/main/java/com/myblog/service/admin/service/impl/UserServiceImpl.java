@@ -21,9 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>
@@ -38,13 +36,8 @@ import java.util.Objects;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     @Override
-    public Response getUserByPage(UserDto userDto) throws Exception {
-        Response response = Response.ok();
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(userDto.getPage())) page = userDto.getPage();
-        if (Objects.nonNull(userDto.getSize())) size = userDto.getSize();
-        Page<User> userPage = new Page<>(page, size);
+    public Map<String, Object> getUserByPage(UserDto userDto) throws Exception {
+        Page<User> userPage = new Page<>(userDto.getPage(), userDto.getSize());
 
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(userDto.getBlurry())) {
@@ -61,17 +54,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             queryWrapper.between(DbConstants.Admin.LAST_LOGIN_TIME, beginDate, endDate);
         }
         baseMapper.selectPage(userPage, queryWrapper);
+        Map<String, Object> resultMap = new HashMap<>();
         List<UserDto> userDtos = this.toDtoList(userPage.getRecords(), UserDto.class);
 
-        response.data(Constants.ReplyField.DATA, userDtos);
-        response.data(Constants.ReplyField.TOTAL, userPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, userDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, userPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, userDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, userDto.getSize());
+        return resultMap;
     }
 
     @Override
-    public Response editUser(UserDto userDto) {
+    public Boolean editUser(UserDto userDto) {
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq(DbConstants.User.EMAIL, userDto.getEmail());
         updateWrapper.eq(DbConstants.User.USERNAME, userDto.getUsername());
@@ -80,8 +74,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setCommentStatus(userDto.getCommentStatus());
         if (baseMapper.update(user, updateWrapper) < 1) {
             log.error("editUser failed by unknown error, user:{}", userDto);
-            return Response.error();
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 }

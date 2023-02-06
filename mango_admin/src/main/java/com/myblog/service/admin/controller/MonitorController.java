@@ -1,11 +1,14 @@
 package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.service.MonitorService;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -26,7 +29,7 @@ public class MonitorController {
     @LogByMethod("/admin/monitor/getServers")
     @ApiOperation(value = "查询系统信息", notes = "查询系统信息", response = Response.class)
     @GetMapping("/getServers")
-    public Response getServers() throws Exception {
-        return monitorService.getServers();
+    public ResultModel<Map<String, Object>> getServers() throws Exception {
+        return ResultModel.ok(monitorService.getServers());
     }
 }

@@ -30,11 +30,11 @@ public interface MenuService extends IService<Menu>, ServiceConvertHandler<Menu,
 
     List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos) throws Exception;
 
-    Response addMenu(MenuDto menuDto) throws Exception;
+    Boolean addMenu(MenuDto menuDto) throws Exception;
 
-    Response editMenu(MenuDto menuDto) throws Exception;
+    Boolean editMenu(MenuDto menuDto) throws Exception;
 
-    Response delMenu(List<String> ids) throws Exception;
+    Boolean delMenu(List<String> ids) throws Exception;
 
     Set<MenuDto> getChildren(List<MenuDto> childrenList, Set<MenuDto> menuDtos) throws Exception;
 }

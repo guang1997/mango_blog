@@ -8,6 +8,7 @@ import com.myblog.service.admin.entity.dto.LinkDto;
 import com.myblog.service.admin.mapper.LinkMapper;
 import com.myblog.service.admin.service.LinkService;
 import com.myblog.service.base.common.*;
+import com.myblog.service.base.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,9 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -38,18 +37,8 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
      * @return
      */
     @Override
-    public Response getLinkByPage(LinkDto linkDto) throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getLinkByPage(LinkDto linkDto) throws Exception {
         QueryWrapper<Link> queryWrapper = new QueryWrapper<>();
-
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(linkDto.getPage())) {
-            page = linkDto.getPage();
-        }
-        if (Objects.nonNull(linkDto.getSize())) {
-            size = linkDto.getSize();
-        }
 
         if (StringUtils.isNotBlank(linkDto.getBlurry())) {
             queryWrapper.like(DbConstants.Link.TITLE, linkDto.getBlurry())
@@ -63,63 +52,64 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
             queryWrapper.eq(DbConstants.Link.LINK_STATUS, linkDto.getLinkStatus());
         }
         queryWrapper.orderByDesc(DbConstants.Base.UPDATE_TIME);
-        Page<Link> linkPage = new Page<>(page, size);
+        Page<Link> linkPage = new Page<>(linkDto.getPage(), linkDto.getSize());
         baseMapper.selectPage(linkPage, queryWrapper);
+        Map<String, Object> resultMap = new HashMap<>();
         List<LinkDto> dictDtos = this.toDtoList(linkPage.getRecords(), LinkDto.class);
-        response.data(Constants.ReplyField.DATA, dictDtos);
-        response.data(Constants.ReplyField.TOTAL, linkPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, dictDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, linkPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, linkDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, linkDto.getSize());
+        return resultMap;
     }
 
     @Override
-    public Response addLink(@Validated LinkDto linkDto) throws Exception{
+    public Boolean addLink(@Validated LinkDto linkDto) throws Exception{
         QueryWrapper<Link> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Link.URL, linkDto.getUrl());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
             log.error("addLink failed, url is already exist, link:{}", linkDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
         Link link = this.toDb(linkDto, Link.class);
         // 添加时设置为申请中状态
         link.setLinkStatus(LinkStatusEnum.APPLY.getCode());
         if (baseMapper.insert(link) < 1) {
             log.error("addLink failed by unknown error, link:{}", link);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     @Override
-    public Response editLink(LinkDto linkDto) throws Exception{
+    public Boolean editLink(LinkDto linkDto) throws Exception{
         QueryWrapper<Link> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Link.URL, linkDto.getUrl());
         List<Link> links = baseMapper.selectList(queryWrapper);
         if (links.size() > 0) {
             for (Link link : links) {
                 if (!Objects.equals(link.getId(), linkDto.getId())) {
-                    return Response.error().message("更新失败, 已存在相同路径的友链");
+                    throw new BusinessException("更新失败, 已存在相同路径的友链");
                 }
             }
         }
         Link link = this.toDb(linkDto, Link.class);
         if (baseMapper.updateById(link) < 1) {
             log.error("editLink failed by unknown error, link:{}", link);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     @Override
-    public Response delLink(Set<String> ids) throws Exception{
+    public Boolean delLink(Set<String> ids) throws Exception{
         for (String id : ids) {
             if (baseMapper.deleteById(id) < 1) {
                 log.error("delLink failed by unknown error, linkId:{}", id);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+                return false;
             }
         }
-        return Response.ok();
+        return true;
     }
 
 }

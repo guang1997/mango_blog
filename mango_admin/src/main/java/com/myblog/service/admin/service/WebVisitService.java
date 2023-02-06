@@ -19,9 +19,9 @@ import com.myblog.service.security.entity.dto.WebVisitDto;
  */
 public interface WebVisitService extends IService<WebVisit>, ServiceConvertHandler<WebVisit, WebVisitDto> {
 
-    Response getWebVisitByPage(WebVisitDto webVisitDto) throws Exception;
+    Map<String, Object> getWebVisitByPage(WebVisitDto webVisitDto) throws Exception;
 
-    Response delWebVisit(Set<String> ids);
+    Boolean delWebVisit(Set<String> ids);
 
     int getWebVisitCount();
 

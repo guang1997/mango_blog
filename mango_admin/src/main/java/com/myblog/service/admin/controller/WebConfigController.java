@@ -10,6 +10,8 @@ import com.myblog.service.admin.service.WebConfigService;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Constants.ReplyField;
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -42,15 +44,18 @@ public class WebConfigController {
     @LogByMethod("/admin/webConfig/getWebConfig")
     @ApiOperation(value = "查询网站配置信息", notes = "查询网站配置信息", response = Response.class)
     @PostMapping("/getWebConfig")
-    public Response getWebConfig() throws Exception {
-        return webConfigService.getWebConfig();
+    public ResultModel<WebConfigDto> getWebConfig() throws Exception {
+        return ResultModel.ok(webConfigService.getWebConfig());
     }
 
     @LogByMethod("/admin/webConfig/editWebConfig")
     @ApiOperation(value = "修改网站配置信息", notes = "修改网站配置信息", response = Response.class)
     @PostMapping("/editWebConfig")
-    public Response editWebConfig(@RequestBody WebConfigDto webConfigDto) throws Exception {
-        return webConfigService.editWebConfig(webConfigDto);
+    public ResultModel<Object> editWebConfig(@RequestBody WebConfigDto webConfigDto) throws Exception {
+        if (webConfigService.editWebConfig(webConfigDto)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.UPDATE_FAILED);
     }
 }
 

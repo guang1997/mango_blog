@@ -1,6 +1,7 @@
 package com.myblog.service.admin.service;
 
 import java.text.ParseException;
+import java.util.Map;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -20,6 +21,6 @@ import com.myblog.service.security.entity.dto.ExceptionLogDto;
 public interface ExceptionLogService extends IService<ExceptionLog>,
     ServiceConvertHandler<ExceptionLog, ExceptionLogDto> {
 
-    Response getExceptionByPage(ExceptionLogDto exceptionLogDto) throws Exception;
+    Map<String, Object> getExceptionByPage(ExceptionLogDto exceptionLogDto) throws Exception;
 
 }

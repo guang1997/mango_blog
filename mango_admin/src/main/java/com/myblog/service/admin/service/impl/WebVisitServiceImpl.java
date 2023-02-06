@@ -44,14 +44,8 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
     private Integer radarMaxValue;
 
     @Override
-    public Response getWebVisitByPage(WebVisitDto webVisitDto) throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getWebVisitByPage(WebVisitDto webVisitDto) throws Exception {
         QueryWrapper<WebVisit> queryWrapper = new QueryWrapper<>();
-
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(webVisitDto.getPage())) page = webVisitDto.getPage();
-        if (Objects.nonNull(webVisitDto.getSize())) size = webVisitDto.getSize();
 
         if (!CollectionUtils.isEmpty(webVisitDto.getCreateTimes()) && Objects.equals(2, webVisitDto.getCreateTimes().size())) {
             Date beginDate = ThreadSafeDateFormat.parse(webVisitDto.getCreateTimes().get(0), ThreadSafeDateFormat.DATETIME);
@@ -62,25 +56,26 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
             queryWrapper.like(DbConstants.WebVisit.BEHAVIOR, webVisitDto.getBehavior());
         }
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
-        Page<WebVisit> webVisitPage = new Page<>(page, size);
+        Page<WebVisit> webVisitPage = new Page<>(webVisitDto.getPage(), webVisitDto.getSize());
         baseMapper.selectPage(webVisitPage, queryWrapper);
+        Map<String, Object> resultMap = new HashMap<>();
         List<WebVisitDto> tagDtos = this.toDtoList(webVisitPage.getRecords(), WebVisitDto.class);
-        response.data(Constants.ReplyField.DATA, tagDtos);
-        response.data(Constants.ReplyField.TOTAL, webVisitPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, tagDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, webVisitPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, webVisitDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, webVisitDto.getSize());
+        return resultMap;
     }
 
     @Override
-    public Response delWebVisit(Set<String> ids) {
+    public Boolean delWebVisit(Set<String> ids) {
         for (String id : ids) {
             if (baseMapper.deleteById(id) < 1) {
                 log.error("delWebVisit failed by unknown error, webVisitId:{}", id);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+                return false;
             }
         }
-        return Response.ok();
+        return true;
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.myblog.service.security.entity.dto.MenuDto;
 import com.myblog.service.security.entity.dto.RoleDto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,17 +23,17 @@ public interface RoleService extends IService<Role>, ServiceConvertHandler<Role,
 
     List<Role> getRolesByUserId(String userId) ;
 
-    Response getRoleByPage(RoleDto roleDto) throws Exception;
+    Map<String, Object> getRoleByPage(RoleDto roleDto) throws Exception;
 
-    Response addRole(RoleDto roleDto) throws Exception;
+    Boolean addRole(RoleDto roleDto) throws Exception;
 
-    Response delRole(Set<String> ids) throws Exception;
+    Boolean delRole(Set<String> ids) throws Exception;
 
-    Response editRole(RoleDto roleDto) throws Exception;
+    Boolean editRole(RoleDto roleDto) throws Exception;
 
-    Response updateMenu(RoleDto roleDto) throws Exception;
+    Boolean updateMenu(RoleDto roleDto) throws Exception;
 
-    Response getRoleById(Role role) throws Exception;
+    RoleDto getRoleById(Role role) throws Exception;
 
     Boolean validRoleLevelByUserId(String userId);
 

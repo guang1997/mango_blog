@@ -7,6 +7,8 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.security.entity.dto.AdminDto;
 
+import java.util.Map;
+
 /**
  * <p>
  * 用户表 服务类
@@ -17,7 +19,7 @@ import com.myblog.service.security.entity.dto.AdminDto;
  */
 public interface UserService extends IService<User>, ServiceConvertHandler<User, UserDto> {
 
-    Response getUserByPage(UserDto userDto) throws Exception;
+    Map<String, Object> getUserByPage(UserDto userDto) throws Exception;
 
-    Response editUser(UserDto userDto);
+    Boolean editUser(UserDto userDto);
 }

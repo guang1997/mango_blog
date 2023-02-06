@@ -5,9 +5,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface OssService {
-    Response upload(MultipartFile file, String moduleName) throws Exception;
+    Map<String, Object> upload(MultipartFile file, String moduleName) throws Exception;
 
     Response delete(String url);
 

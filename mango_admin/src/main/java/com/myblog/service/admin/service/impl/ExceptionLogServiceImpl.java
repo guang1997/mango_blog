@@ -1,10 +1,7 @@
 package com.myblog.service.admin.service.impl;
 
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -33,31 +30,22 @@ import org.springframework.util.CollectionUtils;
 public class ExceptionLogServiceImpl extends ServiceImpl<ExceptionLogMapper, ExceptionLog> implements ExceptionLogService {
 
     @Override
-    public Response getExceptionByPage(ExceptionLogDto exceptionLogDto) throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getExceptionByPage(ExceptionLogDto exceptionLogDto) throws Exception {
         QueryWrapper<ExceptionLog> queryWrapper = new QueryWrapper<>();
-
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(exceptionLogDto.getPage())) {
-            page = exceptionLogDto.getPage();
-        }
-        if (Objects.nonNull(exceptionLogDto.getSize())) {
-            size = exceptionLogDto.getSize();
-        }
         if (!CollectionUtils.isEmpty(exceptionLogDto.getCreateTimes()) && Objects.equals(2, exceptionLogDto.getCreateTimes().size())) {
             Date beginDate = ThreadSafeDateFormat.parse(exceptionLogDto.getCreateTimes().get(0), ThreadSafeDateFormat.DATETIME);
             Date endDate = ThreadSafeDateFormat.parse(exceptionLogDto.getCreateTimes().get(1), ThreadSafeDateFormat.DATETIME);
             queryWrapper.between(DbConstants.Base.CREATE_TIME, beginDate, endDate);
         }
         queryWrapper.orderByDesc(Base.CREATE_TIME);
-        Page<ExceptionLog> exceptionLogPage = new Page<>(page, size);
+        Page<ExceptionLog> exceptionLogPage = new Page<>(exceptionLogDto.getPage(), exceptionLogDto.getSize());
         baseMapper.selectPage(exceptionLogPage, queryWrapper);
         List<ExceptionLogDto> exceptionLogDtos = this.toDtoList(exceptionLogPage.getRecords(), ExceptionLogDto.class);
-        response.data(Constants.ReplyField.DATA, exceptionLogDtos);
-        response.data(Constants.ReplyField.TOTAL, exceptionLogPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put(Constants.ReplyField.DATA, exceptionLogDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, exceptionLogPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, exceptionLogDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, exceptionLogDto.getSize());
+        return resultMap;
     }
 }

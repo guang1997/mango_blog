@@ -1,10 +1,12 @@
 package com.myblog.service.admin.controller;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.myblog.service.admin.service.ExceptionLogService;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.security.entity.dto.ExceptionLogDto;
 import io.swagger.annotations.ApiOperation;
@@ -35,18 +37,18 @@ public class ExceptionLogController {
     @LogByMethod(value = "/admin/exceptionLog/getExceptionByPage", printResponse = false)
     @ApiOperation(value = "分页查询报错信息", notes = "分页查询报错信息", response = Response.class)
     @PostMapping("/getExceptionByPage")
-    public Response getExceptionByPage(@RequestBody ExceptionLogDto exceptionLogDto) throws Exception {
-        return exceptionLogService.getExceptionByPage(exceptionLogDto);
+    public ResultModel<Map<String, Object>> getExceptionByPage(@RequestBody ExceptionLogDto exceptionLogDto) throws Exception {
+        return ResultModel.ok(exceptionLogService.getExceptionByPage(exceptionLogDto));
     }
 
     @LogByMethod("/admin/exceptionLog/delExceptionLog")
     @ApiOperation(value = "删除报错信息", notes = "删除报错信息", response = Response.class)
     @DeleteMapping("/delExceptionLog")
-    public Response delExceptionLog(@RequestBody Set<String> ids) {
+    public ResultModel<Object> delExceptionLog(@RequestBody Set<String> ids) {
         if (exceptionLogService.removeByIds(ids)) {
-            return Response.ok();
+            return ResultModel.ok();
         }
-        return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+        return ResultModel.setResult(ResultCodeEnum.DELETE_FAILED);
     }
 }
 

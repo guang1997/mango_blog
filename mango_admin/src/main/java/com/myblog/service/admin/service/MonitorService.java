@@ -3,6 +3,8 @@ package com.myblog.service.admin.service;
 
 import com.myblog.service.base.common.Response;
 
+import java.util.Map;
+
 /**
  * <p>
  * 监控页面 服务类
@@ -13,5 +15,5 @@ import com.myblog.service.base.common.Response;
  */
 public interface MonitorService {
 
-    Response getServers();
+    Map<String, Object> getServers();
 }

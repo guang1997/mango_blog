@@ -1,6 +1,7 @@
 package com.myblog.service.admin.controller;
 
 
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -37,48 +39,60 @@ public class RoleController {
     @LogByMethod("/admin/role/getRoleByPage")
     @ApiOperation(value = "分页查询角色", notes = "分页查询角色", response = Response.class)
     @PostMapping("/getRoleByPage")
-    public Response getRoleByPage(@RequestBody RoleDto roleDto) throws Exception {
-        return roleService.getRoleByPage(roleDto);
+    public ResultModel<Map<String, Object>> getRoleByPage(@RequestBody RoleDto roleDto) throws Exception {
+        return ResultModel.ok(roleService.getRoleByPage(roleDto));
     }
 
     @LogByMethod("/admin/role/getRoleById")
     @ApiOperation(value = "根据id获取角色信息", notes = "根据id获取角色信息", response = Response.class)
     @GetMapping("/getRoleById")
-    public Response getRoleById(String id) throws Exception {
+    public ResultModel<RoleDto> getRoleById(String id) throws Exception {
         Role role = roleService.getById(id);
-        return roleService.getRoleById(role);
+        return ResultModel.ok(roleService.getRoleById(role));
     }
 
     @LogByMethod(value = "/admin/role/addRole", validate = true)
     @ApiOperation(value = "新增角色", notes = "新增角色", response = Response.class)
     @PostMapping("/addRole")
-    public Response addRole(@RequestBody RoleDto roleDto) throws Exception {
-        return roleService.addRole(roleDto);
+    public ResultModel<Object> addRole(@RequestBody RoleDto roleDto) throws Exception {
+        if (roleService.addRole(roleDto)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.SAVE_FAILED);
     }
 
     @LogByMethod(value = "/admin/role/editRole", validate = true)
     @ApiOperation(value = "修改角色", notes = "修改角色", response = Response.class)
     @PutMapping("/editRole")
-    public Response editRole(@RequestBody RoleDto roleDto) throws Exception {
-        return roleService.editRole(roleDto);
+    public ResultModel<Object> editRole(@RequestBody RoleDto roleDto) throws Exception {
+        if (roleService.editRole(roleDto)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.UPDATE_FAILED);
     }
 
     @LogByMethod("/admin/role/delRole")
     @ApiOperation(value = "删除角色", notes = "删除角色", response = Response.class)
     @DeleteMapping("/delRole")
-    public Response delRole(@RequestBody Set<String> ids) throws Exception {
-        return roleService.delRole(ids);
+    public ResultModel<Object> delRole(@RequestBody Set<String> ids) throws Exception {
+        if (roleService.delRole(ids)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.DELETE_FAILED);
     }
 
     @LogByMethod("/admin/role/menu")
     @ApiOperation(value = "保存菜单", notes = "保存菜单", response = Response.class)
     @PostMapping("/menu")
-    public Response menu(@RequestBody RoleDto roleDto) throws Exception {
+    public ResultModel<Object> menu(@RequestBody RoleDto roleDto) throws Exception {
         if (StringUtils.isBlank(roleDto.getId())) {
             log.error("editMenu failed, roleId cannot be null, role:{}", roleDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return ResultModel.setResult(ResultCodeEnum.SAVE_FAILED);
         }
-        return roleService.updateMenu(roleDto);
+        if (roleService.updateMenu(roleDto)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.SAVE_FAILED);
     }
 }
 

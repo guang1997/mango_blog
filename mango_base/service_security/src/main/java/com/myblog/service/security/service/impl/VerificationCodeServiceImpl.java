@@ -14,6 +14,7 @@ import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.RedisConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.util.Base64Util;
 import com.myblog.service.base.util.RedisUtil;
 import com.myblog.service.base.util.TwoTuple;
@@ -51,7 +52,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
      * @return
      */
     @Override
-    public Response sendCode(String email, String source) {
+    public Boolean sendCode(String email, String source) {
 
         String key = RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + email + RedisConstants.DIVISION + source;
         String content = "";
@@ -74,7 +75,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         emailConfigQueryWrapper.eq(DbConstants.EmailConfig.SOURCE, source);
         EmailConfig emailConfig = emailConfigService.getOne(emailConfigQueryWrapper);
         if (Objects.isNull(emailConfig)) {
-            return Response.error().message("发送邮件失败，请联系管理员配置邮箱");
+            throw new BusinessException("发送邮件失败，请联系管理员配置邮箱");
         }
         MailAccount account = new MailAccount();
         // 设置用户
@@ -101,9 +102,9 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
             // 发送失败从redis中删除验证码
             redisUtil.delete(key);
             LOGGER.error("sendCode failed, exception:", e);
-            return Response.setResult(ResultCodeEnum.SEND_CODE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -133,7 +134,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
      * @return
      */
     @Override
-    public Response sendEmail(String email, String source, TwoTuple<String, Object> param) {
+    public Boolean sendEmail(String email, String source, TwoTuple<String, Object> param) {
         TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
         String templateUrl = "template/email/" + param.getFirst() + "Email.ftl";
         Template template = engine.getTemplate(templateUrl);
@@ -143,7 +144,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         emailConfigQueryWrapper.eq(DbConstants.EmailConfig.SOURCE, source);
         EmailConfig emailConfig = emailConfigService.getOne(emailConfigQueryWrapper);
         if (Objects.isNull(emailConfig)) {
-            return Response.error().message("发送邮件失败，请联系管理员配置邮箱");
+            throw new BusinessException("发送邮件失败，请联系管理员配置邮箱");
         }
         MailAccount account = new MailAccount();
         // 设置用户
@@ -168,8 +169,8 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
                     .send();
         } catch (MailException e) {
             LOGGER.error("sendEmail failed, exception:", e);
-            return Response.setResult(ResultCodeEnum.SEND_EMAIL_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 }
