@@ -6,6 +6,8 @@ import com.myblog.service.admin.entity.dto.BlogDto;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,17 +22,17 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
 
     int getBlogCount();
 
-    Response getBlogCountByTag();
+    List<Map<String, Object>> getBlogCountByTag();
 
-    Response getBlogCountByBlogSort();
+    List<Map<String, Object>> getBlogCountByBlogSort();
 
-    Response getBlogContributeCount() throws Exception;
+    Map<String, Object> getBlogContributeCount() throws Exception;
 
-    Response getBlogByPage(BlogDto blogDto) throws Exception;
+    Map<String, Object> getBlogByPage(BlogDto blogDto) throws Exception;
 
-    Response addBlog(BlogDto blogDto) throws Exception;
+    Boolean addBlog(BlogDto blogDto) throws Exception;
 
-    Response editBlog(BlogDto blogDto) throws Exception;
+    Boolean editBlog(BlogDto blogDto) throws Exception;
 
-    Response delBlog(Set<String> ids) throws Exception;
+    List<String> delBlog(Set<String> ids) throws Exception;
 }

@@ -1,14 +1,14 @@
 package com.myblog.service.security.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
-public class WebVisitDto extends BaseDto {
+public class WebVisitDto extends BaseReqDto {
     private String userId;
 
     private String ip;

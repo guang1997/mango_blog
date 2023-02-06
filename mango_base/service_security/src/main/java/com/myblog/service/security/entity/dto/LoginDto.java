@@ -1,6 +1,6 @@
 package com.myblog.service.security.entity.dto;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import com.myblog.service.security.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = "password")
-public class LoginDto extends BaseDto {
+public class LoginDto extends BaseReqDto {
 
     @NotNull(message = "用户名不能为空")
     private String username;

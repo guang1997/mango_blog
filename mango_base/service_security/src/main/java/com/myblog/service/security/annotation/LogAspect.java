@@ -2,8 +2,10 @@ package com.myblog.service.security.annotation;
 
 import com.myblog.service.base.common.BehaviorEnum;
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.ValidateUtil;
+import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.handler.ExceptionLogHandler;
 import com.myblog.service.security.handler.WebVisitLogHandler;
 import io.swagger.annotations.ApiOperation;
@@ -16,6 +18,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -41,6 +44,11 @@ public class LogAspect {
     @Autowired
     private ExceptionLogHandler exceptionLogHandler;
 
+    @Value("${request.defaultPageNo:1}")
+    private Integer defaultPageNo;
+
+    @Value("${request.defaultPageSize:10}")
+    private Integer defaultPageSize;
     /**
      * 配置切入点
      */
@@ -66,6 +74,8 @@ public class LogAspect {
             log.warn("signature:{} not instance of MethodSignature, methodName:{}", joinPoint.getSignature(), methodName);
             return joinPoint.proceed();
         }
+        // 设置默认分页参数
+        setExtraParam(joinPoint.getArgs());
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         // 配置了注解并且标识为校验入参的方法才进行入参校验
         LogByMethod logByMethod = methodSignature.getMethod().getAnnotation(LogByMethod.class);
@@ -108,6 +118,26 @@ public class LogAspect {
         return response;
     }
 
+    private static void setExtraParam(Object[] args) {
+        for (Object arg : args) {
+            if (arg instanceof BaseReqDto) {
+                BaseReqDto dtoArg = (BaseReqDto)arg;
+                if (Objects.isNull(dtoArg.getPage())) {
+                    dtoArg.setPage(1);
+                }
+                if (Objects.isNull(dtoArg.getSize())) {
+                    dtoArg.setSize(10);
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Object[] objects = new Object[2];
+        objects[0] = new Object();
+        objects[1] = new RoleDto();
+        setExtraParam(objects);
+    }
     private void saveExceptionMessage(String methodName, ProceedingJoinPoint joinPoint, String params, Exception e) {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (Objects.nonNull(requestAttributes)) {

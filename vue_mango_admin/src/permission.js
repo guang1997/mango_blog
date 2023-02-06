@@ -62,8 +62,8 @@ router.beforeEach(async(to, from, next) => {
 
 export const loadMenus = (next, to) => {
   getMenu().then(res => {
-    const sdata = JSON.parse(JSON.stringify(res.data.menu))
-    const rdata = JSON.parse(JSON.stringify(res.data.menu))
+    const sdata = JSON.parse(JSON.stringify(res.data))
+    const rdata = JSON.parse(JSON.stringify(res.data))
     const sidebarRoutes = filterAsyncRouter(sdata)
     const rewriteRoutes = filterAsyncRouter(rdata, false, true)
     rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })

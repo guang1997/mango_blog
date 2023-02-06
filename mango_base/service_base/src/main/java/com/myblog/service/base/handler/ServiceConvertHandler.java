@@ -1,13 +1,12 @@
 package com.myblog.service.base.handler;
 
 import com.myblog.service.base.entity.BaseEntity;
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import com.myblog.service.base.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 用于db和dto类的转换
@@ -16,7 +15,7 @@ import java.util.Objects;
  * @author 李斯特
  * 2022年4月4日
  */
-public interface ServiceConvertHandler<A extends BaseEntity, B extends BaseDto> {
+public interface ServiceConvertHandler<A extends BaseEntity, B extends BaseReqDto> {
 
     /**
      * db集合转换为dto集合

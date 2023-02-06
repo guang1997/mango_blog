@@ -1,8 +1,13 @@
 package com.myblog.service.admin.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.myblog.service.admin.service.BlogService;
 import com.myblog.service.admin.service.CommentService;
 import com.myblog.service.admin.service.WebVisitService;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
@@ -41,52 +46,52 @@ public class DashboardController {
     @LogByMethod("/admin/dashboard/init")
     @ApiOperation(value = "首页初始化数据", notes = "首页初始化数据", response = Response.class)
     @GetMapping("/init")
-    public Response init() throws Exception {
-        Response response = Response.ok();
+    public ResultModel<Map<String, Integer>> init() throws Exception {
         int commentCount = commentService.getCommentCount(Constants.CommentStatus.REVIEWED);
         int blogCount = blogService.getBlogCount();
         int webVisitCount = webVisitService.getWebVisitCount();
         int adminCount = adminService.getAdminCount();
 
-        response.data(Constants.ReplyField.COMMENT_COUNT, commentCount)
-                .data(Constants.ReplyField.BLOG_COUNT, blogCount)
-                .data(Constants.ReplyField.VISIT_COUNT, webVisitCount)
-                .data(Constants.ReplyField.USER_COUNT, adminCount);
-        return response;
+        Map<String, Integer> resultMap = new HashMap<>(4);
+        resultMap.put(Constants.ReplyField.COMMENT_COUNT, commentCount);
+        resultMap.put(Constants.ReplyField.BLOG_COUNT, blogCount);
+        resultMap.put(Constants.ReplyField.VISIT_COUNT, webVisitCount);
+        resultMap.put(Constants.ReplyField.USER_COUNT, adminCount);
+        return ResultModel.ok(resultMap);
     }
 
     @LogByMethod("/admin/dashboard/getVisitByWeek")
     @ApiOperation(value = "获取最近一周用户访问量", notes = "获取最近一周用户访问量", response = Response.class)
     @GetMapping("/getVisitByWeek")
-    public Response getVisitByWeek() throws Exception {
-        return webVisitService.getVisitByWeek();
+    public ResultModel<Map<String, Object>> getVisitByWeek() throws Exception {
+        return ResultModel.ok(webVisitService.getVisitByWeek());
     }
 
     @LogByMethod("/admin/dashboard/getBlogCountByTag")
     @ApiOperation(value = "获取每个标签下文章数目", notes = "获取每个标签下文章数目", response = Response.class)
     @GetMapping("/getBlogCountByTag")
-    public Response getBlogCountByTag() throws Exception {
-        return blogService.getBlogCountByTag();
+    public ResultModel<List<Map<String, Object>>> getBlogCountByTag() throws Exception {
+        return ResultModel.ok(blogService.getBlogCountByTag());
     }
 
     @LogByMethod("/admin/dashboard/getBlogCountByBlogSort")
     @ApiOperation(value = "获取每个分类下文章数目", notes = "获取每个分类下文章数目", response = Response.class)
     @GetMapping("/getBlogCountByBlogSort")
-    public Response getBlogCountByBlogSort() throws Exception {
-       return blogService.getBlogCountByBlogSort();
+    public ResultModel<List<Map<String, Object>>> getBlogCountByBlogSort() throws Exception {
+       return ResultModel.ok(blogService.getBlogCountByBlogSort());
     }
 
     @LogByMethod("/admin/dashboard/getBlogContributeCount")
     @ApiOperation(value = "获取一年内的文章贡献数", notes = "获取一年内的文章贡献度", response = Response.class)
     @RequestMapping(value = "/getBlogContributeCount", method = RequestMethod.GET)
-    public Response getBlogContributeCount() throws Exception{
-        return blogService.getBlogContributeCount();
+    public ResultModel<Map<String, Object>> getBlogContributeCount() throws Exception{
+        return ResultModel.ok(blogService.getBlogContributeCount());
     }
 
     @LogByMethod("/admin/dashboard/getWebVisitGroupByBehavior")
     @ApiOperation(value = "按月和天获取用户行为数据", notes = "按月和天获取用户行为数据", response = Response.class)
     @RequestMapping(value = "/getWebVisitGroupByBehavior", method = RequestMethod.GET)
-    public Response getWebVisitGroupByBehavior() throws Exception{
-        return webVisitService.getWebVisitGroupByBehavior();
+    public ResultModel<Map<String, Object>> getWebVisitGroupByBehavior() throws Exception{
+        return ResultModel.ok(webVisitService.getWebVisitGroupByBehavior());
     }
 }

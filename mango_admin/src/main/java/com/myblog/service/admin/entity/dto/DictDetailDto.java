@@ -1,12 +1,12 @@
 package com.myblog.service.admin.entity.dto;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
 @Data
-public class DictDetailDto extends BaseDto {
+public class DictDetailDto extends BaseReqDto {
     @NotNull(message = "字典id不能为空")
     private String dictId;
 

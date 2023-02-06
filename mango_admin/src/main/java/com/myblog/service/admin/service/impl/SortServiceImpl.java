@@ -13,6 +13,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -45,19 +47,15 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
      * @return
      */
     @Override
-    public Response getSortByPage(SortDto sortDto) throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getSortByPage(SortDto sortDto) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
         if (Objects.nonNull(sortDto.getQueryAll()) && sortDto.getQueryAll()) {
             List<SortDto> sortDtos = this.toDtoList(baseMapper.selectList(null), SortDto.class);
-            response.data(Constants.ReplyField.DATA, sortDtos);
-            return response;
+            resultMap.put(Constants.ReplyField.DATA, sortDtos);
+            return resultMap;
         }
         QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
-
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(sortDto.getPage())) page = sortDto.getPage();
-        if (Objects.nonNull(sortDto.getSize())) size = sortDto.getSize();
+        
         if (StringUtils.isNotBlank(sortDto.getSortName())) {
             queryWrapper.like(DbConstants.Sort.SORT_NAME, sortDto.getSortName());
         }
@@ -66,16 +64,16 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
             Date endDate = ThreadSafeDateFormat.parse(sortDto.getCreateTimes().get(1), ThreadSafeDateFormat.DATETIME);
             queryWrapper.between(DbConstants.Base.CREATE_TIME, beginDate, endDate);
         }
-        Page<Sort> sortPage = new Page<>(page, size);
+        Page<Sort> sortPage = new Page<>(sortDto.getPage(), sortDto.getSize());
 
         baseMapper.selectPage(sortPage, queryWrapper);
 
         List<SortDto> sortDtos = this.toDtoList(sortPage.getRecords(), SortDto.class);
-        response.data(Constants.ReplyField.DATA, sortDtos);
-        response.data(Constants.ReplyField.TOTAL, sortPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, sortDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, sortPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, sortDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, sortDto.getSize());
+        return resultMap;
     }
 
     /**
@@ -84,19 +82,19 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
      * @return
      */
     @Override
-    public Response addSort(SortDto sortDto) throws Exception{
+    public Boolean addSort(SortDto sortDto) throws Exception{
         QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Sort.SORT_NAME, sortDto.getSortName());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
             log.error("addSort failed, sortName is already exist, tag:{}", sortDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
         Sort sort = this.toDb(sortDto, Sort.class);
         if (baseMapper.insert(sort) < 1) {
             log.error("addSort failed by unknown error, sort:{}", sort);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -105,23 +103,23 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
      * @return
      */
     @Override
-    public Response editSort(SortDto sortDto) throws Exception{
+    public Boolean editSort(SortDto sortDto) throws Exception{
         QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Sort.SORT_NAME, sortDto.getSortName());
         List<Sort> sorts = baseMapper.selectList(queryWrapper);
         if (sorts.size() > 0) {
             for (Sort sort : sorts) {
                 if (!Objects.equals(sort.getId(), sortDto.getId())) {
-                    return Response.error().message("更新失败, 已存在相同名称的分类");
+                    throw new BusinessException("更新失败, 已存在相同名称的分类");
                 }
             }
         }
         Sort sort = this.toDb(sortDto, Sort.class);
         if (baseMapper.updateById(sort) < 1) {
             log.error("editSort failed by unknown error, sort:{}", sort);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -130,7 +128,8 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
      * @return
      */
     @Override
-    public Response delSorts(Set<String> ids) throws Exception{
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean delSorts(Set<String> ids) throws Exception{
         // 如果分类已经绑定了博客，那么不删除该分类
         List<String> delFailedSortNames = new ArrayList<>();
         for (String id : ids) {
@@ -145,13 +144,13 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
             }
             if (baseMapper.deleteById(id) < 1) {
                 log.error("delSorts failed by unknown error, sortId:{}", id);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+                return false;
             }
         }
         if (CollectionUtils.isEmpty(delFailedSortNames)) {
-            return Response.ok();
+            return true;
         }
-        return Response.error().message(delFailedSortNames.toString() + "已绑定博客, 未删除成功");
+        throw new BusinessException(delFailedSortNames + "已绑定博客, 未删除成功");
     }
 
 }

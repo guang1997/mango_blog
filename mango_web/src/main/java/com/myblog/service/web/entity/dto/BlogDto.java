@@ -1,6 +1,6 @@
 package com.myblog.service.web.entity.dto;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import com.myblog.service.web.entity.Comment;
 import com.myblog.service.web.entity.Sort;
 import com.myblog.service.web.entity.Tag;
@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @Data
-public class BlogDto extends BaseDto {
+public class BlogDto extends BaseReqDto {
 
     private String title;
 

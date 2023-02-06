@@ -1,13 +1,10 @@
 package com.myblog.service.web.entity.dto;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-import java.util.List;
-
 @Data
-public class SortDto extends BaseDto {
+public class SortDto extends BaseReqDto {
 
     private String sortName;
 

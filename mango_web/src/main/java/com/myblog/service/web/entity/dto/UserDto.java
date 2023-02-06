@@ -1,6 +1,6 @@
 package com.myblog.service.web.entity.dto;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 import lombok.ToString;
 
@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Data
 @ToString(exclude = "password")
-public class UserDto extends BaseDto {
+public class UserDto extends BaseReqDto {
 
     private String username;
 

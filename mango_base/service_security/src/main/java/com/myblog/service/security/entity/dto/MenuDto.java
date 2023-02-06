@@ -1,15 +1,14 @@
 package com.myblog.service.security.entity.dto;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 
 @Data
-public class MenuDto extends BaseDto {
+public class MenuDto extends BaseReqDto {
 
     private String pid;
 

@@ -6,14 +6,18 @@ import com.myblog.service.admin.entity.dto.BlogDto;
 import com.myblog.service.admin.service.BlogService;
 import com.myblog.service.admin.service.OssService;
 import com.myblog.service.base.common.Constants;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -42,34 +46,39 @@ public class BlogController {
     @LogByMethod("/admin/blog/getBlogByPage")
     @ApiOperation(value = "分页查询博客信息", notes = "分页查询博客信息", response = Response.class)
     @PostMapping("/getBlogByPage")
-    public Response getBlogByPage(@RequestBody BlogDto blogDto) throws Exception {
-        return blogService.getBlogByPage(blogDto);
+    public ResultModel<Map<String, Object>> getBlogByPage(@RequestBody BlogDto blogDto) throws Exception {
+        return ResultModel.ok(blogService.getBlogByPage(blogDto));
     }
 
     @LogByMethod(value = "/admin/role/addBlog", validate = true)
     @ApiOperation(value = "新增博客", notes = "新增博客", response = Response.class)
     @PostMapping("/addBlog")
-    public Response addBlog(@RequestBody BlogDto blogDto) throws Exception {
-        return blogService.addBlog(blogDto);
+    public ResultModel<Object> addBlog(@RequestBody @Validated BlogDto blogDto) throws Exception {
+        if (blogService.addBlog(blogDto)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.error();
     }
 
     @LogByMethod(value = "/admin/blog/editBlog", validate = true)
     @ApiOperation(value = "修改博客", notes = "修改博客", response = Response.class)
     @PutMapping("/editBlog")
-    public Response editBlog(@RequestBody BlogDto blogDto) throws Exception {
-        return blogService.editBlog(blogDto);
+    public ResultModel<Object> editBlog(@RequestBody @Validated BlogDto blogDto) throws Exception {
+        if (blogService.editBlog(blogDto)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.error();
     }
 
     @LogByMethod("/admin/blog/delBlog")
     @ApiOperation(value = "删除博客", notes = "删除博客", response = Response.class)
     @DeleteMapping("/delBlog")
-    public Response delBlog(@RequestBody Set<String> ids) throws Exception {
-        Response response = blogService.delBlog(ids);
-        if (response.getSuccess() && qiNiuYunOssProperties.getDeletePicture()) {
+    public ResultModel<Object> delBlog(@RequestBody Set<String> ids) throws Exception {
+        List<String> fileIdList = blogService.delBlog(ids);
+        if (!CollectionUtils.isEmpty(fileIdList) && qiNiuYunOssProperties.getDeletePicture()) {
             try {
                 // 博客删除成功后删除七牛云图片 TODO 目前只删除标题图片, 后续删除内容中的图片
-                List<String> urlList = (List<String>) response.getData().get(Constants.ReplyField.DELETED_FILE_LIST);
-                for (String url : urlList) {
+                for (String url : fileIdList) {
                     ossService.delete(url);
                 }
             } catch (Exception e) {
@@ -77,7 +86,7 @@ public class BlogController {
                 log.error("delBlog success but delete blog fileId failed, blogIds:{}", ids);
             }
         }
-        return response;
+        return ResultModel.ok();
     }
 }
 

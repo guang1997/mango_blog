@@ -1,14 +1,14 @@
 package com.myblog.service.admin.entity.dto;
 
 import com.myblog.service.admin.entity.Tag;
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-public class BlogDto extends BaseDto {
+public class BlogDto extends BaseReqDto {
 
     @NotNull(message = "博客标题不能为空")
     private String title;

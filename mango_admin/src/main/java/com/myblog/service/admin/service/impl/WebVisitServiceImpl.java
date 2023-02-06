@@ -17,6 +17,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import com.myblog.service.security.entity.WebVisit;
 import com.myblog.service.security.entity.dto.WebVisitDto;
@@ -92,8 +93,7 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
     }
 
     @Override
-    public Response getWebVisitGroupByBehavior() throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getWebVisitGroupByBehavior() throws Exception {
         // 当天结束日期
         String endTime = ThreadSafeDateFormat.getTodayEndTime();
         // 获取当月第一天的日期
@@ -151,10 +151,11 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
             menuBehaviorMap.put("max", radarMaxValue);
             menuBehaviorList.add(menuBehaviorMap);
         }
-        response.data(Constants.ReplyField.RADAR_INDICATOR, menuBehaviorList);
+        Map<String, Object> resultMap = new HashMap<>(2);
+        resultMap.put(Constants.ReplyField.RADAR_INDICATOR, menuBehaviorList);
         // [{value:[100,200,300,400,500], name:"2022-04-17"}, {value:[300,100,300,400,200], name:"2022-04-18"}]
-        response.data(Constants.ReplyField.RADAR_CHART_DATA, resultList);
-        return response;
+        resultMap.put(Constants.ReplyField.RADAR_CHART_DATA, resultList);
+        return resultMap;
     }
 
     /**
@@ -163,8 +164,7 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
      * @return
      */
     @Override
-    public Response getVisitByWeek() throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getVisitByWeek() throws Exception {
         // 当天结束日期
         String endTime = ThreadSafeDateFormat.getTodayEndTime();
 
@@ -187,8 +187,9 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
             }
             webVisitList.add(0);
         }
-        response.data(Constants.ReplyField.DATE, betweenDates)
-                .data(Constants.ReplyField.VISIT_LIST, webVisitList);
-        return response;
+        Map<String, Object> resultMap = new HashMap<>(2);
+        resultMap.put(Constants.ReplyField.DATE, betweenDates);
+        resultMap.put(Constants.ReplyField.VISIT_LIST, webVisitList);
+        return resultMap;
     }
 }

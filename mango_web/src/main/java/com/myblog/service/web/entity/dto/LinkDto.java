@@ -1,10 +1,10 @@
 package com.myblog.service.web.entity.dto;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 
 @Data
-public class LinkDto extends BaseDto {
+public class LinkDto extends BaseReqDto {
 
     private String title;
 

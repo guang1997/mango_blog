@@ -1,7 +1,7 @@
 package com.myblog.service.admin.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 import lombok.ToString;
 
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 @ToString(exclude = "password")
-public class UserDto extends BaseDto {
+public class UserDto extends BaseReqDto {
 
     private static final long serialVersionUID=1L;
 

@@ -1,5 +1,6 @@
 package com.myblog.service.admin.service;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -24,7 +25,7 @@ public interface WebVisitService extends IService<WebVisit>, ServiceConvertHandl
 
     int getWebVisitCount();
 
-    Response getWebVisitGroupByBehavior() throws Exception;
+    Map<String, Object> getWebVisitGroupByBehavior() throws Exception;
 
-    Response getVisitByWeek() throws Exception;
+    Map<String, Object> getVisitByWeek() throws Exception;
 }

@@ -1,12 +1,12 @@
 package com.myblog.service.web.entity.dto;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class CommentDto extends BaseDto {
+public class CommentDto extends BaseReqDto {
 
     private String parentId;
 

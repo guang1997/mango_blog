@@ -1,13 +1,13 @@
 package com.myblog.service.web.entity.dto;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ArchiveDto extends BaseDto {
+public class ArchiveDto extends BaseReqDto {
 
     private String title;
 

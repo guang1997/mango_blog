@@ -2,11 +2,11 @@ package com.myblog.service.web.entity.dto;
 
 import java.util.List;
 
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 
 @Data
-public class WebConfigDto extends BaseDto {
+public class WebConfigDto extends BaseReqDto {
 
     private String name;
 

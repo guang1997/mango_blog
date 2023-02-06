@@ -8,6 +8,7 @@ import com.myblog.service.admin.entity.BlogTag;
 import com.myblog.service.admin.entity.Sort;
 import com.myblog.service.admin.entity.Tag;
 import com.myblog.service.admin.entity.dto.BlogDto;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.handler.es.entity.BlogEsDto;
 import com.myblog.service.base.handler.es.impl.BlogEsOperateHandler;
 import com.myblog.service.admin.mapper.BlogMapper;
@@ -99,12 +100,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return
      */
     @Override
-    public Response getBlogCountByTag() {
-        Response response = Response.ok();
+    public List<Map<String, Object>> getBlogCountByTag() {
         List<Map<String, Object>> blogTagList = blogTagMapper.getBlogCountByTag();
         if (Objects.equals(blogTagList.size(), 0)) {
-            response.data(Constants.ReplyField.DATA, blogTagList);
-            return response;
+            throw new BusinessException("getBlogCountByTag failed, blogTagList is empty");
         }
         Set<String> tagIds = blogTagList.stream()
                 .map(map -> map.get("tagId").toString())
@@ -115,15 +114,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                     .filter(tag -> Objects.equals(tag.getId(), blogTagMap.get("tagId")))
                     .findAny().orElse(null);
             if (Objects.isNull(blogTag)) {
-                log.error("getBlogCountByTag failed, cannot find tag from db by id:{}", blogTagMap.get("tagId"));
-                response.setCode(ResultCodeEnum.QUERY_FAILED.getCode());
-                response.setMessage(ResultCodeEnum.QUERY_FAILED.getMessage());
-                return response;
+                throw new BusinessException("getBlogCountByTag failed, cannot find tag from db by id " + blogTagMap.get("tagId"));
             }
             blogTagMap.put(Constants.ReplyField.NAME, blogTag.getTagName());
         }
-        response.data(Constants.ReplyField.DATA, blogTagList);
-        return response;
+        return blogTagList;
     }
 
     /**
@@ -132,12 +127,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return
      */
     @Override
-    public Response getBlogCountByBlogSort() {
-        Response response = Response.ok();
+    public List<Map<String, Object>> getBlogCountByBlogSort() {
         List<Map<String, Object>> blogSortList = baseMapper.getBlogCountByBlogSort();
         if (Objects.equals(blogSortList.size(), 0)) {
-            response.data(Constants.ReplyField.DATA, blogSortList);
-            return response;
+            throw new BusinessException("getBlogCountByTag failed, blogTagList is empty");
         }
         Set<String> sortIds = blogSortList.stream()
                 .map(map -> map.get("sortId").toString())
@@ -148,15 +141,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                     .filter(tag -> Objects.equals(tag.getId(), blogSortMap.get("sortId")))
                     .findAny().orElse(null);
             if (Objects.isNull(sort)) {
-                log.error("getBlogCountByBlogSort failed, cannot find sort from db by id:{}", blogSortMap.get("sortId"));
-                response.setCode(ResultCodeEnum.QUERY_FAILED.getCode());
-                response.setMessage(ResultCodeEnum.QUERY_FAILED.getMessage());
-                return response;
+                throw new BusinessException("getBlogCountByBlogSort failed, cannot find sort from db by id " + blogSortMap.get("sortId"));
             }
             blogSortMap.put(Constants.ReplyField.NAME, sort.getSortName());
         }
-        response.data(Constants.ReplyField.DATA, blogSortList);
-        return response;
+        return blogSortList;
     }
 
     /**
@@ -165,8 +154,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return
      */
     @Override
-    public Response getBlogContributeCount() throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getBlogContributeCount() throws Exception {
         // 获取当天结束时间
         String endTime = ThreadSafeDateFormat.getTodayEndTime();
         // 获取365天之前的日期
@@ -175,7 +163,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         List<Map<String, Object>> blogCountByDateList = baseMapper.getBlogContributeCount(startTime, endTime);
 
         Map<String, Object> blogCountByDateMap = blogCountByDateList.stream()
-                .collect(Collectors.toMap(item -> item.get("date").toString(), item -> item.get("count"), (item1, item2) -> item1));
+            .collect(Collectors.toMap(item -> item.get("date").toString(), item -> item.get("count"), (item1, item2) -> item1));
         List<String> dateList = ThreadSafeDateFormat.getDayBetweenDates(startTime, endTime);
 
         List<List<Object>> resultList = new ArrayList<>();
@@ -192,9 +180,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         List<String> contributeDateList = new ArrayList<>();
         contributeDateList.add(startTime);
         contributeDateList.add(endTime);
-        response.data(Constants.ReplyField.CONTRIBUTE_DATE, contributeDateList);
-        response.data(Constants.ReplyField.BLOG_CONTRIBUTE_COUNT, resultList);
-        return response;
+        Map<String, Object> resultMap = new HashMap<>(2);
+        resultMap.put(Constants.ReplyField.CONTRIBUTE_DATE, contributeDateList);
+        resultMap.put(Constants.ReplyField.BLOG_CONTRIBUTE_COUNT, resultList);
+        return resultMap;
     }
 
     /**
@@ -204,33 +193,25 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return
      */
     @Override
-    public Response getBlogByPage(BlogDto blogDto) throws Exception {
-        Response response = Response.ok();
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(blogDto.getPage())) {
-            page = blogDto.getPage();
-        }
-        if (Objects.nonNull(blogDto.getSize())) {
-            size = blogDto.getSize();
-        }
+    public Map<String, Object> getBlogByPage(BlogDto blogDto) throws Exception {
         blogDto.setPage((blogDto.getPage() - 1) * blogDto.getSize());
 
         List<Blog> blogList = baseMapper.selectBlogByRequest(blogDto);
         // 数据总数，由于可能使用left join导致总条数不准，因此重新查一次
         int totalSize = baseMapper.selectBlogCountByRequest(blogDto);
-        response.data(Constants.ReplyField.DATA, this.toDtoList(blogList, BlogDto.class));
-        response.data(Constants.ReplyField.TOTAL, totalSize);
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put(Constants.ReplyField.DATA, this.toDtoList(blogList, BlogDto.class));
+        resultMap.put(Constants.ReplyField.TOTAL, totalSize);
+        resultMap.put(Constants.ReplyField.PAGE, blogDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, blogDto.getSize());
 
         // 获取所有的标签
         List<Tag> tags = tagMapper.selectList(null);
-        response.data(Constants.ReplyField.BLOG_TAGS, tags);
+        resultMap.put(Constants.ReplyField.BLOG_TAGS, tags);
         // 获取所有的分类
         List<Sort> sorts = sortMapper.selectList(null);
-        response.data(Constants.ReplyField.BLOG_SORTS, sorts);
-        return response;
+        resultMap.put(Constants.ReplyField.BLOG_SORTS, sorts);
+        return resultMap;
     }
 
     /**
@@ -241,17 +222,17 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response addBlog(BlogDto blogDto) throws Exception {
+    public Boolean addBlog(BlogDto blogDto) throws Exception {
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Blog.TITLE, blogDto.getTitle());
         if (baseMapper.selectList(queryWrapper).size() > 0) {
-            return Response.error().message("保存失败, 已存在相同名称的博客");
+            throw new BusinessException("保存失败, 已存在相同名称的博客");
         }
         // 保存博客
         Blog blog = toDb(blogDto, Blog.class);
         if (baseMapper.insert(blog) < 1) {
             log.error("addBlog failed by unknown error, blog:{}", blog);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
         // 查询已经保存的博客
         Blog dbBlog = baseMapper.selectOne(queryWrapper);
@@ -263,15 +244,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             blogTag.setTagId(tagId);
             if (blogTagMapper.insert(blogTag) < 1) {
                 log.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, dbBlog);
-                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+                return false;
             }
         }
         // 保存数据到es
         boolean insertEsResponse = esOperateManager.insert(toEsDto(dbBlog), BlogEsOperateHandler.class);
         if (BooleanUtils.isFalse(insertEsResponse)) {
-            log.warn("insertEs failed, dbBlog:{}", dbBlog);
+            log.error("insertEs failed, dbBlog:{}", dbBlog);
+            throw new BusinessException("insertEs failed");
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -282,22 +264,23 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response editBlog(BlogDto blogDto) throws Exception {
+    public Boolean editBlog(BlogDto blogDto) throws Exception {
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Blog.TITLE, blogDto.getTitle());
         List<Blog> dbBlogList = baseMapper.selectList(queryWrapper);
         if (dbBlogList.size() > 0) {
             for (Blog blog : dbBlogList) {
                 if (!Objects.equals(blog.getId(), blogDto.getId())) {
-                    return Response.error().message("更新失败, 已存在相同名称的博客");
+                    throw new BusinessException("更新失败, 已存在相同名称的博客");
                 }
             }
         }
+
         // 保存博客
         Blog blog = toDb(blogDto, Blog.class);
         if (baseMapper.updateById(blog) < 1) {
             log.error("editBlog failed by unknown error, blog:{}", blog);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
         // 保存标签
         List<String> tagIds = blogDto.getTags().stream().map(Tag::getId).distinct().collect(Collectors.toList());
@@ -310,15 +293,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             blogTag.setTagId(tagId);
             if (blogTagMapper.insert(blogTag) < 1) {
                 log.error("addBlog failed by add tags failed, tagId:{}, blog:{}", tagId, blog);
-                return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+                return false;
             }
         }
         // 更新es的数据
         boolean updateEsResponse = esOperateManager.update(toEsDto(blog), BlogEsOperateHandler.class);
         if (BooleanUtils.isFalse(updateEsResponse)) {
-            log.warn("updateEs failed, dbBlog:{}", blog);
+            log.error("updateEs failed, dbBlog:{}", blog);
+            throw new BusinessException("updateEs failed");
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -329,19 +313,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response delBlog(Set<String> ids) throws Exception {
+    public List<String> delBlog(Set<String> ids) throws Exception {
         List<String> fileIdList = new ArrayList<>();
         for (String blogId : ids) {
             Blog dbBlog = baseMapper.selectById(blogId);
             if (Objects.isNull(dbBlog)) {
                 log.error("delBlog failed, cannot find blog from db, blogId:{}", blogId);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+                return null;
             }
             // 如果博客中的作者与当前登陆用户不一致不删除
             String currentUserId = SecurityUtils.getCurrentUserId();
             if (!Objects.equals(currentUserId, dbBlog.getAdminId())) {
                 log.error("delBlog failed, current adminId:{} not equals db adminId:{}, blogId:{}", currentUserId, dbBlog.getAdminId(), blogId);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+                return null;
             }
             // 删除绑定的菜单
             UpdateWrapper<BlogTag> blogTagUpdateWrapper = new UpdateWrapper<>();
@@ -349,12 +333,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             blogTagMapper.delete(blogTagUpdateWrapper);
             if (baseMapper.deleteById(blogId) < 1) {
                 log.error("delBlog failed by unknown error, blogId:{}", blogId);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+                return null;
             }
             fileIdList.add(dbBlog.getFileId());
         }
-        Response response = Response.ok();
-        response.data(Constants.ReplyField.DELETED_FILE_LIST, fileIdList);
         List<BlogEsDto> delEsList = ids.stream().map(id -> {
             BlogEsDto blogEsDto = new BlogEsDto();
             blogEsDto.setId(id);
@@ -363,9 +345,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         boolean esResponse = esOperateManager.bulk(delEsList, EsBulkBehaviorEnum.DELETE, BlogEsOperateHandler.class);
         if (BooleanUtils.isFalse(esResponse)) {
             log.error("delblog delete es failed, ids:{}, delEsList:{}", ids, delEsList);
-            return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+            throw new BusinessException("delblog delete es failed");
         }
-        return response;
+        return fileIdList;
     }
 
     @Override

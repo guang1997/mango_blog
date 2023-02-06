@@ -1,17 +1,16 @@
 package com.myblog.service.security.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 import lombok.Data;
 import lombok.ToString;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
 @ToString(exclude = "password")
-public class AdminDto extends BaseDto {
+public class AdminDto extends BaseReqDto {
 
     private String username;
 

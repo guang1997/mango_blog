@@ -171,7 +171,7 @@ export default {
     getBlogCountByTag().then(res => {
       if (res.code === this.$ECode.SUCCESS) {
         
-        this.blogCountByTag = res.data.data;
+        this.blogCountByTag = res.data;
 
         var tagList = this.blogCountByTag;
 
@@ -186,7 +186,7 @@ export default {
     //通过博客分类获取博客数目
     getBlogCountByBlogSort().then(res => {
       if (res.code === this.$ECode.SUCCESS) {
-        this.blogCountByBlogSort = res.data.data;
+        this.blogCountByBlogSort = res.data;
 
         var blogSortList = this.blogCountByBlogSort;
 

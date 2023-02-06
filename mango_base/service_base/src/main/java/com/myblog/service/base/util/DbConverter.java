@@ -1,7 +1,7 @@
 package com.myblog.service.base.util;
 
 import com.myblog.service.base.entity.BaseEntity;
-import com.myblog.service.base.entity.dto.BaseDto;
+import com.myblog.service.base.entity.dto.BaseReqDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  * @author 李斯特
  * @date 2022/03/24
  */
-public class DbConverter<A extends BaseEntity, B extends BaseDto> {
+public class DbConverter<A extends BaseEntity, B extends BaseReqDto> {
 
     public List<B> toDto(List<A> dbs, Class<B> bClass) throws IllegalAccessException, InstantiationException {
         List<B> dtoList = new ArrayList<>();

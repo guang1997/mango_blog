@@ -6,6 +6,7 @@ import com.myblog.service.admin.entity.dto.SortDto;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,11 +19,11 @@ import java.util.Set;
  */
 public interface SortService extends IService<Sort>, ServiceConvertHandler<Sort, SortDto> {
 
-    Response getSortByPage(SortDto sortDto) throws Exception;
+    Map<String, Object> getSortByPage(SortDto sortDto) throws Exception;
 
-    Response addSort(SortDto sortDto) throws Exception;
+    Boolean addSort(SortDto sortDto) throws Exception;
 
-    Response editSort(SortDto sortDto) throws Exception;
+    Boolean editSort(SortDto sortDto) throws Exception;
 
-    Response delSorts(Set<String> ids) throws Exception;
+    Boolean delSorts(Set<String> ids) throws Exception;
 }
