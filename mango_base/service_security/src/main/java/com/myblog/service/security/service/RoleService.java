@@ -34,9 +34,9 @@ public interface RoleService extends IService<Role>, ServiceConvertHandler<Role,
 
     Response getRoleById(Role role) throws Exception;
 
-    Response validRoleLevelByUserId(String userId);
+    Boolean validRoleLevelByUserId(String userId);
 
-    Response validRoleLevel(Integer level, String roleName);
+    Boolean validRoleLevel(Integer level, String roleName);
 
     List<String> getMenusByRoleId(List<String> roleIds);
 }

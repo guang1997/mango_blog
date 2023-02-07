@@ -11,6 +11,8 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.common.ResultModel;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -41,20 +43,14 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * @throws ParseException
      */
     @Override
-    public Response getTagByPage(TagDto tagDto) throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getTagByPage(TagDto tagDto) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
         if (Objects.nonNull(tagDto.getQueryAll()) && tagDto.getQueryAll()) {
             List<TagDto> tagDtos = this.toDtoList(baseMapper.selectList(null), TagDto.class);
-            response.data(Constants.ReplyField.DATA, tagDtos);
-            return response;
+            resultMap.put(Constants.ReplyField.DATA, tagDtos);
+            return resultMap;
         }
         QueryWrapper<Tag> queryWrapper = new QueryWrapper<>();
-
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(tagDto.getPage())) page = tagDto.getPage();
-        if (Objects.nonNull(tagDto.getSize())) size = tagDto.getSize();
-
         if (StringUtils.isNotBlank(tagDto.getTagName())) {
             queryWrapper.like(DbConstants.Tag.TAG_NAME, tagDto.getTagName());
         }
@@ -63,16 +59,16 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
             Date endDate = ThreadSafeDateFormat.parse(tagDto.getCreateTimes().get(1), ThreadSafeDateFormat.DATETIME);
             queryWrapper.between(DbConstants.Base.CREATE_TIME, beginDate, endDate);
         }
-        Page<Tag> tagPage = new Page<>(page, size);
+        Page<Tag> tagPage = new Page<>(tagDto.getPage(), tagDto.getSize());
 
         baseMapper.selectPage(tagPage, queryWrapper);
 
         List<TagDto> tagDtos = this.toDtoList(tagPage.getRecords(), TagDto.class);
-        response.data(Constants.ReplyField.DATA, tagDtos);
-        response.data(Constants.ReplyField.TOTAL, tagPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, tagDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, tagPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, tagDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, tagDto.getSize());
+        return resultMap;
     }
 
     /**
@@ -81,19 +77,19 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * @return
      */
     @Override
-    public Response addTag(TagDto tagDto) throws Exception{
+    public Boolean addTag(TagDto tagDto) throws Exception{
         QueryWrapper<Tag> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Tag.TAG_NAME, tagDto.getTagName());
         if (Objects.nonNull(baseMapper.selectOne(queryWrapper))) {
             log.error("addTag failed, tagName is already exist, tag:{}", tagDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
         Tag tag = this.toDb(tagDto, Tag.class);
         if (baseMapper.insert(tag) < 1) {
             log.error("addTag failed by unknown error, tag:{}", tag);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -102,23 +98,23 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * @return
      */
     @Override
-    public Response editTag(TagDto tagDto) throws Exception{
+    public Boolean editTag(TagDto tagDto) throws Exception{
         QueryWrapper<Tag> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Tag.TAG_NAME, tagDto.getTagName());
         List<Tag> tags = baseMapper.selectList(queryWrapper);
         if (tags.size() > 0) {
             for (Tag tag : tags) {
                 if (!Objects.equals(tag.getId(), tagDto.getId())) {
-                    return Response.error().message("更新失败, 已存在相同名称的标签");
+                    throw new BusinessException("更新失败, 已存在相同名称的标签");
                 }
             }
         }
         Tag tag = this.toDb(tagDto, Tag.class);
         if (baseMapper.updateById(tag) < 1) {
             log.error("editTag failed by unknown error, tag:{}", tag);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -127,7 +123,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      * @return
      */
     @Override
-    public Response delTags(Set<String> ids) throws Exception{
+    public Boolean delTags(Set<String> ids) throws Exception{
         // 如果标签已经绑定了博客，那么不删除该标签
         List<String> delFailedTagNames = new ArrayList<>();
         for (String id : ids) {
@@ -140,12 +136,12 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
             }
             if (baseMapper.deleteById(id) < 1) {
                 log.error("delTags failed by unknown error, tagId:{}", id);
-                return Response.setResult(ResultCodeEnum.DELETE_FAILED);
+                return false;
             }
         }
         if (CollectionUtils.isEmpty(delFailedTagNames)) {
-            return Response.ok();
+            return true;
         }
-        return Response.error().message(delFailedTagNames.toString() + "已绑定博客, 未删除成功");
+        throw new BusinessException(delFailedTagNames + "已绑定博客, 未删除成功");
     }
 }

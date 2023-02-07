@@ -6,6 +6,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.DbConstants;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.util.BaseUtil;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
@@ -67,12 +68,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             QueryWrapper<Role> allQueryWrapper = new QueryWrapper<>();
             return response.data(Constants.ReplyField.DATA, this.toDtoList(baseMapper.selectList(allQueryWrapper), RoleDto.class));
         }
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(roleDto.getPage())) page = roleDto.getPage();
-        if (Objects.nonNull(roleDto.getSize())) size = roleDto.getSize();
 
-        Page<Role> rolePage = new Page<>(page, size);
+        Page<Role> rolePage = new Page<>(roleDto.getPage(), roleDto.getSize());
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(roleDto.getBlurry())) {
             queryWrapper.like(DbConstants.Role.ROLE_NAME, roleDto.getBlurry());
@@ -93,8 +90,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
         response.data(Constants.ReplyField.DATA, roleDtos);
         response.data(Constants.ReplyField.TOTAL, rolePage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
+        response.data(Constants.ReplyField.PAGE, roleDto.getPage());
+        response.data(Constants.ReplyField.SIZE, roleDto.getSize());
         return response;
     }
 
@@ -135,9 +132,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         List<String> delSuccessedRoleIds = new ArrayList<>();
         for (String id : ids) {
             Role deleteRole = baseMapper.selectById(id);
-            Response response = validRoleLevel(deleteRole.getLevel(), deleteRole.getRoleName());
-            if (!response.getSuccess()) {
-                return response;
+            if (!validRoleLevel(deleteRole.getLevel(), deleteRole.getRoleName())) {
+                return Response.error();
             }
             List<String> adminIdsByRoleId = baseMapper.getAdminIdsByRoleId(id);
             if (!CollectionUtils.isEmpty(adminIdsByRoleId)) {
@@ -172,9 +168,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Transactional(rollbackFor = Exception.class)
     public Response editRole(RoleDto roleDto) throws Exception{
         Role dbRole = baseMapper.selectById(roleDto.getId());
-        Response response = validRoleLevel(dbRole.getLevel(), dbRole.getRoleName());
-        if (!response.getSuccess()) {
-            return response;
+        if (!validRoleLevel(dbRole.getLevel(), dbRole.getRoleName())) {
+            return Response.error();
         }
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Role.ROLE_NAME, roleDto.getRoleName());
@@ -203,10 +198,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Transactional(rollbackFor = Exception.class)
     public Response updateMenu(RoleDto roleDto) throws Exception{
         Role dbRole = baseMapper.selectById(roleDto.getId());
-        Response response = validRoleLevel(dbRole.getLevel(), dbRole.getRoleName());
-        if (!response.getSuccess()) {
-            return response;
+        if (!validRoleLevel(dbRole.getLevel(), dbRole.getRoleName())) {
+            return Response.error();
         }
+
         // 先删掉该角色绑定的所有菜单的信息
         baseMapper.deleteRoleMenuByRoleId(roleDto.getId());
 
@@ -249,24 +244,25 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @param level
      * @return
      */
-    public Response validRoleLevel(Integer level, String roleName) {
-        if (level == null) {
-            return Response.error().message("找不到被操作角色的级别");
+    @Override
+    public Boolean validRoleLevel(Integer level, String roleName) {
+        if (Objects.isNull(level)) {
+            throw new BusinessException("找不到被操作角色的级别");
         }
         List<Role> roles = baseMapper.getRolesByUserId(SecurityUtils.getCurrentUserId());
         if (CollectionUtils.isEmpty(roles)) {
-            return Response.error().message("当前用户未绑定角色");
+            throw new BusinessException("当前用户未绑定角色");
         }
         Set<String> roleNames = roles.stream().map(Role::getRoleName).collect(Collectors.toSet());
         // 如果所绑定的角色与被操作的角色名称相同，那么可以对其进行操作
         if (roleNames.contains(roleName)) {
-            return Response.ok();
+            return true;
         }
         int currentLevel = roles.stream().mapToInt(Role::getLevel).min().getAsInt();
         if (currentLevel > level) {
-            return Response.error().message("权限不足，你的角色级别：" + currentLevel + "，低于操作的角色级别：" + level);
+            throw new BusinessException("权限不足，你的角色级别：" + currentLevel + "，低于操作的角色级别：" + level);
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -279,7 +275,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         return baseMapper.selectRoleMenuButtons(roleIds);
     }
 
-    public Response validRoleLevelByUserId(String userId) {
+    @Override
+    public Boolean validRoleLevelByUserId(String userId) {
         List<Role> roles = baseMapper.getRolesByUserId(userId);
         Role role = roles.stream().min(Comparator.comparingInt(Role::getLevel)).orElse(null);
         if (Objects.isNull(role)) {

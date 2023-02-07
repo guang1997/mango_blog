@@ -9,6 +9,8 @@ import com.myblog.service.security.entity.dto.LoginDto;
 import com.myblog.service.security.entity.dto.PassAndEmailDto;
 
 import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,11 +25,11 @@ public interface AdminService extends IService<Admin>, ServiceConvertHandler<Adm
 
     Admin checkLogin(LoginDto loginDto) throws Exception;
 
-    Response getAdminByPage(AdminDto adminDto) throws Exception;
+    Map<String, Object> getAdminByPage(AdminDto adminDto) throws Exception;
 
-    Response addAdmin(AdminDto adminDto) throws Exception;
+    Boolean addAdmin(AdminDto adminDto) throws Exception;
 
-    Response delAdmin(Set<String> ids) throws Exception;
+    List<String> delAdmin(Set<String> ids);
 
     Response editAdminFromCenter(AdminDto adminDto) throws Exception;
 
@@ -35,7 +37,7 @@ public interface AdminService extends IService<Admin>, ServiceConvertHandler<Adm
 
     Response updatePass(PassAndEmailDto passAndEmailDto) throws Exception;
 
-    Response editAdmin(AdminDto adminDto) throws Exception;
+    Boolean editAdmin(AdminDto adminDto) throws Exception;
 
     int getAdminCount();
 

@@ -3,6 +3,7 @@ package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.config.QiNiuYunOssProperties;
 import com.myblog.service.admin.service.OssService;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
@@ -21,9 +22,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -60,43 +63,41 @@ public class AdminController {
     @LogByMethod("/admin/manager/getAdminByPage")
     @ApiOperation(value = "分页查询管理员信息", notes = "分页查询管理员信息", response = Response.class)
     @PostMapping("/getAdminByPage")
-    public Response getAdminByPage(@RequestBody AdminDto adminDto) throws Exception {
-        return adminService.getAdminByPage(adminDto);
+    public ResultModel<Map<String, Object>> getAdminByPage(@RequestBody AdminDto adminDto) throws Exception {
+        return ResultModel.ok(adminService.getAdminByPage(adminDto));
     }
 
     @LogByMethod("/admin/manager/addAdmin")
     @ApiOperation(value = "新增管理员", notes = "新增管理员", response = Response.class)
     @PostMapping("/addAdmin")
-    public Response addAdmin(@RequestBody AdminDto adminDto) throws Exception {
-        if (StringUtils.isBlank(adminDto.getUsername())
-                || StringUtils.isBlank(adminDto.getEmail())
-                || StringUtils.isBlank(adminDto.getPhone())
-                || StringUtils.isBlank(adminDto.getNickname())) {
-            log.error("addAdmin failed, username or email or phone or nickname cannot be null, admin:{}", adminDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
-        }
+    public ResultModel<Object> addAdmin(@RequestBody @Validated AdminDto adminDto) throws Exception {
+
         List<RoleDto> roles = adminDto.getRoles();
         if (!CollectionUtils.isEmpty(roles)) {
             for (RoleDto roleDto : roles) {
                 Role role = roleService.getById(roleDto.getId());
-                Response response = roleService.validRoleLevel(role.getLevel(), role.getRoleName());
-                if (!response.getSuccess()) {
-                    return response;
+                if (!roleService.validRoleLevel(role.getLevel(), role.getRoleName())) {
+                    return ResultModel.setResult(ResultCodeEnum.SAVE_FAILED);
                 }
             }
         }
-        return adminService.addAdmin(adminDto);
+        if (adminService.addAdmin(adminDto)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.SAVE_FAILED);
     }
 
     @LogByMethod("/admin/manager/editAdmin")
     @ApiOperation(value = "修改管理员", notes = "修改管理员", response = Response.class)
     @PutMapping("/editAdmin")
-    public Response editAdmin(@RequestBody AdminDto adminDto) throws Exception {
-        Response response = roleService.validRoleLevelByUserId(adminDto.getId());
-        if (!response.getSuccess()) {
-            return response;
+    public ResultModel<Object> editAdmin(@RequestBody @Validated AdminDto adminDto) throws Exception {
+        if (!roleService.validRoleLevelByUserId(adminDto.getId())) {
+            return ResultModel.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
-        return adminService.editAdmin(adminDto);
+        if (adminService.editAdmin(adminDto)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.setResult(ResultCodeEnum.UPDATE_FAILED);
     }
 
     @LogByMethod("/admin/manager/editAdminFromCenter")
@@ -147,18 +148,16 @@ public class AdminController {
     @LogByMethod("/admin/manager/delAdmin")
     @ApiOperation(value = "删除管理员", notes = "删除管理员", response = Response.class)
     @DeleteMapping("/delAdmin")
-    public Response delAdmin(@RequestBody Set<String> ids) throws Exception {
+    public ResultModel<Object> delAdmin(@RequestBody Set<String> ids) throws Exception {
         for (String id : ids) {
-            Response response = roleService.validRoleLevelByUserId(id);
-            if (!response.getSuccess()) {
-                return response;
+            if (!roleService.validRoleLevelByUserId(id)) {
+                return ResultModel.setResult(ResultCodeEnum.DELETE_FAILED);
             }
         }
-        Response response = adminService.delAdmin(ids);
-        if (response.getSuccess() && qiNiuYunOssProperties.getDeletePicture()) {
+        List<String> urlList = adminService.delAdmin(ids);
+        if (!CollectionUtils.isEmpty(urlList) && qiNiuYunOssProperties.getDeletePicture()) {
             // 删除账号后同时删除其头像
             try {
-                List<String> urlList = (List<String>) response.getData().get(Constants.ReplyField.DELETED_FILE_LIST);
                 for (String url : urlList) {
                     ossService.delete(url);
                 }
@@ -166,7 +165,7 @@ public class AdminController {
                 log.error("delAdmin success but delete admin avatar failed, adminIds:{}", ids);
             }
         }
-        return response;
+        return ResultModel.ok();
 
     }
 }

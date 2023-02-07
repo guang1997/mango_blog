@@ -8,10 +8,14 @@ import lombok.ToString;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 @Data
 @ToString(exclude = "password")
 public class AdminDto extends BaseReqDto {
 
+    @NotNull(message = "用户名不能为空")
     private String username;
 
     private String password;
@@ -20,8 +24,10 @@ public class AdminDto extends BaseReqDto {
 
     private String avatar;
 
+    @NotNull(message = "邮箱不能为空")
     private String email;
 
+    @NotNull(message = "手机不能为空")
     private String phone;
 
     private Integer loginCount;
@@ -31,6 +37,7 @@ public class AdminDto extends BaseReqDto {
 
     private String lastLoginIp;
 
+    @NotNull(message = "昵称不能为空")
     private String nickname;
 
     private String qqNumber;

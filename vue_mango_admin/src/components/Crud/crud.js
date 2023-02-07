@@ -357,7 +357,7 @@ function CRUD(options) {
           if (delAll) {
             crud.delAllLoading = false
           } else dataStatus.delete = CRUD.STATUS.PREPARED
-          crud.dleChangePage(1)
+          crud.dleChangePage(ids.length)
           crud.delSuccessNotify()
           callVmHook(crud, CRUD.HOOK.afterDelete, data)
           crud.refresh()

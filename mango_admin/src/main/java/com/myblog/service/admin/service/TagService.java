@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.admin.entity.Tag;
 import com.myblog.service.admin.entity.dto.TagDto;
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,11 +20,11 @@ import java.util.Set;
  */
 public interface TagService extends IService<Tag>, ServiceConvertHandler<Tag, TagDto> {
 
-    Response getTagByPage(TagDto tagDto) throws Exception;
+    Map<String, Object> getTagByPage(TagDto tagDto) throws Exception;
 
-    Response addTag(TagDto tagDto) throws Exception;
+    Boolean addTag(TagDto tagDto) throws Exception;
 
-    Response editTag(TagDto tagDto) throws Exception;
+    Boolean editTag(TagDto tagDto) throws Exception;
 
-    Response delTags(Set<String> ids) throws Exception;
+    Boolean delTags(Set<String> ids) throws Exception;
 }

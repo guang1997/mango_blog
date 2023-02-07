@@ -3,6 +3,7 @@ package com.myblog.service.admin.controller;
 
 import com.myblog.service.admin.entity.dto.SortDto;
 import com.myblog.service.admin.service.SortService;
+import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
@@ -43,7 +44,7 @@ public class SortController {
         if (sortService.addSort(sortDto)) {
             return ResultModel.ok();
         }
-        return ResultModel.error();
+        return ResultModel.setResult(ResultCodeEnum.SAVE_FAILED);
     }
 
     @LogByMethod(value = "/admin/sort/editSort", validate = true)
@@ -53,7 +54,7 @@ public class SortController {
         if (sortService.editSort(sortDto)) {
             return ResultModel.ok();
         }
-        return ResultModel.error();
+        return ResultModel.setResult(ResultCodeEnum.UPDATE_FAILED);
     }
 
     @LogByMethod("/admin/sort/delSorts")
@@ -63,7 +64,7 @@ public class SortController {
         if (sortService.delSorts(ids)) {
             return ResultModel.ok();
         }
-        return ResultModel.error();
+        return ResultModel.setResult(ResultCodeEnum.DELETE_FAILED);
     }
 
 }

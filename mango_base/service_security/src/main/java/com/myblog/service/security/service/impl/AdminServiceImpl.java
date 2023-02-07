@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.*;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.util.*;
 import com.myblog.service.security.config.entity.MySecurityProperties;
 import com.myblog.service.security.config.util.RsaUtils;
@@ -104,17 +105,8 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      * @return
      */
     @Override
-    public Response getAdminByPage(AdminDto adminDto) throws Exception {
-        Response response = Response.ok();
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(adminDto.getPage())) {
-            page = adminDto.getPage();
-        }
-        if (Objects.nonNull(adminDto.getSize())) {
-            size = adminDto.getSize();
-        }
-        Page<Admin> adminPage = new Page<>(page, size);
+    public Map<String, Object> getAdminByPage(AdminDto adminDto) throws Exception {
+        Page<Admin> adminPage = new Page<>(adminDto.getPage(), adminDto.getSize());
 
         QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
@@ -137,12 +129,12 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
         baseMapper.selectPage(adminPage, queryWrapper);
         List<AdminDto> adminDtos = this.toDtoList(adminPage.getRecords(), AdminDto.class);
-
-        response.data(Constants.ReplyField.DATA, adminDtos);
-        response.data(Constants.ReplyField.TOTAL, adminPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put(Constants.ReplyField.DATA, adminDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, adminPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, adminDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, adminDto.getSize());
+        return resultMap;
     }
 
     /**
@@ -153,7 +145,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response addAdmin(AdminDto adminDto) throws Exception {
+    public Boolean addAdmin(AdminDto adminDto) throws Exception {
         // 校验管理员是否已经存在
         QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Admin.USERNAME, adminDto.getUsername());
@@ -161,7 +153,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         List<Admin> admins = baseMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(admins)) {
             LOGGER.error("addAdmin failed, admin already exist in db, admin:{}", adminDto);
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED).message("保存失败，用户名已存在");
+            throw new BusinessException("保存失败，用户名已存在");
         }
         Admin admin = this.toDb(adminDto, Admin.class);
         // 给管理员设置默认密码，规则为用户名+yyyy
@@ -175,7 +167,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         if (baseMapper.updateByUserName(admin) < 1) {
             if (baseMapper.insert(admin) < 1) {
                 LOGGER.error("addAdmin failed by unknown error, admin:{}", admin);
-                return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+                return false;
             }
         }
 
@@ -185,7 +177,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Admin dbAdmin = baseMapper.selectOne(wrapper);
         if (Objects.isNull(dbAdmin)) {
             LOGGER.error("addAdmin failed cannot find admin by username:{}", admin.getUsername());
-            return Response.setResult(ResultCodeEnum.SAVE_FAILED);
+            return false;
         }
         List<RoleDto> roleDtos = adminDto.getRoles();
         if (!CollectionUtils.isEmpty(roleDtos)) {
@@ -196,10 +188,11 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
                 if (roleAdminMapper.insert(roleAdmin) < 1) {
                     Role role = roleMapper.selectById(roleDto.getId());
                     LOGGER.error("addAdmin success, but add role failed by unknown error, username:{}, role:{}", dbAdmin.getUsername(), role);
+                    throw new BusinessException("保存角色信息失败");
                 }
             }
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -211,7 +204,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response delAdmin(Set<String> ids) throws Exception {
+    public List<String> delAdmin(Set<String> ids) {
         List<String> urlList = new ArrayList<>();
         for (String id : ids) {
             Admin admin = baseMapper.selectById(id);
@@ -226,9 +219,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
                 urlList.add(admin.getAvatar());
             }
         }
-        Response response = Response.ok();
-        response.data(Constants.ReplyField.DELETED_FILE_LIST, urlList);
-        return response;
+        return urlList;
     }
 
     /**
@@ -357,7 +348,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response editAdmin(AdminDto adminDto) throws Exception{
+    public Boolean editAdmin(AdminDto adminDto) throws Exception{
         QueryWrapper<Admin> usernameQueryWrapper = new QueryWrapper<>();
         usernameQueryWrapper.eq(DbConstants.Admin.USERNAME, adminDto.getUsername())
                 .or()
@@ -368,7 +359,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Admin dbAdmin = baseMapper.selectOne(usernameQueryWrapper);
         if (Objects.nonNull(dbAdmin) && !Objects.equals(dbAdmin.getId(), adminDto.getId())) {
             LOGGER.error("editAdmin failed, username or phone or email already exist, admin:{}", adminDto);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("保存失败，用户名、手机和邮箱不能重复");
+            throw new BusinessException("保存失败，用户名、手机和邮箱不能重复");
         }
         Admin oldAdmin = baseMapper.selectById(adminDto.getId());
         Admin admin = toDb(adminDto, Admin.class);
@@ -376,7 +367,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         updateWrapper.eq(DbConstants.Base.ID, admin.getId());
         if (baseMapper.update(admin, updateWrapper) < 1) {
             LOGGER.error("editAdmin failed by unknown error, admin:{}", admin);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
         // 更改角色信息
         UpdateWrapper<RoleAdmin> roleAdminUpdateWrapper = new UpdateWrapper<>();
@@ -395,7 +386,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             }
         }
         redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + oldAdmin.getUsername());
-        return Response.ok();
+        return true;
     }
 
     @Override
