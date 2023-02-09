@@ -3,6 +3,7 @@ package com.myblog.service.web.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.*;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.handler.es.EsOperateManager;
 import com.myblog.service.base.handler.es.entity.BlogEsDto;
 import com.myblog.service.base.handler.es.impl.BlogEsOperateHandler;
@@ -67,27 +68,20 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @throws Exception
      */
     @Override
-    public Response getBlogByPage(BlogDto blogDto) throws Exception {
-        Response response = Response.ok();
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(blogDto.getPage())) {
-            page = blogDto.getPage();
-        }
-        if (Objects.nonNull(blogDto.getSize())) {
-            size = blogDto.getSize();
-        }
+    public Map<String, Object> getBlogByPage(BlogDto blogDto) throws Exception {
+
+        Map<String, Object> resultMap = new HashMap<>();
         blogDto.setPage((blogDto.getPage() - 1) * blogDto.getSize());
 
         List<Blog> blogList = baseMapper.selectBlogByRequest(blogDto);
         // 数据总数，由于可能使用left join导致总条数不准，因此重新查一次
         int totalSize = baseMapper.selectBlogCountByRequest(blogDto);
 
-        response.data(Constants.ReplyField.DATA, this.toDtoList(blogList, BlogDto.class));
-        response.data(Constants.ReplyField.TOTAL, totalSize);
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, this.toDtoList(blogList, BlogDto.class));
+        resultMap.put(Constants.ReplyField.TOTAL, totalSize);
+        resultMap.put(Constants.ReplyField.PAGE, blogDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, blogDto.getSize());
+        return resultMap;
     }
 
     /**
@@ -97,8 +91,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return
      */
     @Override
-    public Response getBlogBySortId(BlogDto blogDto) throws Exception {
-        Response response = Response.ok();
+    public List<BlogDto> getBlogBySortId(BlogDto blogDto) throws Exception {
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         queryWrapper.eq(DbConstants.Blog.BLOG_SORT_ID, blogDto.getBlogSortId());
@@ -111,8 +104,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             dto.setTags(this.getBlogTags(blogDto.getId()));
         }
 
-        response.data(Constants.ReplyField.DATA, blogDtos);
-        return response;
+        return blogDtos;
     }
 
     /**
@@ -122,13 +114,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return
      */
     @Override
-    public Response getBlogByTagId(BlogDto blogDto) throws Exception {
-        Response response = Response.ok();
+    public List<BlogDto> getBlogByTagId(BlogDto blogDto) throws Exception {
         QueryWrapper<BlogTag> blogTagQueryWrapper = new QueryWrapper<>();
         blogTagQueryWrapper.eq(DbConstants.BlogTag.TAG_ID, blogDto.getTagId());
         List<BlogTag> blogTags = blogTagMapper.selectList(blogTagQueryWrapper);
         if (CollectionUtils.isEmpty(blogTags)) {
-            return response;
+            return new ArrayList<>();
         }
 
         List<String> blogIds = blogTags.stream().map(BlogTag::getBlogId).distinct().collect(Collectors.toList());
@@ -140,8 +131,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 dto.setSort(blogSort);
             }
         }
-        response.data(Constants.ReplyField.DATA, blogDtos);
-        return response;
+        return blogDtos;
     }
 
     /**
@@ -151,12 +141,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return
      */
     @Override
-    public Response getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception {
-        Response response = Response.ok();
+    public BlogDto getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception {
         Blog blog = baseMapper.selectById(blogDto.getId());
         if (Objects.isNull(blog)) {
             LOGGER.error("cannot find blog by id:{}", blogDto.getId());
-            return Response.setResult(ResultCodeEnum.QUERY_FAILED);
+            throw new BusinessException("未找到博客");
         }
         BlogDto responseDto = this.toDto(blog, BlogDto.class);
         // 查询该ip是否已经给博客点过赞
@@ -165,8 +154,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 blogDto.getUserId(),
                 MD5Utils.string2MD5(UniqueKeyUtil.getUniqueKey(request, blogDto.getScreenInformation())),
                 blogDto.getBrowserFinger()));
-        response.data(Constants.ReplyField.DATA, responseDto);
-        return response;
+        return responseDto;
     }
 
     /**
@@ -176,8 +164,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return
      */
     @Override
-    public Response getPrevNextBlog(BlogDto blogDto) throws Exception {
-        Response response = Response.ok();
+    public Map<String, Object> getPrevNextBlog(BlogDto blogDto) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
         // 获取上一篇博客
         QueryWrapper<Blog> prevQueryWrapper = new QueryWrapper<>();
         prevQueryWrapper.lt(DbConstants.Base.CREATE_TIME, blogDto.getCreateTime());
@@ -185,7 +173,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         prevQueryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         List<Blog> prevBlogList = baseMapper.selectList(prevQueryWrapper);
         if (!CollectionUtils.isEmpty(prevBlogList)) {
-            response.data(Constants.ReplyField.PREV_BLOG, this.toDto(prevBlogList.get(0), BlogDto.class));
+            resultMap.put(Constants.ReplyField.PREV_BLOG, this.toDto(prevBlogList.get(0), BlogDto.class));
         }
         // 获取下一篇博客
         QueryWrapper<Blog> nextQueryWrapper = new QueryWrapper<>();
@@ -194,19 +182,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         prevQueryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         List<Blog> nextBlogList = baseMapper.selectList(nextQueryWrapper);
         if (!CollectionUtils.isEmpty(nextBlogList)) {
-            response.data(Constants.ReplyField.NEXT_BLOG, this.toDto(nextBlogList.get(0), BlogDto.class));
+            resultMap.put(Constants.ReplyField.NEXT_BLOG, this.toDto(nextBlogList.get(0), BlogDto.class));
         }
-        return response;
+        return resultMap;
     }
 
     @Override
-    public Response getArchives(ArchiveDto archiveDto) {
-        Response response = Response.ok();
-        int page = 1;
-        int size = 10;
-        if (Objects.nonNull(archiveDto.getPage())) page = archiveDto.getPage();
-        if (Objects.nonNull(archiveDto.getSize())) size = archiveDto.getSize();
-        Page<Blog> archivePage = new Page<>(page, size);
+    public Map<String, Object> getArchives(ArchiveDto archiveDto) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Page<Blog> archivePage = new Page<>(archiveDto.getPage(), archiveDto.getSize());
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
         if (StringUtils.isNotBlank(archiveDto.getMonth())) {
@@ -215,7 +199,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
         baseMapper.selectPage(archivePage, queryWrapper);
         if (CollectionUtils.isEmpty(archivePage.getRecords())) {
-            response.data(Constants.ReplyField.DATA, new ArrayList<>());
+            resultMap.put(Constants.ReplyField.DATA, new ArrayList<>());
         } else {
             Map<String, ArchiveDto> responseMap = new LinkedHashMap<>();
             for (Blog blog : archivePage.getRecords()) {
@@ -232,34 +216,32 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 yearDto.getChildrens().add(toArchiveDto(blog));
                 responseMap.put(year, yearDto);
             }
-            response.data(Constants.ReplyField.DATA, responseMap.values());
+            resultMap.put(Constants.ReplyField.DATA, responseMap.values());
         }
-        response.data(Constants.ReplyField.TOTAL, archivePage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.TOTAL, archivePage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, archiveDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, archiveDto.getSize());
+        return resultMap;
     }
 
     @Override
-    public Response initArchives(ArchiveDto archiveDto) {
+    public List<ArchiveDto> initArchives(ArchiveDto archiveDto) {
         if (BooleanUtils.isTrue(archiveDto.getQueryByMonth()) && StringUtils.isBlank(archiveDto.getMonth())) {
             List<ArchiveDto> archiveDtos = baseMapper.selectBlogNumByMouth();
-            return Response.ok().data(Constants.ReplyField.DATA, archiveDtos);
-        } else {
-            LOGGER.error("initArchives failed by illegal param:{}", archiveDto);
-            return Response.error();
+            return archiveDtos;
         }
+        LOGGER.error("initArchives failed by illegal param:{}", archiveDto);
+        throw new BusinessException("初始化归档信息失败");
     }
 
     @Override
-    public Response getBlogByKeyword(BlogDto blogDto) throws Exception {
+    public List<BlogEsDto> getBlogByKeyword(BlogDto blogDto) throws Exception {
         if (StringUtils.isBlank(blogDto.getContent())) {
-            return Response.error().message("请输入查询条件");
+            throw new BusinessException("请输入查询条件");
         }
         Map<String, Object> param = new HashMap<>();
         param.put(Constants.EsContants.BLOG_CONTENT, blogDto.getContent());
-        List<BlogEsDto> result = esOperateManager.search(param, BlogEsOperateHandler.class, BlogEsDto.class);
-        return Response.ok().data(Constants.ReplyField.DATA, result);
+        return esOperateManager.search(param, BlogEsOperateHandler.class, BlogEsDto.class);
     }
 
     private ArchiveDto toArchiveDto(Blog blog) {

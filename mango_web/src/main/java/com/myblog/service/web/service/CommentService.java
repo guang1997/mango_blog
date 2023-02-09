@@ -1,5 +1,7 @@
 package com.myblog.service.web.service;
 
+import java.util.Map;
+
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.web.entity.Comment;
@@ -18,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface CommentService extends IService<Comment>, ServiceConvertHandler<Comment, CommentDto> {
 
-    Response getCommentByPage(CommentDto commentDto) throws Exception;
+    Map<String, Object> getCommentByPage(CommentDto commentDto) throws Exception;
 
     Response likeBlog(CommentDto commentDto, HttpServletRequest request) throws Exception;
 

@@ -44,14 +44,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     private BlogMapper blogMapper;
 
     @Override
-    public Response getCommentByPage(CommentDto commentDto) throws Exception {
-        Response response = Response.ok();
-        int page = 1;
-        int size = 5;
-        if (Objects.nonNull(commentDto.getPage())) page = commentDto.getPage();
-        if (Objects.nonNull(commentDto.getSize())) size = commentDto.getSize();
+    public Map<String, Object> getCommentByPage(CommentDto commentDto) throws Exception {
 
-        Page<Comment> commentPage = new Page<>(page, size);
+        Map<String, Object> resultMap = new HashMap<>();
+        Page<Comment> commentPage = new Page<>(commentDto.getPage(), commentDto.getSize());
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(commentDto.getBlogId())) {
             queryWrapper.eq(DbConstants.Comment.BLOG_ID, commentDto.getBlogId());
@@ -77,11 +73,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             commentDtos.addAll(this.toDtoList(baseMapper.selectList(likeQueryWrapper), CommentDto.class));
         }
         commentDtos = CommentTreeUtil.toCommentTree(commentDtos, "0");
-        response.data(Constants.ReplyField.DATA, commentDtos);
-        response.data(Constants.ReplyField.TOTAL, commentPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, commentDtos);
+        resultMap.put(Constants.ReplyField.TOTAL, commentPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, commentDto.getPage());
+        resultMap.put(Constants.ReplyField.SIZE, commentDto.getSize());
+        return resultMap;
     }
 
     /**

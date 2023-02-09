@@ -225,7 +225,7 @@ export default {
       setTimeout(() => {
         getMenusByPid(node.data.id ? node.data.id : 0).then((res) => {
           if (res.code === this.$ECode.SUCCESS) {
-            resolve(res.data.data);
+            resolve(res.data);
           } else {
             this.$commonUtil.message.error(res.message);
           }
@@ -259,7 +259,7 @@ export default {
       // 获取该节点的所有子节点，id 包含自身
       getChildren(menu.id).then(res => {
         // 判断是否在 menuIds 中，如果存在则删除，否则添加
-        const childIds = res.data.data;
+        const childIds = res.data;
         if (this.menuIds.indexOf(menu.id) !== -1) {
           for (let i = 0; i < childIds.length; i++) {
             const index = this.menuIds.indexOf(childIds[i]);
@@ -309,7 +309,7 @@ export default {
       // 无刷新更新 表格数据
       crudRoles.getRoleById(this.currentId).then((res) => {
         for (let i = 0; i < this.crud.data.length; i++) {
-            if (res.data.data.id === this.crud.data[i].id) {
+            if (res.data.id === this.crud.data[i].id) {
               this.crud.data[i] = res.data.data
               break;
             }

@@ -1,7 +1,11 @@
 package com.myblog.service.web.controller;
 
 
+import java.util.List;
+import java.util.Map;
+
 import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.web.entity.dto.ArchiveDto;
@@ -33,14 +37,14 @@ public class ArchiveController {
     @LogByMethod(value = "/web/archive/getArchives", behavior = BehaviorEnum.ARCHIVE)
     @ApiOperation(value = "查询归档", notes = "查询归档", response = Response.class)
     @PostMapping("/getArchives")
-    public Response getArchives(@RequestBody ArchiveDto archiveDto) throws Exception {
-        return blogService.getArchives(archiveDto);
+    public ResultModel<Map<String, Object>> getArchives(@RequestBody ArchiveDto archiveDto) throws Exception {
+        return ResultModel.ok(blogService.getArchives(archiveDto));
     }
 
     @LogByMethod(value = "/web/archive/initArchives")
     @ApiOperation(value = "首页初始化归档", notes = "首页初始化归档", response = Response.class)
     @PostMapping("/initArchives")
-    public Response initArchives(@RequestBody ArchiveDto archiveDto) throws Exception {
-        return blogService.initArchives(archiveDto);
+    public ResultModel<List<ArchiveDto>> initArchives(@RequestBody ArchiveDto archiveDto) throws Exception {
+        return ResultModel.ok(blogService.initArchives(archiveDto));
     }
 }

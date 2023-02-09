@@ -2,6 +2,7 @@ package com.myblog.service.web.service;
 
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
+import com.myblog.service.base.handler.es.entity.BlogEsDto;
 import com.myblog.service.web.entity.Blog;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myblog.service.web.entity.dto.ArchiveDto;
@@ -9,6 +10,8 @@ import com.myblog.service.web.entity.dto.BlogDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -20,19 +23,19 @@ import java.io.IOException;
  */
 public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog, BlogDto> {
 
-    Response getBlogByPage(BlogDto blogDto) throws Exception;
+    Map<String, Object> getBlogByPage(BlogDto blogDto) throws Exception;
 
-    Response getBlogBySortId(BlogDto blogDto) throws Exception;
+    List<BlogDto> getBlogBySortId(BlogDto blogDto) throws Exception;
 
-    Response getBlogByTagId(BlogDto blogDto) throws Exception;
+    List<BlogDto> getBlogByTagId(BlogDto blogDto) throws Exception;
 
-    Response getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception;
+    BlogDto getBlogById(BlogDto blogDto, HttpServletRequest request) throws Exception;
 
-    Response getPrevNextBlog(BlogDto blogDto) throws Exception;
+    Map<String, Object> getPrevNextBlog(BlogDto blogDto) throws Exception;
 
-    Response getArchives(ArchiveDto archiveDto) throws Exception;
+    Map<String, Object> getArchives(ArchiveDto archiveDto) throws Exception;
 
-    Response initArchives(ArchiveDto archiveDto);
+    List<ArchiveDto> initArchives(ArchiveDto archiveDto);
 
-    Response getBlogByKeyword(BlogDto blogDto) throws Exception;
+    List<BlogEsDto> getBlogByKeyword(BlogDto blogDto) throws Exception;
 }

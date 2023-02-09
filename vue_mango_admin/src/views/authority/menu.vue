@@ -323,7 +323,7 @@ export default {
       setTimeout(() => {
         crudMenu.getMenusByPid(tree.id).then((res) => {
           if (res.code === this.$ECode.SUCCESS) {
-            resolve(res.data.data);
+            resolve(res.data);
           } else {
             this.$commonUtil.message.error(res.message);
           }
@@ -333,7 +333,7 @@ export default {
     getSuperior(id) {
       crudMenu.getSuperior(id).then((res) => {
         if (res.code === this.$ECode.SUCCESS) {
-          const children = res.data.data.map(function (obj) {
+          const children = res.data.map(function (obj) {
             if (obj.leaf) {
               delete obj.children;
             }
@@ -349,7 +349,7 @@ export default {
       if (action === LOAD_CHILDREN_OPTIONS) {
         crudMenu.getMenusByPid(parentNode.id).then((res) => {
           if (res.code === this.$ECode.SUCCESS) {
-            parentNode.children = res.data.data.map(function (obj) {
+            parentNode.children = res.data.map(function (obj) {
             if (obj.leaf) {
               delete obj.children;
             }
