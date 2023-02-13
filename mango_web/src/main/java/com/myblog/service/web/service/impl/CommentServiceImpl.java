@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.*;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.util.BaseUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.MD5Utils;
@@ -88,11 +89,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response likeBlog(CommentDto commentDto, HttpServletRequest request) throws Exception {
+    public String likeBlog(CommentDto commentDto, HttpServletRequest request) throws Exception {
         int likeCount = 0;
         String successMsg = "点赞成功";
         String failedMsg = "点赞失败";
-        Response response = Response.ok();
         Comment comment = this.toDb(commentDto, Comment.class);
         comment.setStatus(Constants.CommentStatus.REVIEWED);
         comment.setBlogId(commentDto.getBlogId());
@@ -123,7 +123,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             if (baseMapper.update(comment, userIdUpdateWrapper) < 1) {
                 if (baseMapper.insert(comment) < 1) {
                     LOGGER.error("likeBlog failed by unknowen error, comment:{}", comment);
-                    return Response.error().message(failedMsg);
+                    throw new BusinessException(failedMsg);
                 }
             }
         } else {
@@ -140,16 +140,15 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             if (baseMapper.update(comment, updateWrapper) < 1) {
                 if (baseMapper.insert(comment) < 1) {
                     LOGGER.error("likeBlog failed by unknowen error, comment:{}", comment);
-                    return Response.error().message(failedMsg);
+                    throw new BusinessException(failedMsg);
                 }
             }
         }
         if (blogMapper.changeLike(commentDto.getBlogId(), likeCount) < 1) {
             LOGGER.error("likeBlog failed by change blog likeCount, commentDto:{}", commentDto);
-            return Response.error().message(failedMsg);
+            throw new BusinessException(failedMsg);
         }
-        response.setMessage(successMsg);
-        return response;
+        return successMsg;
     }
 
     /**
@@ -159,14 +158,14 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
      * @return
      */
     @Override
-    public Response saveComment(CommentDto commentDto, HttpServletRequest request) throws Exception {
+    public Boolean saveComment(CommentDto commentDto, HttpServletRequest request) throws Exception {
         Comment comment = this.toDb(commentDto, Comment.class);
         comment.setIp(IpUtils.getIpAddr(request));
         if (baseMapper.insert(comment) < 1) {
             LOGGER.error("likeBlog failed by unknowen error, comment:{}", comment);
-            return Response.setResult(ResultCodeEnum.COMMENT_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -176,7 +175,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
      * @return
      */
     @Override
-    public Response likeComment(CommentDto commentDto, HttpServletRequest request) throws Exception{
+    public String likeComment(CommentDto commentDto, HttpServletRequest request) throws Exception{
         String successMsg = "点赞成功";
         String failedMsg = "点赞失败";
         Comment comment = this.toDb(commentDto, Comment.class);
@@ -207,10 +206,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (baseMapper.update(comment, userIdUpdateWrapper) < 1) {
             if (baseMapper.insert(comment) < 1) {
                 LOGGER.error("likeComment failed by unknowen error, comment:{}", comment);
-                return Response.error().message(failedMsg);
+                throw new BusinessException(failedMsg);
             }
         }
         baseMapper.updateById(parentComment);
-        return Response.ok().message(successMsg);
+        return successMsg;
     }
 }

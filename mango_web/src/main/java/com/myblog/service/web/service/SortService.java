@@ -1,5 +1,7 @@
 package com.myblog.service.web.service;
 
+import java.util.Map;
+
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.web.entity.Sort;
@@ -16,5 +18,5 @@ import com.myblog.service.web.entity.dto.SortDto;
  */
 public interface SortService extends IService<Sort>, ServiceConvertHandler<Sort, SortDto> {
 
-    Response getSortByPage(SortDto sortDto) throws Exception;
+    Map<String, Object> getSortByPage(SortDto sortDto) throws Exception;
 }

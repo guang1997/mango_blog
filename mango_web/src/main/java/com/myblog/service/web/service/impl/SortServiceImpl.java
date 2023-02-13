@@ -1,5 +1,6 @@
 package com.myblog.service.web.service.impl;
 
+import cn.hutool.core.util.BooleanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.Constants;
@@ -14,8 +15,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,20 +37,30 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
     @Autowired
     private BlogMapper blogMapper;
 
-    @Override
-    public Response getSortByPage(SortDto sortDto) throws Exception {
-        Response response = Response.ok();
-        if (Objects.nonNull(sortDto.getQueryAll()) && sortDto.getQueryAll()) {
-            List<SortDto> sortDtos = this.toDtoList(baseMapper.selectList(null), SortDto.class);
-            response.data(Constants.ReplyField.DATA, sortDtos);
-            response.data(Constants.ReplyField.TOTAL, sortDtos.size());
-            return response;
-        }
-        int page = 1;
-        int size = 5;
-        if (Objects.nonNull(sortDto.getPage())) page = sortDto.getPage();
-        if (Objects.nonNull(sortDto.getSize())) size = sortDto.getSize();
+    @Value("${web.sortPage:1}")
+    private Integer sortPage;
 
+    @Value("${web.sortSize:5}")
+    private Integer sortSize;
+
+    @Override
+    public Map<String, Object> getSortByPage(SortDto sortDto) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
+        // 分类页面查询数据
+        if (BooleanUtil.isTrue(sortDto.getQueryAll())) {
+            List<SortDto> sortDtos = this.toDtoList(baseMapper.selectList(null), SortDto.class);
+            resultMap.put(Constants.ReplyField.DATA, sortDtos);
+            resultMap.put(Constants.ReplyField.TOTAL, sortDtos.size());
+            return resultMap;
+        }
+
+        int page = sortDto.getPage();
+        int size = sortDto.getSize();
+        // 首页查询最新分类
+        if (BooleanUtil.isTrue(sortDto.getQueryLatest())) {
+            page = sortPage;
+            size = sortSize;
+        }
         Page<Sort> sortPage = new Page<>(page, size);
         QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc(DbConstants.Base.CREATE_TIME);
@@ -64,13 +77,14 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
                 dbSortDto.setBlogNum(Integer.parseInt(blogSortNumMap.get("blogNum").toString()));
             }
         }
-        response.data(Constants.ReplyField.DATA, sortDtoList);
-        response.data(Constants.ReplyField.TOTAL, sortPage.getTotal());
-        response.data(Constants.ReplyField.PAGE, page);
-        response.data(Constants.ReplyField.SIZE, size);
-        return response;
+        resultMap.put(Constants.ReplyField.DATA, sortDtoList);
+        resultMap.put(Constants.ReplyField.TOTAL, sortPage.getTotal());
+        resultMap.put(Constants.ReplyField.PAGE, page);
+        resultMap.put(Constants.ReplyField.SIZE, size);
+        return resultMap;
     }
 
+    @Override
     public void setDtoExtraProperties(Sort db, SortDto dto) {
         dto.setId(db.getId());
         dto.setCreateTime(db.getCreateTime());

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -30,20 +31,20 @@ public class LinkServiceImpl extends ServiceImpl<LinkMapper, Link> implements Li
     private static Logger LOGGER = LoggerFactory.getLogger(LinkServiceImpl.class);
 
     @Override
-    public Response getFriendLink(LinkDto linkDto) throws Exception {
+    public List<LinkDto> getFriendLink(LinkDto linkDto) throws Exception {
         Response response = Response.ok();
         QueryWrapper<Link> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(DbConstants.Link.LINK_STATUS, Constants.CommonStatus.ENABLED);
-        return response.data(Constants.ReplyField.DATA, this.toDtoList(baseMapper.selectList(queryWrapper), LinkDto.class));
+        return this.toDtoList(baseMapper.selectList(queryWrapper), LinkDto.class);
     }
 
     @Override
-    public Response saveFriendLink(LinkDto linkDto) throws Exception {
+    public Boolean saveFriendLink(LinkDto linkDto) throws Exception {
         Link link = this.toDb(linkDto, Link.class);
         if (baseMapper.insert(link) < 1) {
             LOGGER.error("saveFriendLink failed by unknowen error, link:{}", link);
-            return Response.error();
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 }

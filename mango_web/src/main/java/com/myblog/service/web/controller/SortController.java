@@ -1,7 +1,10 @@
 package com.myblog.service.web.controller;
 
 
+import java.util.Map;
+
 import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.web.entity.dto.SortDto;
@@ -31,15 +34,8 @@ public class SortController {
     @LogByMethod(value = "/web/sort/getSortByPage", behavior = BehaviorEnum.SORT)
     @ApiOperation(value = "分页查询分类信息", notes = "分页查询分类信息", response = Response.class)
     @PostMapping("/getSortByPage")
-    public Response getSortByPage(@RequestBody SortDto sortDto) throws Exception {
-        return sortService.getSortByPage(sortDto);
-    }
-
-    @LogByMethod(value = "/web/sort/initSortByPage")
-    @ApiOperation(value = "首页查询分类信息", notes = "首页查询分类信息", response = Response.class)
-    @PostMapping("/initSortByPage")
-    public Response initSortByPage(@RequestBody SortDto sortDto) throws Exception {
-        return sortService.getSortByPage(sortDto);
+    public ResultModel<Map<String, Object>> getSortByPage(@RequestBody SortDto sortDto) throws Exception {
+        return ResultModel.ok(sortService.getSortByPage(sortDto));
     }
 }
 

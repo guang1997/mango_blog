@@ -312,7 +312,7 @@ export default {
     getFriendLink() {
       linkApi.getFriendLink({}).then((response) => {
         if (response.code == 20000) {
-          this.friendLinkList = response.data.data;
+          this.friendLinkList = response.data;
         }
       });
     },

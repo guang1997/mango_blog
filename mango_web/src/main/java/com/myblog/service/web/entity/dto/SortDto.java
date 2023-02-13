@@ -15,4 +15,6 @@ public class SortDto extends BaseReqDto {
     private Integer blogNum;
 
     private Boolean queryAll;
+
+    private Boolean queryLatest;
 }

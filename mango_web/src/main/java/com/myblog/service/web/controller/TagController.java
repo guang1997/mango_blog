@@ -1,7 +1,10 @@
 package com.myblog.service.web.controller;
 
 
+import java.util.Map;
+
 import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Response;
 import com.myblog.service.web.entity.dto.TagDto;
@@ -31,15 +34,9 @@ public class TagController {
     @LogByMethod(value = "/web/tag/getTagByPage", behavior = BehaviorEnum.TAG)
     @ApiOperation(value = "分页查询标签信息", notes = "分页查询标签信息", response = Response.class)
     @PostMapping("/getTagByPage")
-    public Response getTagByPage(@RequestBody TagDto tagDto) throws Exception {
-        return tagService.getTagByPage(tagDto);
+    public ResultModel<Map<String, Object>> getTagByPage(@RequestBody TagDto tagDto) throws Exception {
+        return ResultModel.ok(tagService.getTagByPage(tagDto));
     }
 
-    @LogByMethod(value = "/web/tag/initTagByPage")
-    @ApiOperation(value = "首页查询标签信息", notes = "首页查询标签信息", response = Response.class)
-    @PostMapping("/initTagByPage")
-    public Response initTagByPage(@RequestBody TagDto tagDto) throws Exception {
-        return tagService.getTagByPage(tagDto);
-    }
 }
 

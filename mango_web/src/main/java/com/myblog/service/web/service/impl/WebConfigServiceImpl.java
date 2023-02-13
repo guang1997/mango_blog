@@ -7,6 +7,7 @@ import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Constants.ReplyField;
 import com.myblog.service.base.common.Constants.Symbol;
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.web.entity.WebConfig;
 import com.myblog.service.web.entity.dto.WebConfigDto;
@@ -28,16 +29,16 @@ import org.springframework.stereotype.Service;
 public class WebConfigServiceImpl extends ServiceImpl<WebConfigMapper, WebConfig> implements WebConfigService {
 
     @Override
-    public Response getWebConfig() throws Exception {
+    public WebConfigDto getWebConfig() throws Exception {
         WebConfig webConfig = baseMapper.selectOne(null);
         if (Objects.isNull(webConfig)) {
-            return Response.error();
+            throw new BusinessException("未找到配置信息");
         }
         WebConfigDto webConfigDto = this.toDto(webConfig, WebConfigDto.class);
         String rollingSentences = webConfig.getRollingSentences();
         if (StringUtils.isNotBlank(rollingSentences)) {
             webConfigDto.setRollingSentences(Arrays.asList(rollingSentences.split(Symbol.COMMA7)));
         }
-        return Response.ok().data(ReplyField.DATA, webConfigDto);
+        return webConfigDto;
     }
 }

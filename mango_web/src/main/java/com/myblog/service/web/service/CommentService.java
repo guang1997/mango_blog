@@ -22,9 +22,9 @@ public interface CommentService extends IService<Comment>, ServiceConvertHandler
 
     Map<String, Object> getCommentByPage(CommentDto commentDto) throws Exception;
 
-    Response likeBlog(CommentDto commentDto, HttpServletRequest request) throws Exception;
+    String likeBlog(CommentDto commentDto, HttpServletRequest request) throws Exception;
 
-    Response saveComment(CommentDto commentDto, HttpServletRequest request) throws Exception;
+    Boolean saveComment(CommentDto commentDto, HttpServletRequest request) throws Exception;
 
-    Response likeComment(CommentDto commentDto, HttpServletRequest request) throws Exception;
+    String likeComment(CommentDto commentDto, HttpServletRequest request) throws Exception;
 }

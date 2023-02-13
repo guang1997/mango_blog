@@ -1,5 +1,8 @@
 package com.myblog.service.web.service;
 
+import java.util.List;
+import java.util.Map;
+
 import com.myblog.service.base.common.Response;
 import com.myblog.service.base.handler.ServiceConvertHandler;
 import com.myblog.service.web.entity.Link;
@@ -16,7 +19,7 @@ import com.myblog.service.web.entity.dto.LinkDto;
  */
 public interface LinkService extends IService<Link>, ServiceConvertHandler<Link, LinkDto> {
 
-    Response getFriendLink(LinkDto linkDto) throws Exception;
+    List<LinkDto> getFriendLink(LinkDto linkDto) throws Exception;
 
-    Response saveFriendLink(LinkDto linkDto) throws Exception;
+    Boolean saveFriendLink(LinkDto linkDto) throws Exception;
 }

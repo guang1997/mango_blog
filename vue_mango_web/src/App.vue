@@ -63,9 +63,8 @@ export default {
         if (res.code === 20000) this.setArchives(res.data.data)
       })
       sortApi
-        .initSortByPage({
-          page: 1,
-          size: 5,
+        .getSortByPage({
+          queryLatest:true
         })
         .then((res) => {
           if (res.code === 20000) {
@@ -74,9 +73,8 @@ export default {
           }
         });
       tagApi
-        .initTagByPage({
-          page: 1,
-          size: 1000,
+        .getTagByPage({
+          queryLatest:true
         })
         .then((res) => {
           if (res.code === 20000) {
@@ -108,8 +106,7 @@ export default {
     initWebConfig() {
       webConfigApi.getWebConfig().then((res) => {
         if(res.code === 20000) {
-          this.setWebConfig(res.data.data)
-          console.log("setWebConfig", res.data.data)
+          this.setWebConfig(res.data)
         }
       })
     },

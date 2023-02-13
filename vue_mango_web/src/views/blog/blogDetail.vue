@@ -250,7 +250,7 @@ export default {
       if (res.code === 20000) {
         this.$message({
           type: "success",
-          message: res.message,
+          message: res.data,
         });
 
         if (isLiked === false) {
@@ -290,7 +290,7 @@ export default {
       if (likeRes.code === 20000) {
         this.$message({
           type: "success",
-          message: likeRes.message,
+          message: likeRes.data,
         });
         this.getCommentByPage();
       }
@@ -411,7 +411,7 @@ export default {
     if(storage.getVisitor()) {
       loginApi.getUser(storage.getVisitor()).then(res => {
         if (res.code === 20000) {
-           this.setVisitorInfo(res.data.data)
+           this.setVisitorInfo(res.data)
         }
       })
     }

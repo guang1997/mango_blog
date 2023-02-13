@@ -52,18 +52,18 @@ public class LoginController {
     @LogByMethod(value = "/web/login/doLogin", behavior = BehaviorEnum.LOGIN)
     @ApiOperation(value = "保存用户", notes = "保存用户", response = Response.class)
     @PostMapping("/doLogin")
-    public Response doLogin(@RequestBody UserDto userDto, HttpServletRequest request) throws Exception {
+    public ResultModel<UserDto> doLogin(@RequestBody UserDto userDto, HttpServletRequest request) throws Exception {
         // 校验验证码
         if (!verificationCodeService.validateCode(userDto.getEmail(), userDto.getCode(), Constants.EmailSource.WEB).getSuccess()) {
-            return Response.error().message("验证码错误");
+            return ResultModel.<UserDto>error().message("验证码错误");
         }
-        return userService.doLogin(userDto, request);
+        return ResultModel.ok(userService.doLogin(userDto, request));
     }
 
     @LogByMethod(value = "/web/login/getUser", behavior = BehaviorEnum.LOGIN)
     @ApiOperation(value = "获取用户", notes = "获取用户", response = Response.class)
     @PostMapping("/getUser")
-    public Response getUser(@RequestBody UserDto userDto) throws Exception {
-        return userService.getUser(userDto);
+    public ResultModel<UserDto> getUser(@RequestBody UserDto userDto) throws Exception {
+        return ResultModel.ok(userService.getUser(userDto));
     }
 }

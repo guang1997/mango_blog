@@ -3,6 +3,7 @@ package com.myblog.service.web.controller;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.myblog.service.base.common.BehaviorEnum;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
 import com.myblog.service.base.common.Response;
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -55,24 +58,23 @@ public class LinkController {
     @LogByMethod(value = "/web/link/getFriendLink", behavior = BehaviorEnum.FRIENDSHIP_LINK)
     @ApiOperation(value = "查询友链信息", notes = "查询友链信息", response = Response.class)
     @PostMapping("/getFriendLink")
-    public Response getFriendLink(@RequestBody LinkDto linkDto) throws Exception {
-        return linkService.getFriendLink(linkDto);
+    public ResultModel<List<LinkDto>> getFriendLink(@RequestBody LinkDto linkDto) throws Exception {
+        return ResultModel.ok(linkService.getFriendLink(linkDto));
     }
 
     @LogByMethod("/web/link/saveFriendLink")
     @ApiOperation(value = "保存友链", notes = "保存友链", response = Response.class)
     @PostMapping("/saveFriendLink")
-    public Response saveFriendLink(@RequestBody LinkDto linkDto) throws Exception {
+    public ResultModel<Object> saveFriendLink(@RequestBody LinkDto linkDto) throws Exception {
         // 校验验证码
         if (!verificationCodeService.validateCode(linkDto.getEmail(), linkDto.getCode(), Constants.EmailSource.WEB).getSuccess()) {
-            return Response.error().message("验证码错误");
+            return ResultModel.error().message("验证码错误");
         }
-        Response response = linkService.saveFriendLink(linkDto);
         // 保存成功之后异步发送邮件
-        if (response.getSuccess()) {
+        if (linkService.saveFriendLink(linkDto)) {
             this.sendEmail(linkDto.getEmail(), linkDto.getUrl());
         }
-        return response;
+        return ResultModel.ok();
     }
 
     private void sendEmail(String email, String url) {

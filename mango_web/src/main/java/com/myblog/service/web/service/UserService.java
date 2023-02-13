@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface UserService extends IService<User>, ServiceConvertHandler<User, UserDto> {
 
-    Response doLogin(UserDto userDto, HttpServletRequest request) throws Exception;
+    UserDto doLogin(UserDto userDto, HttpServletRequest request) throws Exception;
 
-    Response getUser(UserDto userDto) throws Exception;
+    UserDto getUser(UserDto userDto) throws Exception;
 }

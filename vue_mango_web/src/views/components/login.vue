@@ -294,7 +294,7 @@ export default {
         });
 
           if (res.code === 20000) {
-            this.setVisitorInfo(res.data.data);
+            this.setVisitorInfo(res.data);
             this.$emit("changeCustomVisible", false);
             this.formInfo = {
               nickname: "",

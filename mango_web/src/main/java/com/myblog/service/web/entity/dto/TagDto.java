@@ -17,4 +17,6 @@ public class TagDto extends BaseReqDto {
     private List<String> createTimes;
 
     private Boolean queryAll;
+
+    private Boolean queryLatest;
 }

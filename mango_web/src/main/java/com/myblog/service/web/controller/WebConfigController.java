@@ -5,7 +5,9 @@ import javax.annotation.PostConstruct;
 
 import com.myblog.service.base.common.Constants.ReplyField;
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
+import com.myblog.service.web.entity.dto.WebConfigDto;
 import com.myblog.service.web.service.WebConfigService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +37,8 @@ public class WebConfigController {
     @LogByMethod("/web/webConfig/getWebConfig")
     @ApiOperation(value = "查询网站配置信息", notes = "查询网站配置信息", response = Response.class)
     @PostMapping("/getWebConfig")
-    public Response getWebConfig() throws Exception {
-        return webConfigService.getWebConfig();
+    public ResultModel<WebConfigDto> getWebConfig() throws Exception {
+        return ResultModel.ok(webConfigService.getWebConfig());
     }
 }
 

@@ -16,5 +16,5 @@ import com.myblog.service.web.entity.dto.WebConfigDto;
  */
 public interface WebConfigService extends IService<WebConfig>, ServiceConvertHandler<WebConfig, WebConfigDto> {
 
-    Response getWebConfig() throws Exception;
+    WebConfigDto getWebConfig() throws Exception;
 }
