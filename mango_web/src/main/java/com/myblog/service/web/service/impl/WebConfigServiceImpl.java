@@ -34,6 +34,7 @@ public class WebConfigServiceImpl extends ServiceImpl<WebConfigMapper, WebConfig
         if (Objects.isNull(webConfig)) {
             throw new BusinessException("未找到配置信息");
         }
+
         WebConfigDto webConfigDto = this.toDto(webConfig, WebConfigDto.class);
         String rollingSentences = webConfig.getRollingSentences();
         if (StringUtils.isNotBlank(rollingSentences)) {

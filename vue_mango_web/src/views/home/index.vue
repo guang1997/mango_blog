@@ -58,11 +58,7 @@ export default {
       backTimer: null,
       watingTyped: false,
       hidePage: false,
-      blogs: [],
-      // dictums: [
-      //   ['小鱼干是换不来幸福的，因为它本身就是幸福'],
-      //   ['有些事本来很遥远，你争取，它就会离你愈来愈近'],
-      // ]
+      blogs: []
     }
   },
   created() {

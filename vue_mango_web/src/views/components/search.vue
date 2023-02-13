@@ -76,9 +76,9 @@ export default {
         size: this.pageSize
       }).then((searchRes) => {
         if (searchRes.code === 20000) {
-        this.blogs = searchRes.data.data
+        this.blogs = searchRes.data
         this.searched = true
-        this.total = searchRes.data.total
+        this.total = searchRes.total
       } else {
         this.$message({
           type: 'error',

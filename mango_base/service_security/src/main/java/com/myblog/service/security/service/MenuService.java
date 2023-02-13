@@ -10,6 +10,7 @@ import com.myblog.service.security.entity.dto.MenuDto;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,7 +28,6 @@ public interface MenuService extends IService<Menu>, ServiceConvertHandler<Menu,
     MenuDto getMenuById(String id) throws Exception;
 
     List<MenuDto> getMenusByPid(String pid) throws Exception;
-
     List<MenuDto> getSuperior(MenuDto menuDto, List<MenuDto> menuDtos) throws Exception;
 
     Boolean addMenu(MenuDto menuDto) throws Exception;

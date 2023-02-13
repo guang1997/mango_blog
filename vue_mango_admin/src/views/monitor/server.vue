@@ -346,7 +346,7 @@ export default {
     getMessage(msg) {
       // var jsonObj = JSON.parse(msg);
       var jsonObj = JSON.parse(msg.data);
-      this.data = jsonObj.data;
+      this.data = jsonObj;
       this.show = true;
       if (this.cpuInfo.xAxis.data.length >= 8) {
         this.cpuInfo.xAxis.data.shift();
@@ -354,11 +354,11 @@ export default {
         this.cpuInfo.series[0].data.shift();
         this.memoryInfo.series[0].data.shift();
       }
-      this.cpuInfo.xAxis.data.push(jsonObj.data.time);
-      this.memoryInfo.xAxis.data.push(jsonObj.data.time);
-      this.cpuInfo.series[0].data.push(parseFloat(jsonObj.data.cpu.used));
+      this.cpuInfo.xAxis.data.push(jsonObj.time);
+      this.memoryInfo.xAxis.data.push(jsonObj.time);
+      this.cpuInfo.series[0].data.push(parseFloat(jsonObj.cpu.used));
       this.memoryInfo.series[0].data.push(
-        parseFloat(jsonObj.data.memory.usageRate)
+        parseFloat(jsonObj.memory.usageRate)
       );
     },
     send: function () {},

@@ -60,7 +60,7 @@ export default {
     ]),
     initPannel() {
       archiveApi.initArchives({ queryByMonth: true }).then((res) => {
-        if (res.code === 20000) this.setArchives(res.data.data)
+        if (res.code === 20000) this.setArchives(res.data)
       })
       sortApi
         .getSortByPage({
