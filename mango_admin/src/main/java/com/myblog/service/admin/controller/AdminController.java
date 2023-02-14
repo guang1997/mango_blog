@@ -10,7 +10,9 @@ import com.myblog.service.base.common.Response;
 import com.myblog.service.base.common.ResultCodeEnum;
 import com.myblog.service.security.entity.Role;
 import com.myblog.service.security.entity.dto.AdminDto;
+import com.myblog.service.security.entity.dto.AdminDto.AdminGroup;
 import com.myblog.service.security.entity.dto.PassAndEmailDto;
+import com.myblog.service.security.entity.dto.PassAndEmailDto.PassAndEmailGroup;
 import com.myblog.service.security.entity.dto.RoleDto;
 import com.myblog.service.security.service.AdminService;
 import com.myblog.service.security.service.RoleService;
@@ -70,7 +72,7 @@ public class AdminController {
     @LogByMethod("/admin/manager/addAdmin")
     @ApiOperation(value = "新增管理员", notes = "新增管理员", response = Response.class)
     @PostMapping("/addAdmin")
-    public ResultModel<Object> addAdmin(@RequestBody @Validated AdminDto adminDto) throws Exception {
+    public ResultModel<Object> addAdmin(@RequestBody @Validated(AdminGroup.AddAdmin.class) AdminDto adminDto) throws Exception {
 
         List<RoleDto> roles = adminDto.getRoles();
         if (!CollectionUtils.isEmpty(roles)) {
@@ -90,7 +92,7 @@ public class AdminController {
     @LogByMethod("/admin/manager/editAdmin")
     @ApiOperation(value = "修改管理员", notes = "修改管理员", response = Response.class)
     @PutMapping("/editAdmin")
-    public ResultModel<Object> editAdmin(@RequestBody @Validated AdminDto adminDto) throws Exception {
+    public ResultModel<Object> editAdmin(@RequestBody @Validated(AdminGroup.EditAdmin.class) AdminDto adminDto) throws Exception {
         if (!roleService.validRoleLevelByUserId(adminDto.getId())) {
             return ResultModel.setResult(ResultCodeEnum.UPDATE_FAILED);
         }
@@ -103,26 +105,22 @@ public class AdminController {
     @LogByMethod("/admin/manager/editAdminFromCenter")
     @ApiOperation(value = "从个人中心页面修改管理员", notes = "从个人中心页面修改管理员", response = Response.class)
     @PutMapping("/editAdminFromCenter")
-    public Response editAdminFromCenter(@RequestBody AdminDto adminDto) throws Exception {
-        if (StringUtils.isBlank(adminDto.getQqNumber())
-                || StringUtils.isBlank(adminDto.getWeChat())) {
-            log.error("editAdminFromCenter failed, qqNumber or weChat cannot be null, admin:{}", adminDto);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+    public ResultModel<Object> editAdminFromCenter(@RequestBody @Validated(AdminGroup.EditAdminFromCenter.class) AdminDto adminDto) throws Exception {
+        if (adminService.editAdminFromCenter(adminDto)) {
+            return ResultModel.ok();
         }
-        return adminService.editAdminFromCenter(adminDto);
+        return ResultModel.error();
     }
 
     @LogByMethod("/admin/manager/updatePass")
     @ApiOperation(value = "从个人中心页面修改密码", notes = "从个人中心页面修改密码", response = Response.class)
     @PostMapping("/updatePass")
     @Transactional(rollbackFor = Exception.class)
-    public Response updatePass(@RequestBody PassAndEmailDto passAndEmailDto) throws Exception {
-        if (StringUtils.isBlank(passAndEmailDto.getOldPass())
-                || StringUtils.isBlank(passAndEmailDto.getNewPass())) {
-            log.error("updatePass failed, pass cannot be null");
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+    public ResultModel<Object> updatePass(@RequestBody @Validated(PassAndEmailGroup.EditPass.class) PassAndEmailDto passAndEmailDto) throws Exception {
+        if (adminService.updatePass(passAndEmailDto)) {
+            return ResultModel.ok();
         }
-        return adminService.updatePass(passAndEmailDto);
+        return ResultModel.error();
 
     }
 
@@ -130,18 +128,15 @@ public class AdminController {
     @ApiOperation(value = "从个人中心页面修改邮箱", notes = "从个人中心页面修改邮箱", response = Response.class)
     @PostMapping("/updateEmail")
     @Transactional(rollbackFor = Exception.class)
-    public Response updateEmail(@RequestBody PassAndEmailDto passAndEmailDto) throws Exception {
-        if (StringUtils.isBlank(passAndEmailDto.getPass())
-                || StringUtils.isBlank(passAndEmailDto.getEmail())) {
-            log.error("updateEmail failed, pass or email cannot be null");
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
-        }
+    public ResultModel<Object> updateEmail(@RequestBody @Validated(PassAndEmailGroup.EditEmail.class)PassAndEmailDto passAndEmailDto) throws Exception {
         // 对验证码进行校验
-        Response verificationCodeResponse = verificationCodeService.validateCode(passAndEmailDto.getEmail(), passAndEmailDto.getCode(), Constants.EmailSource.ADMIN);
-        if (!verificationCodeResponse.getSuccess()) {
-            return verificationCodeResponse;
+        if(!verificationCodeService.validateCode(passAndEmailDto.getEmail(), passAndEmailDto.getCode(), Constants.EmailSource.ADMIN)) {
+            return ResultModel.setResult(ResultCodeEnum.CODE_ERROR);
         }
-        return adminService.updateEmail(passAndEmailDto);
+        if (adminService.updateEmail(passAndEmailDto)) {
+            return ResultModel.ok();
+        }
+        return ResultModel.error();
 
     }
 

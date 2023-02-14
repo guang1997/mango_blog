@@ -230,7 +230,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response editAdminFromCenter(AdminDto adminDto) throws Exception {
+    public Boolean editAdminFromCenter(AdminDto adminDto) throws Exception {
         Admin admin = baseMapper.selectById(adminDto.getId());
 
         QueryWrapper<Admin> phoneQueryWrapper = new QueryWrapper<>();
@@ -238,7 +238,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Admin adminByPhone = baseMapper.selectOne(phoneQueryWrapper);
         if (Objects.nonNull(adminByPhone) && !Objects.equals(admin.getId(), adminByPhone.getId())) {
             LOGGER.error("editAdminFromCenter failed, phone is already exist, admin:{}", adminDto);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED_BY_PHONE_EXIST);
+            return false;
         }
 
         QueryWrapper<Admin> qqNumberQueryWrapper = new QueryWrapper<>();
@@ -246,21 +246,21 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Admin adminByQQNumber = baseMapper.selectOne(qqNumberQueryWrapper);
         if (Objects.nonNull(adminByQQNumber) && !Objects.equals(admin.getId(), adminByQQNumber.getId())) {
             LOGGER.error("editAdminFromCenter failed, qqNumber is already exist, admin:{}", adminDto);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED_BY_QQ_NUMBER_EXIST);
+            return false;
         }
         QueryWrapper<Admin> weChatQueryWrapper = new QueryWrapper<>();
         weChatQueryWrapper.eq(DbConstants.Admin.WE_CHAT, adminDto.getWeChat());
         Admin adminByWeChat = baseMapper.selectOne(weChatQueryWrapper);
         if (Objects.nonNull(adminByWeChat) && !Objects.equals(admin.getId(), adminByWeChat.getId())) {
             LOGGER.error("editAdminFromCenter failed, weChat is already exist, admin:{}", adminDto);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED_BY_WE_CHAT_EXIST);
+            return false;
         }
         Admin newAdmin = this.toDb(adminDto, Admin.class);
         if (baseMapper.updateById(newAdmin) < 1) {
             LOGGER.error("editAdminFromCenter failed by unknown error, admin:{}", newAdmin);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -272,7 +272,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response updateEmail(PassAndEmailDto passAndEmailDto) throws Exception {
+    public Boolean updateEmail(PassAndEmailDto passAndEmailDto) throws Exception {
         // 获取当前登陆用户信息
         QueryWrapper<Admin> wrapper = new QueryWrapper<>();
         String currentUsername = SecurityUtils.getCurrentUsername();
@@ -281,25 +281,25 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Admin admin = baseMapper.selectOne(wrapper);
         if (Objects.isNull(admin)) {
             LOGGER.error("updateEmail failed, cannot find admin from db, username:{}", currentUsername);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
         // 如果新邮箱已经被绑定，那么返回错误
         QueryWrapper<Admin> newQueryWrapper = new QueryWrapper<>();
         newQueryWrapper.eq(DbConstants.Admin.EMAIL, passAndEmailDto.getEmail());
         if (!CollectionUtils.isEmpty(baseMapper.selectList(newQueryWrapper))) {
             LOGGER.error("updateEmail failed, email already in use, email:{}", passAndEmailDto.getEmail());
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("邮箱已被绑定，请更换其他邮箱");
+            throw new BusinessException("邮箱已被绑定，请更换其他邮箱");
         }
         // 对密码进行校验
         String pass = RsaUtils.decryptByPrivateKey(mySecurityProperties.getRsaPrivateKey(), passAndEmailDto.getPass());
         if (!passwordEncoder.matches(pass, admin.getPassword())) {
             LOGGER.error("updateEmail failed, password is error");
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("修改失败，密码错误");
+            throw new BusinessException("修改失败，密码错误");
         }
         // 更新用户邮箱
         admin.setEmail(passAndEmailDto.getEmail());
         baseMapper.updateById(admin);
-        return Response.ok();
+        return true;
     }
 
     /**
@@ -310,7 +310,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Response updatePass(PassAndEmailDto passAndEmailDto) throws Exception {
+    public Boolean updatePass(PassAndEmailDto passAndEmailDto) throws Exception {
         // 获取当前登陆用户信息
         QueryWrapper<Admin> wrapper = new QueryWrapper<>();
         String currentUsername = SecurityUtils.getCurrentUsername();
@@ -318,27 +318,27 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         Admin admin = baseMapper.selectOne(wrapper);
         if (Objects.isNull(admin)) {
             LOGGER.error("updatePass failed, cannot find admin from db, username:{}", currentUsername);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
         // 对密码进行校验
         String oldPass = RsaUtils.decryptByPrivateKey(mySecurityProperties.getRsaPrivateKey(), passAndEmailDto.getOldPass());
         String newPass = RsaUtils.decryptByPrivateKey(mySecurityProperties.getRsaPrivateKey(), passAndEmailDto.getNewPass());
         if (!passwordEncoder.matches(oldPass, admin.getPassword())) {
             LOGGER.error("updatePass failed, password is error");
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("修改失败，密码错误");
+            throw new BusinessException("修改失败，密码错误");
         }
         if (passwordEncoder.matches(newPass, admin.getPassword())) {
             LOGGER.error("updatePass failed, newPass cannot equal oldPass");
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED).message("修改失败，旧密码不能与新密码相同");
+            throw new BusinessException("修改失败，旧密码不能与新密码相同");
         }
         admin.setPassword(passwordEncoder.encode(newPass));
         if (baseMapper.updateById(admin) < 1) {
             LOGGER.error("updatePass failed by unknown error, admin:{}", admin);
-            return Response.setResult(ResultCodeEnum.UPDATE_FAILED);
+            return false;
         }
         // 从redis删除用户token
         redisUtil.delete(RedisConstants.TOKEN_KEY + RedisConstants.DIVISION + admin.getUsername());
-        return Response.ok();
+        return true;
     }
 
     /**

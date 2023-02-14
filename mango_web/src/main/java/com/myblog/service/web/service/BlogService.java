@@ -37,5 +37,5 @@ public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog,
 
     List<ArchiveDto> initArchives(ArchiveDto archiveDto);
 
-    List<BlogEsDto> getBlogByKeyword(BlogDto blogDto) throws Exception;
+    Map<String, Object> getBlogByKeyword(BlogDto blogDto) throws Exception;
 }

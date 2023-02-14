@@ -1,6 +1,7 @@
 package com.myblog.service.base.util;
 
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.ResultModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +20,10 @@ public class ValidateUtil {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ValidateUtil.class);
 
-    public static Response validate(Object request) throws IllegalAccessException {
+    public static ResultModel<Object> validate(Object request) throws IllegalAccessException {
         if (Objects.isNull(request)) {
             LOGGER.error("request:[{}] validate failed", request);
-            return Response.error().message("参数错误，请检查入参");
+            return ResultModel.error().message("参数错误，请检查入参");
         }
         Field[] fields = request.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -34,10 +35,10 @@ public class ValidateUtil {
             Object requestParam = field.get(request);
             if (Objects.isNull(requestParam) || StringUtils.isBlank(requestParam.toString())) {
                 LOGGER.error("request:[{}] validate failed, param:[{}]", request, field.getName());
-                return Response.error().message("参数错误，请检查入参");
+                return ResultModel.error().message("参数错误，请检查入参");
             }
         }
 
-        return Response.ok();
+        return ResultModel.ok();
     }
 }

@@ -36,6 +36,7 @@ import scrollTo from '@/utils/scrollTo'
 import blogApi from '@/api/blog'
 import blogIterator from '@/views/components/blog-iterator'
 import { mapState } from "vuex";
+import webConfigApi from "@/api/webConfig";
 export default {
   // 组件名称
   name: 'home',
@@ -58,7 +59,8 @@ export default {
       backTimer: null,
       watingTyped: false,
       hidePage: false,
-      blogs: []
+      blogs: [],
+      rollingSentences: []
     }
   },
   created() {
@@ -69,8 +71,17 @@ export default {
     ...mapState(["webConfig"]),
   },
   watch: {},
-  async mounted() {
-    this.startPlay()
+  mounted() {
+    this.rollingSentences = this.webConfig.rollingSentences
+      if(!this.rollingSentences) {
+        webConfigApi.getWebConfig().then(res => {
+          if(res.code === 20000) {
+          this.rollingSentences = res.data.rollingSentences
+          this.startPlay()
+         }
+        })
+      }
+    
   },
   methods: {
     randArr(arr){
@@ -104,7 +115,8 @@ export default {
       scrollTo(height)
     },
     async startPlay() {
-      const dictums = this.randArr(this.webConfig.rollingSentences.flat())
+      
+      const dictums = this.randArr(this.rollingSentences.flat())
       const tasks = dictums.map((dictum) => {
         return this.createTask(async (resolve) => {
           let i = 0

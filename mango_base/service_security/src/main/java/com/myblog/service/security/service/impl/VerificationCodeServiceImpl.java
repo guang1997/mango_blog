@@ -115,15 +115,15 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
      * @return
      */
     @Override
-    public Response validateCode(String email, String code, String source) {
+    public Boolean validateCode(String email, String code, String source) {
         String key = RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + email + RedisConstants.DIVISION + source;
         String redisCode = redisUtil.get(key);
         if (StringUtils.isBlank(redisCode) || !Objects.equals(redisCode, code)) {
             LOGGER.debug("validateCode, redisCode:[{}] is not equals code:[{}]", redisCode, code);
-            return Response.setResult(ResultCodeEnum.CODE_ERROR);
+            return false;
         }
         // 校验完不删除验证码，5分钟后自动删除
-        return Response.ok();
+        return true;
     }
 
     /**

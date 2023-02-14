@@ -103,7 +103,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     public List<Map<String, Object>> getBlogCountByTag() {
         List<Map<String, Object>> blogTagList = blogTagMapper.getBlogCountByTag();
         if (Objects.equals(blogTagList.size(), 0)) {
-            throw new BusinessException("getBlogCountByTag failed, blogTagList is empty");
+            return blogTagList;
         }
         Set<String> tagIds = blogTagList.stream()
                 .map(map -> map.get("tagId").toString())
@@ -130,7 +130,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     public List<Map<String, Object>> getBlogCountByBlogSort() {
         List<Map<String, Object>> blogSortList = baseMapper.getBlogCountByBlogSort();
         if (Objects.equals(blogSortList.size(), 0)) {
-            throw new BusinessException("getBlogCountByTag failed, blogTagList is empty");
+            return blogSortList;
         }
         Set<String> sortIds = blogSortList.stream()
                 .map(map -> map.get("sortId").toString())

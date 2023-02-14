@@ -94,7 +94,7 @@
                     <logsDirectory>logs</logsDirectory>
 
                     <!--java启动参数-->
-                    <extraJvmArguments>-Xms1024m -Xmx1024m -Xmn512m</extraJvmArguments>
+                    <extraJvmArguments>-Xms1024m -Xmx1024m -Xmn512m -Dspring.profiles.active=prod</extraJvmArguments>
                     <programs>
                         <program>
                             <!--指定主类，脚本名。会生成shell/bat两种类型,也可用platforms指定运行平台-->
@@ -145,4 +145,22 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <package.environment>dev</package.environment>
+            </properties>
+            <!--默认选择-->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <package.environment>prod</package.environment>
+            </properties>
+        </profile>
+    </profiles>
 </project>

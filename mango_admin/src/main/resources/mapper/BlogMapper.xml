@@ -3,7 +3,7 @@
 <mapper namespace="com.myblog.service.admin.mapper.BlogMapper">
 
     <select id="getBlogCountByBlogSort" resultType="java.util.Map">
-        SELECT blog_sort_id as sortId, COUNT(id) AS value FROM t_blog GROUP BY blog_sort_id
+        SELECT blog_sort_id as sortId, COUNT(id) AS value FROM t_blog where is_deleted = 0 GROUP BY blog_sort_id
     </select>
     <select id="getBlogContributeCount" resultType="java.util.Map">
         SELECT DISTINCT DATE_FORMAT(create_time, '%Y-%m-%d') date, COUNT(id) count FROM t_blog WHERE is_deleted = 0 AND create_time BETWEEN #{startTime} AND #{endTime} GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')

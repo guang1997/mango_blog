@@ -419,15 +419,17 @@ export default {
   },
   methods: {
     // 添加取消之后
-    [CRUD.HOOK.afterAddCancel]() {
-       this.fileId = null;
-       this.form.tags = null;
-    },
+    // [CRUD.HOOK.afterAddCancel]() {
+    //    this.fileId = null;
+    //    this.form.tags = null;
+    //    this.form.content = null
+    // },
     // 编辑取消之后
-    [CRUD.HOOK.afterEditCancel]() {
-      this.fileId = null;
-      this.form.tags = null;
-    },
+    // [CRUD.HOOK.afterEditCancel]() {
+    //   this.fileId = null;
+    //   this.form.tags = null;
+    //   this.form.content = null
+    // },
     // 提交前做的操作
     [CRUD.HOOK.afterValidateCU](crud) {
       if (!this.fileId) {
@@ -463,7 +465,10 @@ export default {
       if (this.$refs.editor) {
         this.$refs.editor.textData = null;
       }
-       this.tagDatas = []
+      this.tagDatas = []
+      this.fileId = null;
+      this.form.tags = null;
+      this.form.content = null
     },
     // 初始化编辑时的标签
     [CRUD.HOOK.beforeToEdit](crud, form) {

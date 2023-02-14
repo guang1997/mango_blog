@@ -225,7 +225,7 @@ export default {
       setTimeout(() => {
         getMenusByPid(node.data.id ? node.data.id : 0).then((res) => {
           if (res.code === this.$ECode.SUCCESS) {
-            resolve(res.data);
+            resolve(res.data.data);
           } else {
             this.$commonUtil.message.error(res.message);
           }

@@ -96,7 +96,7 @@ public class BlogController {
     @LogByMethod(value = "/web/blog/getBlogByKeyword")
     @ApiOperation(value = "模糊查询", notes = "模糊查询", response = Response.class)
     @PostMapping("/getBlogByKeyword")
-    public ResultModel<List<BlogEsDto>> getBlogByKeyword(@RequestBody BlogDto blogDto) throws Exception {
+    public ResultModel<Map<String, Object>> getBlogByKeyword(@RequestBody BlogDto blogDto) throws Exception {
         return ResultModel.ok(blogService.getBlogByKeyword(blogDto));
     }
 }

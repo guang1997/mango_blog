@@ -2,6 +2,7 @@ package com.myblog.service.security.annotation;
 
 import com.myblog.service.base.common.BehaviorEnum;
 import com.myblog.service.base.common.Response;
+import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.base.entity.dto.BaseReqDto;
 import com.myblog.service.base.util.JsonUtils;
 import com.myblog.service.base.util.ValidateUtil;
@@ -80,7 +81,7 @@ public class LogAspect {
         // 配置了注解并且标识为校验入参的方法才进行入参校验
         LogByMethod logByMethod = methodSignature.getMethod().getAnnotation(LogByMethod.class);
         if (Objects.nonNull(logByMethod) && logByMethod.validate()) {
-            Response validateResponse = ValidateUtil.validate(joinPoint.getArgs()[0]);
+            ResultModel validateResponse = ValidateUtil.validate(joinPoint.getArgs()[0]);
             if (!validateResponse.getSuccess()) {
                 return validateResponse;
             }
@@ -113,7 +114,7 @@ public class LogAspect {
             if (Objects.nonNull(response)) {
                 return response;
             }
-            return Response.error();
+            return ResultModel.error().message(e.getMessage());
         }
         return response;
     }

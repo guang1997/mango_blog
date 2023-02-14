@@ -54,7 +54,7 @@ public class LoginController {
     @PostMapping("/doLogin")
     public ResultModel<UserDto> doLogin(@RequestBody UserDto userDto, HttpServletRequest request) throws Exception {
         // 校验验证码
-        if (!verificationCodeService.validateCode(userDto.getEmail(), userDto.getCode(), Constants.EmailSource.WEB).getSuccess()) {
+        if (!verificationCodeService.validateCode(userDto.getEmail(), userDto.getCode(), Constants.EmailSource.WEB)) {
             return ResultModel.<UserDto>error().message("验证码错误");
         }
         return ResultModel.ok(userService.doLogin(userDto, request));

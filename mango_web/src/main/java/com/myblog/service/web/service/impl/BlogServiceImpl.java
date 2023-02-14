@@ -3,6 +3,7 @@ package com.myblog.service.web.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.myblog.service.base.common.*;
+import com.myblog.service.base.common.Constants.ReplyField;
 import com.myblog.service.base.exception.BusinessException;
 import com.myblog.service.base.handler.es.EsOperateManager;
 import com.myblog.service.base.handler.es.entity.BlogEsDto;
@@ -10,6 +11,7 @@ import com.myblog.service.base.handler.es.impl.BlogEsOperateHandler;
 import com.myblog.service.base.util.BeanUtil;
 import com.myblog.service.base.util.IpUtils;
 import com.myblog.service.base.util.MD5Utils;
+import com.myblog.service.base.util.PageUtil;
 import com.myblog.service.base.util.ThreadSafeDateFormat;
 import com.myblog.service.web.controller.BlogController;
 import com.myblog.service.web.entity.*;
@@ -235,13 +237,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
-    public List<BlogEsDto> getBlogByKeyword(BlogDto blogDto) throws Exception {
+    public Map<String, Object> getBlogByKeyword(BlogDto blogDto) throws Exception {
         if (StringUtils.isBlank(blogDto.getContent())) {
             throw new BusinessException("请输入查询条件");
         }
         Map<String, Object> param = new HashMap<>();
         param.put(Constants.EsContants.BLOG_CONTENT, blogDto.getContent());
-        return esOperateManager.search(param, BlogEsOperateHandler.class, BlogEsDto.class);
+        List<BlogEsDto> esDtos = esOperateManager.search(param, BlogEsOperateHandler.class, BlogEsDto.class);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put(ReplyField.DATA, PageUtil.page(esDtos, blogDto.getPage(), blogDto.getSize()));
+        resultMap.put(ReplyField.PAGE, blogDto.getPage());
+        resultMap.put(ReplyField.SIZE, blogDto.getSize());
+        resultMap.put(ReplyField.TOTAL, esDtos.size());
+        return resultMap;
     }
 
     private ArchiveDto toArchiveDto(Blog blog) {

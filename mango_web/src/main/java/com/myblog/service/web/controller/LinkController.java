@@ -67,7 +67,7 @@ public class LinkController {
     @PostMapping("/saveFriendLink")
     public ResultModel<Object> saveFriendLink(@RequestBody LinkDto linkDto) throws Exception {
         // 校验验证码
-        if (!verificationCodeService.validateCode(linkDto.getEmail(), linkDto.getCode(), Constants.EmailSource.WEB).getSuccess()) {
+        if (!verificationCodeService.validateCode(linkDto.getEmail(), linkDto.getCode(), Constants.EmailSource.WEB)) {
             return ResultModel.error().message("验证码错误");
         }
         // 保存成功之后异步发送邮件

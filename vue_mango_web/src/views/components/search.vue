@@ -22,7 +22,7 @@
       </el-scrollbar>
       <div class="search__page">
         <el-pagination
-          v-if="blogs.length < total"
+          v-if="blogs.length != 0"
           :total="total"
           layout="prev, pager, next"
           :page-size="pageSize"
@@ -43,7 +43,7 @@ export default {
       keyword: '',
       searched: false,
       total: 0,
-      pageSize: 10,
+      pageSize: 5,
       currentPage: 1,
       blogs: []
     }
@@ -76,9 +76,9 @@ export default {
         size: this.pageSize
       }).then((searchRes) => {
         if (searchRes.code === 20000) {
-        this.blogs = searchRes.data
+        this.blogs = searchRes.data.data
         this.searched = true
-        this.total = searchRes.total
+        this.total = searchRes.data.total
       } else {
         this.$message({
           type: 'error',

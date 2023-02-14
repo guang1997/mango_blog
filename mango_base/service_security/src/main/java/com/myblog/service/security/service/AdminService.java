@@ -31,11 +31,11 @@ public interface AdminService extends IService<Admin>, ServiceConvertHandler<Adm
 
     List<String> delAdmin(Set<String> ids);
 
-    Response editAdminFromCenter(AdminDto adminDto) throws Exception;
+    Boolean editAdminFromCenter(AdminDto adminDto) throws Exception;
 
-    Response updateEmail(PassAndEmailDto passAndEmailDto) throws Exception;
+    Boolean updateEmail(PassAndEmailDto passAndEmailDto) throws Exception;
 
-    Response updatePass(PassAndEmailDto passAndEmailDto) throws Exception;
+    Boolean updatePass(PassAndEmailDto passAndEmailDto) throws Exception;
 
     Boolean editAdmin(AdminDto adminDto) throws Exception;
 
