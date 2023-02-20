@@ -116,17 +116,4 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             }
         }
     }
-
-    /**
-     * 获取特定类型的评论数目
-     * @param status
-     * @return
-     */
-    @Override
-    public int getCommentCount(int status) {
-        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Comment.STATUS, status);
-        Integer count = baseMapper.selectCount(queryWrapper);
-        return Objects.isNull(count) ? 0 : count;
-    }
 }

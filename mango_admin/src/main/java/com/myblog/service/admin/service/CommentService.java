@@ -22,6 +22,4 @@ public interface CommentService extends IService<Comment>, ServiceConvertHandler
     Map<String, Object> getCommentByPage(CommentDto commentDto) throws Exception;
 
     Boolean delComment(Set<String> ids);
-
-    int getCommentCount(int status);
 }

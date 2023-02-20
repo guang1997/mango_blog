@@ -68,7 +68,7 @@
             label="昵称"
           />
         
-           <el-table-column label="评论状态" align="center" prop="commentStatus" v-permission="permission.edit">
+           <el-table-column label="评论状态" align="center" prop="commentStatus" v-if="checkPer(['admin', 'user:edit'])">
             <template slot-scope="scope">
               <el-switch
                 :value="scope.row.commentStatus"
@@ -90,7 +90,11 @@
               <span>{{ scope.row.lastLoginIp }}</span>
             </template>
           </el-table-column>
-           <el-table-column label="最后登录时间"  prop="lastLoginTime" width="160"/>
+          <el-table-column label="最后登录时间" width="160" prop="lastLoginTime">
+            <template slot-scope="scope">
+              <span>{{ scope.row.lastLoginTime }}</span>
+            </template>
+          </el-table-column>
         </el-table>
         <!--分页组件-->
         <pagination />

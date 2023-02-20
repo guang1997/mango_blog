@@ -34,20 +34,16 @@
       <note>
         <p>{{ blog.summary }}</p>
       </note>
-      <div v-highlight v-html="blog.content" class="article-detail__body ql-editor"></div>
+      <div v-html="blog.content" class="article-detail__body ql-editor"></div>
       <div class="article-detail__update">
         <span>最后编辑于：{{ blog.updateTime }}</span>
       </div>
       <div :class="buttonClass">
         <div class="article-detail__like" v-if="blog.liked === true">
-          <el-button type="success" @click.prevent="likeBlog($event)"
-            >👍🏻 {{ likeText }}</el-button
-          >
+          <el-button type="success" @click.prevent="likeBlog($event)">👍🏻 {{ likeText }}</el-button>
         </div>
         <div class="article-detail__like" v-else-if="blog.liked === false">
-          <el-button type="success" plain @click.prevent="likeBlog($event)"
-            >👍🏻 {{ likeText }}</el-button
-          >
+          <el-button type="success" plain @click.prevent="likeBlog($event)">👍🏻 {{ likeText }}</el-button>
         </div>
       </div>
 
@@ -55,11 +51,7 @@
         <copyright :url="url" :blogId="blog.id"></copyright>
       </div>
       <div class="article-detail__share">
-        <share
-          :tags="blog.tags"
-          :summary="blog.summary"
-          :title="blog.title"
-        ></share>
+        <share :tags="blog.tags" :summary="blog.summary" :title="blog.title"></share>
       </div>
       <div class="article-detail__prevnext">
         <prevnext :createTime="blog.createTime"></prevnext>
@@ -71,30 +63,18 @@
           <span>文章评论</span>
         </div>
         <div class="comment__submit">
-          <submit
-            @submitContent="submitContent"
-            @getComments="getCommentByPage"
-          ></submit>
+          <submit @submitContent="submitContent" @getComments="getCommentByPage"></submit>
         </div>
         <div class="comment__total">
           <span>{{ total }}条评论</span>
         </div>
         <div class="comment__list">
-          <comments
-            :comments="comments"
-            @submitReply="submitReply"
-            @likeComment="likeComment"
-            @getCommentByPage="getCommentByPage"
-          ></comments>
+          <comments :comments="comments" @submitReply="submitReply" @likeComment="likeComment"
+            @getCommentByPage="getCommentByPage"></comments>
         </div>
         <div class="comment__page" v-if="total">
-          <el-pagination
-            :current-page.sync="page"
-            :total="total"
-            layout="prev, pager, next"
-            :page-size="size"
-            @current-change="currentChange"
-          ></el-pagination>
+          <el-pagination :current-page.sync="page" :total="total" layout="prev, pager, next" :page-size="size"
+            @current-change="currentChange"></el-pagination>
         </div>
       </div>
     </layout>
@@ -176,21 +156,22 @@ export default {
           this.collectTitles();
         });
       }
-    },
+    }
   },
   filters: {},
   mounted() {
-    // this.$nextTick(function () {
-    //   Prism.highlightAll();
-    // });
-    this.collectTitles();
     window.addEventListener("scroll", this.handleScroll, false);
   },
   created() {
     this.updateVisitorInfo()
     this.asyncData(this.$route.params.id)
   },
-  updated() {},
+  updated() { 
+    // 设置目录
+    this.collectTitles();
+    // 设置额外属性
+    this.setAttr()
+  },
 
   // async asyncData({ route, isServer, _ip }) {
   //   this.blogId = route.params.id
@@ -215,18 +196,20 @@ export default {
     ...mapMutations(["setCatalogs", "setActiveCatalog", "setVisitor"]),
     async asyncData(blogId) {
       const res = await blogApi.getBlogById({
-      id: blogId,
-      userId: storage.getVisitor() ? storage.getVisitor().id : "",
-      browserFinger: storage.getMangoBlogBrowserFinger(),
-      screenInformation: JSON.parse(storage.getMangoBlogScreenInformation()),
-      page: 1,
-      size: 10,
-    });
-    if (res.code === 20000) {
+        id: blogId,
+        userId: storage.getVisitor() ? storage.getVisitor().id : "",
+        browserFinger: storage.getMangoBlogBrowserFinger(),
+        screenInformation: JSON.parse(storage.getMangoBlogScreenInformation()),
+        page: 1,
+        size: 10,
+      });
+      if (res.code === 20000) {
         this.blog = res.data.data
+        // 解决使用v-html后内容未能解析成html的问题
+        this.blog.content = this.blog.content.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&apos;/g, "'")
         this.comments = res.data.comment
         this.total = res.data.commentCount
-    }
+      }
     },
     async likeBlog(event) {
       const isLiked = this.blog.liked ? true : false;
@@ -302,7 +285,7 @@ export default {
       this.submit(content, currentReplyComment, cb);
     },
     async submit(content, currentReplyComment, cb) {
-       if(this.visitorInfo.commentStatus == 0) {
+      if (this.visitorInfo.commentStatus == 0) {
         this.$message({
           type: "warning",
           message: "您被禁言了，请联系管理员处理",
@@ -356,9 +339,10 @@ export default {
       }
     },
     collectTitles() {
-      const selectors = ["h1", "h2", "h3", "h4", "h5", "h6"]
-        .map((et) => ".article-detail__body " + et)
-        .join(",");
+      const selectors = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+        .map((et) => '.article-detail__body ' + et)
+        .join(',')
+
       const nodeList = document.querySelectorAll(selectors);
       if (!nodeList) return;
 
@@ -381,6 +365,16 @@ export default {
       const catalogs = generateTree(flatTree);
       this.addTreeLevel(catalogs);
       this.setCatalogs(catalogs);
+    },
+    setAttr() {
+      // 设置复选框不能被选中
+      var nodeList = document.querySelectorAll(".article-detail__body input");
+      if(!nodeList) return;
+      for(var i = 0; i < nodeList.length; i++) {
+        if(nodeList[i].type=="checkbox") {
+          nodeList[i].disabled=true
+        }
+      }
     },
     addTreeLevel(catalogs, level, order) {
       catalogs.forEach((catalog, index) => {
@@ -406,17 +400,17 @@ export default {
         }
       });
     },
-     updateVisitorInfo() {
-    // 如果用户没有退出账号就关闭网页了，再次打开网页的时候去更新网页
-    if(storage.getVisitor()) {
-      loginApi.getUser(storage.getVisitor()).then(res => {
-        if (res.code === 20000) {
-           this.setVisitorInfo(res.data)
-        }
-      })
-    }
-  },
-  setVisitorInfo(info) {
+    updateVisitorInfo() {
+      // 如果用户没有退出账号就关闭网页了，再次打开网页的时候去更新网页
+      if (storage.getVisitor()) {
+        loginApi.getUser(storage.getVisitor()).then(res => {
+          if (res.code === 20000) {
+            this.setVisitorInfo(res.data)
+          }
+        })
+      }
+    },
+    setVisitorInfo(info) {
       this.setVisitor(info);
       storage.setVisitor(info);
     },
@@ -429,6 +423,7 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss">
 @import "~@/style/index.scss";
+
 .article-detail {
   &__header {
     width: 100%;
@@ -436,24 +431,29 @@ export default {
     @include flex-box-center;
     flex-direction: column;
   }
+
   &__body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
       Lato, Roboto, "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei",
       sans-serif;
     line-height: 2;
     color: #4c4948;
+
     img {
       width: 100%;
       height: 100%;
     }
   }
+
   &__title {
     line-height: 1.5;
     padding: 0 12px;
     text-align: center;
+
     @include themeify() {
       color: themed("color-title");
     }
+
     @include respond-to(xs) {
       font-size: 18px;
     }
@@ -461,91 +461,115 @@ export default {
 
   &__info {
     padding: 0 12px;
+
     @include themeify() {
       color: themed("color-navbar");
     }
   }
+
   .info-2 {
     margin-top: 8px;
   }
+
   &__update {
     margin-top: 20px;
     padding: 14px;
     text-align: right;
+
     @include themeify() {
       color: themed("color-ele-holder");
     }
   }
+
   &__like {
     margin-top: 20px;
     padding: 14px;
     text-align: center;
   }
+
   &__copyright {
     margin-top: 28px;
   }
+
   &__share {
     margin-top: 12px;
   }
+
   &__prevnext {
     margin-top: 28px;
   }
+
   &__comment {
     margin-top: 32px;
+
     .comment__title {
       padding: 16px 0;
       font-size: 20px;
       font-weight: 700;
-      > [class^="el-icon-"] {
+
+      >[class^="el-icon-"] {
         font-weight: 700;
       }
+
       span {
         margin-left: 12px;
       }
     }
+
     .comment__total {
       color: #4c4948;
       font-size: 25px;
       font-weight: bold;
       margin-top: 28px;
     }
+
     .comment__list {
       margin-top: 28px;
     }
+
     .comment__page {
       @include flex-box-center;
       padding: 16px 0;
     }
   }
+
   // 覆盖 quill.js 中的部分css
   .ql-editor {
     padding: 0;
     line-height: 2;
+
     .code-toolbar {
       margin-top: 12px;
     }
+
     a {
       color: #409eff;
     }
+
     a:hover {
       text-decoration: underline;
     }
+
     ul,
     ol {
       padding-left: 0;
     }
+
     li.ql-indent-1:not(.ql-direction-rtl) {
       padding-left: 3.5em;
     }
-    pre > code {
+
+    pre>code {
       background: 0 0 !important;
     }
+
     code:not([class*="language-"]) {
       background-color: #f0f0f0;
       border-radius: 3px;
       font-size: 90%;
       padding: 3px 5px;
     }
+
     blockquote {
       border-left: 4px solid #ccc;
       margin-bottom: 5px;

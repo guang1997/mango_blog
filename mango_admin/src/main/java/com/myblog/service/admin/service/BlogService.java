@@ -20,8 +20,6 @@ import java.util.Set;
  */
 public interface BlogService extends IService<Blog>, ServiceConvertHandler<Blog, BlogDto> {
 
-    int getBlogCount();
-
     List<Map<String, Object>> getBlogCountByTag();
 
     List<Map<String, Object>> getBlogCountByBlogSort();

@@ -181,7 +181,7 @@
             prop="nickname"
             label="昵称"
           />
-          <el-table-column label="状态" align="center" prop="enabled" v-permission="permission.edit">
+          <el-table-column label="状态" align="center" prop="enabled" v-if="checkPer(['admin', 'admin:edit'])">
             <template slot-scope="scope">
               <el-switch
                 :disabled="scope.row.id === user.id"

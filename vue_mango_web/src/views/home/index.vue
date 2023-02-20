@@ -74,12 +74,16 @@ export default {
   mounted() {
     this.rollingSentences = this.webConfig.rollingSentences
       if(!this.rollingSentences) {
+        
         webConfigApi.getWebConfig().then(res => {
+          
           if(res.code === 20000) {
           this.rollingSentences = res.data.rollingSentences
           this.startPlay()
          }
         })
+      } else {
+        this.startPlay()
       }
     
   },

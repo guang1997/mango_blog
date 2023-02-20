@@ -114,7 +114,7 @@ public class LogAspect {
             if (Objects.nonNull(response)) {
                 return response;
             }
-            return ResultModel.error().message(e.getMessage());
+            throw e;
         }
         return response;
     }

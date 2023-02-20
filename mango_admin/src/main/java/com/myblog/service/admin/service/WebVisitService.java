@@ -23,8 +23,6 @@ public interface WebVisitService extends IService<WebVisit>, ServiceConvertHandl
 
     Boolean delWebVisit(Set<String> ids);
 
-    int getWebVisitCount();
-
     Map<String, Object> getWebVisitGroupByBehavior() throws Exception;
 
     Map<String, Object> getVisitByWeek() throws Exception;

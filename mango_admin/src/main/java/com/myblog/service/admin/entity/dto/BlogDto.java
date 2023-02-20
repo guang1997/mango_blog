@@ -39,4 +39,7 @@ public class BlogDto extends BaseReqDto {
 
     @NotNull(message = "博客标签不能为空")
     private List<Tag> tags;
+
+
+    private Long ids123;
 }

@@ -93,7 +93,7 @@ export default {
           })
         }
       }
-      if (this.$router.currentRoute.name !== 'articleDetail') {
+      if (this.$router.currentRoute.name !== 'blogDetail') {
         const index = def.indexOf('pannel-catalog')
         if (index !== -1) def.splice(index, 1)
       }

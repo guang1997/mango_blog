@@ -156,6 +156,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 blogDto.getUserId(),
                 MD5Utils.string2MD5(UniqueKeyUtil.getUniqueKey(request, blogDto.getScreenInformation())),
                 blogDto.getBrowserFinger()));
+        // 博客点击量+1
+        blog.setClickCount(blog.getClickCount() + 1);
+        baseMapper.updateById(blog);
         return responseDto;
     }
 

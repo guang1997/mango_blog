@@ -79,15 +79,6 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
     }
 
     @Override
-    public int getWebVisitCount() {
-        String startTime = ThreadSafeDateFormat.getTodayStartTime();
-        String endTime = ThreadSafeDateFormat.getTodayEndTime();
-        QueryWrapper<WebVisit> queryWrapper = new QueryWrapper<>();
-        queryWrapper.between(DbConstants.WebVisit.REQUEST_TIME, startTime, endTime);
-        return baseMapper.selectCount(queryWrapper);
-    }
-
-    @Override
     public Map<String, Object> getWebVisitGroupByBehavior() throws Exception {
         // 当天结束日期
         String endTime = ThreadSafeDateFormat.getTodayEndTime();

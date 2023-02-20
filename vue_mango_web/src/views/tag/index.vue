@@ -51,7 +51,7 @@ export default {
       this.selectBlogId = tagId;
       blogApi.getBlogByTagId({tagId}).then(response => {
         if (response.code == 20000) {
-          this.itemByDate = response.data.data;
+          this.itemByDate = response.data;
         }
       });
     },

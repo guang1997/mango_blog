@@ -83,18 +83,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     /**
-     * 获取博客总数量，用于首页展示
-     *
-     * @return
-     */
-    @Override
-    public int getBlogCount() {
-        QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
-        return baseMapper.selectCount(queryWrapper);
-    }
-
-    /**
      * 根据获取标签和博客数量，用于首页展示
      *
      * @return

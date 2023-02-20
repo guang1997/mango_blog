@@ -54,7 +54,7 @@
   
         <el-tab-pane>
           <template>
-            <el-button @click="openAdd" class="filter-item" size="mini" type="primary" icon="el-icon-plus">新增</el-button>
+            <el-button v-permission="permission.add" @click="openAdd" class="filter-item" size="mini" type="primary" icon="el-icon-plus">新增</el-button>
           </template>
   
           <span slot="label">
@@ -66,10 +66,10 @@
             <el-table-column v-if="checkPer(['admin', 'webConfig:add', 'webConfig:del'])" label="操作" width="130px"
               align="center">
               <template slot-scope="scope">
-                <el-button :permission="permission.add" size="mini" type="primary" icon="el-icon-edit"
+                <el-button v-permission="permission.add" size="mini" type="primary" icon="el-icon-edit"
                   @click="openEdit(scope.$index, scope.row)" />
   
-                <el-popover :permission="permission.del" placement="top" width="180" 
+                <el-popover v-permission="permission.del" placement="top" width="180" 
                   :ref="`popover-${scope.$index}`">
                   <p>确定删除本条数据吗？</p>
                   <div style="text-align: right; margin: 0">
@@ -110,7 +110,7 @@
             roles: ["admin"],
             menuButtons: ["webConfig:add"]
           },
-          edit: {
+          del: {
             roles: ["admin"],
             menuButtons: ["webConfig:del"]
           }

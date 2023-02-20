@@ -39,6 +39,4 @@ public interface AdminService extends IService<Admin>, ServiceConvertHandler<Adm
 
     Boolean editAdmin(AdminDto adminDto) throws Exception;
 
-    int getAdminCount();
-
 }

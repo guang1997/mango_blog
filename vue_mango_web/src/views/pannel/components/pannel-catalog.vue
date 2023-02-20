@@ -24,7 +24,8 @@ export default {
   data() {
     return {}
   },
-  mounted() {},
+  mounted() {
+  },
   computed: {
     ...mapState(['catalogs'])
   },

@@ -390,14 +390,6 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     }
 
     @Override
-    public int getAdminCount() {
-        QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DbConstants.Base.IS_DELETED, Constants.IsDeleted.NO);
-        Integer count = baseMapper.selectCount(queryWrapper);
-        return Objects.isNull(count) ? 0 : count;
-    }
-
-    @Override
     public void setDtoExtraProperties(Admin admin, AdminDto adminDto) {
         adminDto.setId(admin.getId());
         adminDto.setCreateTime(admin.getCreateTime());

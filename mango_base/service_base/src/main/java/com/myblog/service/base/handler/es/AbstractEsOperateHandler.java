@@ -178,7 +178,7 @@ public abstract class AbstractEsOperateHandler<T extends BaseEsEntity> implement
             getLogger().error("update failed, indexResponse is null, esModel:{}", esModel);
             throw new RuntimeException("保存失败");
         }
-        if (!Objects.equals(response.status(), RestStatus.OK) || !Objects.equals(response.status(), RestStatus.CREATED)) {
+        if (!Objects.equals(response.status(), RestStatus.OK) && !Objects.equals(response.status(), RestStatus.CREATED)) {
             getLogger().error("update es failed, errorCode:{}, esModel:{}", response.status().getStatus(), esModel);
             return false;
         }
