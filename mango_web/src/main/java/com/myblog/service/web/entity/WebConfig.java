@@ -46,4 +46,10 @@ public class WebConfig extends BaseEntity {
 
     @ApiModelProperty(value = "首页滚动句子")
     private String rollingSentences;
+
+    @ApiModelProperty(value = "友链简介")
+    private String friendLinkDesc;
+
+    @ApiModelProperty(value = "友链地址")
+    private String friendLinkUrl;
 }

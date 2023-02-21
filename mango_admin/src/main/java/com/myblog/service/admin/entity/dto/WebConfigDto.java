@@ -23,4 +23,8 @@ public class WebConfigDto extends BaseReqDto {
     private List<String> rollingSentences;
 
     private Boolean deleteSentence;
+
+    private String friendLinkDesc;
+
+    private String friendLinkUrl;
 }

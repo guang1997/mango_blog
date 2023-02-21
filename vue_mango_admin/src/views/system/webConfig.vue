@@ -27,8 +27,8 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="github">
-                  <el-input v-model="configForm.github" placeholder="请输入github地址"></el-input>
+                <el-form-item label="友链地址">
+                  <el-input v-model="configForm.friendLinkUrl" placeholder="请输入友链地址"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -38,11 +38,23 @@
                   <el-input v-model="configForm.gitee" placeholder="请输入gitee地址"></el-input>
                 </el-form-item>
               </el-col>
+              <el-col :span="12">
+                <el-form-item label="github">
+                  <el-input v-model="configForm.github" placeholder="请输入github地址"></el-input>
+                </el-form-item>
+              </el-col>
             </el-row>
             <el-row :gutter="24">
               <el-col :span="24">
-                <el-form-item label="描述">
-                  <el-input :rows="10" type="textarea" v-model="configForm.summary" placeholder="请输入描述"></el-input>
+                <el-form-item label="友链描述">
+                  <el-input :rows="5" type="textarea" v-model="configForm.friendLinkDesc" placeholder="请输入友链描述"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row :gutter="24">
+              <el-col :span="24">
+                <el-form-item label="首页描述">
+                  <el-input :rows="5" type="textarea" v-model="configForm.summary" placeholder="请输入首页描述"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>

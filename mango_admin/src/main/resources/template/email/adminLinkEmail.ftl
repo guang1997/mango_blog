@@ -39,7 +39,7 @@
 			font-size: 12px;
 			padding: 20px 0px;
 			font-family: Microsoft YaHei;">
-            Copyright &copy;${.now?string("yyyy")} <a hover="color: #DA251D;" style="color: #999;" href="https://github.com/elunez/eladmin" target="_blank">MANGO-WEB</a> lisite's博客 All Rights Reserved.
+            <a hover="color: #DA251D;" style="color: #999;" href="http://web.mangoblog.vip/" target="_blank">MANGO-WEB</a> lisite's博客 All Rights Reserved.
         </div>
 
     </div>

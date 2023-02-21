@@ -1,6 +1,7 @@
 package com.myblog.service.web.controller;
 
 import com.myblog.service.base.common.*;
+import com.myblog.service.base.common.Constants.EmailSource;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.security.service.VerificationCodeService;
 import com.myblog.service.web.entity.dto.UserDto;
@@ -43,7 +44,7 @@ public class LoginController {
             log.error("sendCode failed, email:[{}] cannot be null", userDto.getEmail());
             return ResultModel.error().message("邮箱不能为空");
         }
-        if (verificationCodeService.sendCode(userDto.getEmail(), Constants.EmailSource.ADMIN)) {
+        if (verificationCodeService.sendCode(userDto.getEmail(), EmailSource.WEB)) {
             return ResultModel.ok();
         }
         return ResultModel.setResult(ResultCodeEnum.SEND_CODE_FAILED);

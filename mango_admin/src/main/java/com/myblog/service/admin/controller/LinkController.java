@@ -2,7 +2,9 @@ package com.myblog.service.admin.controller;
 
 
 import com.myblog.service.admin.entity.dto.LinkDto;
+import com.myblog.service.admin.entity.dto.WebConfigDto;
 import com.myblog.service.admin.service.LinkService;
+import com.myblog.service.admin.service.WebConfigService;
 import com.myblog.service.base.common.ResultModel;
 import com.myblog.service.security.annotation.LogByMethod;
 import com.myblog.service.base.common.Constants;
@@ -40,11 +42,11 @@ public class LinkController {
     @Autowired
     private LinkService linkService;
 
-    @Value("${email.blogAddress}")
-    private String blogAddress;
-
     @Autowired
     private VerificationCodeService verificationCodeService;
+
+    @Autowired
+    private WebConfigService webConfigService;
 
     @LogByMethod("/admin/link/getLinkByPage")
     @ApiOperation(value = "分页查询友情链接", notes = "分页查询友情链接", response = Response.class)
@@ -70,7 +72,8 @@ public class LinkController {
         Boolean editSuccess = linkService.editLink(linkDto);
         // 如果是更改友链状态，更改成功后发送邮件
         if (BooleanUtils.isTrue(editSuccess) && BooleanUtils.isTrue(linkDto.getChangeStatus()) && Objects.equals(Constants.CommonStatus.ENABLED, linkDto.getLinkStatus())) {
-            editSuccess = verificationCodeService.sendEmail(linkDto.getEmail(), Constants.EmailSource.ADMIN, new TwoTuple<>(Constants.EmailParam.ADMIN_LINK, blogAddress));
+            WebConfigDto webConfig = webConfigService.getWebConfig();
+            editSuccess = verificationCodeService.sendEmail(linkDto.getEmail(), Constants.EmailSource.ADMIN, new TwoTuple<>(Constants.EmailParam.ADMIN_LINK, webConfig.getFriendLinkUrl()));
         }
         if (editSuccess) {
             return ResultModel.ok();

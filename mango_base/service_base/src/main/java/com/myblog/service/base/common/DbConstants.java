@@ -98,6 +98,8 @@ public interface DbConstants {
     interface WebVisit {
         String BEHAVIOR = "behavior";
         String REQUEST_TIME = "request_time";
+
+        String IP = "ip";
     }
 
     interface EmailConfig {

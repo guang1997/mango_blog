@@ -178,4 +178,10 @@ public class WebVisitServiceImpl extends ServiceImpl<WebVisitMapper, WebVisit> i
         resultMap.put(Constants.ReplyField.VISIT_LIST, webVisitList);
         return resultMap;
     }
+
+    @Override
+    public int groupByIp(String startTime, String endTime) {
+        List<String> resultList = baseMapper.groupByIp(startTime, endTime);
+        return resultList.size();
+    }
 }

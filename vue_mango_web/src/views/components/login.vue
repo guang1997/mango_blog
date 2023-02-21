@@ -66,7 +66,7 @@
             >注册并登陆</el-button
           >
         </div>
-        <div class="submit__third-part">
+        <!-- <div class="submit__third-part">
           <div class="line">第三方登录</div>
           <div class="submit__third-app">
             <a href="javascript: void(0)" @click="openQQ" class="login-qq">
@@ -80,7 +80,7 @@
               <img src="~@/assets/img/github.png" alt="github登录" />
             </a>
           </div>
-        </div>
+        </div> -->
       </div>
     </el-dialog>
     <Vcode

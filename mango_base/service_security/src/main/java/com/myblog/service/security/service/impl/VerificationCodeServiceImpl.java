@@ -119,7 +119,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         String key = RedisConstants.EMAIL_CODE + RedisConstants.DIVISION + email + RedisConstants.DIVISION + source;
         String redisCode = redisUtil.get(key);
         if (StringUtils.isBlank(redisCode) || !Objects.equals(redisCode, code)) {
-            LOGGER.debug("validateCode, redisCode:[{}] is not equals code:[{}]", redisCode, code);
+            LOGGER.error("validateCode, redisCode:[{}] is not equals code:[{}]", redisCode, code);
             return false;
         }
         // 校验完不删除验证码，5分钟后自动删除

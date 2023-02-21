@@ -66,8 +66,7 @@ public class DashboardController {
 
         String startTime = ThreadSafeDateFormat.getTodayStartTime();
         String endTime = ThreadSafeDateFormat.getTodayEndTime();
-        int webVisitCount = webVisitService.count(new QueryWrapper<WebVisit>().between(DbConstants.WebVisit.REQUEST_TIME, startTime, endTime));
-
+        int webVisitCount = webVisitService.groupByIp(startTime, endTime);
 
         Map<String, Integer> resultMap = new HashMap<>(4);
         resultMap.put(Constants.ReplyField.COMMENT_COUNT, commentCount);

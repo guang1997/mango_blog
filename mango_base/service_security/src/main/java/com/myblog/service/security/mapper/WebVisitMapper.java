@@ -23,4 +23,6 @@ public interface WebVisitMapper extends BaseMapper<WebVisit> {
 
     @MapKey("date")
     List<Map<String, Object>> getVisitByWeek(@Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    List<String> groupByIp(@Param("startTime") String startTime, @Param("endTime") String endTime);
 }

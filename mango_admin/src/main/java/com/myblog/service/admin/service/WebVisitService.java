@@ -26,4 +26,6 @@ public interface WebVisitService extends IService<WebVisit>, ServiceConvertHandl
     Map<String, Object> getWebVisitGroupByBehavior() throws Exception;
 
     Map<String, Object> getVisitByWeek() throws Exception;
+
+    int groupByIp(String startTime, String endTime);
 }
